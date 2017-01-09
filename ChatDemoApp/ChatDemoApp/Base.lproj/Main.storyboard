@@ -77,6 +77,7 @@
                     </view>
                     <extendedEdge key="edgesForExtendedLayout"/>
                     <navigationItem key="navigationItem" id="kLV-qP-QjP"/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
                     <connections>
                         <outlet property="usernameField" destination="jl4-EX-GGU" id="mvk-U9-cde"/>
                     </connections>

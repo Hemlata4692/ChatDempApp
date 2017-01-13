@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		90DC0D66A2ED385893C02E29 /* libPods-ChatDemoApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE07D7CB35D225B6FB24E1D2 /* libPods-ChatDemoApp.a */; };
 		B745F8291E234D55001119BD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F8281E234D55001119BD /* main.m */; };
 		B745F82C1E234D55001119BD /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F82B1E234D55001119BD /* AppDelegate.m */; };
 		B745F82F1E234D55001119BD /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F82E1E234D55001119BD /* ViewController.m */; };
@@ -51,6 +52,10 @@
 		B7B9A5631E23A07E00DB4429 /* PrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
 		B7B9A5641E23B17A00DB4429 /* MMMaterialDesignSpinner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMMaterialDesignSpinner.h; sourceTree = "<group>"; };
 		B7B9A5651E23B17A00DB4429 /* MMMaterialDesignSpinner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMMaterialDesignSpinner.m; sourceTree = "<group>"; };
+		B7CC6C511E27B0A000F471B6 /* XMPPFramework.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMPPFramework.h; sourceTree = "<group>"; };
+		BE07D7CB35D225B6FB24E1D2 /* libPods-ChatDemoApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ChatDemoApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C26AFEFEE9D4453F5BADEC55 /* Pods-ChatDemoApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChatDemoApp.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ChatDemoApp/Pods-ChatDemoApp.debug.xcconfig"; sourceTree = "<group>"; };
+		CD812D2266E1DC46754E4BD1 /* Pods-ChatDemoApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChatDemoApp.release.xcconfig"; path = "Pods/Target Support Files/Pods-ChatDemoApp/Pods-ChatDemoApp.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,17 +63,37 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				90DC0D66A2ED385893C02E29 /* libPods-ChatDemoApp.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		17B33E1764E99E0E1724F920 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				C26AFEFEE9D4453F5BADEC55 /* Pods-ChatDemoApp.debug.xcconfig */,
+				CD812D2266E1DC46754E4BD1 /* Pods-ChatDemoApp.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		91178C8E9192B3153C7C164B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				BE07D7CB35D225B6FB24E1D2 /* libPods-ChatDemoApp.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		B745F81B1E234D54001119BD = {
 			isa = PBXGroup;
 			children = (
 				B745F8261E234D54001119BD /* ChatDemoApp */,
 				B745F8251E234D54001119BD /* Products */,
+				17B33E1764E99E0E1724F920 /* Pods */,
+				91178C8E9192B3153C7C164B /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -164,6 +189,7 @@
 		B745F84D1E23535F001119BD /* HelperClasses */ = {
 			isa = PBXGroup;
 			children = (
+				B7CC6C511E27B0A000F471B6 /* XMPPFramework.h */,
 				B745F8661E23595F001119BD /* SegmentControl */,
 				B745F8571E235425001119BD /* BSKeyboardControl */,
 				B745F8501E2353C1001119BD /* Loader */,
@@ -232,9 +258,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B745F83B1E234D55001119BD /* Build configuration list for PBXNativeTarget "ChatDemoApp" */;
 			buildPhases = (
+				AC2AECC22A5811909D2D629B /* Check Pods Manifest.lock */,
 				B745F8201E234D54001119BD /* Sources */,
 				B745F8211E234D54001119BD /* Frameworks */,
 				B745F8221E234D54001119BD /* Resources */,
+				E1F60AD4CAAC40B1161EA6D8 /* Embed Pods Frameworks */,
+				A0DFD971CED423A703D6F07C /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -290,6 +319,54 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A0DFD971CED423A703D6F07C /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ChatDemoApp/Pods-ChatDemoApp-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		AC2AECC22A5811909D2D629B /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		E1F60AD4CAAC40B1161EA6D8 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ChatDemoApp/Pods-ChatDemoApp-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		B745F8201E234D54001119BD /* Sources */ = {
@@ -350,6 +427,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -373,7 +451,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -398,6 +476,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -415,7 +494,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
@@ -424,10 +503,12 @@
 		};
 		B745F83C1E234D55001119BD /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C26AFEFEE9D4453F5BADEC55 /* Pods-ChatDemoApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				GCC_PREFIX_HEADER = ChatDemoApp/PrefixHeader.pch;
 				INFOPLIST_FILE = ChatDemoApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Ranosys.ChatDemoApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -436,10 +517,12 @@
 		};
 		B745F83D1E234D55001119BD /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = CD812D2266E1DC46754E4BD1 /* Pods-ChatDemoApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				GCC_PREFIX_HEADER = ChatDemoApp/PrefixHeader.pch;
 				INFOPLIST_FILE = ChatDemoApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Ranosys.ChatDemoApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";

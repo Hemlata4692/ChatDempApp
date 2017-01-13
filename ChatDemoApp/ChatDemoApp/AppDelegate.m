@@ -8,6 +8,8 @@
 
 #import "AppDelegate.h"
 #import "MMMaterialDesignSpinner.h"
+//Uncomment libxml code while running on devices in module.modulemap
+#import "XMPPFramework.h"
 
 @interface AppDelegate () {
 

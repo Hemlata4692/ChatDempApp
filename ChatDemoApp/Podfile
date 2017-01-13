@@ -1,0 +1,8 @@
+source 'https://github.com/CocoaPods/Specs.git'
+platform :ios, ‘8.0’
+target 'ChatDemoApp' do
+pod 'XMPPFramework'
+pod 'XMPPFramework/XEP-0009'
+pod 'XMPPFramework/XEP-0224'
+end
+

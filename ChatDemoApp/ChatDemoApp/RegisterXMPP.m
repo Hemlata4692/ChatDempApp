@@ -61,20 +61,23 @@
     NSData *placeholderImageData = UIImagePNGRepresentation(placeholderImage);
     NSData *profileImageData = UIImagePNGRepresentation(profileImageView);
     
+    AppDelegateObjectFile *appDelegate = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
+    
     if ([profileImageData isEqualToData:placeholderImageData])
     {
-        myDelegate.userProfileImageDataValue=nil;
+        appDelegate.userProfileImageDataValue=nil;
     }
     else {
-        myDelegate.userProfileImageDataValue = UIImageJPEGRepresentation(profileImageView, 1.0);
+        appDelegate.userProfileImageDataValue = UIImageJPEGRepresentation(profileImageView, 1.0);
     }
 }
 
 - (void)userRegistrationPassword:(NSString *)userPassword name:(NSString*)name email:(NSString*)email phone:(NSString*)phone {
     
-    NSString *username = [NSString stringWithFormat:@"%@@192.168.1.169",phone]; // OR
+     AppDelegateObjectFile *appDelegate = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
+    NSString *username = [NSString stringWithFormat:@"%@@%@",phone,appDelegate.hostName]; // OR
     NSString *password = userPassword;
-    AppDelegate *del = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    AppDelegateObjectFile *del = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
     del.xmppStream.myJID = [XMPPJID jidWithString:username];
     if (del.xmppStream.supportsInBandRegistration) {
         NSError *error = nil;

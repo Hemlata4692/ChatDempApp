@@ -228,7 +228,7 @@
     }
     
     [myDelegate disconnect];
-    NSString *username = [NSString stringWithFormat:@"%@@192.168.1.169",self.mobileField.text]; // OR
+    NSString *username = [NSString stringWithFormat:@"%@@%@",self.mobileField.text,myDelegate.hostName]; // OR
     NSString *password = self.password.text;
     [UserDefaultManager setValue:username key:@"LoginCred"];
     [UserDefaultManager setValue:password key:@"PassCred"];

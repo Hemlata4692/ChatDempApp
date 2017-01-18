@@ -22,6 +22,7 @@
 		B745F85E1E2354B8001119BD /* UITextField+Validations.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F85D1E2354B8001119BD /* UITextField+Validations.m */; };
 		B745F8691E23596D001119BD /* HMSegmentedControl.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F8681E23596D001119BD /* HMSegmentedControl.m */; };
 		B780E9F71E2F6E1A00437B4E /* ErrorCode.m in Sources */ = {isa = PBXBuildFile; fileRef = B780E9F61E2F6E1A00437B4E /* ErrorCode.m */; };
+		B780E9F91E2F9FC200437B4E /* ReadMe.rtf in Resources */ = {isa = PBXBuildFile; fileRef = B780E9F81E2F9FC200437B4E /* ReadMe.rtf */; };
 		B79353D61E28B28800E7EEB8 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B79353D51E28B28800E7EEB8 /* Security.framework */; };
 		B79353D81E28B28E00E7EEB8 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B79353D71E28B28E00E7EEB8 /* CFNetwork.framework */; };
 		B79353DA1E28B29500E7EEB8 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B79353D91E28B29500E7EEB8 /* SystemConfiguration.framework */; };
@@ -57,6 +58,7 @@
 		B745F8681E23596D001119BD /* HMSegmentedControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HMSegmentedControl.m; sourceTree = "<group>"; };
 		B780E9F51E2F6E1A00437B4E /* ErrorCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ErrorCode.h; sourceTree = "<group>"; };
 		B780E9F61E2F6E1A00437B4E /* ErrorCode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ErrorCode.m; sourceTree = "<group>"; };
+		B780E9F81E2F9FC200437B4E /* ReadMe.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = ReadMe.rtf; sourceTree = "<group>"; };
 		B79353D51E28B28800E7EEB8 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		B79353D71E28B28E00E7EEB8 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		B79353D91E28B29500E7EEB8 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
@@ -142,6 +144,7 @@
 		B745F8271E234D54001119BD /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				B780E9F81E2F9FC200437B4E /* ReadMe.rtf */,
 				B745F8281E234D55001119BD /* main.m */,
 				B7B9A5631E23A07E00DB4429 /* PrefixHeader.pch */,
 			);
@@ -337,6 +340,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B745F8341E234D55001119BD /* Assets.xcassets in Resources */,
+				B780E9F91E2F9FC200437B4E /* ReadMe.rtf in Resources */,
 				B745F8321E234D55001119BD /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -49,6 +49,9 @@
 @property(strong, nonatomic)NSData *userProfileImageDataValue;
 @property(strong, nonatomic)NSString *myView;
 
+@property(strong, nonatomic)NSString *hostName;
+@property(assign, nonatomic)int portNumber;
+
 -(BOOL)connect;
 -(void)disconnect;
 -(void)addBadgeIcon:(NSString*)badgeValue;

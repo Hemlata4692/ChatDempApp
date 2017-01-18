@@ -53,29 +53,54 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 @synthesize xmppMessageArchivingCoreDataStorage, xmppMessageArchivingModule;
 @synthesize userProfileImageData;
 
+@synthesize portNumber, hostName;
+
 - (void)didFinishLaunchingMethod {
 
+    hostName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"];
+    portNumber = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"PortNumber"] intValue];
+    
     userProfileImageData = [[UIImageView alloc] init];
     
     userHistoryArr = [NSMutableArray new];
     userProfileImage = [NSMutableDictionary new];
     //    if ([UserDefaultManager getValue:@"LoginCred"] == nil) {
-    [UserDefaultManager setValue:@"zebra@192.168.1.169" key:@"LoginCred"];
-    [UserDefaultManager setValue:@"password" key:@"PassCred"];
+    
+    [self setValue:[NSString stringWithFormat:@"zebra@%@",hostName] key:@"LoginCred"];
+    [self setValue:@"password" key:@"PassCred"];
     
     //    }
     xmppMessageArchivingCoreDataStorage = [XMPPMessageArchivingCoreDataStorage sharedInstance];
     xmppMessageArchivingModule = [[XMPPMessageArchiving alloc]initWithMessageArchivingStorage:xmppMessageArchivingCoreDataStorage];
-    if ([UserDefaultManager getValue:@"CountData"] == nil) {
+    if ([self getValue:@"CountData"] == nil) {
         NSMutableDictionary* countData = [NSMutableDictionary new];
-        [UserDefaultManager setValue:countData key:@"CountData"];
+        [self setValue:countData key:@"CountData"];
     }
-    if ([UserDefaultManager getValue:@"BadgeCount"] == nil) {
-        [UserDefaultManager setValue:@"0" key:@"BadgeCount"];
+    if ([self getValue:@"BadgeCount"] == nil) {
+        [self setValue:@"0" key:@"BadgeCount"];
     }
     [DDLog addLogger:[DDTTYLogger sharedInstance] withLogLevel:XMPP_LOG_FLAG_SEND_RECV];
     [self setupStream];
     [self connect];
+}
+
+//Set data in userDefault
+- (void)setValue:(id)value key:(NSString *)key {
+    
+    [[NSUserDefaults standardUserDefaults]setObject:value forKey:key];
+    [[NSUserDefaults standardUserDefaults]synchronize];
+}
+
+//Fetch data in userDefault
+- (id)getValue:(NSString *)key {
+    
+    return [[NSUserDefaults standardUserDefaults]objectForKey:key];
+}
+
+//Remove data in userDefault
+- (void)removeValue:(NSString *)key {
+    
+    [[NSUserDefaults standardUserDefaults]removeObjectForKey:key];
 }
 
 - (void)enterBackgroundMethod :(UIApplication *)application {
@@ -164,8 +189,8 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [xmppStream addDelegate:self delegateQueue:dispatch_get_main_queue()];
     [xmppRoster addDelegate:self delegateQueue:dispatch_get_main_queue()];
     
-    [xmppStream setHostName:@"192.168.1.169"];
-    [xmppStream setHostPort:5222];
+    [xmppStream setHostName:hostName];
+    [xmppStream setHostPort:portNumber];
     
     customCertEvaluation = YES;
 }
@@ -204,7 +229,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     
     if([domain isEqualToString:@"gmail.com"]
        || [domain isEqualToString:@"gtalk.com"]
-       || [domain isEqualToString:@"talk.google.com"]  || [domain isEqualToString:@"192.168.1.169"])
+       || [domain isEqualToString:@"talk.google.com"]  || [domain isEqualToString:hostName])
     {
         NSXMLElement *priority = [NSXMLElement elementWithName:@"priority" stringValue:@"24"];
         [presence addChild:priority];
@@ -228,8 +253,8 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         return YES;
     }
     
-    NSString *myJID = [UserDefaultManager getValue:@"LoginCred"];
-    NSString *myPassword = [UserDefaultManager getValue:@"PassCred"];
+    NSString *myJID = [self getValue:@"LoginCred"];
+    NSString *myPassword = [self getValue:@"PassCred"];
     
     if (myJID == nil || myPassword == nil)
     {
@@ -351,7 +376,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 - (void)xmppStream:(XMPPStream *)sender didNotAuthenticate:(NSXMLElement *)error
 {
     DDLogVerbose(@"%@: %@", THIS_FILE, THIS_METHOD);
-    if (nil!=[UserDefaultManager getValue:@"LoginCred"] && ![[UserDefaultManager getValue:@"LoginCred"] isEqualToString:@"zebra@192.168.1.169"]) {
+    if (nil!=[self getValue:@"LoginCred"] && ![[self getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"zebra@%@",hostName]]) {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Sorry"
                                                         message:@"Please Check Username or Password"
                                                        delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
@@ -406,34 +431,36 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         
         [xmppMessageArchivingCoreDataStorage archiveMessage:message outgoing:NO xmppStream:[self xmppStream]];
         NSString *keyName = [[[message attributeStringValueForName:@"from"] componentsSeparatedByString:@"/"] objectAtIndex:0];
-        if ([[UserDefaultManager getValue:@"CountData"] objectForKey:keyName] == nil) {
+        if ([[self getValue:@"CountData"] objectForKey:keyName] == nil) {
             int tempCount = 1;
             
-            NSMutableDictionary *tempDict = [[UserDefaultManager getValue:@"CountData"] mutableCopy];
+            NSMutableDictionary *tempDict = [[self getValue:@"CountData"] mutableCopy];
             [tempDict setObject:[NSString stringWithFormat:@"%d",tempCount] forKey:keyName];
-            [UserDefaultManager setValue:tempDict key:@"CountData"];
+            [self setValue:tempDict key:@"CountData"];
         }
         else{
-            int tempCount = [[[UserDefaultManager getValue:@"CountData"] objectForKey:keyName] intValue];
+            int tempCount = [[[self getValue:@"CountData"] objectForKey:keyName] intValue];
             tempCount = tempCount + 1;
-            NSMutableDictionary *tempDict = [[UserDefaultManager getValue:@"CountData"] mutableCopy];
+            NSMutableDictionary *tempDict = [[self getValue:@"CountData"] mutableCopy];
             [tempDict setObject:[NSString stringWithFormat:@"%d",tempCount] forKey:keyName];
-            [UserDefaultManager setValue:tempDict key:@"CountData"];
+            [self setValue:tempDict key:@"CountData"];
         }
         
         NSArray* fromUser = [[message attributeStringValueForName:@"from"] componentsSeparatedByString:@"/"];
-        NSLog(@"%@",myDelegate.chatUser);
-        if ([myDelegate.chatUser isEqualToString:[fromUser objectAtIndex:0]]){
+        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+
+        NSLog(@"%@",appDelegate.chatUser);
+        if ([appDelegate.chatUser isEqualToString:[fromUser objectAtIndex:0]]){
             [[NSNotificationCenter defaultCenter] postNotificationName:@"UserHistory" object:message];
         }
-        else if ([myDelegate.chatUser isEqualToString:@"ChatScreen"]){  //this is use for History chat screen if already open
-            [self addBadgeIcon:[NSString stringWithFormat:@"%d",[[UserDefaultManager getValue:@"BadgeCount"] intValue] + 1 ]];
-            [UserDefaultManager setValue:[NSString stringWithFormat:@"%d",[[UserDefaultManager getValue:@"BadgeCount"] intValue] + 1 ] key:@"BadgeCount"];
+        else if ([appDelegate.chatUser isEqualToString:@"ChatScreen"]){  //this is use for History chat screen if already open
+            [self addBadgeIcon:[NSString stringWithFormat:@"%d",[[self getValue:@"BadgeCount"] intValue] + 1 ]];
+            [self setValue:[NSString stringWithFormat:@"%d",[[self getValue:@"BadgeCount"] intValue] + 1 ] key:@"BadgeCount"];
             [[NSNotificationCenter defaultCenter] postNotificationName:@"ChatScreenHistory" object:nil];
         }
         else{
-            [self addBadgeIcon:[NSString stringWithFormat:@"%d",[[UserDefaultManager getValue:@"BadgeCount"] intValue] + 1 ]];
-            [UserDefaultManager setValue:[NSString stringWithFormat:@"%d",[[UserDefaultManager getValue:@"BadgeCount"] intValue] + 1 ] key:@"BadgeCount"];
+            [self addBadgeIcon:[NSString stringWithFormat:@"%d",[[self getValue:@"BadgeCount"] intValue] + 1 ]];
+            [self setValue:[NSString stringWithFormat:@"%d",[[self getValue:@"BadgeCount"] intValue] + 1 ] key:@"BadgeCount"];
         }
     }
 }
@@ -450,11 +477,11 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     NSLog(@"Printing full jid of user %@",[[sender myJID] resource]);
     NSLog(@"From user %@",[[presence from] full]);
     
-    int myCount = [[UserDefaultManager getValue:@"CountValue"] intValue];
+    int myCount = [[self getValue:@"CountValue"] intValue];
     
-    
-    if ((myCount == 1)&&nil!=myDelegate.userProfileImageDataValue) {
-        [UserDefaultManager setValue:[NSString stringWithFormat:@"%d",myCount+1] key:@"CountValue"];
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    if ((myCount == 1)&&nil!=appDelegate.userProfileImageDataValue) {
+        [self setValue:[NSString stringWithFormat:@"%d",myCount+1] key:@"CountValue"];
         [self performSelector:@selector(methodCalling) withObject:nil afterDelay:0.1];
     }
     
@@ -504,18 +531,20 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 
 -(void)methodCalling{
     
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     NSXMLElement *vCardXML = [NSXMLElement elementWithName:@"vCard" xmlns:@"vcard-temp"];
     XMPPvCardTemp *newvCardTemp = [XMPPvCardTemp vCardTempFromElement:vCardXML];
-    NSData *pictureData = UIImageJPEGRepresentation([UIImage imageWithData:myDelegate.userProfileImageDataValue], 0.5);
+    NSData *pictureData = UIImageJPEGRepresentation([UIImage imageWithData:appDelegate.userProfileImageDataValue], 0.5);
     [newvCardTemp setPhoto:pictureData];
     XMPPvCardCoreDataStorage * xmppvCardStorage1 = [XMPPvCardCoreDataStorage sharedInstance];
     XMPPvCardTempModule * xmppvCardTempModule1 = [[XMPPvCardTempModule alloc] initWithvCardStorage:xmppvCardStorage1];
     [xmppvCardTempModule1  activate:[self xmppStream]];
     [xmppvCardTempModule1 updateMyvCardTemp:newvCardTemp];
-    [myDelegate stopIndicator];
+//    [appDelegate stopIndicator];
     
 }
 -(void)editProfileImageUploading:(UIImage*)editProfileImge{
+    
     NSXMLElement *vCardXML = [NSXMLElement elementWithName:@"vCard" xmlns:@"vcard-temp"];
     XMPPvCardTemp *newvCardTemp = [XMPPvCardTemp vCardTempFromElement:vCardXML];
     NSData *pictureData = UIImageJPEGRepresentation(editProfileImge, 0.5);
@@ -525,8 +554,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     XMPPvCardTempModule * xmppvCardTempModule1 = [[XMPPvCardTempModule alloc] initWithvCardStorage:xmppvCardStorage1];
     [xmppvCardTempModule1  activate:[self xmppStream]];
     [xmppvCardTempModule1 updateMyvCardTemp:newvCardTemp];
-    [myDelegate stopIndicator];
-    
+//    [myDelegate stopIndicator];
 }
 
 - (void)xmppStream:(XMPPStream *)sender didReceiveError:(id)error

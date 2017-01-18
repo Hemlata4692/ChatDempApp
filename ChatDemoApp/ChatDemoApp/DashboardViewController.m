@@ -64,7 +64,7 @@
         [UserDefaultManager setValue:nil key:@"userName"];
         [UserDefaultManager setValue:nil key:@"LoginCred"];
     [myDelegate disconnect];
-    [UserDefaultManager setValue:@"zebra@192.168.1.169" key:@"LoginCred"];
+    [UserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",myDelegate.hostName] key:@"LoginCred"];
     [UserDefaultManager setValue:@"password" key:@"PassCred"];
     [myDelegate connect];
     

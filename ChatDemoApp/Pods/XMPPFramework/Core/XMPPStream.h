@@ -434,6 +434,8 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
 - (BOOL)supportsInBandRegistration;
 - (BOOL)registerWithElements:(NSArray *)elements error:(NSError **)errPtr;
 - (BOOL)registerWithPassword:(NSString *)password error:(NSError **)errPtr;
+- (BOOL)registerWithPassword:(NSString *)password name:(NSString*)name error:(NSError **)errPtr;
+- (BOOL)registerWithPassword:(NSString *)password name:(NSString*)name email:(NSString*)email phone:(NSString*)phone error:(NSError **)errPtr;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark Authentication

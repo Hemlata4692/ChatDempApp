@@ -16,7 +16,8 @@
 @property (strong, nonatomic) IBOutlet UIImageView *profileImageView;
 @property (strong, nonatomic) IBOutlet UITextField *usernameField;
 @property (strong, nonatomic) IBOutlet UITextField *emailField;
-@property (strong, nonatomic) IBOutlet UITextField *dobField;
+@property (strong, nonatomic) IBOutlet UITextField *mobileField;
+@property (strong, nonatomic) IBOutlet UITextField *password;
 
 //Declare BSKeyboard variable
 @property (strong, nonatomic) BSKeyboardControls *keyboardControls;
@@ -31,7 +32,7 @@
     self.navigationItem.title=@"Register";
     
     //Adding textfield to keyboard controls array
-    [self setKeyboardControls:[[BSKeyboardControls alloc] initWithFields:@[self.usernameField, self.emailField, self.dobField]]];
+    [self setKeyboardControls:[[BSKeyboardControls alloc] initWithFields:@[self.usernameField, self.emailField, self.mobileField, self.password]]];
     [self.keyboardControls setDelegate:self];
     // Do any additional setup after loading the view.
 }
@@ -84,7 +85,23 @@
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     
-    return YES;
+    if(textField == self.mobileField) {
+        if (range.length > 0 && [string length] == 0)
+        {
+            return YES;
+        }
+        if (textField.text.length > 9 && range.length == 0)
+        {
+            return NO;
+        }
+        else
+        {
+            return YES;
+        }
+    }
+    else {
+        return YES;
+    }
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
@@ -97,12 +114,16 @@
 #pragma mark - Login validation
 - (BOOL)performValidationsForRegister {
     
-    if ([self.usernameField isEmpty]&&[self.emailField isEmpty]&&[self.dobField isEmpty]) {
+    if ([self.usernameField isEmpty]&&[self.emailField isEmpty]&&[self.mobileField isEmpty]&&[self.password isEmpty]) {
         [UserDefaultManager showAlertMessage:@"Alert" message:@"Please fill in the required fields."];
         return NO;
     }
-    else if([self.emailField isValidEmail]) {
+    else if(![self.emailField isValidEmail]) {
         [UserDefaultManager showAlertMessage:@"Alert" message:@"Please validate your email field."];
+        return NO;
+    }
+    else if(self.mobileField.text.length<10) {
+        [UserDefaultManager showAlertMessage:@"Alert" message:@"Please enter valid mobile number."];
         return NO;
     }
     else {
@@ -160,9 +181,9 @@
     
     [self.view endEditing:YES];
     if ([self performValidationsForRegister]) {
-        
+    
         [myDelegate showIndicator];
-        [self performSelector:@selector(userSignUp) withObject:nil afterDelay:2];
+        [self performSelector:@selector(userSignUp) withObject:nil afterDelay:0.1];
     }
 }
 #pragma mark - end
@@ -183,12 +204,63 @@
 #pragma mark - Webservice
 - (void)userSignUp {
     
+//    UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+//    UIViewController * objReveal = [storyboard instantiateViewControllerWithIdentifier:@"DashboardViewController"];
+//    [self.navigationController setViewControllers: [NSArray arrayWithObject: objReveal]
+//                                         animated: NO];
+    
+    [self setXMPPProfilePhotoPlaceholder:@"profile_camera" profileImageView:self.profileImageView.image];
+    //Here name,email are optional
+    [self userRegistrationPassword:self.password.text name:self.usernameField.text email:self.emailField.text phone:self.mobileField.text];
+}
+
+//Register XMPP method
+- (void)UserDidRegister {
+    
     [myDelegate stopIndicator];
-    [UserDefaultManager setValue:self.usernameField.text key:@"userName"];
+    [UserDefaultManager setValue:self.mobileField.text key:@"userName"];
+    if ([UserDefaultManager getValue:@"CountData"] == nil) {
+        NSMutableDictionary* countData = [NSMutableDictionary new];
+        [UserDefaultManager setValue:countData key:@"CountData"];
+    }
+    if ([UserDefaultManager getValue:@"BadgeCount"] == nil) {
+        [UserDefaultManager setValue:@"0" key:@"BadgeCount"];
+    }
+    
+    [myDelegate disconnect];
+    NSString *username = [NSString stringWithFormat:@"%@@192.168.1.169",self.mobileField.text]; // OR
+    NSString *password = self.password.text;
+    [UserDefaultManager setValue:username key:@"LoginCred"];
+    [UserDefaultManager setValue:password key:@"PassCred"];
+    [UserDefaultManager setValue:@"1" key:@"CountValue"];
+    [myDelegate connect];
     UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     UIViewController * objReveal = [storyboard instantiateViewControllerWithIdentifier:@"DashboardViewController"];
     [self.navigationController setViewControllers: [NSArray arrayWithObject: objReveal]
                                          animated: NO];
 }
-#pragma mark - end
+
+- (void)UserDidNotRegister:(ErrorType)errorType {
+    
+    [myDelegate stopIndicator];
+    NSString *errorMessage=@"";
+    if(errorType==XMPP_UserExist){
+        
+        errorMessage=@"Username Already Exists!";
+    }
+    else if(errorType==XMPP_InvalidUserName){
+        //This error is called when your Name is as username
+        errorMessage=@"Please enter valid username";
+    }
+    else {
+        errorMessage=@"Something went wrong, Please try again.";
+    }
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Registration Failed!" message:errorMessage preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction * action){
+        // Ok action example
+    }];
+    [alert addAction:okAction];
+    [self presentViewController:alert animated:YES completion:nil];
+}
+//end
 @end

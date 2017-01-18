@@ -8,12 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		90DC0D66A2ED385893C02E29 /* libPods-ChatDemoApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE07D7CB35D225B6FB24E1D2 /* libPods-ChatDemoApp.a */; };
+		B70AE66A1E2F1EC600554038 /* AppDelegateObjectFile.m in Sources */ = {isa = PBXBuildFile; fileRef = B70AE6691E2F1EC600554038 /* AppDelegateObjectFile.m */; };
 		B745F8291E234D55001119BD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F8281E234D55001119BD /* main.m */; };
 		B745F82C1E234D55001119BD /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F82B1E234D55001119BD /* AppDelegate.m */; };
 		B745F82F1E234D55001119BD /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F82E1E234D55001119BD /* ViewController.m */; };
 		B745F8321E234D55001119BD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B745F8301E234D55001119BD /* Main.storyboard */; };
 		B745F8341E234D55001119BD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B745F8331E234D55001119BD /* Assets.xcassets */; };
-		B745F8371E234D55001119BD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B745F8351E234D55001119BD /* LaunchScreen.storyboard */; };
 		B745F8461E2351F1001119BD /* RegisterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F8451E2351F1001119BD /* RegisterViewController.m */; };
 		B745F8491E2351FF001119BD /* DashboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F8481E2351FF001119BD /* DashboardViewController.m */; };
 		B745F84C1E235210001119BD /* GroupConversationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F84B1E235210001119BD /* GroupConversationViewController.m */; };
@@ -21,10 +21,17 @@
 		B745F85A1E235435001119BD /* BSKeyboardControls.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F8591E235435001119BD /* BSKeyboardControls.m */; };
 		B745F85E1E2354B8001119BD /* UITextField+Validations.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F85D1E2354B8001119BD /* UITextField+Validations.m */; };
 		B745F8691E23596D001119BD /* HMSegmentedControl.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F8681E23596D001119BD /* HMSegmentedControl.m */; };
+		B780E9F71E2F6E1A00437B4E /* ErrorCode.m in Sources */ = {isa = PBXBuildFile; fileRef = B780E9F61E2F6E1A00437B4E /* ErrorCode.m */; };
+		B79353D61E28B28800E7EEB8 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B79353D51E28B28800E7EEB8 /* Security.framework */; };
+		B79353D81E28B28E00E7EEB8 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B79353D71E28B28E00E7EEB8 /* CFNetwork.framework */; };
+		B79353DA1E28B29500E7EEB8 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B79353D91E28B29500E7EEB8 /* SystemConfiguration.framework */; };
+		B7A7A9A01E2F64060027D2B6 /* RegisterXMPP.m in Sources */ = {isa = PBXBuildFile; fileRef = B7A7A99F1E2F64060027D2B6 /* RegisterXMPP.m */; };
 		B7B9A5661E23B17A00DB4429 /* MMMaterialDesignSpinner.m in Sources */ = {isa = PBXBuildFile; fileRef = B7B9A5651E23B17A00DB4429 /* MMMaterialDesignSpinner.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B70AE6681E2F1EC600554038 /* AppDelegateObjectFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegateObjectFile.h; sourceTree = "<group>"; };
+		B70AE6691E2F1EC600554038 /* AppDelegateObjectFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegateObjectFile.m; sourceTree = "<group>"; };
 		B745F8241E234D54001119BD /* ChatDemoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChatDemoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B745F8281E234D55001119BD /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		B745F82A1E234D55001119BD /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -33,7 +40,6 @@
 		B745F82E1E234D55001119BD /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		B745F8311E234D55001119BD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		B745F8331E234D55001119BD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		B745F8361E234D55001119BD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B745F8381E234D55001119BD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B745F8441E2351F1001119BD /* RegisterViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegisterViewController.h; sourceTree = "<group>"; };
 		B745F8451E2351F1001119BD /* RegisterViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegisterViewController.m; sourceTree = "<group>"; };
@@ -49,6 +55,13 @@
 		B745F85D1E2354B8001119BD /* UITextField+Validations.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITextField+Validations.m"; sourceTree = "<group>"; };
 		B745F8671E23596D001119BD /* HMSegmentedControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HMSegmentedControl.h; sourceTree = "<group>"; };
 		B745F8681E23596D001119BD /* HMSegmentedControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HMSegmentedControl.m; sourceTree = "<group>"; };
+		B780E9F51E2F6E1A00437B4E /* ErrorCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ErrorCode.h; sourceTree = "<group>"; };
+		B780E9F61E2F6E1A00437B4E /* ErrorCode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ErrorCode.m; sourceTree = "<group>"; };
+		B79353D51E28B28800E7EEB8 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		B79353D71E28B28E00E7EEB8 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		B79353D91E28B29500E7EEB8 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		B7A7A99E1E2F64060027D2B6 /* RegisterXMPP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegisterXMPP.h; sourceTree = "<group>"; };
+		B7A7A99F1E2F64060027D2B6 /* RegisterXMPP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegisterXMPP.m; sourceTree = "<group>"; };
 		B7B9A5631E23A07E00DB4429 /* PrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
 		B7B9A5641E23B17A00DB4429 /* MMMaterialDesignSpinner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMMaterialDesignSpinner.h; sourceTree = "<group>"; };
 		B7B9A5651E23B17A00DB4429 /* MMMaterialDesignSpinner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMMaterialDesignSpinner.m; sourceTree = "<group>"; };
@@ -63,6 +76,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B79353DA1E28B29500E7EEB8 /* SystemConfiguration.framework in Frameworks */,
+				B79353D81E28B28E00E7EEB8 /* CFNetwork.framework in Frameworks */,
+				B79353D61E28B28800E7EEB8 /* Security.framework in Frameworks */,
 				90DC0D66A2ED385893C02E29 /* libPods-ChatDemoApp.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -82,6 +98,9 @@
 		91178C8E9192B3153C7C164B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B79353D91E28B29500E7EEB8 /* SystemConfiguration.framework */,
+				B79353D71E28B28E00E7EEB8 /* CFNetwork.framework */,
+				B79353D51E28B28800E7EEB8 /* Security.framework */,
 				BE07D7CB35D225B6FB24E1D2 /* libPods-ChatDemoApp.a */,
 			);
 			name = Frameworks;
@@ -114,7 +133,6 @@
 				B745F84E1E23536F001119BD /* CategoryClasses */,
 				B745F8301E234D55001119BD /* Main.storyboard */,
 				B745F8331E234D55001119BD /* Assets.xcassets */,
-				B745F8351E234D55001119BD /* LaunchScreen.storyboard */,
 				B745F8381E234D55001119BD /* Info.plist */,
 				B745F8271E234D54001119BD /* Supporting Files */,
 			);
@@ -135,6 +153,10 @@
 			children = (
 				B745F82A1E234D55001119BD /* AppDelegate.h */,
 				B745F82B1E234D55001119BD /* AppDelegate.m */,
+				B70AE6681E2F1EC600554038 /* AppDelegateObjectFile.h */,
+				B70AE6691E2F1EC600554038 /* AppDelegateObjectFile.m */,
+				B780E9F51E2F6E1A00437B4E /* ErrorCode.h */,
+				B780E9F61E2F6E1A00437B4E /* ErrorCode.m */,
 			);
 			name = AppDelegate;
 			sourceTree = "<group>";
@@ -164,6 +186,8 @@
 			children = (
 				B745F8441E2351F1001119BD /* RegisterViewController.h */,
 				B745F8451E2351F1001119BD /* RegisterViewController.m */,
+				B7A7A99E1E2F64060027D2B6 /* RegisterXMPP.h */,
+				B7A7A99F1E2F64060027D2B6 /* RegisterXMPP.m */,
 			);
 			name = RegisterView;
 			sourceTree = "<group>";
@@ -312,7 +336,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B745F8371E234D55001119BD /* LaunchScreen.storyboard in Resources */,
 				B745F8341E234D55001119BD /* Assets.xcassets in Resources */,
 				B745F8321E234D55001119BD /* Main.storyboard in Resources */,
 			);
@@ -374,10 +397,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				B745F85E1E2354B8001119BD /* UITextField+Validations.m in Sources */,
+				B780E9F71E2F6E1A00437B4E /* ErrorCode.m in Sources */,
+				B70AE66A1E2F1EC600554038 /* AppDelegateObjectFile.m in Sources */,
 				B745F8491E2351FF001119BD /* DashboardViewController.m in Sources */,
 				B745F84C1E235210001119BD /* GroupConversationViewController.m in Sources */,
 				B745F82F1E234D55001119BD /* ViewController.m in Sources */,
 				B745F82C1E234D55001119BD /* AppDelegate.m in Sources */,
+				B7A7A9A01E2F64060027D2B6 /* RegisterXMPP.m in Sources */,
 				B745F85A1E235435001119BD /* BSKeyboardControls.m in Sources */,
 				B745F8691E23596D001119BD /* HMSegmentedControl.m in Sources */,
 				B7B9A5661E23B17A00DB4429 /* MMMaterialDesignSpinner.m in Sources */,
@@ -396,14 +422,6 @@
 				B745F8311E234D55001119BD /* Base */,
 			);
 			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		B745F8351E234D55001119BD /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				B745F8361E234D55001119BD /* Base */,
-			);
-			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -506,6 +524,7 @@
 			baseConfigurationReference = C26AFEFEE9D4453F5BADEC55 /* Pods-ChatDemoApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PREFIX_HEADER = ChatDemoApp/PrefixHeader.pch;
 				INFOPLIST_FILE = ChatDemoApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -520,6 +539,7 @@
 			baseConfigurationReference = CD812D2266E1DC46754E4BD1 /* Pods-ChatDemoApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PREFIX_HEADER = ChatDemoApp/PrefixHeader.pch;
 				INFOPLIST_FILE = ChatDemoApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;

@@ -61,7 +61,14 @@
 #pragma mark - IBActions
 - (void)logoutAction :(id)sender {
     
-    [UserDefaultManager setValue:nil key:@"userName"];
+        [UserDefaultManager setValue:nil key:@"userName"];
+        [UserDefaultManager setValue:nil key:@"LoginCred"];
+    [myDelegate disconnect];
+    [UserDefaultManager setValue:@"zebra@192.168.1.169" key:@"LoginCred"];
+    [UserDefaultManager setValue:@"password" key:@"PassCred"];
+    [myDelegate connect];
+    
+
     UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     UIViewController * objReveal = [storyboard instantiateViewControllerWithIdentifier:@"ViewController"];
     [myDelegate.navigationController setViewControllers: [NSArray arrayWithObject: objReveal]

@@ -107,10 +107,16 @@
 
     [myDelegate stopIndicator];
     [UserDefaultManager setValue:self.usernameField.text key:@"userName"];
-    UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-    UIViewController * objReveal = [storyboard instantiateViewControllerWithIdentifier:@"DashboardViewController"];
-    [self.navigationController setViewControllers: [NSArray arrayWithObject: objReveal]
-                                         animated: NO];
+//    UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+//    UIViewController * objReveal = [storyboard instantiateViewControllerWithIdentifier:@"DashboardViewController"];
+//    [self.navigationController setViewControllers: [NSArray arrayWithObject: objReveal]
+//                                         animated: NO];
+    [UserDefaultManager setValue:@"11_amit@192.168.1.169" key:@"LoginCred"];
+    [UserDefaultManager setValue:@"password" key:@"PassCred"];
+    [UserDefaultManager setValue:@"1" key:@"CountValue"];
+    [myDelegate disconnect];
+    [myDelegate connect];
+//    [myDelegate connect];
 }
 #pragma mark - end
 @end

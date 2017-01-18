@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "RegisterXMPP.h"
 
-@interface RegisterViewController : UIViewController
+@interface RegisterViewController : RegisterXMPP
 
 @end

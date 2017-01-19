@@ -62,7 +62,10 @@
 //    [DDLog addLogger:[DDTTYLogger sharedInstance] withLogLevel:XMPP_LOG_FLAG_SEND_RECV];
 //    [self setupStream];
 //    [self connect];
+    
+    //Initialize xmpp connection
     [self didFinishLaunchingMethod];//Call appdelegateObjectFile method
+    
     NSLog(@"customerId %@",[[NSUserDefaults standardUserDefaults] objectForKey:@"userId"]);
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@"userName"] != nil)
     {

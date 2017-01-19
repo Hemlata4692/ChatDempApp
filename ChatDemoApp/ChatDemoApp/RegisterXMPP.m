@@ -31,6 +31,7 @@
     // Dispose of any resources that can be recreated.
 }
 
+#pragma mark - Post notification called method
 - (void)UserDidRegister:(NSNotification *)notification {
     
     [self UserDidRegister];
@@ -51,9 +52,12 @@
     }
 }
 
+//These method is called to subViewController of RegisterXMPP file
 - (void)UserDidRegister {}
 - (void)UserDidNotRegister:(ErrorType)errorType {}
+#pragma mark - end
 
+#pragma mark - Upload XMPP profile photo at server
 - (void)setXMPPProfilePhotoPlaceholder:(NSString *)profilePlaceholder profileImageView:(UIImage *)profileImageView {
 
     UIImage* placeholderImage = [UIImage imageNamed:profilePlaceholder];
@@ -68,7 +72,9 @@
         appDelegate.userProfileImageDataValue = UIImageJPEGRepresentation(profileImageView, 1.0);
     }
 }
+#pragma mark - end
 
+#pragma mark - User registration at XMPP server(OpenFire)
 - (void)userRegistrationPassword:(NSString *)userPassword name:(NSString*)name email:(NSString*)email phone:(NSString*)phone {
     
     NSString *username = [NSString stringWithFormat:@"%@@%@",phone,appDelegate.hostName];
@@ -143,7 +149,9 @@
         NSLog(@"Inband registration failed.");
     }
 }
+#pragma mark - end
 
+#pragma mark - XMPP conection after user registration successfull
 - (void)xmppConnect:(NSString *)phone password:(NSString *)passwordtext
 {
 
@@ -185,7 +193,9 @@
     [self setValue:@"1" key:@"CountValue"];
     [appDelegate connect];
 }
+#pragma mark - end
 
+#pragma mark - Get/Set/Remove data from userDefault methods
 //Set data in userDefault
 - (void)setValue:(id)value key:(NSString *)key {
     
@@ -204,6 +214,7 @@
     
     [[NSUserDefaults standardUserDefaults]removeObjectForKey:key];
 }
+#pragma mark - end
 
 /*
 #pragma mark - Navigation

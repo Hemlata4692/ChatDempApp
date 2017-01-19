@@ -10,9 +10,15 @@
 
 @interface LoginXMPP : UIViewController
 
+//This method will be called when password is not required
 - (void)loginConnectWithoutPassword:(NSString *)username;
+//This method will be called when password is required
 - (void)loginConnectPassword:(NSString *)password username:(NSString *)username;
+
+//This method will be used for login authentication response
 - (void)UserDidAuthenticatedResult;
 - (void)UserNotAuthenticatedResult;
+
+//This method is used for logout user
 - (void)userLogout;
 @end

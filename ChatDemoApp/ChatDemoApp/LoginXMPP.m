@@ -31,6 +31,7 @@
     // Dispose of any resources that can be recreated.
 }
 
+#pragma mark - Login User
 - (void)loginConnectWithoutPassword:(NSString *)username {
     
     [self setValue:[NSString stringWithFormat:@"%@@%@",username,appDelegate.hostName] key:@"LoginCred"];
@@ -48,7 +49,9 @@
     [appDelegate disconnect];
     [appDelegate connect];
 }
+#pragma mark - end
 
+#pragma mark - Post notification called method
 - (void)UserDidAuthenticated {
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
@@ -63,9 +66,13 @@
     [self UserNotAuthenticatedResult];
 }
 
+//These method is called to subViewController of LoginXMPP file
 - (void)UserDidAuthenticatedResult {}
 - (void)UserNotAuthenticatedResult{}
+//end
+#pragma mark - end
 
+#pragma mark - User logout
 - (void)userLogout {
 
     [self setValue:nil key:@"LoginCred"];
@@ -74,7 +81,9 @@
     [self setValue:@"password" key:@"PassCred"];
     [appDelegate connect];
 }
+#pragma mark - end
 
+#pragma mark - Get/Set/Remove data from userDefault methods
 //Set data in userDefault
 - (void)setValue:(id)value key:(NSString *)key {
     
@@ -93,8 +102,7 @@
     
     [[NSUserDefaults standardUserDefaults]removeObjectForKey:key];
 }
-
-
+#pragma mark - end
 
 /*
 #pragma mark - Navigation

@@ -24,12 +24,13 @@
     XMPPvCardAvatarModule *xmppvCardAvatarModule;
     XMPPCapabilities *xmppCapabilities;
     XMPPCapabilitiesCoreDataStorage *xmppCapabilitiesStorage;
-    NSString *password;
+    NSString *xmppPassword;
     BOOL customCertEvaluation;
     BOOL isXmppConnected;
     NSMutableArray *turnSockets;
 }
 
+//Delcare XMPP variables
 @property (nonatomic, strong, readonly) XMPPStream *xmppStream;
 @property (nonatomic, strong, readonly) XMPPReconnect *xmppReconnect;
 @property (nonatomic, strong, readonly) XMPPRoster *xmppRoster;
@@ -38,20 +39,25 @@
 @property (nonatomic, strong, readonly) XMPPvCardAvatarModule *xmppvCardAvatarModule;
 @property (nonatomic, strong, readonly) XMPPCapabilities *xmppCapabilities;
 @property (nonatomic, strong, readonly) XMPPCapabilitiesCoreDataStorage *xmppCapabilitiesStorage;
+
+@property(strong, nonatomic)XMPPMessageArchivingCoreDataStorage* xmppMessageArchivingCoreDataStorage;
+@property(strong, nonatomic)XMPPMessageArchiving* xmppMessageArchivingModule;
+//end
+
+//Declaration hostname, port and defaultpassword for complete app
+@property(strong, nonatomic)NSString *hostName;
+@property(strong, nonatomic)NSString *defaultPassword;
+@property(assign, nonatomic)int portNumber;
+//end
+
 @property(strong, nonatomic)NSMutableArray *UserListArray;
 @property(strong, nonatomic)NSMutableArray *groupListArray;
 @property(strong, nonatomic)NSString *chatUser;
-@property(strong, nonatomic)XMPPMessageArchivingCoreDataStorage* xmppMessageArchivingCoreDataStorage;
-@property(strong, nonatomic)XMPPMessageArchiving* xmppMessageArchivingModule;
 @property(strong, nonatomic)NSMutableArray *userHistoryArr;
 @property(strong, nonatomic)NSMutableDictionary *userProfileImage;
 @property(strong, nonatomic)UIImageView *userProfileImageData;
 @property(strong, nonatomic)NSData *userProfileImageDataValue;
 @property(strong, nonatomic)NSString *myView;
-
-@property(strong, nonatomic)NSString *hostName;
-@property(strong, nonatomic)NSString *defaultPassword;
-@property(assign, nonatomic)int portNumber;
 
 -(BOOL)connect;
 -(void)disconnect;

@@ -7,9 +7,9 @@
 //
 
 #import "AppDelegateObjectFile.h"
+
 //Uncomment libxml code while running on devices in module.modulemap
 #import "XMPPFramework.h"
-
 #import "GCDAsyncSocket.h"
 #import "XMPP.h"
 #import "XMPPLogging.h"
@@ -55,6 +55,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 
 @synthesize portNumber, hostName, defaultPassword;
 
+#pragma mark - Intialze XMPP connection
 - (void)didFinishLaunchingMethod {
 
     if (nil!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"] && NULL!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"]) {
@@ -97,26 +98,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [self setupStream];
     [self connect];
 }
+#pragma mark - end
 
-//Set data in userDefault
-- (void)setValue:(id)value key:(NSString *)key {
-    
-    [[NSUserDefaults standardUserDefaults]setObject:value forKey:key];
-    [[NSUserDefaults standardUserDefaults]synchronize];
-}
-
-//Fetch data in userDefault
-- (id)getValue:(NSString *)key {
-    
-    return [[NSUserDefaults standardUserDefaults]objectForKey:key];
-}
-
-//Remove data in userDefault
-- (void)removeValue:(NSString *)key {
-    
-    [[NSUserDefaults standardUserDefaults]removeObjectForKey:key];
-}
-
+#pragma mark - Background/Foreground/Termination mode XMPP coding
 - (void)enterBackgroundMethod :(UIApplication *)application {
     //    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
     //    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
@@ -148,6 +132,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     
     [self teardownStream];
 }
+#pragma mark - end
 
 #pragma mark - XMPP framework chat code
 
@@ -171,7 +156,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         xmppStream.enableBackgroundingOnSocket = YES;
     }
 #endif
-    
     
     xmppRosterStorage = [[XMPPRosterCoreDataStorage alloc] initWithInMemoryStore];
     
@@ -276,7 +260,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     }
     
     [xmppStream setMyJID:[XMPPJID jidWithString:myJID]];
-    password = myPassword;
+    xmppPassword = myPassword;
     
     NSError *error = nil;
     if (![xmppStream connectWithTimeout:XMPPStreamTimeoutNone error:&error])
@@ -358,7 +342,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     
     NSError *error = nil;
     
-    if (![[self xmppStream] authenticateWithPassword:password error:&error])
+    if (![[self xmppStream] authenticateWithPassword:xmppPassword error:&error])
     {
         DDLogError(@"Error authenticating: %@", error);
     }
@@ -409,7 +393,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 
 - (BOOL)xmppStream:(XMPPStream *)sender didReceiveIQ:(XMPPIQ *)iq
 {
-    
     NSXMLElement *queryElement = [NSXMLElement elementWithName:@"query" xmlns:@"jabber:iq:roster"];
     
     if (queryElement) {
@@ -420,9 +403,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
             NSString *jid=[[[itemElements objectAtIndex:i] attributeForName:@"jid"] stringValue];
             [mArray addObject:jid];
         }
-        
-        
-        
     }
     return NO;
 }
@@ -496,7 +476,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         [self setValue:[NSString stringWithFormat:@"%d",myCount+1] key:@"CountValue"];
         [self performSelector:@selector(methodCalling) withObject:nil afterDelay:0.1];
     }
-    
 }
 
 - (void)xmppStreamDidRegister:(XMPPStream *)sender{
@@ -627,7 +606,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         
         [[UIApplication sharedApplication] presentLocalNotificationNow:localNotification];
     }
-    
 }
 
 - (void)xmppRosterDidEndPopulating:(XMPPRoster *)sender
@@ -722,5 +700,26 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     //    }
 }
 
+#pragma mark - end
+
+#pragma mark - Get/Set/Remove data from userDefault methods
+//Set data in userDefault
+- (void)setValue:(id)value key:(NSString *)key {
+    
+    [[NSUserDefaults standardUserDefaults]setObject:value forKey:key];
+    [[NSUserDefaults standardUserDefaults]synchronize];
+}
+
+//Fetch data in userDefault
+- (id)getValue:(NSString *)key {
+    
+    return [[NSUserDefaults standardUserDefaults]objectForKey:key];
+}
+
+//Remove data in userDefault
+- (void)removeValue:(NSString *)key {
+    
+    [[NSUserDefaults standardUserDefaults]removeObjectForKey:key];
+}
 #pragma mark - end
 @end

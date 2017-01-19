@@ -11,7 +11,6 @@
 
 @interface AppDelegate : AppDelegateObjectFile <UIApplicationDelegate,XMPPRosterDelegate>
 
-
 @property (strong, nonatomic) UIWindow *window;
 @property(nonatomic,retain) UINavigationController *navigationController;
 

@@ -175,7 +175,6 @@
 
 - (void)xmppConnectWithoutPassword:(NSString *)phone
 {
-    
     [self setValue:phone key:@"userName"];
     if ([self getValue:@"CountData"] == nil) {
         NSMutableDictionary* countData = [NSMutableDictionary new];

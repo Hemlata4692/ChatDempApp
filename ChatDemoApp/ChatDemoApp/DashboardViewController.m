@@ -61,14 +61,16 @@
 #pragma mark - IBActions
 - (void)logoutAction :(id)sender {
     
-        [UserDefaultManager setValue:nil key:@"userName"];
- 
-    
+    [UserDefaultManager setValue:nil key:@"userName"];
     [self userLogout];
-    UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-    UIViewController * objReveal = [storyboard instantiateViewControllerWithIdentifier:@"ViewController"];
-    [myDelegate.navigationController setViewControllers: [NSArray arrayWithObject: objReveal]
-                                               animated: NO];
+    
+//    UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+//    UIViewController * objReveal = [storyboard instantiateViewControllerWithIdentifier:@"ViewController"];
+//    [myDelegate.navigationController setViewControllers: [NSArray arrayWithObject: objReveal]
+//                                               animated: NO];
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    myDelegate.navigationController = [storyboard instantiateViewControllerWithIdentifier:@"loginNavigation"];
+    myDelegate.window.rootViewController = myDelegate.navigationController;
 }
 
 - (void)groupAction :(id)sender {

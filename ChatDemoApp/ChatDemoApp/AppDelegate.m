@@ -70,9 +70,13 @@
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@"userName"] != nil)
     {
         UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-        UIViewController * objReveal = [storyboard instantiateViewControllerWithIdentifier:@"DashboardViewController"];
-        [self.navigationController setViewControllers: [NSArray arrayWithObject: objReveal]
-                                             animated: YES];
+//        UIViewController * objReveal = [storyboard instantiateViewControllerWithIdentifier:@"DashboardViewController"];
+//        [self.navigationController setViewControllers: [NSArray arrayWithObject: objReveal]
+//                                             animated: YES]
+        UIViewController * objView=[storyboard instantiateViewControllerWithIdentifier:@"DashboardNavigation"];
+        self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+        [self.window setRootViewController:objView];
+        [self.window makeKeyAndVisible];;
     }
 //    NSDictionary *remoteNotifiInfo = [launchOptions objectForKey: UIApplicationLaunchOptionsRemoteNotificationKey];
 //    //Accept push notification when app is not open

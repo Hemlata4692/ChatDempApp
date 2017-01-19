@@ -7,6 +7,7 @@
 //
 
 #import "RegisterXMPP.h"
+#import "XMPPUserDefaultManager.h"
 
 @interface RegisterXMPP () {
     
@@ -155,63 +156,42 @@
 - (void)xmppConnect:(NSString *)phone password:(NSString *)passwordtext
 {
 
-    [self setValue:phone key:@"userName"];
-    if ([self getValue:@"CountData"] == nil) {
+    [XMPPUserDefaultManager setValue:phone key:@"userName"];
+    if ([XMPPUserDefaultManager getValue:@"CountData"] == nil) {
         NSMutableDictionary* countData = [NSMutableDictionary new];
-        [self setValue:countData key:@"CountData"];
+        [XMPPUserDefaultManager setValue:countData key:@"CountData"];
     }
-    if ([self getValue:@"BadgeCount"] == nil) {
-        [self setValue:@"0" key:@"BadgeCount"];
+    if ([XMPPUserDefaultManager getValue:@"BadgeCount"] == nil) {
+        [XMPPUserDefaultManager setValue:@"0" key:@"BadgeCount"];
     }
     
     [appDelegate disconnect];
     NSString *username = [NSString stringWithFormat:@"%@@%@",phone,appDelegate.hostName]; // OR
     NSString *password = passwordtext;
-    [self setValue:username key:@"LoginCred"];
-    [self setValue:password key:@"PassCred"];
-    [self setValue:@"1" key:@"CountValue"];
+    [XMPPUserDefaultManager setValue:username key:@"LoginCred"];
+    [XMPPUserDefaultManager setValue:password key:@"PassCred"];
+    [XMPPUserDefaultManager setValue:@"1" key:@"CountValue"];
     [appDelegate connect];
 }
 
 - (void)xmppConnectWithoutPassword:(NSString *)phone
 {
-    [self setValue:phone key:@"userName"];
-    if ([self getValue:@"CountData"] == nil) {
+    [XMPPUserDefaultManager setValue:phone key:@"userName"];
+    if ([XMPPUserDefaultManager getValue:@"CountData"] == nil) {
         NSMutableDictionary* countData = [NSMutableDictionary new];
-        [self setValue:countData key:@"CountData"];
+        [XMPPUserDefaultManager setValue:countData key:@"CountData"];
     }
-    if ([self getValue:@"BadgeCount"] == nil) {
-        [self setValue:@"0" key:@"BadgeCount"];
+    if ([XMPPUserDefaultManager getValue:@"BadgeCount"] == nil) {
+        [XMPPUserDefaultManager setValue:@"0" key:@"BadgeCount"];
     }
     
     [appDelegate disconnect];
     NSString *username = [NSString stringWithFormat:@"%@@%@",phone,appDelegate.hostName]; // OR
     NSString *password = appDelegate.defaultPassword;
-    [self setValue:username key:@"LoginCred"];
-    [self setValue:password key:@"PassCred"];
-    [self setValue:@"1" key:@"CountValue"];
+    [XMPPUserDefaultManager setValue:username key:@"LoginCred"];
+    [XMPPUserDefaultManager setValue:password key:@"PassCred"];
+    [XMPPUserDefaultManager setValue:@"1" key:@"CountValue"];
     [appDelegate connect];
-}
-#pragma mark - end
-
-#pragma mark - Get/Set/Remove data from userDefault methods
-//Set data in userDefault
-- (void)setValue:(id)value key:(NSString *)key {
-    
-    [[NSUserDefaults standardUserDefaults]setObject:value forKey:key];
-    [[NSUserDefaults standardUserDefaults]synchronize];
-}
-
-//Fetch data in userDefault
-- (id)getValue:(NSString *)key {
-    
-    return [[NSUserDefaults standardUserDefaults]objectForKey:key];
-}
-
-//Remove data in userDefault
-- (void)removeValue:(NSString *)key {
-    
-    [[NSUserDefaults standardUserDefaults]removeObjectForKey:key];
 }
 #pragma mark - end
 

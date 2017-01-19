@@ -7,6 +7,7 @@
 //
 
 #import "LoginXMPP.h"
+#import "XMPPUserDefaultManager.h"
 
 @interface LoginXMPP () {
 
@@ -34,18 +35,18 @@
 #pragma mark - Login User
 - (void)loginConnectWithoutPassword:(NSString *)username {
     
-    [self setValue:[NSString stringWithFormat:@"%@@%@",username,appDelegate.hostName] key:@"LoginCred"];
-    [self setValue:appDelegate.defaultPassword key:@"PassCred"];
-    [self setValue:@"1" key:@"CountValue"];
+    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%@@%@",username,appDelegate.hostName] key:@"LoginCred"];
+    [XMPPUserDefaultManager setValue:appDelegate.defaultPassword key:@"PassCred"];
+    [XMPPUserDefaultManager setValue:@"1" key:@"CountValue"];
     [appDelegate disconnect];
     [appDelegate connect];
 }
 
 - (void)loginConnectPassword:(NSString *)password username:(NSString *)username {
     
-    [self setValue:[NSString stringWithFormat:@"%@@%@",username,appDelegate.hostName] key:@"LoginCred"];
-    [self setValue:password key:@"PassCred"];
-    [self setValue:@"1" key:@"CountValue"];
+    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%@@%@",username,appDelegate.hostName] key:@"LoginCred"];
+    [XMPPUserDefaultManager setValue:password key:@"PassCred"];
+    [XMPPUserDefaultManager setValue:@"1" key:@"CountValue"];
     [appDelegate disconnect];
     [appDelegate connect];
 }
@@ -61,8 +62,8 @@
 
 - (void)UserNotAuthenticated {
     
-    [self removeValue:@"LoginCred"];
-    [self removeValue:@"PassCred"];
+    [XMPPUserDefaultManager removeValue:@"LoginCred"];
+    [XMPPUserDefaultManager removeValue:@"PassCred"];
     [self UserNotAuthenticatedResult];
 }
 
@@ -70,38 +71,6 @@
 - (void)UserDidAuthenticatedResult {}
 - (void)UserNotAuthenticatedResult{}
 //end
-#pragma mark - end
-
-#pragma mark - User logout
-- (void)userLogout {
-
-    [self setValue:nil key:@"LoginCred"];
-    [appDelegate disconnect];
-    [self setValue:[NSString stringWithFormat:@"zebra@%@",myDelegate.hostName] key:@"LoginCred"];
-    [self setValue:@"password" key:@"PassCred"];
-    [appDelegate connect];
-}
-#pragma mark - end
-
-#pragma mark - Get/Set/Remove data from userDefault methods
-//Set data in userDefault
-- (void)setValue:(id)value key:(NSString *)key {
-    
-    [[NSUserDefaults standardUserDefaults]setObject:value forKey:key];
-    [[NSUserDefaults standardUserDefaults]synchronize];
-}
-
-//Fetch data in userDefault
-- (id)getValue:(NSString *)key {
-    
-    return [[NSUserDefaults standardUserDefaults]objectForKey:key];
-}
-
-//Remove data in userDefault
-- (void)removeValue:(NSString *)key {
-    
-    [[NSUserDefaults standardUserDefaults]removeObjectForKey:key];
-}
 #pragma mark - end
 
 /*

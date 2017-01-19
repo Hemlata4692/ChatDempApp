@@ -18,7 +18,4 @@
 //This method will be used for login authentication response
 - (void)UserDidAuthenticatedResult;
 - (void)UserNotAuthenticatedResult;
-
-//This method is used for logout user
-- (void)userLogout;
 @end

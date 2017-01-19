@@ -10,10 +10,14 @@
 #import "UserDefaultManager.h"
 #import "HMSegmentedControl.h"
 
+#import "XMPPvCardTemp.h"
+#import "XMPPMessageArchivingCoreDataStorage.h"
+
 @interface DashboardViewController () {
 
     HMSegmentedControl *customSegmentedControl;
 }
+@property (strong, nonatomic) IBOutlet UITableView *dasboardTableListing;
 @end
 
 @implementation DashboardViewController
@@ -24,6 +28,12 @@
     
     self.navigationItem.title=@"Dashboard";
     [self addBarButton];
+    
+    if ([myDelegate connect])
+    {
+        [self fetchedResultsController];
+        [self.dasboardTableListing reloadData];
+    }
     // Do any additional setup after loading the view.
 }
 
@@ -37,6 +47,296 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+#pragma mark - XMPP delegates
+- (XMPPStream *)xmppStream
+{
+    return [myDelegate xmppStream];
+}
+- (NSFetchedResultsController *)fetchedResultsController
+{
+    if (fetchedResultsController == nil)
+    {
+        NSManagedObjectContext *moc = [myDelegate managedObjectContext_roster];
+        NSEntityDescription *entity = [NSEntityDescription entityForName:@"XMPPUserCoreDataStorageObject"
+                                                  inManagedObjectContext:moc];
+        NSSortDescriptor *sd1 = [[NSSortDescriptor alloc] initWithKey:@"sectionNum" ascending:YES];
+        NSSortDescriptor *sd2 = [[NSSortDescriptor alloc] initWithKey:@"displayName" ascending:YES];
+        NSArray *sortDescriptors = [NSArray arrayWithObjects:sd1, sd2, nil];
+        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+        [fetchRequest setEntity:entity];
+        [fetchRequest setSortDescriptors:sortDescriptors];
+        [fetchRequest setFetchBatchSize:10];
+        fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
+                                                                       managedObjectContext:moc
+                                                                         sectionNameKeyPath:@"sectionNum"
+                                                                                  cacheName:nil];
+        [fetchedResultsController setDelegate:self];
+        NSError *error = nil;
+        if (![fetchedResultsController performFetch:&error])
+        {
+            //error
+        }
+    }
+    return fetchedResultsController;
+}
+
+- (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
+{
+//    NSArray *sections = [[self fetchedResultsController] sections];
+////    [sortArrSet removeAllObjects];
+//    for (int i = 0 ; i< [[[self fetchedResultsController] sections] count];i++) {
+//        for (int j = 0; j<[[sections objectAtIndex:i] numberOfObjects]; j++) {
+//            if (([[[self fetchedResultsController] objectAtIndexPath:[NSIndexPath indexPathForRow:j inSection:i]] displayName] != nil) && ![[[[self fetchedResultsController] objectAtIndexPath:[NSIndexPath indexPathForRow:j inSection:i]] displayName] isEqualToString:@""] && ([[[self fetchedResultsController] objectAtIndexPath:[NSIndexPath indexPathForRow:j inSection:i]] displayName] != NULL)) {
+//                
+//                if ([[[[self fetchedResultsController] objectAtIndexPath:[NSIndexPath indexPathForRow:j inSection:i]] displayName] containsString:@"52.74.174.129"]) {
+//                    NSString *myName = [[[[[self fetchedResultsController] objectAtIndexPath:[NSIndexPath indexPathForRow:j inSection:i]] displayName] componentsSeparatedByString:@"@52.74.174.129@"] objectAtIndex:1];
+//                    
+////                    if (!([myName intValue] <= [yearValue intValue] - 3) || ((([yearValue intValue] - 3) == [myName intValue]) && [checkCompare isEqualToString:@"L"])) {
+////                        [sortArrSet addObject:[[self fetchedResultsController] objectAtIndexPath:[NSIndexPath indexPathForRow:j inSection:i]]];
+////                    }
+//                }
+//                
+//            }
+//        }
+//    }
+//    NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"displayName" ascending:YES];
+////    userListArr = [[sortArrSet sortedArrayUsingDescriptors:[NSArray arrayWithObject:sort]] mutableCopy];
+    [self.dasboardTableListing reloadData];
+}
+#pragma mark - end
+
+#pragma mark - Table view delegates
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section;
+{
+    return 50;
+}
+
+//- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)sectionIndex
+//{
+////    if (isSearch)
+////    {
+////        if (searchResultArray.count<1) {
+////            noRecordsLabel.hidden=NO;
+////            noRecordsLabel.text=@"No records found.";
+////            return searchResultArray.count;
+////        }
+////        else
+////        {
+////            noRecordsLabel.hidden=YES;
+////            return searchResultArray.count;
+////        }
+////    }
+////    else
+////    {
+////        if (userListArr.count<1)
+////        {
+////            noRecordsLabel.hidden=NO;
+////            noRecordsLabel.text=@"No friends added.";
+////            return userListArr.count;
+////        }
+////        else
+////        {
+////            noRecordsLabel.hidden=YES;
+////            return userListArr.count;
+////        }
+////    }
+//    return 5;
+//}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)sectionIndex
+{
+    NSArray *sections = [[self fetchedResultsController] sections];
+    
+    if (sectionIndex < [sections count])
+    {
+        id <NSFetchedResultsSectionInfo> sectionInfo = [sections objectAtIndex:sectionIndex];
+        return sectionInfo.numberOfObjects;
+    }
+    
+    return 0;
+    //return 5;
+}
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return [[[self fetchedResultsController] sections] count];
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    UIView * headerView;
+    NSArray *sections = [[self fetchedResultsController] sections];
+    
+    if (section < [sections count])
+    {
+        headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, 46.0)];
+        headerView.backgroundColor = [UIColor whiteColor];
+        UILabel * label = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, headerView.frame.size.width, 46)];
+        id <NSFetchedResultsSectionInfo> sectionInfo = [sections objectAtIndex:section];
+        
+        int section = [sectionInfo.name intValue];
+        switch (section)
+        {
+            case 0  :
+                label.text = @"Available";
+                label.textColor=[UIColor colorWithRed:13.0/255.0 green:213.0/255.0 blue:178.0/255.0 alpha:1.0];
+                break;
+            case 1  :
+                label.text =  @"Away";
+                label.textColor=[UIColor yellowColor];
+                break;
+            default :
+                label.text =  @"Offline";
+                label.textColor=[UIColor redColor];
+                break;
+        }
+        label.font = [UIFont fontWithName:@"Helvetica-Bold" size:15.0];
+        label.backgroundColor=[UIColor clearColor];
+        
+        [headerView addSubview:label];
+    }
+    else{
+        headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, 0)];
+        headerView.backgroundColor = [UIColor clearColor];
+        
+    }
+    
+    return headerView;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString *CellIdentifier = @"Cell";
+    
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    if (cell == nil)
+    {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
+                                      reuseIdentifier:CellIdentifier];
+    }
+    
+    XMPPUserCoreDataStorageObject *user = [[self fetchedResultsController] objectAtIndexPath:indexPath];
+    
+    UILabel* nameLabel = (UILabel*)[cell viewWithTag:1];
+    nameLabel.text = user.displayName;
+    [self configurePhotoForCell:cell user:user];
+    
+    return cell;
+}
+//{
+//    static NSString *CellIdentifier = @"Cell";
+//    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+//    if (cell == nil)
+//    {
+//        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
+//                                      reuseIdentifier:CellIdentifier];
+//    }
+////    UIImageView *userImage = (UIImageView*)[cell viewWithTag:2];
+////    userImage.layer.cornerRadius = 20;
+////    userImage.layer.masksToBounds = YES;
+////    userImage.layer.borderWidth=1.5f;
+////    userImage.layer.borderColor=[UIColor colorWithRed:236.0/255.0 green:236.0/255.0 blue:236.0/255.0 alpha:1.0].CGColor;
+////    UILabel* nameLabel = (UILabel*)[cell viewWithTag:1];
+//    XMPPUserCoreDataStorageObject *user;
+////    if (isSearch)
+////    {
+////        if (searchResultArray.count!=0)
+////        {
+////            user = [searchResultArray objectAtIndex:indexPath.row];
+////        }
+////        else
+////        {
+////            noRecordsLabel.hidden=NO;
+////            noRecordsLabel.text=@"No records found.";
+////            userListTableView.hidden=YES;
+////        }
+////    }
+////    else
+////    {
+////        if (userListArr.count!=0)
+////        {
+////            user = [userListArr objectAtIndex:indexPath.row];
+////        }
+////    }
+//    
+////    nameLabel.text = [[[user displayName] componentsSeparatedByString:@"@52.74.174.129@"] objectAtIndex:0];
+//    [self configurePhotoForCell:cell user:user];
+//    return cell;
+//}
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+//    PersonalChatViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"PersonalChatViewController"];
+//    if (isSearch)
+//    {
+//        vc.userDetail = [searchResultArray objectAtIndex:indexPath.row];
+//        vc.lastView = @"UserListViewController";
+//        if ([myDelegate.userProfileImage objectForKey:[[searchResultArray objectAtIndex:indexPath.row] jidStr]] == nil) {
+//            vc.friendProfileImageView = [UIImage imageNamed:@"user_thumbnail.png"];
+//        }
+//        else{
+//            vc.friendProfileImageView = [myDelegate.userProfileImage objectForKey:[[searchResultArray objectAtIndex:indexPath.row] jidStr]];
+//        }
+//        vc.userListVC = self;
+//    }
+//    else
+//    {
+//        vc.userDetail = [userListArr objectAtIndex:indexPath.row];
+//        vc.lastView = @"UserListViewController";
+//        if ([myDelegate.userProfileImage objectForKey:[[userListArr objectAtIndex:indexPath.row] jidStr]] == nil) {
+//            vc.friendProfileImageView = [UIImage imageNamed:@"user_thumbnail.png"];
+//        }
+//        else{
+//            vc.friendProfileImageView = [myDelegate.userProfileImage objectForKey:[[userListArr objectAtIndex:indexPath.row] jidStr]];
+//        }
+//        vc.userListVC = self;
+//    }
+//    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (void)configurePhotoForCell:(UITableViewCell *)cell user:(XMPPUserCoreDataStorageObject *)user
+{
+    // Our xmppRosterStorage will cache photos as they arrive from the xmppvCardAvatarModule.
+    // We only need to ask the avatar module for a photo, if the roster doesn't have it.
+    UIImageView *userImage = (UIImageView*)[cell viewWithTag:2];
+    
+    if (user.photo != nil)
+    {
+        userImage.image = user.photo;
+    }
+    else
+    {
+        NSData *photoData = [[myDelegate xmppvCardAvatarModule] photoDataForJID:user.jid];
+        
+        if (photoData != nil)
+            userImage.image = [UIImage imageWithData:photoData];
+        else
+            userImage.image = [UIImage imageNamed:@"images.png"];
+        
+//        [myDelegate.userProfileImage setObject:userImage.image forKey:[NSString stringWithFormat:@"%@",user.jidStr]];
+    }
+}
+//{
+////    UIImageView *userImage = (UIImageView*)[cell viewWithTag:2];
+//    
+//    if (user.photo != nil)
+//    {
+////        userImage.image = user.photo;
+//    }
+//    else
+//    {
+//        NSData *photoData = [myDelegate.xmppvCardAvatarModule photoDataForJID:user.jid];
+//        
+////        if (photoData != nil)
+////            userImage.image = [UIImage imageWithData:photoData];
+////        else
+////            userImage.image = [UIImage imageNamed:@"user_thumbnail.png"];
+//        
+////        [myDelegate.userProfileImage setObject:userImage.image forKey:[NSString stringWithFormat:@"%@",user.jidStr]];
+//    }
+//}
+#pragma mark - end
+
 
 #pragma mark - Custom accessors
 - (void)addBarButton {
@@ -61,7 +361,7 @@
 #pragma mark - IBActions
 - (void)logoutAction :(id)sender {
     
-    [UserDefaultManager setValue:nil key:@"userName"];
+    [UserDefaultManager removeValue:@"userName"];
     [self userLogout];
     
 //    UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];

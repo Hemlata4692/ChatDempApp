@@ -46,6 +46,7 @@
 
 //Declaration hostname, port and defaultpassword for complete app
 @property(strong, nonatomic)NSString *hostName;
+@property(strong, nonatomic)NSString *serverName;
 @property(strong, nonatomic)NSString *defaultPassword;
 @property(assign, nonatomic)int portNumber;
 //end

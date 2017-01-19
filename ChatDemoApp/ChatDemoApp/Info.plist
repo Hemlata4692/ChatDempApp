@@ -28,6 +28,8 @@
 	<true/>
 	<key>PortNumber</key>
 	<integer>5222</integer>
+	<key>ServerName</key>
+	<string>ranosys</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UIRequiredDeviceCapabilities</key>

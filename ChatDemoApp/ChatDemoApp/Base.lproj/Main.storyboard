@@ -94,6 +94,7 @@
                     <navigationItem key="navigationItem" id="kLV-qP-QjP"/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
                     <connections>
+                        <outlet property="passwordField" destination="CKz-RL-pJQ" id="CyD-fA-n22"/>
                         <outlet property="usernameField" destination="jl4-EX-GGU" id="mvk-U9-cde"/>
                     </connections>
                 </viewController>

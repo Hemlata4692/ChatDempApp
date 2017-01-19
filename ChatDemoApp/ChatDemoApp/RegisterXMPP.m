@@ -8,14 +8,18 @@
 
 #import "RegisterXMPP.h"
 
-@interface RegisterXMPP ()
-
+@interface RegisterXMPP () {
+    
+    AppDelegateObjectFile *appDelegate;
+}
 @end
 
 @implementation RegisterXMPP
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    appDelegate = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(UserDidRegister:) name:@"XMPPDidRegisterResponse" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(UserNotRegister:) name:@"XMPPDidNotRegisterResponse" object:nil];
@@ -47,22 +51,15 @@
     }
 }
 
-- (void)UserDidRegister {
-
-}
-
-- (void)UserDidNotRegister:(ErrorType)errorType {
-
-}
+- (void)UserDidRegister {}
+- (void)UserDidNotRegister:(ErrorType)errorType {}
 
 - (void)setXMPPProfilePhotoPlaceholder:(NSString *)profilePlaceholder profileImageView:(UIImage *)profileImageView {
 
     UIImage* placeholderImage = [UIImage imageNamed:profilePlaceholder];
     NSData *placeholderImageData = UIImagePNGRepresentation(placeholderImage);
     NSData *profileImageData = UIImagePNGRepresentation(profileImageView);
-    
-    AppDelegateObjectFile *appDelegate = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
-    
+ 
     if ([profileImageData isEqualToData:placeholderImageData])
     {
         appDelegate.userProfileImageDataValue=nil;
@@ -74,28 +71,28 @@
 
 - (void)userRegistrationPassword:(NSString *)userPassword name:(NSString*)name email:(NSString*)email phone:(NSString*)phone {
     
-     AppDelegateObjectFile *appDelegate = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
-    NSString *username = [NSString stringWithFormat:@"%@@%@",phone,appDelegate.hostName]; // OR
+    NSString *username = [NSString stringWithFormat:@"%@@%@",phone,appDelegate.hostName];
+    
     NSString *password = userPassword;
-    AppDelegateObjectFile *del = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
-    del.xmppStream.myJID = [XMPPJID jidWithString:username];
-    if (del.xmppStream.supportsInBandRegistration) {
+
+    appDelegate.xmppStream.myJID = [XMPPJID jidWithString:username];
+    if (appDelegate.xmppStream.supportsInBandRegistration) {
         NSError *error = nil;
         
         if (![name isEqualToString:@""]&&![email isEqualToString:@""]&&![phone isEqualToString:@""]) {
-            if (![del.xmppStream registerWithPassword:password name:name email:email phone:phone error:&error])
+            if (![appDelegate.xmppStream registerWithPassword:password name:name email:email phone:phone error:&error])
             {
                 [self UserDidNotRegister:XMPP_OtherError];
             }
         }
         else if ([name isEqualToString:@""]&&[email isEqualToString:@""]) {
-            if (![del.xmppStream registerWithPassword:password error:&error])
+            if (![appDelegate.xmppStream registerWithPassword:password error:&error])
             {
                 [self UserDidNotRegister:XMPP_OtherError];
             }
         }
         else if ([email isEqualToString:@""]) {
-            if (![del.xmppStream registerWithPassword:password name:name error:&error])
+            if (![appDelegate.xmppStream registerWithPassword:password name:name error:&error])
             {
                 [self UserDidNotRegister:XMPP_OtherError];
             }
@@ -108,6 +105,104 @@
         [self UserDidNotRegister:XMPP_OtherError];
         NSLog(@"Inband registration failed.");
     }
+}
+
+- (void)userRegistrationWithoutPassword:(NSString*)name email:(NSString*)email phone:(NSString*)phone {
+    
+    NSString *username = [NSString stringWithFormat:@"%@@%@",phone,appDelegate.hostName];
+    NSString *password = appDelegate.defaultPassword;
+    
+    appDelegate.xmppStream.myJID = [XMPPJID jidWithString:username];
+    if (appDelegate.xmppStream.supportsInBandRegistration) {
+        NSError *error = nil;
+        
+        if (![name isEqualToString:@""]&&![email isEqualToString:@""]&&![phone isEqualToString:@""]) {
+            if (![appDelegate.xmppStream registerWithPassword:password name:name email:email phone:phone error:&error])
+            {
+                [self UserDidNotRegister:XMPP_OtherError];
+            }
+        }
+        else if ([name isEqualToString:@""]&&[email isEqualToString:@""]) {
+            if (![appDelegate.xmppStream registerWithPassword:password error:&error])
+            {
+                [self UserDidNotRegister:XMPP_OtherError];
+            }
+        }
+        else if ([email isEqualToString:@""]) {
+            if (![appDelegate.xmppStream registerWithPassword:password name:name error:&error])
+            {
+                [self UserDidNotRegister:XMPP_OtherError];
+            }
+        }
+        else {
+            [self UserDidNotRegister:XMPP_OtherError];
+        }
+    }
+    else {
+        [self UserDidNotRegister:XMPP_OtherError];
+        NSLog(@"Inband registration failed.");
+    }
+}
+
+- (void)xmppConnect:(NSString *)phone password:(NSString *)passwordtext
+{
+
+    [self setValue:phone key:@"userName"];
+    if ([self getValue:@"CountData"] == nil) {
+        NSMutableDictionary* countData = [NSMutableDictionary new];
+        [self setValue:countData key:@"CountData"];
+    }
+    if ([self getValue:@"BadgeCount"] == nil) {
+        [self setValue:@"0" key:@"BadgeCount"];
+    }
+    
+    [appDelegate disconnect];
+    NSString *username = [NSString stringWithFormat:@"%@@%@",phone,appDelegate.hostName]; // OR
+    NSString *password = passwordtext;
+    [self setValue:username key:@"LoginCred"];
+    [self setValue:password key:@"PassCred"];
+    [self setValue:@"1" key:@"CountValue"];
+    [appDelegate connect];
+}
+
+- (void)xmppConnectWithoutPassword:(NSString *)phone
+{
+    
+    [self setValue:phone key:@"userName"];
+    if ([self getValue:@"CountData"] == nil) {
+        NSMutableDictionary* countData = [NSMutableDictionary new];
+        [self setValue:countData key:@"CountData"];
+    }
+    if ([self getValue:@"BadgeCount"] == nil) {
+        [self setValue:@"0" key:@"BadgeCount"];
+    }
+    
+    [appDelegate disconnect];
+    NSString *username = [NSString stringWithFormat:@"%@@%@",phone,appDelegate.hostName]; // OR
+    NSString *password = appDelegate.defaultPassword;
+    [self setValue:username key:@"LoginCred"];
+    [self setValue:password key:@"PassCred"];
+    [self setValue:@"1" key:@"CountValue"];
+    [appDelegate connect];
+}
+
+//Set data in userDefault
+- (void)setValue:(id)value key:(NSString *)key {
+    
+    [[NSUserDefaults standardUserDefaults]setObject:value forKey:key];
+    [[NSUserDefaults standardUserDefaults]synchronize];
+}
+
+//Fetch data in userDefault
+- (id)getValue:(NSString *)key {
+    
+    return [[NSUserDefaults standardUserDefaults]objectForKey:key];
+}
+
+//Remove data in userDefault
+- (void)removeValue:(NSString *)key {
+    
+    [[NSUserDefaults standardUserDefaults]removeObjectForKey:key];
 }
 
 /*

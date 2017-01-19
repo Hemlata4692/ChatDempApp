@@ -53,23 +53,37 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 @synthesize xmppMessageArchivingCoreDataStorage, xmppMessageArchivingModule;
 @synthesize userProfileImageData;
 
-@synthesize portNumber, hostName;
+@synthesize portNumber, hostName, defaultPassword;
 
 - (void)didFinishLaunchingMethod {
 
-    hostName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"];
-    portNumber = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"PortNumber"] intValue];
+    if (nil!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"] && NULL!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"]) {
+        hostName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"];
+    }
+    else {
+        hostName = @"";
+    }
+    
+    if (nil!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"PortNumber"] && NULL!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"PortNumber"]) {
+        portNumber = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"PortNumber"] intValue];
+    }
+    else {
+        portNumber = 0;
+    }
+    
+    if (nil!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"PasswordRequired"] && NULL!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"PasswordRequired"] && ![[NSBundle mainBundle] objectForInfoDictionaryKey:@"PasswordRequired"]) {
+        defaultPassword = @"password";
+    }
     
     userProfileImageData = [[UIImageView alloc] init];
     
     userHistoryArr = [NSMutableArray new];
     userProfileImage = [NSMutableDictionary new];
-    //    if ([UserDefaultManager getValue:@"LoginCred"] == nil) {
     
-    [self setValue:[NSString stringWithFormat:@"zebra@%@",hostName] key:@"LoginCred"];
-    [self setValue:@"password" key:@"PassCred"];
-    
-    //    }
+    if ([self getValue:@"LoginCred"] == nil) {
+        [self setValue:[NSString stringWithFormat:@"zebra@%@",hostName] key:@"LoginCred"];
+        [self setValue:@"password" key:@"PassCred"];
+    }
     xmppMessageArchivingCoreDataStorage = [XMPPMessageArchivingCoreDataStorage sharedInstance];
     xmppMessageArchivingModule = [[XMPPMessageArchiving alloc]initWithMessageArchivingStorage:xmppMessageArchivingCoreDataStorage];
     if ([self getValue:@"CountData"] == nil) {
@@ -363,6 +377,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         
     }
     
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPDidAuthenticatedResponse" object:nil];
 }
 
 - (void)xmppvCardTempModuleDidUpdateMyvCard:(XMPPvCardTempModule *)vCardTempModule{
@@ -377,10 +392,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 {
     DDLogVerbose(@"%@: %@", THIS_FILE, THIS_METHOD);
     if (nil!=[self getValue:@"LoginCred"] && ![[self getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"zebra@%@",hostName]]) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Sorry"
-                                                        message:@"Please Check Username or Password"
-                                                       delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-        [alert show];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPDidNotAuthenticatedResponse" object:nil];
     }
 }
 

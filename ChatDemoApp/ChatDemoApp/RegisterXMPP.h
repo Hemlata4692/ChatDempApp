@@ -13,6 +13,9 @@
 
 -(void)UserDidRegister;
 -(void)UserDidNotRegister:(ErrorType)errorType;
-- (void)userRegistrationPassword:(NSString *)userPassword name:(NSString*)name email:(NSString*)email phone:(NSString*)phone ;
+- (void)userRegistrationPassword:(NSString *)userPassword name:(NSString*)name email:(NSString*)email phone:(NSString*)phone;
+- (void)userRegistrationWithoutPassword:(NSString*)name email:(NSString*)email phone:(NSString*)phone;
 - (void)setXMPPProfilePhotoPlaceholder:(NSString *)profilePlaceholder profileImageView:(UIImage *)profileImageView;
+- (void)xmppConnect:(NSString *)phone password:(NSString *)password;
+- (void)xmppConnectWithoutPassword:(NSString *)phone;
 @end

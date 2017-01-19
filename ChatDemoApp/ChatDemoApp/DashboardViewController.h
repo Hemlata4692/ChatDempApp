@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "LoginXMPP.h"
 
-@interface DashboardViewController : UIViewController
+@interface DashboardViewController : LoginXMPP
 
 @end

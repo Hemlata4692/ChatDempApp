@@ -50,6 +50,7 @@
 @property(strong, nonatomic)NSString *myView;
 
 @property(strong, nonatomic)NSString *hostName;
+@property(strong, nonatomic)NSString *defaultPassword;
 @property(assign, nonatomic)int portNumber;
 
 -(BOOL)connect;

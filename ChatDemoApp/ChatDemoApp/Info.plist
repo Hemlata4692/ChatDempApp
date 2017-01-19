@@ -24,6 +24,8 @@
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We need to access your photos in order to attach them</string>
+	<key>PasswordRequired</key>
+	<true/>
 	<key>PortNumber</key>
 	<integer>5222</integer>
 	<key>UIMainStoryboardFile</key>

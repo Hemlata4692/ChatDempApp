@@ -15,6 +15,7 @@
 @interface ViewController ()
 
 @property (strong, nonatomic) IBOutlet UITextField *usernameField;
+@property (strong, nonatomic) IBOutlet UITextField *passwordField;
 
 //Declare BSKeyboard variable
 @property (strong, nonatomic) BSKeyboardControls *keyboardControls;
@@ -91,7 +92,7 @@
     if ([self performValidationsForLogin]) {
         
         [myDelegate showIndicator];
-        [self performSelector:@selector(userLogin) withObject:nil afterDelay:2];
+        [self performSelector:@selector(userLogin) withObject:nil afterDelay:0.1];
     }
 }
 
@@ -104,19 +105,35 @@
 
 #pragma mark - Webservice
 - (void)userLogin {
+    
+    //If you want to login without password then commented this code
+    [self loginConnectPassword:self.passwordField.text username:self.usernameField.text];
+    /*//If you want to login without password then uncomment this code
+     [self loginConnectWithoutPassword:self.usernameField.text];
+     */
+}
+#pragma mark - end
 
+#pragma mark - LoginXMPP autenticate result method
+- (void)UserDidAuthenticatedResult {
+    
     [myDelegate stopIndicator];
     [UserDefaultManager setValue:self.usernameField.text key:@"userName"];
-//    UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-//    UIViewController * objReveal = [storyboard instantiateViewControllerWithIdentifier:@"DashboardViewController"];
-//    [self.navigationController setViewControllers: [NSArray arrayWithObject: objReveal]
-//                                         animated: NO];
-    [UserDefaultManager setValue:@"11_amit@192.168.1.169" key:@"LoginCred"];
-    [UserDefaultManager setValue:@"password" key:@"PassCred"];
-    [UserDefaultManager setValue:@"1" key:@"CountValue"];
-    [myDelegate disconnect];
-    [myDelegate connect];
-//    [myDelegate connect];
+    UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    UIViewController * objReveal = [storyboard instantiateViewControllerWithIdentifier:@"DashboardViewController"];
+    [self.navigationController setViewControllers: [NSArray arrayWithObject: objReveal]
+                                         animated: NO];
+}
+
+- (void)UserNotAuthenticatedResult{
+    
+    [myDelegate stopIndicator];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Authentication Failed!" message:@"Please check your credential." preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction * action){
+        // Ok action example
+    }];
+    [alert addAction:okAction];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 #pragma mark - end
 @end

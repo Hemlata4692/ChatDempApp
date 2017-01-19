@@ -210,30 +210,26 @@
 //                                         animated: NO];
     
     [self setXMPPProfilePhotoPlaceholder:@"profile_camera" profileImageView:self.profileImageView.image];
+    
+    //If you want no password form then commented this code
     //Here name,email are optional
     [self userRegistrationPassword:self.password.text name:self.usernameField.text email:self.emailField.text phone:self.mobileField.text];
+    /*//If you want no password form then uncomment this code
+    [self userRegistrationWithoutPassword:self.usernameField.text email:self.emailField.text phone:self.mobileField.text];
+     */
 }
 
 //Register XMPP method
 - (void)UserDidRegister {
     
     [myDelegate stopIndicator];
-    [UserDefaultManager setValue:self.mobileField.text key:@"userName"];
-    if ([UserDefaultManager getValue:@"CountData"] == nil) {
-        NSMutableDictionary* countData = [NSMutableDictionary new];
-        [UserDefaultManager setValue:countData key:@"CountData"];
-    }
-    if ([UserDefaultManager getValue:@"BadgeCount"] == nil) {
-        [UserDefaultManager setValue:@"0" key:@"BadgeCount"];
-    }
     
-    [myDelegate disconnect];
-    NSString *username = [NSString stringWithFormat:@"%@@%@",self.mobileField.text,myDelegate.hostName]; // OR
-    NSString *password = self.password.text;
-    [UserDefaultManager setValue:username key:@"LoginCred"];
-    [UserDefaultManager setValue:password key:@"PassCred"];
-    [UserDefaultManager setValue:@"1" key:@"CountValue"];
-    [myDelegate connect];
+     //If you want to connect without password then commented this code
+    [self xmppConnect:self.mobileField.text password:self.password.text];
+    
+    /*//If you want to connect without password then uncomment this code
+     [self xmppConnectWithoutPassword:self.mobileField.text];
+     */
     UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     UIViewController * objReveal = [storyboard instantiateViewControllerWithIdentifier:@"DashboardViewController"];
     [self.navigationController setViewControllers: [NSArray arrayWithObject: objReveal]

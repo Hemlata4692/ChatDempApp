@@ -62,13 +62,9 @@
 - (void)logoutAction :(id)sender {
     
         [UserDefaultManager setValue:nil key:@"userName"];
-        [UserDefaultManager setValue:nil key:@"LoginCred"];
-    [myDelegate disconnect];
-    [UserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",myDelegate.hostName] key:@"LoginCred"];
-    [UserDefaultManager setValue:@"password" key:@"PassCred"];
-    [myDelegate connect];
+ 
     
-
+    [self userLogout];
     UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     UIViewController * objReveal = [storyboard instantiateViewControllerWithIdentifier:@"ViewController"];
     [myDelegate.navigationController setViewControllers: [NSArray arrayWithObject: objReveal]

@@ -8,8 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import "BSKeyboardControls.h"
+#import "LoginXMPP.h"
 
-@interface ViewController : UIViewController<BSKeyboardControlsDelegate>
+@interface ViewController : LoginXMPP<BSKeyboardControlsDelegate>
 
 @end
 

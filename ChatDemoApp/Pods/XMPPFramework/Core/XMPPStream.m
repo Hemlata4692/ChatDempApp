@@ -1784,6 +1784,7 @@ enum XMPPStreamConfig
         [elements addObject:[NSXMLElement elementWithName:@"username" stringValue:username]];
         [elements addObject:[NSXMLElement elementWithName:@"password" stringValue:password]];
         [elements addObject:[NSXMLElement elementWithName:@"name" stringValue:name]];
+//        [elements addObject:[NSXMLElement elementWithName:@"name" stringValue:[NSString stringWithFormat:@"%@_##@##_%@_##@##_%@",name,email,phone]]];
         [elements addObject:[NSXMLElement elementWithName:@"email" stringValue:email]];
         [elements addObject:[NSXMLElement elementWithName:@"phone" stringValue:phone]];
         [self registerWithElements:elements error:errPtr];

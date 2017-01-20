@@ -12,7 +12,10 @@
 
 #import "XMPPvCardTemp.h"
 #import "XMPPMessageArchivingCoreDataStorage.h"
+#import "XMPPvCardCoreDataStorage.h"
 
+
+@class XMPPvCardTempModuleStorage;
 @interface DashboardViewController () {
 
     HMSegmentedControl *customSegmentedControl;
@@ -33,7 +36,17 @@
     {
         [self fetchedResultsController];
         [self.dasboardTableListing reloadData];
+        
+//        NSData *photoData1 = [[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:@"1234567890@ranosys"]];
+//        UIImage *imagetemp=[UIImage imageWithData:photoData1];
+//        NSLog(@"d");
+         NSLog(@"a");
+        XMPPvCardTemp *newvCardTemp = [[myDelegate xmppvCardTempModule] vCardTempForJID:[XMPPJID jidWithString:@"2222222222@ranosys"] shouldFetch:YES];
+        
+         NSLog(@"%@",newvCardTemp.userStatus);
+        NSLog(@"%@",newvCardTemp.emailAddresses);
     }
+    
     // Do any additional setup after loading the view.
 }
 
@@ -218,6 +231,13 @@
     
     XMPPUserCoreDataStorageObject *user = [[self fetchedResultsController] objectAtIndexPath:indexPath];
     
+    if ([user.jidStr isEqualToString:@"2222222222@ranosys"]) {
+        
+        NSLog(@"a");
+//        - (XMPPvCardTemp *)vCardTempForJID:(XMPPJID *)jid xmppStream:(XMPPStream *)stream
+//        XMPPvCardTemp *newvCardTemp = [[myDelegate xmppvCardTempModule] vCardTempForJID:user.jid shouldFetch:YES];
+        NSLog(@"a");
+    }
     UILabel* nameLabel = (UILabel*)[cell viewWithTag:1];
     nameLabel.text = user.displayName;
     [self configurePhotoForCell:cell user:user];

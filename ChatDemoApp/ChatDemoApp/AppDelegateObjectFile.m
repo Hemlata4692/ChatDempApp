@@ -365,7 +365,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     if ([xmppStream isAuthenticated]) {
         
         NSLog(@"authenticated");
-        [xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:@"1234567890@ranosys"] ignoreStorage:YES];
+        [xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:@"test11@administrator"] ignoreStorage:YES];
         
     }
     
@@ -530,16 +530,32 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 
 -(void)methodCalling{
     
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+//    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+//    NSXMLElement *vCardXML = [NSXMLElement elementWithName:@"vCard" xmlns:@"vcard-temp"];
+//    XMPPvCardTemp *newvCardTemp = [XMPPvCardTemp vCardTempFromElement:vCardXML];
+//    NSData *pictureData = UIImageJPEGRepresentation([UIImage imageWithData:appDelegate.userProfileImageDataValue], 0.5);
+//    [newvCardTemp setPhoto:pictureData];
+////    [newvCardTemp setemail:@"a@a.co"];
+//    [newvCardTemp setFamilyName:@"My Family"];
+//    XMPPvCardCoreDataStorage * xmppvCardStorage1 = [XMPPvCardCoreDataStorage sharedInstance];
+//    XMPPvCardTempModule * xmppvCardTempModule1 = [[XMPPvCardTempModule alloc] initWithvCardStorage:xmppvCardStorage1];
+//    [xmppvCardTempModule1  activate:[self xmppStream]];
+//    [xmppvCardTempModule1 updateMyvCardTemp:newvCardTemp];
+//    [appDelegate stopIndicator];
+    
+    
+    NSLog(@"TEST FOR VCARD");
     NSXMLElement *vCardXML = [NSXMLElement elementWithName:@"vCard" xmlns:@"vcard-temp"];
     XMPPvCardTemp *newvCardTemp = [XMPPvCardTemp vCardTempFromElement:vCardXML];
-    NSData *pictureData = UIImageJPEGRepresentation([UIImage imageWithData:appDelegate.userProfileImageDataValue], 0.5);
-    [newvCardTemp setPhoto:pictureData];
-    XMPPvCardCoreDataStorage * xmppvCardStorage1 = [XMPPvCardCoreDataStorage sharedInstance];
-    XMPPvCardTempModule * xmppvCardTempModule1 = [[XMPPvCardTempModule alloc] initWithvCardStorage:xmppvCardStorage1];
-    [xmppvCardTempModule1  activate:[self xmppStream]];
-    [xmppvCardTempModule1 updateMyvCardTemp:newvCardTemp];
-//    [appDelegate stopIndicator];
+    [newvCardTemp setNickname:@"aaaaaa"];
+    NSArray *interestsArray= [[NSArray alloc] initWithObjects:@"food", nil];
+    [newvCardTemp setLabels:interestsArray];
+    [newvCardTemp setMiddleName:@"Stt"];
+    [newvCardTemp setUserStatus:@"I am available"];
+    [newvCardTemp setAddress:@"rohitm@ranosys.com"];
+    [newvCardTemp setEmailAddresses:[NSMutableArray arrayWithObjects:@"rohitmodi@ranosys.com",@"rohitm@ranosys.com", nil]];
+    
+    [xmppvCardTempModule updateMyvCardTemp:newvCardTemp];
     
 }
 -(void)editProfileImageUploading:(UIImage*)editProfileImge{

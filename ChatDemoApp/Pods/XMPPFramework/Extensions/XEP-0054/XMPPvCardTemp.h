@@ -51,11 +51,16 @@ extern NSString *const kXMPPvCardTempElement;
 @property (nonatomic, strong) NSString *middleName;
 @property (nonatomic, strong) NSString *prefix;
 @property (nonatomic, strong) NSString *suffix;
+@property (nonatomic, strong) NSString *userStatus;
 
 @property (nonatomic, strong) NSArray *addresses;
+@property (nonatomic, strong) NSString *address;
 @property (nonatomic, strong) NSArray *labels;
+@property (nonatomic, strong) NSString *label;
 @property (nonatomic, strong) NSArray *telecomsAddresses;
+@property (nonatomic, strong) NSString *telecomsAddress;
 @property (nonatomic, strong) NSArray *emailAddresses;
+@property (nonatomic, strong) NSString *emailAddress;
 
 @property (nonatomic, strong) XMPPJID *jid;
 @property (nonatomic, strong) NSString *mailer;

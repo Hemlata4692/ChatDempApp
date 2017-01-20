@@ -301,33 +301,156 @@ NSString *const kXMPPvCardTempElement = @"vCard";
 #pragma mark Delivery Addressing Types
 
 
-- (NSArray *)addresses { return nil; }
+//- (NSArray *)addresses { return nil; }
 - (void)addAddress:(XMPPvCardTempAdr *)adr { }
 - (void)removeAddress:(XMPPvCardTempAdr *)adr { }
-- (void)setAddresses:(NSArray *)adrs { }
+//- (void)setAddresses:(NSArray *)adrs { }
 - (void)clearAddresses { }
 
 
-- (NSArray *)labels { return nil; }
+//- (NSArray *)labels { return nil; }
 - (void)addLabel:(XMPPvCardTempLabel *)label { }
 - (void)removeLabel:(XMPPvCardTempLabel *)label { }
-- (void)setLabels:(NSArray *)labels { }
+//- (void)setLabels:(NSArray *)labels { }
 - (void)clearLabels { }
 
 
-- (NSArray *)telecomsAddresses { return nil; }
+//- (NSArray *)telecomsAddresses { return nil; }
 - (void)addTelecomsAddress:(XMPPvCardTempTel *)tel { }
 - (void)removeTelecomsAddress:(XMPPvCardTempTel *)tel { }
-- (void)setTelecomsAddresses:(NSArray *)tels { }
+//- (void)setTelecomsAddresses:(NSArray *)tels { }
 - (void)clearTelecomsAddresses { }
 
 
-- (NSArray *)emailAddresses { return nil; }
+//- (NSArray *)emailAddresses { return nil; }
 - (void)addEmailAddress:(XMPPvCardTempEmail *)email { }
 - (void)removeEmailAddress:(XMPPvCardTempEmail *)email { }
-- (void)setEmailAddresses:(NSArray *)emails { }
+//- (void)setEmailAddresses:(NSArray *)emails { }
 - (void)clearEmailAddresses { }
 
+- (NSArray *)getGlobalArrayData:(NSString *)externalName {
+    
+    NSArray *result = nil;
+    NSXMLElement *categories = [self elementForName:externalName];
+    
+    if (categories != nil) {
+        NSArray *elems = [categories elementsForName:@"KEYWORD"];
+        NSMutableArray *arr = [[NSMutableArray alloc] initWithCapacity:[elems count]];
+        
+        for (NSXMLElement *elem in elems) {
+            [arr addObject:[elem stringValue]];
+        }
+        
+        result = [NSArray arrayWithArray:arr];
+    }
+    return result;
+}
+
+- (void)setGlobalArrayData:(NSString *)externalName data:(NSArray*)data {
+    
+    NSXMLElement *cat = [self elementForName:externalName];
+    
+    if (data != nil) {
+        if (cat == nil) {
+            cat = [NSXMLElement elementWithName:externalName];
+            [self addChild:cat];
+        }
+        
+        NSArray *elems = [cat elementsForName:@"KEYWORD"];
+        for (NSXMLElement *elem in elems) {
+            [cat removeChildAtIndex:[[cat children] indexOfObject:elem]];
+        }
+        
+        for (NSString *kw in data) {
+            NSXMLElement *elem = [NSXMLElement elementWithName:@"KEYWORD"];
+            [elem setStringValue:kw];
+            
+            [cat addChild:elem];
+        }
+    } else if (cat != nil) {
+        [self removeChildAtIndex:[[self children] indexOfObject:cat]];
+    }
+}
+
+- (NSArray *)labels {
+    
+    return [self getGlobalArrayData:@"LABELS"];
+}
+
+- (void)setLabels:(NSArray *)labels {
+    
+    [self setGlobalArrayData:@"LABELS" data:labels];
+}
+
+- (NSArray *)telecomsAddresses {
+    
+    return [self getGlobalArrayData:@"TELS"];
+}
+
+- (void)setTelecomsAddresses:(NSArray *)tels {
+    
+    [self setGlobalArrayData:@"TELS" data:tels];
+}
+
+- (NSArray *)addresses {
+
+    return [self getGlobalArrayData:@"Addresses"];
+}
+
+- (void)setAddresses:(NSArray *)address {
+    
+    [self setGlobalArrayData:@"Addresses" data:address];
+}
+
+- (NSArray *)emailAddresses {
+    
+    return [self getGlobalArrayData:@"EMAIL"];
+}
+
+- (void)setEmailAddresses:(NSArray *)emails {
+    
+   [self setGlobalArrayData:@"EMAIL" data:emails];
+}
+
+- (NSString *)userStatus {
+    return [[self elementForName:@"USERSTATUS"] stringValue];
+}
+
+- (void)setUserStatus:(NSString *)userStatus {
+    XMPP_VCARD_SET_STRING_CHILD(userStatus, @"USERSTATUS");
+}
+
+- (NSString *)address {
+    return [[self elementForName:@"ADDRESS"] stringValue];
+}
+
+- (void)setAddress:(NSString *)address {
+    XMPP_VCARD_SET_STRING_CHILD(address, @"ADDRESS");
+}
+
+- (NSString *)label {
+    return [[self elementForName:@"LABEL"] stringValue];
+}
+
+- (void)setLabel:(NSString *)label {
+    XMPP_VCARD_SET_STRING_CHILD(label, @"LABEL");
+}
+
+- (NSString *)telecomsAddress {
+    return [[self elementForName:@"TEL"] stringValue];
+}
+
+- (void)setTelecomsAddress:(NSString *)telecomsAddress {
+    XMPP_VCARD_SET_STRING_CHILD(telecomsAddress, @"TEL");
+}
+
+- (NSString *)emailAddress {
+    return [[self elementForName:@"EMAILADDRESS"] stringValue];
+}
+
+- (void)setEmailAddress:(NSString *)emailAddress {
+    XMPP_VCARD_SET_STRING_CHILD(emailAddress, @"EMAILADDRESS");
+}
 
 - (XMPPJID *)jid {
 	XMPPJID *jid = nil;

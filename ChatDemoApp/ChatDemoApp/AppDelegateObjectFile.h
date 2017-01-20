@@ -66,6 +66,7 @@
 -(void)editProfileImageUploading:(UIImage*)editProfileImge;
 -(void)addBadgeIconLastTab;
 -(void)removeBadgeIconLastTab;
+-(void)methodCalling;
 - (NSManagedObjectContext *)managedObjectContext_roster;
 - (NSManagedObjectContext *)managedObjectContext_capabilities;
 

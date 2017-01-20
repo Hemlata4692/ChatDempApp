@@ -56,7 +56,7 @@
 - (void)UserDidAuthenticated {
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        [self UserDidAuthenticatedResult];
+        [self loginUserDidAuthenticatedResult];
     });
 }
 
@@ -64,12 +64,12 @@
     
     [XMPPUserDefaultManager removeValue:@"LoginCred"];
     [XMPPUserDefaultManager removeValue:@"PassCred"];
-    [self UserNotAuthenticatedResult];
+    [self loginUserNotAuthenticatedResult];
 }
 
 //These method is called to subViewController of LoginXMPP file
-- (void)UserDidAuthenticatedResult {}
-- (void)UserNotAuthenticatedResult{}
+- (void)loginUserDidAuthenticatedResult {}
+- (void)loginUserNotAuthenticatedResult{}
 //end
 #pragma mark - end
 

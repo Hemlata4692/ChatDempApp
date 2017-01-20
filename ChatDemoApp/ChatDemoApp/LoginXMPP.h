@@ -16,6 +16,6 @@
 - (void)loginConnectPassword:(NSString *)password username:(NSString *)username;
 
 //This method will be used for login authentication response
-- (void)UserDidAuthenticatedResult;
-- (void)UserNotAuthenticatedResult;
+- (void)loginUserDidAuthenticatedResult;
+- (void)loginUserNotAuthenticatedResult;
 @end

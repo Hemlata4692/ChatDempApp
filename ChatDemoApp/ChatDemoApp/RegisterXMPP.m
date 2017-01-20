@@ -24,6 +24,9 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(UserDidRegister:) name:@"XMPPDidRegisterResponse" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(UserNotRegister:) name:@"XMPPDidNotRegisterResponse" object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPvCardTempModuleDidUpdateMyvCardSuccess) name:@"XMPPvCardTempModuleDidUpdateMyvCardSuccess" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPvCardTempModuleDidUpdateMyvCardFail) name:@"XMPPvCardTempModuleDidUpdateMyvCardFail" object:nil];
     // Do any additional setup after loading the view.
 }
 
@@ -35,6 +38,7 @@
 #pragma mark - Post notification called method
 - (void)UserDidRegister:(NSNotification *)notification {
     
+//    [appDelegate methodCalling]
     [self UserDidRegister];
 }
 
@@ -176,7 +180,7 @@
 
 - (void)xmppConnectWithoutPassword:(NSString *)phone
 {
-    [XMPPUserDefaultManager setValue:phone key:@"userName"];
+//    [XMPPUserDefaultManager setValue:phone key:@"userName"];
     if ([XMPPUserDefaultManager getValue:@"CountData"] == nil) {
         NSMutableDictionary* countData = [NSMutableDictionary new];
         [XMPPUserDefaultManager setValue:countData key:@"CountData"];
@@ -194,6 +198,19 @@
     [appDelegate connect];
 }
 #pragma mark - end
+
+- (void)XMPPvCardTempModuleDidUpdateMyvCardSuccess {
+    
+    NSLog(@"success ");
+}
+
+- (void)XMPPvCardTempModuleDidUpdateMyvCardFail {
+    NSLog(@"fail ");
+}
+
+
+
+
 
 /*
 #pragma mark - Navigation

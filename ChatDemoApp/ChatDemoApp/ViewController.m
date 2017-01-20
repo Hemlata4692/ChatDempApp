@@ -115,7 +115,7 @@
 #pragma mark - end
 
 #pragma mark - LoginXMPP autenticate result method
-- (void)UserDidAuthenticatedResult {
+- (void)loginUserDidAuthenticatedResult {
     
     [myDelegate stopIndicator];
     [UserDefaultManager setValue:self.usernameField.text key:@"userName"];
@@ -124,13 +124,13 @@
 //    [self.navigationController setViewControllers: [NSArray arrayWithObject: objReveal]
 //                                         animated: NO];
     
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+ /*   UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     UIViewController * homeView = [storyboard instantiateViewControllerWithIdentifier:@"DashboardNavigation"];
     [myDelegate.window setRootViewController:homeView];
-    [myDelegate.window makeKeyAndVisible];
+    [myDelegate.window makeKeyAndVisible];*/
 }
 
-- (void)UserNotAuthenticatedResult{
+- (void)loginUserNotAuthenticatedResult{
     
     [myDelegate stopIndicator];
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Authentication Failed!" message:@"Please check your credential." preferredStyle:UIAlertControllerStyleAlert];

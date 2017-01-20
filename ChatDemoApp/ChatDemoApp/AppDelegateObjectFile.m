@@ -59,6 +59,8 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 #pragma mark - Intialze XMPP connection
 - (void)didFinishLaunchingMethod {
 
+   
+    
     if (nil!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"] && NULL!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"]) {
         hostName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"];
     }
@@ -365,7 +367,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     if ([xmppStream isAuthenticated]) {
         
         NSLog(@"authenticated");
-        [xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:@"test11@administrator"] ignoreStorage:YES];
+//        [xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:@"test11@administrator"] ignoreStorage:YES];
         
     }
     
@@ -479,8 +481,8 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     
     int myCount = [[XMPPUserDefaultManager getValue:@"CountValue"] intValue];
     
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    if ((myCount == 1)&&nil!=appDelegate.userProfileImageDataValue) {
+//    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    if ((myCount == 1)&&nil!=self.userProfileImageDataValue) {
         [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%d",myCount+1] key:@"CountValue"];
         [self performSelector:@selector(methodCalling) withObject:nil afterDelay:0.1];
     }
@@ -530,41 +532,51 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 
 -(void)methodCalling{
     
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSXMLElement *vCardXML = [NSXMLElement elementWithName:@"vCard" xmlns:@"vcard-temp"];
-    XMPPvCardTemp *newvCardTemp = [XMPPvCardTemp vCardTempFromElement:vCardXML];
-    NSData *pictureData = UIImageJPEGRepresentation([UIImage imageWithData:appDelegate.userProfileImageDataValue], 0.5);
-    [newvCardTemp setPhoto:pictureData];
-//    [newvCardTemp setemail:@"a@a.co"];
-    [newvCardTemp setFamilyName:@"My Family"];
-    [newvCardTemp setNickname:@"aaaa"];
-    NSArray *interestsArray= [[NSArray alloc] initWithObjects:@"food", nil];
-    [newvCardTemp setLabels:interestsArray];
-    [newvCardTemp setMiddleName:@"Stt"];
-    [newvCardTemp setUserStatus:@"I am available"];
-    [newvCardTemp setAddress:@"rohitm@ranosys.com"];
-    [newvCardTemp setEmailAddresses:[NSMutableArray arrayWithObjects:@"rohitmodi@ranosys.com",@"rohitm@ranosys.com", nil]];
-    XMPPvCardCoreDataStorage * xmppvCardStorage1 = [XMPPvCardCoreDataStorage sharedInstance];
-    XMPPvCardTempModule * xmppvCardTempModule1 = [[XMPPvCardTempModule alloc] initWithvCardStorage:xmppvCardStorage1];
-    [xmppvCardTempModule1  activate:[self xmppStream]];
-    [xmppvCardTempModule1 updateMyvCardTemp:newvCardTemp];
-//    [appDelegate stopIndicator];
-    
-    
-//    NSLog(@"TEST FOR VCARD");
+//    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
 //    NSXMLElement *vCardXML = [NSXMLElement elementWithName:@"vCard" xmlns:@"vcard-temp"];
 //    XMPPvCardTemp *newvCardTemp = [XMPPvCardTemp vCardTempFromElement:vCardXML];
-//    [newvCardTemp setNickname:@"aaaaaa"];
+////    NSData *pictureData = UIImageJPEGRepresentation([UIImage imageWithData:appDelegate.userProfileImageDataValue], 0.5);
+////    [newvCardTemp setPhoto:pictureData];
+////    [newvCardTemp setemail:@"a@a.co"];
+//    [newvCardTemp setFamilyName:@"My Family"];
+//    [newvCardTemp setNickname:@"aaaa"];
 //    NSArray *interestsArray= [[NSArray alloc] initWithObjects:@"food", nil];
 //    [newvCardTemp setLabels:interestsArray];
 //    [newvCardTemp setMiddleName:@"Stt"];
 //    [newvCardTemp setUserStatus:@"I am available"];
 //    [newvCardTemp setAddress:@"rohitm@ranosys.com"];
 //    [newvCardTemp setEmailAddresses:[NSMutableArray arrayWithObjects:@"rohitmodi@ranosys.com",@"rohitm@ranosys.com", nil]];
-//    
-//    [xmppvCardTempModule updateMyvCardTemp:newvCardTemp];
+//    XMPPvCardCoreDataStorage * xmppvCardStorage1 = [XMPPvCardCoreDataStorage sharedInstance];
+//    XMPPvCardTempModule * xmppvCardTempModule1 = [[XMPPvCardTempModule alloc] initWithvCardStorage:xmppvCardStorage1];
+////    [xmppvCardTempModule1  activate:[self xmppStream]];
+//    [xmppvCardTempModule1 updateMyvCardTemp:newvCardTemp];
+////    [appDelegate stopIndicator];
+    
+    
+    NSLog(@"TEST FOR VCARD");
+    NSXMLElement *vCardXML = [NSXMLElement elementWithName:@"vCard" xmlns:@"vcard-temp"];
+    XMPPvCardTemp *newvCardTemp = [XMPPvCardTemp vCardTempFromElement:vCardXML];
+    [newvCardTemp setNickname:@"aaaaaa"];
+    NSArray *interestsArray= [[NSArray alloc] initWithObjects:@"food", nil];
+    [newvCardTemp setLabels:interestsArray];
+    [newvCardTemp setMiddleName:@"Stt"];
+    [newvCardTemp setUserStatus:@"I am available"];
+    [newvCardTemp setAddress:@"rohitm@ranosys.com"];
+    [newvCardTemp setEmailAddresses:[NSMutableArray arrayWithObjects:@"rohitmodi@ranosys.com",@"rohitm@ranosys.com", nil]];
+//
+    [xmppvCardTempModule updateMyvCardTemp:newvCardTemp];
+    
+    [myDelegate stopIndicator];
     
 }
+
+- (void)xmppvCardTempModule:(XMPPvCardTempModule *)vCardTempModule
+        didReceivevCardTemp:(XMPPvCardTemp *)vCardTemp
+                     forJID:(XMPPJID *)jid{
+    NSLog(@"a");
+}
+
+
 -(void)editProfileImageUploading:(UIImage*)editProfileImge{
     
     NSXMLElement *vCardXML = [NSXMLElement elementWithName:@"vCard" xmlns:@"vcard-temp"];
@@ -576,7 +588,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     XMPPvCardTempModule * xmppvCardTempModule1 = [[XMPPvCardTempModule alloc] initWithvCardStorage:xmppvCardStorage1];
     [xmppvCardTempModule1  activate:[self xmppStream]];
     [xmppvCardTempModule1 updateMyvCardTemp:newvCardTemp];
-//    [myDelegate stopIndicator];
+    
 }
 
 - (void)xmppStream:(XMPPStream *)sender didReceiveError:(id)error
@@ -642,6 +654,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 - (void)xmppRosterDidEndPopulating:(XMPPRoster *)sender
 {
     if ([myDelegate.myView isEqualToString:@"UserListView"]) {
+        
         [myDelegate stopIndicator];
     }
     
@@ -728,4 +741,30 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     //    }
 }
 #pragma mark - end
+
+
+
+//[[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPvCardTempModuleDidUpdateMyvCardSuccess" object:nil];
+//}
+//
+//- (void)xmppvCardTempModule:(XMPPvCardTempModule *)vCardTempModule failedToUpdateMyvCard:(NSXMLElement *)error{
+//    //The vCard failed to update so we fetch the current one from the server
+//    [_xmppvCardTempModule fetchvCardTempForJID:[xmppStream myJID] ignoreStorage:YES];
+//    [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPvCardTempModuleDidUpdateMyvCardFail" object:nil];
+
+
+
+//[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPvCardTempModuleDidUpdateMyvCardSuccess) name:@"XMPPvCardTempModuleDidUpdateMyvCardSuccess" object:nil];
+//[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPvCardTempModuleDidUpdateMyvCardFail) name:@"XMPPvCardTempModuleDidUpdateMyvCardFail" object:nil];
+
+
+
+
+
+
+
+
+
+
+
 @end

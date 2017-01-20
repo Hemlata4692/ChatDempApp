@@ -226,18 +226,18 @@
     
      //If you want to connect without password then commented this code
     [self xmppConnect:self.mobileField.text password:self.password.text];
-    
-    /*//If you want to connect without password then uncomment this code
-     [self xmppConnectWithoutPassword:self.mobileField.text];
-     */
-//    UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-//    UIViewController * objReveal = [storyboard instantiateViewControllerWithIdentifier:@"DashboardViewController"];
-//    [self.navigationController setViewControllers: [NSArray arrayWithObject: objReveal]
-//                                         animated: NO];
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-    UIViewController * homeView = [storyboard instantiateViewControllerWithIdentifier:@"DashboardNavigation"];
-    [myDelegate.window setRootViewController:homeView];
-    [myDelegate.window makeKeyAndVisible];
+//
+//    /*//If you want to connect without password then uncomment this code
+//     [self xmppConnectWithoutPassword:self.mobileField.text];
+//     */
+////    UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+////    UIViewController * objReveal = [storyboard instantiateViewControllerWithIdentifier:@"DashboardViewController"];
+////    [self.navigationController setViewControllers: [NSArray arrayWithObject: objReveal]
+////                                         animated: NO];
+//    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+//    UIViewController * homeView = [storyboard instantiateViewControllerWithIdentifier:@"DashboardNavigation"];
+//    [myDelegate.window setRootViewController:homeView];
+//    [myDelegate.window makeKeyAndVisible];
 }
 
 - (void)UserDidNotRegister:(ErrorType)errorType {

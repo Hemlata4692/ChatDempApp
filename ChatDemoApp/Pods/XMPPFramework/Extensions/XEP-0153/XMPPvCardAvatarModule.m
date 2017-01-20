@@ -287,12 +287,16 @@ NSString *const kXMPPvCardAvatarPhotoElement = @"photo";
 
 - (void)xmppvCardTempModuleDidUpdateMyvCard:(XMPPvCardTempModule *)vCardTempModule{
     //The vCard has been updated on the server so we need to cache it
+     [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPvCardTempModuleDidUpdateMyvCardSuccess" object:nil];
     [_xmppvCardTempModule fetchvCardTempForJID:[xmppStream myJID] ignoreStorage:NO];
+   
 }
 
 - (void)xmppvCardTempModule:(XMPPvCardTempModule *)vCardTempModule failedToUpdateMyvCard:(NSXMLElement *)error{
 		//The vCard failed to update so we fetch the current one from the server
+     [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPvCardTempModuleDidUpdateMyvCardFail" object:nil];
     [_xmppvCardTempModule fetchvCardTempForJID:[xmppStream myJID] ignoreStorage:YES];
+   
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

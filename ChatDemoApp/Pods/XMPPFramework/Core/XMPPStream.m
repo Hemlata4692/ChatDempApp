@@ -1758,91 +1758,91 @@ enum XMPPStreamConfig
 	return result;
 }
 
-- (BOOL)registerWithPassword:(NSString *)password name:(NSString*)name email:(NSString*)email phone:(NSString*)phone error:(NSError **)errPtr
-{
-    XMPPLogTrace();
-    
-    __block BOOL result = YES;
-    __block NSError *err = nil;
-    
-    dispatch_block_t block = ^{ @autoreleasepool {
-        
-        if (myJID_setByClient == nil)
-        {
-            NSString *errMsg = @"You must set myJID before calling registerWithPassword:error:.";
-            NSDictionary *info = [NSDictionary dictionaryWithObject:errMsg forKey:NSLocalizedDescriptionKey];
-            
-            err = [NSError errorWithDomain:XMPPStreamErrorDomain code:XMPPStreamInvalidProperty userInfo:info];
-            
-            result = NO;
-            return_from_block;
-        }
-        
-        NSString *username = [myJID_setByClient user];
-        
-        NSMutableArray *elements = [NSMutableArray array];
-        [elements addObject:[NSXMLElement elementWithName:@"username" stringValue:username]];
-        [elements addObject:[NSXMLElement elementWithName:@"password" stringValue:password]];
-        [elements addObject:[NSXMLElement elementWithName:@"name" stringValue:name]];
-//        [elements addObject:[NSXMLElement elementWithName:@"name" stringValue:[NSString stringWithFormat:@"%@_##@##_%@_##@##_%@",name,email,phone]]];
-        [elements addObject:[NSXMLElement elementWithName:@"email" stringValue:email]];
-        [elements addObject:[NSXMLElement elementWithName:@"phone" stringValue:phone]];
-        [self registerWithElements:elements error:errPtr];
-    }};
-    
-    
-    if (dispatch_get_specific(xmppQueueTag))
-        block();
-    else
-        dispatch_sync(xmppQueue, block);
-    
-    if (errPtr)
-        *errPtr = err;
-    
-    return result;
-}
-
-- (BOOL)registerWithPassword:(NSString *)password name:(NSString*)name error:(NSError **)errPtr
-{
-    XMPPLogTrace();
-    
-    __block BOOL result = YES;
-    __block NSError *err = nil;
-    
-    dispatch_block_t block = ^{ @autoreleasepool {
-        
-        if (myJID_setByClient == nil)
-        {
-            NSString *errMsg = @"You must set myJID before calling registerWithPassword:error:.";
-            NSDictionary *info = [NSDictionary dictionaryWithObject:errMsg forKey:NSLocalizedDescriptionKey];
-            
-            err = [NSError errorWithDomain:XMPPStreamErrorDomain code:XMPPStreamInvalidProperty userInfo:info];
-            
-            result = NO;
-            return_from_block;
-        }
-        
-        NSString *username = [myJID_setByClient user];
-        
-        NSMutableArray *elements = [NSMutableArray array];
-        [elements addObject:[NSXMLElement elementWithName:@"username" stringValue:username]];
-        [elements addObject:[NSXMLElement elementWithName:@"password" stringValue:password]];
-        [elements addObject:[NSXMLElement elementWithName:@"name" stringValue:name]];
-        [self registerWithElements:elements error:errPtr];
-    }};
-    
-    
-    if (dispatch_get_specific(xmppQueueTag))
-        block();
-    else
-        dispatch_sync(xmppQueue, block);
-    
-    if (errPtr)
-        *errPtr = err;
-    
-    return result;
-}
-
+//- (BOOL)registerWithPassword:(NSString *)password name:(NSString*)name email:(NSString*)email phone:(NSString*)phone error:(NSError **)errPtr
+//{
+//    XMPPLogTrace();
+//    
+//    __block BOOL result = YES;
+//    __block NSError *err = nil;
+//    
+//    dispatch_block_t block = ^{ @autoreleasepool {
+//        
+//        if (myJID_setByClient == nil)
+//        {
+//            NSString *errMsg = @"You must set myJID before calling registerWithPassword:error:.";
+//            NSDictionary *info = [NSDictionary dictionaryWithObject:errMsg forKey:NSLocalizedDescriptionKey];
+//            
+//            err = [NSError errorWithDomain:XMPPStreamErrorDomain code:XMPPStreamInvalidProperty userInfo:info];
+//            
+//            result = NO;
+//            return_from_block;
+//        }
+//        
+//        NSString *username = [myJID_setByClient user];
+//        
+//        NSMutableArray *elements = [NSMutableArray array];
+//        [elements addObject:[NSXMLElement elementWithName:@"username" stringValue:username]];
+//        [elements addObject:[NSXMLElement elementWithName:@"password" stringValue:password]];
+//        [elements addObject:[NSXMLElement elementWithName:@"name" stringValue:name]];
+////        [elements addObject:[NSXMLElement elementWithName:@"name" stringValue:[NSString stringWithFormat:@"%@_##@##_%@_##@##_%@",name,email,phone]]];
+//        [elements addObject:[NSXMLElement elementWithName:@"email" stringValue:email]];
+//        [elements addObject:[NSXMLElement elementWithName:@"phone" stringValue:phone]];
+//        [self registerWithElements:elements error:errPtr];
+//    }};
+//    
+//    
+//    if (dispatch_get_specific(xmppQueueTag))
+//        block();
+//    else
+//        dispatch_sync(xmppQueue, block);
+//    
+//    if (errPtr)
+//        *errPtr = err;
+//    
+//    return result;
+//}
+//
+//- (BOOL)registerWithPassword:(NSString *)password name:(NSString*)name error:(NSError **)errPtr
+//{
+//    XMPPLogTrace();
+//    
+//    __block BOOL result = YES;
+//    __block NSError *err = nil;
+//    
+//    dispatch_block_t block = ^{ @autoreleasepool {
+//        
+//        if (myJID_setByClient == nil)
+//        {
+//            NSString *errMsg = @"You must set myJID before calling registerWithPassword:error:.";
+//            NSDictionary *info = [NSDictionary dictionaryWithObject:errMsg forKey:NSLocalizedDescriptionKey];
+//            
+//            err = [NSError errorWithDomain:XMPPStreamErrorDomain code:XMPPStreamInvalidProperty userInfo:info];
+//            
+//            result = NO;
+//            return_from_block;
+//        }
+//        
+//        NSString *username = [myJID_setByClient user];
+//        
+//        NSMutableArray *elements = [NSMutableArray array];
+//        [elements addObject:[NSXMLElement elementWithName:@"username" stringValue:username]];
+//        [elements addObject:[NSXMLElement elementWithName:@"password" stringValue:password]];
+//        [elements addObject:[NSXMLElement elementWithName:@"name" stringValue:name]];
+//        [self registerWithElements:elements error:errPtr];
+//    }};
+//    
+//    
+//    if (dispatch_get_specific(xmppQueueTag))
+//        block();
+//    else
+//        dispatch_sync(xmppQueue, block);
+//    
+//    if (errPtr)
+//        *errPtr = err;
+//    
+//    return result;
+//}
+//
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark Authentication
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

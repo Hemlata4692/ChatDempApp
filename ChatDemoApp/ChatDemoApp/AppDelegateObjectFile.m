@@ -482,10 +482,10 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     int myCount = [[XMPPUserDefaultManager getValue:@"CountValue"] intValue];
     
 //    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    if ((myCount == 1)&&nil!=self.userProfileImageDataValue) {
-        [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%d",myCount+1] key:@"CountValue"];
-        [self performSelector:@selector(methodCalling) withObject:nil afterDelay:0.1];
-    }
+//    if ((myCount == 1)&&nil!=self.userProfileImageDataValue) {
+//        [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%d",myCount+1] key:@"CountValue"];
+//        [self performSelector:@selector(methodCalling) withObject:nil afterDelay:0.1];
+//    }
 }
 
 - (void)xmppStreamDidRegister:(XMPPStream *)sender{
@@ -517,20 +517,13 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     }
     else if([errorCode isEqualToString:@"500"]){
         [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPDidNotRegisterResponse" object:[NSNumber numberWithInt:XMPP_InvalidUserName]];
-//        [alert setMessage:@"Username Already Exists!"];
     }
     else {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPDidNotRegisterResponse" object:[NSNumber numberWithInt:XMPP_UserExist]];
     }
-//    [alert show];
-//    NSLog(@"%d",VALUE_A);
-    
-    
-    
-    //500 - rohit modi
 }
 
--(void)methodCalling{
+-(void)methodCalling:(NSMutableDictionary *)profileData {
     
 //    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
 //    NSXMLElement *vCardXML = [NSXMLElement elementWithName:@"vCard" xmlns:@"vcard-temp"];
@@ -553,9 +546,19 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 ////    [appDelegate stopIndicator];
     
     
+
+    
     NSLog(@"TEST FOR VCARD");
     NSXMLElement *vCardXML = [NSXMLElement elementWithName:@"vCard" xmlns:@"vcard-temp"];
     XMPPvCardTemp *newvCardTemp = [XMPPvCardTemp vCardTempFromElement:vCardXML];
+    NSData *pictureData;
+    if (nil!=self.userProfileImageDataValue) {
+        
+        pictureData = UIImageJPEGRepresentation([UIImage imageWithData:self.userProfileImageDataValue], 1.0);
+        [newvCardTemp setPhoto:pictureData];
+    }
+
+    /*//Other variables
     [newvCardTemp setNickname:@"aaaaaa"];
     NSArray *interestsArray= [[NSArray alloc] initWithObjects:@"food", nil];
     [newvCardTemp setLabels:interestsArray];
@@ -563,11 +566,29 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [newvCardTemp setUserStatus:@"I am available"];
     [newvCardTemp setAddress:@"rohitm@ranosys.com"];
     [newvCardTemp setEmailAddresses:[NSMutableArray arrayWithObjects:@"rohitmodi@ranosys.com",@"rohitm@ranosys.com", nil]];
-//
+     */
+    [newvCardTemp setNickname:[self setProfileDataValue:profileData key:@"xmppName"]];
+    [newvCardTemp setTelecomsAddress:[self setProfileDataValue:profileData key:@"xmppPhoneNumber"]];
+    [newvCardTemp setUserStatus:[self setProfileDataValue:profileData key:@"xmppUserStatus"]];
+    [newvCardTemp setDesc:[self setProfileDataValue:profileData key:@"xmppDescription"]];
+    [newvCardTemp setAddress:[self setProfileDataValue:profileData key:@"xmppAddress"]];
+    [newvCardTemp setEmailAddress:[self setProfileDataValue:profileData key:@"xmppEmailAddress"]];
+    [newvCardTemp setBday:[self setProfileDataValue:profileData key:@"xmppUserBirthDay"]];
+    [newvCardTemp setGender:[self setProfileDataValue:profileData key:@"xmppGender"]];
+    
     [xmppvCardTempModule updateMyvCardTemp:newvCardTemp];
     
     [myDelegate stopIndicator];
-    
+}
+
+- (NSString *)setProfileDataValue:(NSMutableDictionary *)profileData key:(NSString *)key {
+
+    NSString *value=@"";
+    if (nil!=[profileData objectForKey:key]||NULL!=[profileData objectForKey:key]||([[profileData objectForKey:key] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].length != 0)) {
+        
+        value=[[profileData objectForKey:key] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    }
+    return value;
 }
 
 - (void)xmppvCardTempModule:(XMPPvCardTempModule *)vCardTempModule
@@ -575,7 +596,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
                      forJID:(XMPPJID *)jid{
     NSLog(@"a");
 }
-
 
 -(void)editProfileImageUploading:(UIImage*)editProfileImge{
     

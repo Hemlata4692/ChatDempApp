@@ -100,27 +100,37 @@ NSString *const kXMPPvCardTempElement = @"vCard";
 #pragma mark Identification Types
 
 
-- (NSDate *)bday {
-	NSDate *bday = nil;
-	NSXMLElement *elem = [self elementForName:@"BDAY"];
-	
-	if (elem != nil) {
-		bday = [NSDate dateWithXmppDateString:[elem stringValue]];
-	}
-	
-	return bday;
+//- (NSDate *)bday {
+//	NSDate *bday = nil;
+//	NSXMLElement *elem = [self elementForName:@"BDAY"];
+//	
+//	if (elem != nil) {
+//		bday = [NSDate dateWithXmppDateString:[elem stringValue]];
+//	}
+//	
+//	return bday;
+//}
+//
+//
+//- (void)setBday:(NSDate *)bday {
+//	NSXMLElement *elem = [self elementForName:@"BDAY"];
+//  
+//	if (elem == nil) {
+//		elem = [NSXMLElement elementWithName:@"BDAY"];
+//		[self addChild:elem];
+//	}
+//	
+//	[elem setStringValue:[bday xmppDateString]];
+//}
+
+- (NSString *)bday {
+    
+    return [[self elementForName:@"BDAY"] stringValue];
 }
 
-
-- (void)setBday:(NSDate *)bday {
-	NSXMLElement *elem = [self elementForName:@"BDAY"];
-  
-	if (elem == nil) {
-		elem = [NSXMLElement elementWithName:@"BDAY"];
-		[self addChild:elem];
-	}
-	
-	[elem setStringValue:[bday xmppDateString]];
+- (void)setBday:(NSString *)bday {
+    
+    XMPP_VCARD_SET_STRING_CHILD(bday, @"BDAY");
 }
 
 
@@ -418,6 +428,14 @@ NSString *const kXMPPvCardTempElement = @"vCard";
 
 - (void)setUserStatus:(NSString *)userStatus {
     XMPP_VCARD_SET_STRING_CHILD(userStatus, @"USERSTATUS");
+}
+
+- (NSString *)gender {
+    return [[self elementForName:@"USERSTATUS"] stringValue];
+}
+
+- (void)setGender:(NSString *)gender {
+    XMPP_VCARD_SET_STRING_CHILD(gender, @"GENDER");
 }
 
 - (NSString *)address {

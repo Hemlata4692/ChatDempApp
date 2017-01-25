@@ -12,6 +12,8 @@
 @interface RegisterXMPP () {
     
     AppDelegateObjectFile *appDelegate;
+    NSMutableDictionary *xmppProfileData;
+    NSString *xmppUserNameCredential, *xmppPasswordCredential;
 }
 @end
 
@@ -21,13 +23,20 @@
     [super viewDidLoad];
     
     appDelegate = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
+    // Do any additional setup after loading the view.
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:YES];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(RegisterUserDidAuthenticated) name:@"XMPPDidAuthenticatedResponse" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(RegisterUserNotAuthenticated) name:@"XMPPDidNotAuthenticatedResponse" object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(UserDidRegister:) name:@"XMPPDidRegisterResponse" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(UserNotRegister:) name:@"XMPPDidNotRegisterResponse" object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPvCardTempModuleDidUpdateMyvCardSuccess) name:@"XMPPvCardTempModuleDidUpdateMyvCardSuccess" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPvCardTempModuleDidUpdateMyvCardFail) name:@"XMPPvCardTempModuleDidUpdateMyvCardFail" object:nil];
-    // Do any additional setup after loading the view.
 }
 
 - (void)didReceiveMemoryWarning {
@@ -35,32 +44,11 @@
     // Dispose of any resources that can be recreated.
 }
 
-#pragma mark - Post notification called method
-- (void)UserDidRegister:(NSNotification *)notification {
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:YES];
     
-//    [appDelegate methodCalling]
-    [self UserDidRegister];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
-
-- (void)UserNotRegister:(NSNotification *)notification {
-    
-    if([[notification object] intValue]==XMPP_UserExist){
-        
-        [self UserDidNotRegister:XMPP_UserExist];
-    }
-    else if(([[notification object] intValue]==XMPP_InvalidUserName)){
-        //This error is called when your Name is as username
-        [self UserDidNotRegister:XMPP_InvalidUserName];
-    }
-    else {
-        [self UserDidNotRegister:XMPP_OtherError];
-    }
-}
-
-//These method is called to subViewController of RegisterXMPP file
-- (void)UserDidRegister {}
-- (void)UserDidNotRegister:(ErrorType)errorType {}
-#pragma mark - end
 
 #pragma mark - Upload XMPP profile photo at server
 - (void)setXMPPProfilePhotoPlaceholder:(NSString *)profilePlaceholder profileImageView:(UIImage *)profileImageView {
@@ -80,87 +68,138 @@
 #pragma mark - end
 
 #pragma mark - User registration at XMPP server(OpenFire)
-- (void)userRegistrationPassword:(NSString *)userPassword name:(NSString*)name email:(NSString*)email phone:(NSString*)phone {
+- (void)userRegistrationPassword:(NSString *)userPassword userName:(NSString*)userName profileData:(NSMutableDictionary*)profileData profilePlaceholder:(NSString *)profilePlaceholder profileImageView:(UIImage *)profileImageView {
     
-    NSString *username = [NSString stringWithFormat:@"%@@%@",phone,appDelegate.hostName];
+    xmppProfileData=[profileData mutableCopy];
+    //Set image in delegate object
+    UIImage* placeholderImage = [UIImage imageNamed:profilePlaceholder];
+    NSData *placeholderImageData = UIImagePNGRepresentation(placeholderImage);
+    NSData *profileImageData = UIImagePNGRepresentation(profileImageView);
     
+    if ([profileImageData isEqualToData:placeholderImageData])
+    {
+        appDelegate.userProfileImageDataValue=nil;
+    }
+    else {
+        appDelegate.userProfileImageDataValue = UIImageJPEGRepresentation(profileImageView, 1.0);
+    }
+    //end
+    
+    NSString *name=@"";
+    if (nil==[profileData objectForKey:self.xmppName]||NULL==[profileData objectForKey:self.xmppName]||([[profileData objectForKey:self.xmppName] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].length == 0)) {
+        
+        name=userName;
+    }
+    else {
+    
+        name=[[profileData objectForKey:self.xmppName] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    }
+    NSString *xmppUsername = [NSString stringWithFormat:@"%@@%@",userName,appDelegate.hostName];
     NSString *password = userPassword;
 
-    appDelegate.xmppStream.myJID = [XMPPJID jidWithString:username];
+    xmppUserNameCredential=xmppUsername;
+    xmppPasswordCredential=password;
+    appDelegate.xmppStream.myJID = [XMPPJID jidWithString:xmppUsername];
     if (appDelegate.xmppStream.supportsInBandRegistration) {
         NSError *error = nil;
         
-        if (![name isEqualToString:@""]&&![email isEqualToString:@""]&&![phone isEqualToString:@""]) {
-            if (![appDelegate.xmppStream registerWithPassword:password name:name email:email phone:phone error:&error])
-            {
-                [self UserDidNotRegister:XMPP_OtherError];
-            }
-        }
-        else if ([name isEqualToString:@""]&&[email isEqualToString:@""]) {
-            if (![appDelegate.xmppStream registerWithPassword:password error:&error])
-            {
-                [self UserDidNotRegister:XMPP_OtherError];
-            }
-        }
-        else if ([email isEqualToString:@""]) {
-            if (![appDelegate.xmppStream registerWithPassword:password name:name error:&error])
-            {
-                [self UserDidNotRegister:XMPP_OtherError];
-            }
-        }
-        else {
-            [self UserDidNotRegister:XMPP_OtherError];
+        if (![self registerWithPassword:password name:name error:&error])
+        {
+            [self tempUserDidNotRegister:XMPP_OtherError];
         }
     }
     else {
-        [self UserDidNotRegister:XMPP_OtherError];
+        [self tempUserDidNotRegister:XMPP_OtherError];
         NSLog(@"Inband registration failed.");
     }
 }
 
-- (void)userRegistrationWithoutPassword:(NSString*)name email:(NSString*)email phone:(NSString*)phone {
+- (void)userRegistrationWithoutPassword:(NSString*)userName profileData:(NSMutableDictionary*)profileData profilePlaceholder:(NSString *)profilePlaceholder profileImageView:(UIImage *)profileImageView {
     
-    NSString *username = [NSString stringWithFormat:@"%@@%@",phone,appDelegate.hostName];
+    xmppProfileData=[profileData mutableCopy];
+    
+    //Set image in delegate object
+    UIImage* placeholderImage = [UIImage imageNamed:profilePlaceholder];
+    NSData *placeholderImageData = UIImagePNGRepresentation(placeholderImage);
+    NSData *profileImageData = UIImagePNGRepresentation(profileImageView);
+    
+    if ([profileImageData isEqualToData:placeholderImageData])
+    {
+        appDelegate.userProfileImageDataValue=nil;
+    }
+    else {
+        appDelegate.userProfileImageDataValue = UIImageJPEGRepresentation(profileImageView, 1.0);
+    }
+    //end
+    
+    NSString *name=@"";
+    if (nil==[profileData objectForKey:self.xmppName]||NULL==[profileData objectForKey:self.xmppName]||([[profileData objectForKey:self.xmppName] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].length == 0)) {
+        
+        name=userName;
+    }
+    else {
+        
+        name=[[profileData objectForKey:self.xmppName] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    }
+
+    NSString *xmppUsername = [NSString stringWithFormat:@"%@@%@",userName,appDelegate.hostName];
     NSString *password = appDelegate.defaultPassword;
     
-    appDelegate.xmppStream.myJID = [XMPPJID jidWithString:username];
+    xmppUserNameCredential=xmppUsername;
+    xmppPasswordCredential=password;
+    
+    appDelegate.xmppStream.myJID = [XMPPJID jidWithString:xmppUsername];
     if (appDelegate.xmppStream.supportsInBandRegistration) {
         NSError *error = nil;
         
-        if (![name isEqualToString:@""]&&![email isEqualToString:@""]&&![phone isEqualToString:@""]) {
-            if (![appDelegate.xmppStream registerWithPassword:password name:name email:email phone:phone error:&error])
-            {
-                [self UserDidNotRegister:XMPP_OtherError];
-            }
-        }
-        else if ([name isEqualToString:@""]&&[email isEqualToString:@""]) {
-            if (![appDelegate.xmppStream registerWithPassword:password error:&error])
-            {
-                [self UserDidNotRegister:XMPP_OtherError];
-            }
-        }
-        else if ([email isEqualToString:@""]) {
-            if (![appDelegate.xmppStream registerWithPassword:password name:name error:&error])
-            {
-                [self UserDidNotRegister:XMPP_OtherError];
-            }
-        }
-        else {
-            [self UserDidNotRegister:XMPP_OtherError];
+//        [appDelegate.xmppStream registerWithPassword:password error:&error]
+        if (![self registerWithPassword:password name:name error:&error])
+        {
+            
+            [self tempUserDidNotRegister:XMPP_OtherError];
         }
     }
     else {
-        [self UserDidNotRegister:XMPP_OtherError];
+        [self tempUserDidNotRegister:XMPP_OtherError];
         NSLog(@"Inband registration failed.");
     }
+}
+
+- (BOOL)registerWithPassword:(NSString *)password name:(NSString *)name error:(NSError **)errPtr
+{
+    //    XMPPLogTrace();
+    
+    __block BOOL result = YES;
+    __block NSError *err = nil;
+    
+    //    dispatch_block_t block = ^{ @autoreleasepool {
+    
+    if ( myDelegate.xmppStream.myJID == nil)
+    {
+        NSString *errMsg = @"You must set myJID before calling registerWithPassword:error:.";
+        NSDictionary *info = @{NSLocalizedDescriptionKey : errMsg};
+        
+        err = [NSError errorWithDomain:XMPPStreamErrorDomain code:XMPPStreamInvalidProperty userInfo:info];
+        
+        result = NO;
+        //            return_from_block;
+    }
+    
+    NSString *username = [myDelegate.xmppStream.myJID user];
+    
+    NSMutableArray *elements = [NSMutableArray array];
+    [elements addObject:[NSXMLElement elementWithName:@"username" stringValue:username]];
+    [elements addObject:[NSXMLElement elementWithName:@"password" stringValue:password]];
+    [elements addObject:[NSXMLElement elementWithName:@"name" stringValue:name]];
+    
+    [myDelegate.xmppStream registerWithElements:elements error:errPtr];
+    return result;
 }
 #pragma mark - end
 
 #pragma mark - XMPP conection after user registration successfull
-- (void)xmppConnect:(NSString *)phone password:(NSString *)passwordtext
-{
+- (void)xmppConnect {
 
-    [XMPPUserDefaultManager setValue:phone key:@"userName"];
     if ([XMPPUserDefaultManager getValue:@"CountData"] == nil) {
         NSMutableDictionary* countData = [NSMutableDictionary new];
         [XMPPUserDefaultManager setValue:countData key:@"CountData"];
@@ -170,9 +209,9 @@
     }
     
     [appDelegate disconnect];
-    NSString *username = [NSString stringWithFormat:@"%@@%@",phone,appDelegate.hostName]; // OR
-    NSString *password = passwordtext;
-    [XMPPUserDefaultManager setValue:username key:@"LoginCred"];
+//    NSString *username = xmppUserNameCredential; // OR
+    NSString *password = xmppPasswordCredential;
+    [XMPPUserDefaultManager setValue:xmppUserNameCredential key:@"LoginCred"];
     [XMPPUserDefaultManager setValue:password key:@"PassCred"];
     [XMPPUserDefaultManager setValue:@"1" key:@"CountValue"];
     [appDelegate connect];
@@ -180,7 +219,6 @@
 
 - (void)xmppConnectWithoutPassword:(NSString *)phone
 {
-//    [XMPPUserDefaultManager setValue:phone key:@"userName"];
     if ([XMPPUserDefaultManager getValue:@"CountData"] == nil) {
         NSMutableDictionary* countData = [NSMutableDictionary new];
         [XMPPUserDefaultManager setValue:countData key:@"CountData"];
@@ -199,19 +237,116 @@
 }
 #pragma mark - end
 
+#pragma mark - Post notification called method
+- (void)UserDidRegister:(NSNotification *)notification {
+    
+    //    [appDelegate methodCalling]
+    [self xmppConnect];
+    //    [self UserDidRegister];
+}
+
+- (void)UserNotRegister:(NSNotification *)notification {
+    
+    if([[notification object] intValue]==XMPP_UserExist){
+        
+        [self tempUserDidNotRegister:XMPP_UserExist];
+    }
+    else if(([[notification object] intValue]==XMPP_InvalidUserName)){
+        //This error is called when your Name is as username
+        [self tempUserDidNotRegister:XMPP_InvalidUserName];
+    }
+    else {
+        [self tempUserDidNotRegister:XMPP_OtherError];
+    }
+}
+
+- (void)tempUserDidNotRegister:(ErrorType)errorType {
+    
+    xmppUserNameCredential=@"";
+    xmppPasswordCredential=@"";
+    appDelegate.userProfileImageDataValue=nil;
+    [self UserDidNotRegister:errorType];
+}
+
+//These method is called to subViewController of RegisterXMPP file
+- (void)UserDidRegister {}
+- (void)UserDidNotRegister:(ErrorType)errorType {}
+//end
+
+- (void)RegisterUserDidAuthenticated {
+
+    [appDelegate methodCalling:xmppProfileData];
+}
+
+- (void)RegisterUserNotAuthenticated {
+    
+    [XMPPUserDefaultManager removeValue:@"LoginCred"];
+    [XMPPUserDefaultManager removeValue:@"PassCred"];
+    [self UserDidNotRegister:XMPP_OtherError];
+}
+
+//These method is called to subViewController of LoginXMPP file
+- (void)registerUserDidAuthenticatedResult {}
+- (void)registerUserNotAuthenticatedResult{}
+//end
+
 - (void)XMPPvCardTempModuleDidUpdateMyvCardSuccess {
     
     NSLog(@"success ");
+    [self UserDidRegister];
 }
 
 - (void)XMPPvCardTempModuleDidUpdateMyvCardFail {
     NSLog(@"fail ");
+    
+    //This code is used to delete currently logined user
+     NSXMLElement *query = [NSXMLElement elementWithName:@"query" xmlns:@"jabber:iq:register"];
+     [query addChild:[NSXMLElement elementWithName:@"remove"]];
+     
+     NSXMLElement *iq = [NSXMLElement elementWithName:@"iq"];
+     [iq addAttributeWithName:@"type" stringValue:@"set"];
+     [iq addAttributeWithName:@"id" stringValue:@"unreg1"];
+     [iq addChild:query];
+     [[appDelegate xmppStream] sendElement:iq];
+     //end
+    
+    [self UserDidNotRegister:XMPP_OtherError];
+}
+#pragma mark - end
+
+#pragma mark - Set static value
+- (NSString *)xmppName {
+    return @"xmppName";
 }
 
+- (NSString *)xmppPhoneNumber {
+    return @"xmppPhoneNumber";
+}
 
+- (NSString *)xmppUserStatus {
+    return @"xmppUserStatus";
+}
 
+- (NSString *)xmppDescription {
+    return @"xmppDescription";
+}
 
+- (NSString *)xmppAddress {
+    return @"xmppAddress";
+}
 
+- (NSString *)xmppEmailAddress {
+    return @"xmppEmailAddress";
+}
+
+- (NSString *)xmppUserBirthDay {
+    return @"xmppUserBirthDay";
+}
+
+- (NSString *)xmppGender {
+    return @"xmppGender";
+}
+#pragma mark - end
 /*
 #pragma mark - Navigation
 

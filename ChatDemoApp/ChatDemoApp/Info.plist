@@ -19,7 +19,7 @@
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>HostName</key>
-	<string>192.168.1.169</string>
+	<string>192.168.1.171</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
@@ -29,7 +29,7 @@
 	<key>PortNumber</key>
 	<integer>5222</integer>
 	<key>ServerName</key>
-	<string>ranosys</string>
+	<string>192.168.1.171</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UIRequiredDeviceCapabilities</key>

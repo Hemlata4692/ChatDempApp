@@ -204,18 +204,21 @@
 #pragma mark - Webservice
 - (void)userSignUp {
     
-//    UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-//    UIViewController * objReveal = [storyboard instantiateViewControllerWithIdentifier:@"DashboardViewController"];
-//    [self.navigationController setViewControllers: [NSArray arrayWithObject: objReveal]
-//                                         animated: NO];
-    
-    [self setXMPPProfilePhotoPlaceholder:@"profile_camera" profileImageView:self.profileImageView.image];
-    
     //If you want no password form then commented this code
-    //Here name,email are optional
-    [self userRegistrationPassword:self.password.text name:self.usernameField.text email:self.emailField.text phone:self.mobileField.text];
+    //You can add these optional values
+    NSMutableDictionary *profileData=[NSMutableDictionary new];
+    [profileData setObject:self.usernameField.text forKey:self.xmppName];
+    [profileData setObject:self.mobileField.text forKey:self.xmppPhoneNumber];
+    [profileData setObject:@"" forKey:self.xmppGender];
+    [profileData setObject:@"" forKey:self.xmppAddress];
+    [profileData setObject:@"My status" forKey:self.xmppUserStatus];
+    [profileData setObject:@"" forKey:self.xmppDescription];
+    [profileData setObject:self.emailField.text forKey:self.xmppEmailAddress];
+    [profileData setObject:@"" forKey:self.xmppUserBirthDay];
+    
+    [self userRegistrationPassword:self.password.text userName:self.mobileField.text profileData:profileData profilePlaceholder:@"profile_camera" profileImageView:self.profileImageView.image];
     /*//If you want no password form then uncomment this code
-    [self userRegistrationWithoutPassword:self.usernameField.text email:self.emailField.text phone:self.mobileField.text];
+    [self userRegistrationWithoutPassword:self.mobileField.text profileData:profileData profilePlaceholder:@"profile_camera" profileImageView:self.profileImageView.image];
      */
 }
 
@@ -223,21 +226,11 @@
 - (void)UserDidRegister {
     
     [myDelegate stopIndicator];
-    
-     //If you want to connect without password then commented this code
-    [self xmppConnect:self.mobileField.text password:self.password.text];
-//
-//    /*//If you want to connect without password then uncomment this code
-//     [self xmppConnectWithoutPassword:self.mobileField.text];
-//     */
-////    UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-////    UIViewController * objReveal = [storyboard instantiateViewControllerWithIdentifier:@"DashboardViewController"];
-////    [self.navigationController setViewControllers: [NSArray arrayWithObject: objReveal]
-////                                         animated: NO];
-//    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-//    UIViewController * homeView = [storyboard instantiateViewControllerWithIdentifier:@"DashboardNavigation"];
-//    [myDelegate.window setRootViewController:homeView];
-//    [myDelegate.window makeKeyAndVisible];
+    [UserDefaultManager setValue:self.usernameField.text key:@"userName"];
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    UIViewController * homeView = [storyboard instantiateViewControllerWithIdentifier:@"DashboardNavigation"];
+    [myDelegate.window setRootViewController:homeView];
+    [myDelegate.window makeKeyAndVisible];
 }
 
 - (void)UserDidNotRegister:(ErrorType)errorType {

@@ -31,28 +31,26 @@
     
     self.navigationItem.title=@"Dashboard";
     [self addBarButton];
-    
-    if ([myDelegate connect])
-    {
-        [self fetchedResultsController];
-        [self.dasboardTableListing reloadData];
-        
-//        NSData *photoData1 = [[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:@"1234567890@ranosys"]];
-//        UIImage *imagetemp=[UIImage imageWithData:photoData1];
-//        NSLog(@"d");
-//         NSLog(@"a");
-//        XMPPvCardTemp *newvCardTemp = [[myDelegate xmppvCardTempModule] vCardTempForJID:[XMPPJID jidWithString:@"2222222222@ranosys"] shouldFetch:YES];
-//        
-//         NSLog(@"%@",newvCardTemp.userStatus);
-//        NSLog(@"%@",newvCardTemp.emailAddresses);
-    }
-    
     // Do any additional setup after loading the view.
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:YES];
     
+    if ([myDelegate connect])
+    {
+        [self fetchedResultsController];
+        [self.dasboardTableListing reloadData];
+        
+        //        NSData *photoData1 = [[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:@"1234567890@ranosys"]];
+        //        UIImage *imagetemp=[UIImage imageWithData:photoData1];
+        //        NSLog(@"d");
+        //         NSLog(@"a");
+        XMPPvCardTemp *newvCardTemp = [[myDelegate xmppvCardTempModule] vCardTempForJID:[XMPPJID jidWithString:[NSString stringWithFormat:@"2135647878@%@",myDelegate.hostName]] shouldFetch:YES];
+        
+        NSLog(@"%@",newvCardTemp.userStatus);
+        NSLog(@"%@",newvCardTemp.emailAddress);
+    }
     [self addSegmentBar];
 }
 

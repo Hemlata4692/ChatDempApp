@@ -98,6 +98,7 @@
     NSString *password = userPassword;
 
     xmppUserNameCredential=xmppUsername;
+    [xmppProfileData setObject:xmppUsername forKey:self.xmppRegisterId];
     xmppPasswordCredential=password;
     appDelegate.xmppStream.myJID = [XMPPJID jidWithString:xmppUsername];
     if (appDelegate.xmppStream.supportsInBandRegistration) {
@@ -146,6 +147,7 @@
     NSString *password = appDelegate.defaultPassword;
     
     xmppUserNameCredential=xmppUsername;
+    [xmppProfileData setObject:xmppUsername forKey:self.xmppRegisterId];
     xmppPasswordCredential=password;
     
     appDelegate.xmppStream.myJID = [XMPPJID jidWithString:xmppUsername];
@@ -315,6 +317,10 @@
 #pragma mark - end
 
 #pragma mark - Set static value
+- (NSString *)xmppRegisterId {
+    return @"xmppRegisterId";
+}
+
 - (NSString *)xmppName {
     return @"xmppName";
 }

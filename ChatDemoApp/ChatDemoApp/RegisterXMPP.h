@@ -11,6 +11,7 @@
 
 @interface RegisterXMPP : UIViewController<XMPPStreamDelegate>
 
+@property(nonatomic,readonly) NSString *xmppRegisterId;
 @property(nonatomic,readonly) NSString *xmppName;
 @property(nonatomic,readonly) NSString *xmppPhoneNumber;
 @property(nonatomic,readonly) NSString *xmppUserStatus;

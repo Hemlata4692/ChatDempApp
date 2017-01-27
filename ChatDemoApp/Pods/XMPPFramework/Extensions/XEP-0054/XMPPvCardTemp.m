@@ -196,8 +196,8 @@ NSString *const kXMPPvCardTempElement = @"vCard";
     return [[self elementForName:@"RegisterUserId"] stringValue];
 }
 
-- (void)registerUserId:(NSString *)name {
-    XMPP_VCARD_SET_STRING_CHILD(name, @"RegisterUserId");
+- (void)setRegisterUserId:(NSString *)registerUserId {
+    XMPP_VCARD_SET_STRING_CHILD(registerUserId, @"RegisterUserId");
 }
 
 - (NSString *)formattedName {

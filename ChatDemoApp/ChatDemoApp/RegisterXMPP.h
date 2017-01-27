@@ -29,6 +29,8 @@
 //This method will be used for user registeration response
 -(void)UserDidRegister;
 -(void)UserDidNotRegister:(ErrorType)errorType;
+- (void)loginUserDidAuthenticatedResult;
+- (void)loginRegisteredUser;
 
 //This method will be used to connect XMPP with registered user
 - (void)xmppConnect;

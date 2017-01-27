@@ -385,9 +385,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 - (void)xmppStream:(XMPPStream *)sender didNotAuthenticate:(NSXMLElement *)error
 {
     DDLogVerbose(@"%@: %@", THIS_FILE, THIS_METHOD);
-    if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"zebra@%@",hostName]]) {
+//    if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"zebra@%@",hostName]]) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPDidNotAuthenticatedResponse" object:nil];
-    }
+//    }
 }
 
 -(void)fetchRosterListWithUserId:(NSString *)userId // yourID
@@ -555,8 +555,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [newvCardTemp setGender:[self setProfileDataValue:profileData key:@"xmppGender"]];
     
     [xmppvCardTempModule updateMyvCardTemp:newvCardTemp];
-    
-    [myDelegate stopIndicator];
 }
 
 - (NSString *)setProfileDataValue:(NSMutableDictionary *)profileData key:(NSString *)key {
@@ -652,6 +650,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 - (void)xmppRosterDidEndPopulating:(XMPPRoster *)sender
 {
     if ([myDelegate.myView isEqualToString:@"UserListView"]) {
+        
         
         [myDelegate stopIndicator];
     }

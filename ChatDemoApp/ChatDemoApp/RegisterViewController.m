@@ -226,11 +226,12 @@
 - (void)UserDidRegister {
     
     [myDelegate stopIndicator];
-    [UserDefaultManager setValue:self.usernameField.text key:@"userName"];
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-    UIViewController * homeView = [storyboard instantiateViewControllerWithIdentifier:@"DashboardNavigation"];
-    [myDelegate.window setRootViewController:homeView];
-    [myDelegate.window makeKeyAndVisible];
+    [self loginRegisteredUser];//After registration using this method, logged in user.
+//    [UserDefaultManager setValue:self.usernameField.text key:@"userName"];
+//    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+//    UIViewController * homeView = [storyboard instantiateViewControllerWithIdentifier:@"DashboardNavigation"];
+//    [myDelegate.window setRootViewController:homeView];
+//    [myDelegate.window makeKeyAndVisible];
 }
 
 - (void)UserDidNotRegister:(ErrorType)errorType {
@@ -256,4 +257,14 @@
     [self presentViewController:alert animated:YES completion:nil];
 }
 //end
+
+- (void)loginUserDidAuthenticatedResult {
+    NSLog(@"a");
+        [UserDefaultManager setValue:self.usernameField.text key:@"userName"];
+        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+        UIViewController * homeView = [storyboard instantiateViewControllerWithIdentifier:@"DashboardNavigation"];
+        [myDelegate.window setRootViewController:homeView];
+        [myDelegate.window makeKeyAndVisible];
+}
+
 @end

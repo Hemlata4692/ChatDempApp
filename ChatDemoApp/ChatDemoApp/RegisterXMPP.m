@@ -14,6 +14,7 @@
     AppDelegateObjectFile *appDelegate;
     NSMutableDictionary *xmppProfileData;
     NSString *xmppUserNameCredential, *xmppPasswordCredential;
+    BOOL isRegisterAuthenticate;
 }
 @end
 
@@ -29,6 +30,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:YES];
     
+    isRegisterAuthenticate=false;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(RegisterUserDidAuthenticated) name:@"XMPPDidAuthenticatedResponse" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(RegisterUserNotAuthenticated) name:@"XMPPDidNotAuthenticatedResponse" object:nil];
     
@@ -239,12 +241,19 @@
 }
 #pragma mark - end
 
+#pragma mark - Login user after registration
+- (void)loginRegisteredUser {
+
+    isRegisterAuthenticate=false;
+    [self xmppConnect];
+}
+#pragma mark - end
+
 #pragma mark - Post notification called method
 - (void)UserDidRegister:(NSNotification *)notification {
     
-    //    [appDelegate methodCalling]
+    isRegisterAuthenticate=true;
     [self xmppConnect];
-    //    [self UserDidRegister];
 }
 
 - (void)UserNotRegister:(NSNotification *)notification {
@@ -264,8 +273,11 @@
 
 - (void)tempUserDidNotRegister:(ErrorType)errorType {
     
-    xmppUserNameCredential=@"";
-    xmppPasswordCredential=@"";
+    xmppUserNameCredential=[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName];
+    xmppPasswordCredential=@"password";
+    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName] key:@"LoginCred"];
+    [XMPPUserDefaultManager setValue:@"password" key:@"PassCred"];
+    
     appDelegate.userProfileImageDataValue=nil;
     [self UserDidNotRegister:errorType];
 }
@@ -277,25 +289,50 @@
 
 - (void)RegisterUserDidAuthenticated {
 
-    [appDelegate methodCalling:xmppProfileData];
+    if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName]]) {
+        
+        if (isRegisterAuthenticate) {
+            [appDelegate methodCalling:xmppProfileData];
+        }
+        else {
+            [self loginUserDidAuthenticatedResult];
+        }
+    }
+    else {
+        [self UserDidRegister];
+    }
 }
 
 - (void)RegisterUserNotAuthenticated {
     
-    [XMPPUserDefaultManager removeValue:@"LoginCred"];
-    [XMPPUserDefaultManager removeValue:@"PassCred"];
-    [self UserDidNotRegister:XMPP_OtherError];
+    if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName]]) {
+        
+                [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName] key:@"LoginCred"];
+                [XMPPUserDefaultManager setValue:@"password" key:@"PassCred"];
+        
+        [self UserDidNotRegister:XMPP_OtherError];
+    }
+    else {
+        [self UserDidRegister];
+    }
 }
 
-//These method is called to subViewController of LoginXMPP file
-- (void)registerUserDidAuthenticatedResult {}
-- (void)registerUserNotAuthenticatedResult{}
+//These method is called to subViewController of RegisterXMPP file
+- (void)loginUserDidAuthenticatedResult {}
+- (void)loginUserNotAuthenticatedResult{}
 //end
 
 - (void)XMPPvCardTempModuleDidUpdateMyvCardSuccess {
     
     NSLog(@"success ");
-    [self UserDidRegister];
+//    [appDelegate disconnect];
+    if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName]]) {
+         [appDelegate disconnect];
+        [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName] key:@"LoginCred"];
+        [XMPPUserDefaultManager setValue:@"password" key:@"PassCred"];
+        
+        [appDelegate connect];
+    }
 }
 
 - (void)XMPPvCardTempModuleDidUpdateMyvCardFail {

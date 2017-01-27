@@ -124,10 +124,10 @@
 //    [self.navigationController setViewControllers: [NSArray arrayWithObject: objReveal]
 //                                         animated: NO];
     
- /*   UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     UIViewController * homeView = [storyboard instantiateViewControllerWithIdentifier:@"DashboardNavigation"];
     [myDelegate.window setRootViewController:homeView];
-    [myDelegate.window makeKeyAndVisible];*/
+    [myDelegate.window makeKeyAndVisible];
 }
 
 - (void)loginUserNotAuthenticatedResult{

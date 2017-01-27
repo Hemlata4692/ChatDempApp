@@ -46,7 +46,7 @@
         //        UIImage *imagetemp=[UIImage imageWithData:photoData1];
         //        NSLog(@"d");
         //         NSLog(@"a");
-        XMPPvCardTemp *newvCardTemp = [[myDelegate xmppvCardTempModule] vCardTempForJID:[XMPPJID jidWithString:[NSString stringWithFormat:@"1111111111@%@",myDelegate.hostName]] shouldFetch:YES];
+        XMPPvCardTemp *newvCardTemp = [[myDelegate xmppvCardTempModule] vCardTempForJID:[XMPPJID jidWithString:[NSString stringWithFormat:@"2222222222@%@",myDelegate.hostName]] shouldFetch:YES];
         
         NSLog(@"%@",newvCardTemp.userStatus);
         NSLog(@"%@",newvCardTemp.emailAddress);
@@ -113,6 +113,11 @@
 //    }
 //    NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"displayName" ascending:YES];
 ////    userListArr = [[sortArrSet sortedArrayUsingDescriptors:[NSArray arrayWithObject:sort]] mutableCopy];
+    
+    XMPPvCardTemp *newvCardTemp = [[myDelegate xmppvCardTempModule] vCardTempForJID:[XMPPJID jidWithString:[NSString stringWithFormat:@"2222222222@%@",myDelegate.hostName]] shouldFetch:YES];
+    
+    NSLog(@"%@",newvCardTemp.userStatus);
+    NSLog(@"%@",newvCardTemp.emailAddress);
     [self.dasboardTableListing reloadData];
 }
 #pragma mark - end

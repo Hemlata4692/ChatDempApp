@@ -4333,7 +4333,7 @@ enum XMPPStreamConfig
 	lastSendReceiveTime = [NSDate timeIntervalSinceReferenceDate];
 	numberOfBytesReceived += [data length];
 	
-	XMPPLogRecvPre(@"RECV: %@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+	XMPPLogRecvPre(@"RECV3: %@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
 	
 	// Asynchronously parse the xml data
 	[parser parseData:data];
@@ -4476,7 +4476,7 @@ enum XMPPStreamConfig
 	if (sender != parser) return;
 	
 	XMPPLogTrace();
-	XMPPLogRecvPost(@"RECV: %@", [root compactXMLString]);
+	XMPPLogRecvPost(@"RECV2: %@", [root compactXMLString]);
 		
 	// At this point we've sent our XML stream header, and we've received the response XML stream header.
 	// We save the root element of our stream for future reference.
@@ -4573,7 +4573,7 @@ enum XMPPStreamConfig
 	if (sender != parser) return;
 	
 	XMPPLogTrace();
-	XMPPLogRecvPost(@"RECV: %@", [element compactXMLString]);
+	XMPPLogRecvPost(@"RECV1: %@", [element compactXMLString]);
 		
 	NSString *elementName = [element name];
 	

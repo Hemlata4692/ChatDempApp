@@ -19,6 +19,7 @@
 @interface DashboardViewController () {
 
     HMSegmentedControl *customSegmentedControl;
+    AppDelegateObjectFile *appDelegate;
 }
 @property (strong, nonatomic) IBOutlet UITableView *dasboardTableListing;
 @end
@@ -30,6 +31,7 @@
     [super viewDidLoad];
     
     self.navigationItem.title=@"Dashboard";
+    appDelegate = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
     [self addBarButton];
     // Do any additional setup after loading the view.
 }
@@ -114,10 +116,10 @@
 //    NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"displayName" ascending:YES];
 ////    userListArr = [[sortArrSet sortedArrayUsingDescriptors:[NSArray arrayWithObject:sort]] mutableCopy];
     
-    XMPPvCardTemp *newvCardTemp = [[myDelegate xmppvCardTempModule] vCardTempForJID:[XMPPJID jidWithString:[NSString stringWithFormat:@"2222222222@%@",myDelegate.hostName]] shouldFetch:YES];
-    
-    NSLog(@"%@",newvCardTemp.userStatus);
-    NSLog(@"%@",newvCardTemp.emailAddress);
+//    XMPPvCardTemp *newvCardTemp = [[myDelegate xmppvCardTempModule] vCardTempForJID:[XMPPJID jidWithString:[NSString stringWithFormat:@"8888888899@%@",myDelegate.hostName]] shouldFetch:YES];
+//    
+//    NSLog(@"%@",newvCardTemp.userStatus);
+//    NSLog(@"%@",newvCardTemp.emailAddress);
     [self.dasboardTableListing reloadData];
 }
 #pragma mark - end
@@ -437,6 +439,20 @@
     }
 }
 #pragma mark - end
+
+- (IBAction)updateProfile:(id)sender {
+    
+//    NSLog(@"%@",[NSString stringWithFormat:@"8888888899@%@",myDelegate.hostName]);
+//    [appDelegate.xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:[NSString stringWithFormat:@"8888888899@%@",myDelegate.hostName]] ignoreStorage:YES];
+    
+//    XMPPvCardTemp *newvCardTemp = [[myDelegate xmppvCardTempModule] vCardTempForJID:[XMPPJID jidWithString:[NSString stringWithFormat:@"8888888899@%@",myDelegate.hostName]] shouldFetch:YES];
+//    
+//    NSLog(@"%@",newvCardTemp.userStatus);
+//    NSLog(@"%@",newvCardTemp.emailAddress);
+    
+    
+    [appDelegate editProfileImageUploading];
+}
 /*
 #pragma mark - Navigation
 

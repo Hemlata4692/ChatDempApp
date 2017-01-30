@@ -31,6 +31,8 @@
 }
 
 //Delcare XMPP variables
+
+@property (nonatomic, strong) XMPPPresence *presencexmpp;
 @property (nonatomic, strong, readonly) XMPPStream *xmppStream;
 @property (nonatomic, strong, readonly) XMPPReconnect *xmppReconnect;
 @property (nonatomic, strong, readonly) XMPPRoster *xmppRoster;
@@ -63,10 +65,11 @@
 -(BOOL)connect;
 -(void)disconnect;
 -(void)addBadgeIcon:(NSString*)badgeValue;
--(void)editProfileImageUploading:(UIImage*)editProfileImge;
+-(void)editProfileImageUploading;
 -(void)addBadgeIconLastTab;
 -(void)removeBadgeIconLastTab;
 -(void)methodCalling:(NSMutableDictionary *)profileData;
+
 - (NSManagedObjectContext *)managedObjectContext_roster;
 - (NSManagedObjectContext *)managedObjectContext_capabilities;
 

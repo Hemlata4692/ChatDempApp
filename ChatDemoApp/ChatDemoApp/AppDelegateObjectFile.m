@@ -54,6 +54,8 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 @synthesize xmppMessageArchivingCoreDataStorage, xmppMessageArchivingModule;
 @synthesize userProfileImageData;
 
+@synthesize presencexmpp;
+
 @synthesize portNumber, hostName, serverName, defaultPassword;
 
 #pragma mark - Intialze XMPP connection
@@ -229,8 +231,8 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 
 - (void)goOnline
 {
-    XMPPPresence *presence = [XMPPPresence presence]; // type="available" is implicit
-    
+//    XMPPPresence *presence = [XMPPPresence presence]; // type="available" is implicit
+    presencexmpp = [XMPPPresence presence];
     NSString *domain = [xmppStream.myJID domain];
     
     //Google set their presence priority to 24, so we do the same to be compatible.
@@ -240,10 +242,10 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
        || [domain isEqualToString:@"talk.google.com"]  || [domain isEqualToString:hostName])
     {
         NSXMLElement *priority = [NSXMLElement elementWithName:@"priority" stringValue:@"24"];
-        [presence addChild:priority];
+        [presencexmpp addChild:priority];
     }
     
-    [[self xmppStream] sendElement:presence];
+    [[self xmppStream] sendElement:presencexmpp];
 }
 
 - (void)goOffline
@@ -405,6 +407,13 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 {
     NSXMLElement *queryElement = [NSXMLElement elementWithName:@"query" xmlns:@"jabber:iq:roster"];
     
+    NSXMLElement *vcardInfo = [iq elementForName:@"vCard"];
+    NSArray *successStoryArray = [vcardInfo elementsForName:@"EMAILADDRESS"];
+    NSLog(@"successStoryArray: %@", successStoryArray);
+    
+//    <iq xmlns="jabber:client" type="set" id="100-166" to="1111111111@192.168.1.171/8nbo21q8fn"><query xmlns="jabber:iq:roster"><item jid="9999666666@192.168.1.171" name="p" subscription="both"><group>Ranosys</group></item></query></iq>
+//    <iq xmlns="jabber:client" type="set" id="827-142" to="1111111111@192.168.1.171/8nbo21q8fn"><query xmlns="jabber:iq:roster"><item jid="5555888888@192.168.1.171" subscription="remove"></item></query></iq>
+    
     if (queryElement) {
         NSArray *itemElements = [queryElement elementsForName: @"item"];
         NSMutableArray *mArray = [[NSMutableArray alloc] init];
@@ -547,7 +556,8 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [newvCardTemp setRegisterUserId:[self setProfileDataValue:profileData key:@"xmppRegisterId"]];
     [newvCardTemp setNickname:[self setProfileDataValue:profileData key:@"xmppName"]];
     [newvCardTemp setTelecomsAddress:[self setProfileDataValue:profileData key:@"xmppPhoneNumber"]];
-    [newvCardTemp setUserStatus:[self setProfileDataValue:profileData key:@"xmppUserStatus"]];
+//    [newvCardTemp setUserStatus:[self setProfileDataValue:profileData key:@"xmppUserStatus"]];
+    [newvCardTemp setUserStatus:@"old status"];
     [newvCardTemp setDesc:[self setProfileDataValue:profileData key:@"xmppDescription"]];
     [newvCardTemp setAddress:[self setProfileDataValue:profileData key:@"xmppAddress"]];
     [newvCardTemp setEmailAddress:[self setProfileDataValue:profileData key:@"xmppEmailAddress"]];
@@ -555,6 +565,23 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [newvCardTemp setGender:[self setProfileDataValue:profileData key:@"xmppGender"]];
     
     [xmppvCardTempModule updateMyvCardTemp:newvCardTemp];
+    
+    
+//    XMPPPresence *presence = [XMPPPresence presence];
+    //    NSString *string = [notification object]; // object contains some random string.
+//    NSXMLElement *status = [NSXMLElement elementWithName:@"status" stringValue:@"my status"];
+//     NSXMLElement *emailId = [NSXMLElement elementWithName:@"emailId" stringValue:@"my status"];
+//     NSXMLElement *name = [NSXMLElement elementWithName:@"name" stringValue:@"my status"];
+//    [presencexmpp addChild:status];
+//    [presencexmpp addChild:[NSXMLElement elementWithName:@"emailId" stringValue:@"my status"]];
+//    [presencexmpp addChild:[NSXMLElement elementWithName:@"name" stringValue:@"my status"]];
+//    NSLog(@"presence info :- %@",presencexmpp);
+//    [[self xmppStream] sendElement:presencexmpp];
+    
+    
+//    XMPPPresence *presence = [XMPPPresence presenceWithType:@"unavailable"];
+//    
+//    [[self xmppStream] sendElement:presence];
 }
 
 - (NSString *)setProfileDataValue:(NSMutableDictionary *)profileData key:(NSString *)key {
@@ -567,23 +594,65 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     return value;
 }
 
+- (NSString *)setProfileDataValuae:value1 key:(NSString *)key {
+    
+    NSString *value=@"";
+//    if (nil!=[profileData objectForKey:key]||NULL!=[profileData objectForKey:key]||([[profileData objectForKey:key] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].length != 0)) {
+    
+        value=value1;
+//    }
+    return value;
+}
+
 - (void)xmppvCardTempModule:(XMPPvCardTempModule *)vCardTempModule
         didReceivevCardTemp:(XMPPvCardTemp *)vCardTemp
                      forJID:(XMPPJID *)jid{
     NSLog(@"a");
 }
 
--(void)editProfileImageUploading:(UIImage*)editProfileImge{
+-(void)editProfileImageUploading{
+    
+//    NSXMLElement *vCardXML = [NSXMLElement elementWithName:@"vCard" xmlns:@"vcard-temp"];
+//    XMPPvCardTemp *newvCardTemp = [XMPPvCardTemp vCardTempFromElement:vCardXML];
+//    NSData *pictureData = UIImageJPEGRepresentation(editProfileImge, 0.5);
+//    
+//    [newvCardTemp setPhoto:pictureData];
+//    XMPPvCardCoreDataStorage * xmppvCardStorage1 = [XMPPvCardCoreDataStorage sharedInstance];
+//    XMPPvCardTempModule * xmppvCardTempModule1 = [[XMPPvCardTempModule alloc] initWithvCardStorage:xmppvCardStorage1];
+//    [xmppvCardTempModule1  activate:[self xmppStream]];
+//    [xmppvCardTempModule1 updateMyvCardTemp:newvCardTemp];
     
     NSXMLElement *vCardXML = [NSXMLElement elementWithName:@"vCard" xmlns:@"vcard-temp"];
     XMPPvCardTemp *newvCardTemp = [XMPPvCardTemp vCardTempFromElement:vCardXML];
-    NSData *pictureData = UIImageJPEGRepresentation(editProfileImge, 0.5);
+//    NSData *pictureData;
+//    if (nil!=self.userProfileImageDataValue) {
+//        
+//        pictureData = UIImageJPEGRepresentation([UIImage imageWithData:self.userProfileImageDataValue], 1.0);
+//        [newvCardTemp setPhoto:pictureData];
+//    }
     
-    [newvCardTemp setPhoto:pictureData];
-    XMPPvCardCoreDataStorage * xmppvCardStorage1 = [XMPPvCardCoreDataStorage sharedInstance];
-    XMPPvCardTempModule * xmppvCardTempModule1 = [[XMPPvCardTempModule alloc] initWithvCardStorage:xmppvCardStorage1];
-    [xmppvCardTempModule1  activate:[self xmppStream]];
-    [xmppvCardTempModule1 updateMyvCardTemp:newvCardTemp];
+    /*//Other variables
+     [newvCardTemp setNickname:@"aaaaaa"];
+     NSArray *interestsArray= [[NSArray alloc] initWithObjects:@"food", nil];
+     [newvCardTemp setLabels:interestsArray];
+     [newvCardTemp setMiddleName:@"Stt"];
+     [newvCardTemp setUserStatus:@"I am available"];
+     [newvCardTemp setAddress:@"rohitm@ranosys.com"];
+     [newvCardTemp setEmailAddresses:[NSMutableArray arrayWithObjects:@"rohitmodi@ranosys.com",@"rohitm@ranosys.com", nil]];
+     */
+    
+//    [newvCardTemp setRegisterUserId:[self setProfileDataValue:profileData key:@"xmppRegisterId"]];
+//    [newvCardTemp setNickname:[self setProfileDataValue:profileData key:@"xmppName"]];
+//    [newvCardTemp setTelecomsAddress:[self setProfileDataValue:profileData key:@"xmppPhoneNumber"]];
+    [newvCardTemp setUserStatus:@"tenth status"];
+//    [newvCardTemp setDesc:[self setProfileDataValue:profileData key:@"xmppDescription"]];
+//    [newvCardTemp setAddress:[self setProfileDataValue:profileData key:@"xmppAddress"]];
+    [newvCardTemp setEmailAddress:@"newemail@c.com"];
+    [newvCardTemp setNickname:@"newemail@c.com"];
+//    [newvCardTemp setBday:[self setProfileDataValue:profileData key:@"xmppUserBirthDay"]];
+//    [newvCardTemp setGender:[self setProfileDataValue:profileData key:@"xmppGender"]];
+    
+    [xmppvCardTempModule updateMyvCardTemp:newvCardTemp];
     
 }
 

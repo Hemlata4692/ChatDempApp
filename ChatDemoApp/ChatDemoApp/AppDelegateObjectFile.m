@@ -93,10 +93,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     userHistoryArr = [NSMutableArray new];
     userProfileImage = [NSMutableDictionary new];
     
-    if ([XMPPUserDefaultManager getValue:@"LoginCred"] == nil) {
-        [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",hostName] key:@"LoginCred"];
-        [XMPPUserDefaultManager setValue:@"password" key:@"PassCred"];
-    }
     xmppMessageArchivingCoreDataStorage = [XMPPMessageArchivingCoreDataStorage sharedInstance];
     xmppMessageArchivingModule = [[XMPPMessageArchiving alloc]initWithMessageArchivingStorage:xmppMessageArchivingCoreDataStorage];
     if ([XMPPUserDefaultManager getValue:@"CountData"] == nil) {
@@ -108,7 +104,15 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     }
     [DDLog addLogger:[DDTTYLogger sharedInstance] withLogLevel:XMPP_LOG_FLAG_SEND_RECV];
     [self setupStream];
-    [self connect];
+    NSLog(@"%@",[XMPPUserDefaultManager getValue:@"LoginCred"]);
+    if (([XMPPUserDefaultManager getValue:@"LoginCred"] != nil)) {
+//        [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",hostName] key:@"LoginCred"];
+//        [XMPPUserDefaultManager setValue:@"password" key:@"PassCred"];
+        [self connect];
+    }
+//    else {
+//    [self connect];
+//    }
 }
 #pragma mark - end
 

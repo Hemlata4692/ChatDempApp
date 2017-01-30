@@ -226,7 +226,11 @@
 - (void)UserDidRegister {
     
     [myDelegate stopIndicator];
-    [self loginRegisteredUser];//After registration using this method, logged in user.
+    [self loginRegisteredUser:self.mobileField.text password:self.password.text];//After registration using this method, logged in user.
+    /*//If you want no password form then uncomment this code
+    [self loginRegisteredUser:self.mobileField.text];//After registration using this method, logged in user.
+     */
+    
 //    [UserDefaultManager setValue:self.usernameField.text key:@"userName"];
 //    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
 //    UIViewController * homeView = [storyboard instantiateViewControllerWithIdentifier:@"DashboardNavigation"];

@@ -13,7 +13,7 @@
     
     AppDelegateObjectFile *appDelegate;
     NSMutableDictionary *xmppProfileData;
-    NSString *xmppUserNameCredential, *xmppPasswordCredential;
+    NSString *xmppUserNameCredential, *xmppPasswordCredential, *xmppNameCredential;
     BOOL isRegisterAuthenticate;
 }
 @end
@@ -72,6 +72,7 @@
 #pragma mark - User registration at XMPP server(OpenFire)
 - (void)userRegistrationPassword:(NSString *)userPassword userName:(NSString*)userName profileData:(NSMutableDictionary*)profileData profilePlaceholder:(NSString *)profilePlaceholder profileImageView:(UIImage *)profileImageView {
     
+    [appDelegate disconnect];
     xmppProfileData=[profileData mutableCopy];
     //Set image in delegate object
     UIImage* placeholderImage = [UIImage imageNamed:profilePlaceholder];
@@ -87,14 +88,14 @@
     }
     //end
     
-    NSString *name=@"";
+    xmppNameCredential=@"";
     if (nil==[profileData objectForKey:self.xmppName]||NULL==[profileData objectForKey:self.xmppName]||([[profileData objectForKey:self.xmppName] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].length == 0)) {
         
-        name=userName;
+        xmppNameCredential=userName;
     }
     else {
     
-        name=[[profileData objectForKey:self.xmppName] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        xmppNameCredential=[[profileData objectForKey:self.xmppName] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     }
     NSString *xmppUsername = [NSString stringWithFormat:@"%@@%@",userName,appDelegate.hostName];
     NSString *password = userPassword;
@@ -102,19 +103,26 @@
     xmppUserNameCredential=xmppUsername;
     [xmppProfileData setObject:xmppUsername forKey:self.xmppRegisterId];
     xmppPasswordCredential=password;
-    appDelegate.xmppStream.myJID = [XMPPJID jidWithString:xmppUsername];
-    if (appDelegate.xmppStream.supportsInBandRegistration) {
-        NSError *error = nil;
-        
-        if (![self registerWithPassword:password name:name error:&error])
-        {
-            [self tempUserDidNotRegister:XMPP_OtherError];
-        }
-    }
-    else {
-        [self tempUserDidNotRegister:XMPP_OtherError];
-        NSLog(@"Inband registration failed.");
-    }
+    [self createConnection];//Create connection using invalid user bcz without connection cannot register new account
+    
+    
+    
+    
+    
+    
+//    appDelegate.xmppStream.myJID = [XMPPJID jidWithString:xmppUsername];
+//    if (appDelegate.xmppStream.supportsInBandRegistration) {
+//        NSError *error = nil;
+//        
+//        if (![self registerWithPassword:password name:xmppNameCredential error:&error])
+//        {
+//            [self tempUserDidNotRegister:XMPP_OtherError];
+//        }
+//    }
+//    else {
+//        [self tempUserDidNotRegister:XMPP_OtherError];
+//        NSLog(@"Inband registration failed.");
+//    }
 }
 
 - (void)userRegistrationWithoutPassword:(NSString*)userName profileData:(NSMutableDictionary*)profileData profilePlaceholder:(NSString *)profilePlaceholder profileImageView:(UIImage *)profileImageView {
@@ -135,14 +143,14 @@
     }
     //end
     
-    NSString *name=@"";
+    xmppNameCredential=@"";
     if (nil==[profileData objectForKey:self.xmppName]||NULL==[profileData objectForKey:self.xmppName]||([[profileData objectForKey:self.xmppName] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].length == 0)) {
         
-        name=userName;
+        xmppNameCredential=userName;
     }
     else {
         
-        name=[[profileData objectForKey:self.xmppName] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        xmppNameCredential=[[profileData objectForKey:self.xmppName] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     }
 
     NSString *xmppUsername = [NSString stringWithFormat:@"%@@%@",userName,appDelegate.hostName];
@@ -151,22 +159,34 @@
     xmppUserNameCredential=xmppUsername;
     [xmppProfileData setObject:xmppUsername forKey:self.xmppRegisterId];
     xmppPasswordCredential=password;
+    [self createConnection];//Create connection using invalid user bcz without connection cannot register new account
     
-    appDelegate.xmppStream.myJID = [XMPPJID jidWithString:xmppUsername];
-    if (appDelegate.xmppStream.supportsInBandRegistration) {
-        NSError *error = nil;
-        
-//        [appDelegate.xmppStream registerWithPassword:password error:&error]
-        if (![self registerWithPassword:password name:name error:&error])
-        {
-            
-            [self tempUserDidNotRegister:XMPP_OtherError];
-        }
-    }
-    else {
-        [self tempUserDidNotRegister:XMPP_OtherError];
-        NSLog(@"Inband registration failed.");
-    }
+    
+    
+    
+    
+//    appDelegate.xmppStream.myJID = [XMPPJID jidWithString:xmppUsername];
+//    if (appDelegate.xmppStream.supportsInBandRegistration) {
+//        NSError *error = nil;
+//        
+////        [appDelegate.xmppStream registerWithPassword:password error:&error]
+//        if (![self registerWithPassword:password name:name error:&error])
+//        {
+//            
+//            [self tempUserDidNotRegister:XMPP_OtherError];
+//        }
+//    }
+//    else {
+//        [self tempUserDidNotRegister:XMPP_OtherError];
+//        NSLog(@"Inband registration failed.");
+//    }
+}
+
+- (void)createConnection {
+
+    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName] key:@"LoginCred"];
+    [XMPPUserDefaultManager setValue:@"password" key:@"PassCred"];
+    [appDelegate connect];
 }
 
 - (BOOL)registerWithPassword:(NSString *)password name:(NSString *)name error:(NSError **)errPtr
@@ -220,9 +240,18 @@
     [XMPPUserDefaultManager setValue:@"1" key:@"CountValue"];
     [appDelegate connect];
 }
+#pragma mark - end
 
-- (void)xmppConnectWithoutPassword:(NSString *)phone
-{
+#pragma mark - Login user after registration
+//- (void)loginRegisteredUser {
+//
+//    isRegisterAuthenticate=false;
+//    [self xmppConnect];
+//}
+
+- (void)loginRegisteredUser:(NSString *)userName password:(NSString *)passwordValue {
+    
+    isRegisterAuthenticate=false;
     if ([XMPPUserDefaultManager getValue:@"CountData"] == nil) {
         NSMutableDictionary* countData = [NSMutableDictionary new];
         [XMPPUserDefaultManager setValue:countData key:@"CountData"];
@@ -232,20 +261,34 @@
     }
     
     [appDelegate disconnect];
-    NSString *username = [NSString stringWithFormat:@"%@@%@",phone,appDelegate.hostName]; // OR
-    NSString *password = appDelegate.defaultPassword;
-    [XMPPUserDefaultManager setValue:username key:@"LoginCred"];
+    //    NSString *username = xmppUserNameCredential; // OR
+    NSString *password = passwordValue;
+    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%@@%@",userName,appDelegate.hostName] key:@"LoginCred"];
     [XMPPUserDefaultManager setValue:password key:@"PassCred"];
     [XMPPUserDefaultManager setValue:@"1" key:@"CountValue"];
     [appDelegate connect];
+    //    [self xmppConnect];
 }
-#pragma mark - end
 
-#pragma mark - Login user after registration
-- (void)loginRegisteredUser {
-
+- (void)loginRegisteredUser:(NSString *)userName {
+    
     isRegisterAuthenticate=false;
-    [self xmppConnect];
+    if ([XMPPUserDefaultManager getValue:@"CountData"] == nil) {
+        NSMutableDictionary* countData = [NSMutableDictionary new];
+        [XMPPUserDefaultManager setValue:countData key:@"CountData"];
+    }
+    if ([XMPPUserDefaultManager getValue:@"BadgeCount"] == nil) {
+        [XMPPUserDefaultManager setValue:@"0" key:@"BadgeCount"];
+    }
+    
+    [appDelegate disconnect];
+    //    NSString *username = xmppUserNameCredential; // OR
+    NSString *password = appDelegate.defaultPassword;
+    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%@@%@",userName,appDelegate.hostName] key:@"LoginCred"];
+    [XMPPUserDefaultManager setValue:password key:@"PassCred"];
+    [XMPPUserDefaultManager setValue:@"1" key:@"CountValue"];
+    [appDelegate connect];
+    //    [self xmppConnect];
 }
 #pragma mark - end
 
@@ -273,11 +316,16 @@
 
 - (void)tempUserDidNotRegister:(ErrorType)errorType {
     
-    xmppUserNameCredential=[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName];
-    xmppPasswordCredential=@"password";
-    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName] key:@"LoginCred"];
-    [XMPPUserDefaultManager setValue:@"password" key:@"PassCred"];
+//    xmppUserNameCredential=[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName];
+//    xmppPasswordCredential=@"password";
+//    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName] key:@"LoginCred"];
+//    [XMPPUserDefaultManager setValue:@"password" key:@"PassCred"];
     
+    [XMPPUserDefaultManager removeValue:@"LoginCred"];
+    //    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",myDelegate.hostName] key:@"LoginCred"];
+    [XMPPUserDefaultManager removeValue:@"PassCred"];
+    
+    [appDelegate disconnect];
     appDelegate.userProfileImageDataValue=nil;
     [self UserDidNotRegister:errorType];
 }
@@ -299,7 +347,8 @@
         }
     }
     else {
-        [self UserDidRegister];
+//        [self UserDidRegister];
+        
     }
 }
 
@@ -307,13 +356,33 @@
     
     if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName]]) {
         
-                [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName] key:@"LoginCred"];
-                [XMPPUserDefaultManager setValue:@"password" key:@"PassCred"];
+//                [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName] key:@"LoginCred"];
+//                [XMPPUserDefaultManager setValue:@"password" key:@"PassCred"];
+        [XMPPUserDefaultManager removeValue:@"LoginCred"];
+        //    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",myDelegate.hostName] key:@"LoginCred"];
+        [XMPPUserDefaultManager removeValue:@"PassCred"];
         
+        [appDelegate disconnect];
         [self UserDidNotRegister:XMPP_OtherError];
     }
     else {
-        [self UserDidRegister];
+//        [self UserDidRegister];
+        //After connection created, register new user
+        appDelegate.xmppStream.myJID = [XMPPJID jidWithString:xmppUserNameCredential];
+        if (appDelegate.xmppStream.supportsInBandRegistration) {
+            NSError *error = nil;
+            
+            //        [appDelegate.xmppStream registerWithPassword:password error:&error]
+            if (![self registerWithPassword:xmppPasswordCredential name:xmppNameCredential error:&error])
+            {
+                
+                [self tempUserDidNotRegister:XMPP_OtherError];
+            }
+        }
+        else {
+            [self tempUserDidNotRegister:XMPP_OtherError];
+            NSLog(@"Inband registration failed.");
+        }
     }
 }
 
@@ -326,13 +395,14 @@
     
     NSLog(@"success ");
 //    [appDelegate disconnect];
-    if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName]]) {
-         [appDelegate disconnect];
-        [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName] key:@"LoginCred"];
-        [XMPPUserDefaultManager setValue:@"password" key:@"PassCred"];
-        
-        [appDelegate connect];
-    }
+//    if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName]]) {
+    [appDelegate disconnect];
+    [self UserDidRegister];
+//        [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName] key:@"LoginCred"];
+//        [XMPPUserDefaultManager setValue:@"password" key:@"PassCred"];
+//        
+//        [appDelegate connect];
+//    }
 }
 
 - (void)XMPPvCardTempModuleDidUpdateMyvCardFail {
@@ -348,6 +418,10 @@
      [iq addChild:query];
      [[appDelegate xmppStream] sendElement:iq];
      //end
+    
+    [XMPPUserDefaultManager removeValue:@"LoginCred"];
+    [XMPPUserDefaultManager removeValue:@"PassCred"];
+    [appDelegate disconnect];
     
     [self UserDidNotRegister:XMPP_OtherError];
 }

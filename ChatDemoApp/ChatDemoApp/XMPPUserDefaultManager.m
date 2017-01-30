@@ -27,7 +27,8 @@
 //Remove data in userDefault
 + (void)removeValue:(NSString *)key {
     
-    [[NSUserDefaults standardUserDefaults]removeObjectForKey:key];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:key];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 #pragma mark - end
 @end

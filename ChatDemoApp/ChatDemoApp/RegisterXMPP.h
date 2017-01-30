@@ -32,6 +32,9 @@
 - (void)loginUserDidAuthenticatedResult;
 - (void)loginRegisteredUser;
 
+- (void)loginRegisteredUser:(NSString *)userName password:(NSString *)passwordValue;
+- (void)loginRegisteredUser:(NSString *)userName;
+
 //This method will be used to connect XMPP with registered user
 - (void)xmppConnect;
 - (void)xmppConnectWithoutPassword:(NSString *)phone;

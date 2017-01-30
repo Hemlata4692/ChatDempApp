@@ -32,11 +32,11 @@
 #pragma mark - User logout
 - (void)userLogout {
     
-    [XMPPUserDefaultManager setValue:nil key:@"LoginCred"];
     [appDelegate disconnect];
-    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",myDelegate.hostName] key:@"LoginCred"];
-    [XMPPUserDefaultManager setValue:@"password" key:@"PassCred"];
-    [appDelegate connect];
+    [XMPPUserDefaultManager removeValue:@"LoginCred"];
+    //    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",myDelegate.hostName] key:@"LoginCred"];
+    [XMPPUserDefaultManager removeValue:@"PassCred"];
+//    [appDelegate connect];
 }
 #pragma mark - end
 

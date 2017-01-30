@@ -66,22 +66,23 @@
 #pragma mark - Post notification called method
 - (void)UserDidAuthenticated {
 
-    if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName]]) {
+//    if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName]]) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
             [self loginUserDidAuthenticatedResult];
         });
-    }
+//    }
 }
 
 - (void)UserNotAuthenticated {
     
-    if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName]]) {
+//    if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName]]) {
 //        [XMPPUserDefaultManager removeValue:@"LoginCred"];
 //        [XMPPUserDefaultManager removeValue:@"PassCred"];
-        [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName] key:@"LoginCred"];
-        [XMPPUserDefaultManager setValue:@"password" key:@"PassCred"];
+        [appDelegate disconnect];
+        [XMPPUserDefaultManager removeValue:@"LoginCred"];
+        [XMPPUserDefaultManager removeValue:@"PassCred"];
         [self loginUserNotAuthenticatedResult];
-    }
+//    }
 }
 
 //These method is called to subViewController of LoginXMPP file

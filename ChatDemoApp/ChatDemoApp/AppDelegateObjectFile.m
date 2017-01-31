@@ -83,9 +83,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         portNumber = 0;
     }
     
-    if (nil!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"PasswordRequired"] && NULL!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"PasswordRequired"] && ![[NSBundle mainBundle] objectForInfoDictionaryKey:@"PasswordRequired"]) {
+//    if (nil!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"PasswordRequired"] && NULL!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"PasswordRequired"] && ![[NSBundle mainBundle] objectForInfoDictionaryKey:@"PasswordRequired"]) {
         defaultPassword = @"password";
-    }
+//    }
     
     xmppUniqueId=@"Zebra123456";
     userProfileImageData = [[UIImageView alloc] init];

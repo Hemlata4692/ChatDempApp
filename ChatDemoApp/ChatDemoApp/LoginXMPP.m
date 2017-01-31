@@ -8,7 +8,6 @@
 
 #import "LoginXMPP.h"
 #import "XMPPUserDefaultManager.h"
-#import <CoreData/CoreData.h>
 
 @interface LoginXMPP () {
 

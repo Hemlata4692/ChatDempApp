@@ -32,25 +32,9 @@
     //Adding textfield to keyboard controls array
     [self setKeyboardControls:[[BSKeyboardControls alloc] initWithFields:@[self.usernameField]]];
     [self.keyboardControls setDelegate:self];
-    
-    
-    NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"Device"];
-    NSMutableArray *devices = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
     NSLog(@"a");
     // Do any additional setup after loading the view, typically from a nib.
 }
-
-
-- (NSManagedObjectContext *)managedObjectContext {
-    NSManagedObjectContext *context = nil;
-    id delegate = [[UIApplication sharedApplication] delegate];
-    if ([delegate performSelector:@selector(managedObjectContext)]) {
-        context = [delegate managedObjectContext];
-    }
-    return context;
-}
-
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

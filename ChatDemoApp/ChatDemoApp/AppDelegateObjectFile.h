@@ -13,6 +13,7 @@
 #import "TURNSocket.h"
 #import "XMPPMessageArchivingCoreDataStorage.h"
 
+
 @interface AppDelegateObjectFile : UIResponder<XMPPRosterDelegate>
 {
     XMPPStream *xmppStream;
@@ -50,6 +51,7 @@
 @property(strong, nonatomic)NSString *hostName;
 @property(strong, nonatomic)NSString *serverName;
 @property(strong, nonatomic)NSString *defaultPassword;
+@property(strong, nonatomic)NSString *xmppUniqueId;
 @property(assign, nonatomic)int portNumber;
 //end
 
@@ -80,6 +82,8 @@
 - (void)enterTerminationMethod :(UIApplication *)application;
 //end
 
+//CoreData array
+@property (strong) NSMutableArray *xmppUserEntries;
 
 
 

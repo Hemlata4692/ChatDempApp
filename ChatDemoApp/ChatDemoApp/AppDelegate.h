@@ -9,6 +9,8 @@
 #import <UIKit/UIKit.h>
 #import "AppDelegateObjectFile.h"
 
+#import <CoreData/CoreData.h>
+
 @interface AppDelegate : AppDelegateObjectFile <UIApplicationDelegate,XMPPRosterDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
@@ -17,5 +19,10 @@
 //Indicator method
 - (void)showIndicator;
 - (void)stopIndicator;
+
+
+@property (readonly, strong) NSPersistentContainer *persistentContainer;
+
+- (void)saveContext;
 @end
 

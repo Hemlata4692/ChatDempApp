@@ -54,15 +54,14 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 @synthesize xmppMessageArchivingCoreDataStorage, xmppMessageArchivingModule;
 @synthesize userProfileImageData;
 
+@synthesize xmppUserEntries;
 @synthesize presencexmpp;
 
-@synthesize portNumber, hostName, serverName, defaultPassword;
+@synthesize portNumber, hostName, serverName, defaultPassword, xmppUniqueId;
 
 #pragma mark - Intialze XMPP connection
 - (void)didFinishLaunchingMethod {
 
-   
-    
     if (nil!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"] && NULL!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"]) {
         hostName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"];
     }
@@ -88,6 +87,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         defaultPassword = @"password";
     }
     
+    xmppUniqueId=@"Zebra123456";
     userProfileImageData = [[UIImageView alloc] init];
     
     userHistoryArr = [NSMutableArray new];
@@ -113,6 +113,13 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 //    else {
 //    [self connect];
 //    }
+    
+    
+//    // Fetch the user entries from persistent data store
+//    NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
+//    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UserEntry"];
+//    xmppUserEntries = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
+
 }
 #pragma mark - end
 
@@ -560,8 +567,8 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [newvCardTemp setRegisterUserId:[self setProfileDataValue:profileData key:@"xmppRegisterId"]];
     [newvCardTemp setNickname:[self setProfileDataValue:profileData key:@"xmppName"]];
     [newvCardTemp setTelecomsAddress:[self setProfileDataValue:profileData key:@"xmppPhoneNumber"]];
-//    [newvCardTemp setUserStatus:[self setProfileDataValue:profileData key:@"xmppUserStatus"]];
-    [newvCardTemp setUserStatus:@"old status"];
+    [newvCardTemp setUserStatus:[self setProfileDataValue:profileData key:@"xmppUserStatus"]];
+//    [newvCardTemp setUserStatus:@"old status"];
     [newvCardTemp setDesc:[self setProfileDataValue:profileData key:@"xmppDescription"]];
     [newvCardTemp setAddress:[self setProfileDataValue:profileData key:@"xmppAddress"]];
     [newvCardTemp setEmailAddress:[self setProfileDataValue:profileData key:@"xmppEmailAddress"]];
@@ -813,6 +820,15 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 #pragma mark - end
 
 
+//- (NSManagedObjectContext *)managedObjectContext
+//{
+//    NSManagedObjectContext *context = nil;
+//    id delegate = [[UIApplication sharedApplication] delegate];
+//    if ([delegate performSelector:@selector(managedObjectContext)]) {
+//        context = [delegate managedObjectContext];
+//    }
+//    return context;
+//}
 
 //[[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPvCardTempModuleDidUpdateMyvCardSuccess" object:nil];
 //}

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="11542" systemVersion="16A323" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="UserEntry" representedClassName="UserEntry" isAbstract="YES" syncable="YES" codeGenerationType="class">
+        <attribute name="xmppAddress" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="xmppDescription" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="xmppEmailAddress" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="xmppGender" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="xmppName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="xmppPhoneNumber" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="xmppRegisterId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="xmppUserBirthDay" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="xmppUserStatus" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="UserEntry" positionX="-63" positionY="-18" width="128" height="178"/>
+    </elements>
+</model>

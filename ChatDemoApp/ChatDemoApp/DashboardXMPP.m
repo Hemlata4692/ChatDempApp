@@ -1,26 +1,26 @@
 //
-//  LogoutXMPP.m
+//  DashboardXMPP.m
 //  ChatDemoApp
 //
-//  Created by Ranosys on 19/01/17.
+//  Created by Ranosys on 31/01/17.
 //  Copyright © 2017 Ranosys. All rights reserved.
 //
 
-#import "LogoutXMPP.h"
+#import "DashboardXMPP.h"
 #import "XMPPUserDefaultManager.h"
 
-@interface LogoutXMPP (){
+@interface DashboardXMPP (){
     
     AppDelegateObjectFile *appDelegate;
 }
 @end
 
-@implementation LogoutXMPP
+@implementation DashboardXMPP
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    appDelegate = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
+     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProfileInformation) name:@"UpdatedProfile" object:nil];
     // Do any additional setup after loading the view.
 }
 
@@ -36,10 +36,11 @@
     [XMPPUserDefaultManager removeValue:@"LoginCred"];
     //    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",myDelegate.hostName] key:@"LoginCred"];
     [XMPPUserDefaultManager removeValue:@"PassCred"];
-//    [appDelegate connect];
+    //    [appDelegate connect];
 }
 #pragma mark - end
 
+- (void)updateProfileInformation {}
 
 /*
 #pragma mark - Navigation

@@ -30,7 +30,7 @@
     self.navigationItem.title=@"Login";
     
     //Adding textfield to keyboard controls array
-    [self setKeyboardControls:[[BSKeyboardControls alloc] initWithFields:@[self.usernameField]]];
+    [self setKeyboardControls:[[BSKeyboardControls alloc] initWithFields:@[self.usernameField, self.passwordField]]];
     [self.keyboardControls setDelegate:self];
     NSLog(@"a");
     // Do any additional setup after loading the view, typically from a nib.

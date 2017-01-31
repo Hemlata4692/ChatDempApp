@@ -13,13 +13,15 @@
 #import "XMPPvCardTemp.h"
 #import "XMPPMessageArchivingCoreDataStorage.h"
 #import "XMPPvCardCoreDataStorage.h"
-
+#import <CoreData/CoreData.h>
 
 @class XMPPvCardTempModuleStorage;
 @interface DashboardViewController () {
 
     HMSegmentedControl *customSegmentedControl;
     AppDelegateObjectFile *appDelegate;
+    
+    NSMutableArray *endty;
 }
 @property (strong, nonatomic) IBOutlet UITableView *dasboardTableListing;
 @end
@@ -31,6 +33,7 @@
     [super viewDidLoad];
     
     self.navigationItem.title=@"Dashboard";
+   
     appDelegate = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
     [self addBarButton];
     // Do any additional setup after loading the view.
@@ -39,6 +42,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:YES];
     
+    appDelegate.myView=@"UserListView";
     if ([myDelegate connect])
     {
         [self fetchedResultsController];
@@ -48,10 +52,10 @@
         //        UIImage *imagetemp=[UIImage imageWithData:photoData1];
         //        NSLog(@"d");
         //         NSLog(@"a");
-        XMPPvCardTemp *newvCardTemp = [[myDelegate xmppvCardTempModule] vCardTempForJID:[XMPPJID jidWithString:[NSString stringWithFormat:@"2222222222@%@",myDelegate.hostName]] shouldFetch:YES];
-        
-        NSLog(@"%@",newvCardTemp.userStatus);
-        NSLog(@"%@",newvCardTemp.emailAddress);
+//        XMPPvCardTemp *newvCardTemp = [[myDelegate xmppvCardTempModule] vCardTempForJID:[XMPPJID jidWithString:[NSString stringWithFormat:@"2222222222@%@",myDelegate.hostName]] shouldFetch:YES];
+//        
+//        NSLog(@"%@",newvCardTemp.userStatus);
+//        NSLog(@"%@",newvCardTemp.emailAddress);
     }
     [self addSegmentBar];
 }
@@ -96,30 +100,21 @@
 
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
 {
+//    endty=[NSMutableArray new];
 //    NSArray *sections = [[self fetchedResultsController] sections];
-////    [sortArrSet removeAllObjects];
 //    for (int i = 0 ; i< [[[self fetchedResultsController] sections] count];i++) {
 //        for (int j = 0; j<[[sections objectAtIndex:i] numberOfObjects]; j++) {
-//            if (([[[self fetchedResultsController] objectAtIndexPath:[NSIndexPath indexPathForRow:j inSection:i]] displayName] != nil) && ![[[[self fetchedResultsController] objectAtIndexPath:[NSIndexPath indexPathForRow:j inSection:i]] displayName] isEqualToString:@""] && ([[[self fetchedResultsController] objectAtIndexPath:[NSIndexPath indexPathForRow:j inSection:i]] displayName] != NULL)) {
-//                
-//                if ([[[[self fetchedResultsController] objectAtIndexPath:[NSIndexPath indexPathForRow:j inSection:i]] displayName] containsString:@"52.74.174.129"]) {
-//                    NSString *myName = [[[[[self fetchedResultsController] objectAtIndexPath:[NSIndexPath indexPathForRow:j inSection:i]] displayName] componentsSeparatedByString:@"@52.74.174.129@"] objectAtIndex:1];
-//                    
-////                    if (!([myName intValue] <= [yearValue intValue] - 3) || ((([yearValue intValue] - 3) == [myName intValue]) && [checkCompare isEqualToString:@"L"])) {
-////                        [sortArrSet addObject:[[self fetchedResultsController] objectAtIndexPath:[NSIndexPath indexPathForRow:j inSection:i]]];
-////                    }
-//                }
-//                
+//
+//                    [endty addObject:[[self fetchedResultsController] objectAtIndexPath:[NSIndexPath indexPathForRow:j inSection:i]]];
+// 
 //            }
 //        }
-//    }
-//    NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"displayName" ascending:YES];
-////    userListArr = [[sortArrSet sortedArrayUsingDescriptors:[NSArray arrayWithObject:sort]] mutableCopy];
+//NSSortDescriptor *descriptor = [NSSortDescriptor sortDescriptorWithKey:@"displayName"
+//                                                                 ascending:YES];
+//    //
+//    NSArray *results = [endty
+//                        sortedArrayUsingDescriptors:[NSArray arrayWithObject:descriptor]];
     
-//    XMPPvCardTemp *newvCardTemp = [[myDelegate xmppvCardTempModule] vCardTempForJID:[XMPPJID jidWithString:[NSString stringWithFormat:@"8888888899@%@",myDelegate.hostName]] shouldFetch:YES];
-//    
-//    NSLog(@"%@",newvCardTemp.userStatus);
-//    NSLog(@"%@",newvCardTemp.emailAddress);
     [self.dasboardTableListing reloadData];
 }
 #pragma mark - end
@@ -290,7 +285,62 @@
 //    return cell;
 //}
 
+- (NSManagedObjectContext *)managedObjectContext {
+    NSManagedObjectContext *context = nil;
+    id delegate = [[UIApplication sharedApplication] delegate];
+    if ([delegate performSelector:@selector(managedObjectContext)]) {
+        context = [delegate managedObjectContext];
+    }
+    return context;
+}
+
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+//    XMPPUserCoreDataStorageObject *user = [[self fetchedResultsController] objectAtIndexPath:indexPath];
+//    XMPPPresence *presence = [[XMPPPresence alloc] initWithType:@"type" to:[XMPPJID jidWithString:user.jidStr]];
+//    [appDelegate.xmppStream sendElement:presence];
+    
+    XMPPUserCoreDataStorageObject *user = [[self fetchedResultsController] objectAtIndexPath:indexPath];
+    NSString *resource = [[[user primaryResource] jid] resource];
+    
+//    XMPPUserCoreDataStorageObject *user = [[self fetchedResultsController] objectAtIndexPath:indexPath];
+//    
+        NSLog(@"%@",[NSString stringWithFormat:@"%@",user.jidStr]);
+//    appDelegate.isUpdatePofile=YES;
+//    appDelegate.updateProfileUserId=user.jidStr;
+//        [appDelegate.xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:user.jidStr] ignoreStorage:YES];
+//    
+//    NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
+//    NSPredicate *pred;
+//    NSMutableArray *results = [[NSMutableArray alloc]init];
+//    pred = [NSPredicate predicateWithFormat:@"xmppRegisterId == %@", user.jidStr];
+//    NSLog(@"predicate: %@",pred);
+//    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"UserEntry"];
+//    [fetchRequest setPredicate:pred];
+//    
+//    results = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
+//    if (results.count>0) {
+//        NSManagedObject *devicea = [results objectAtIndex:0];
+//        NSLog(@"%@",[devicea valueForKey:@"xmppRegisterId"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppName"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppPhoneNumber"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppUserStatus"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppDescription"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppAddress"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppEmailAddress"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppUserBirthDay"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppGender"]);
+//        NSLog(@"\n\n");
+//
+//    }
+    
+    
+    
+    
+    
+    
+//    if ([user.jidStr isEqualToString:@"2222222222@ranosys"]) 
+    
 //    PersonalChatViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"PersonalChatViewController"];
 //    if (isSearch)
 //    {
@@ -452,6 +502,15 @@
     
     
     [appDelegate editProfileImageUploading];
+}
+
+- (void)updateProfileInformation {
+
+    NSLog(@"a");
+    appDelegate.isUpdatePofile=false;
+    appDelegate.updateProfileUserId=@"";
+
+//    [das]
 }
 /*
 #pragma mark - Navigation

@@ -7,10 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "LogoutXMPP.h"
+#import "DashboardXMPP.h"
 #import <CoreData/CoreData.h>
 
-@interface DashboardViewController : LogoutXMPP<NSFetchedResultsControllerDelegate>
+@interface DashboardViewController : DashboardXMPP<NSFetchedResultsControllerDelegate>
 {
     NSFetchedResultsController *fetchedResultsController;
     

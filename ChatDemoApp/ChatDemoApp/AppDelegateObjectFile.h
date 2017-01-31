@@ -12,7 +12,7 @@
 #import "XMPPFramework.h"
 #import "TURNSocket.h"
 #import "XMPPMessageArchivingCoreDataStorage.h"
-
+#import <CoreData/CoreData.h>
 
 @interface AppDelegateObjectFile : UIResponder<XMPPRosterDelegate>
 {
@@ -63,6 +63,8 @@
 @property(strong, nonatomic)UIImageView *userProfileImageData;
 @property(strong, nonatomic)NSData *userProfileImageDataValue;
 @property(strong, nonatomic)NSString *myView;
+@property(assign, nonatomic)BOOL isUpdatePofile;
+@property(strong, nonatomic)NSString *updateProfileUserId;
 
 -(BOOL)connect;
 -(void)disconnect;
@@ -84,8 +86,12 @@
 
 //CoreData array
 @property (strong) NSMutableArray *xmppUserEntries;
-
-
+@property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;
+@property (readonly, strong, nonatomic) NSManagedObjectModel *managedObjectModel;
+@property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
+@property (readonly, strong) NSPersistentContainer *persistentContainer;
+- (void)saveContext;
+//end
 
 
 

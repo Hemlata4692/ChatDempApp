@@ -58,10 +58,19 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 @synthesize presencexmpp;
 
 @synthesize portNumber, hostName, serverName, defaultPassword, xmppUniqueId;
+@synthesize isUpdatePofile, updateProfileUserId;
+
+//Coredata
+@synthesize managedObjectContext = _managedObjectContext;
+@synthesize managedObjectModel = _managedObjectModel;
+@synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
+//end
 
 #pragma mark - Intialze XMPP connection
 - (void)didFinishLaunchingMethod {
 
+    isUpdatePofile=false;
+    updateProfileUserId=@"";
     if (nil!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"] && NULL!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"]) {
         hostName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"];
     }
@@ -113,13 +122,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 //    else {
 //    [self connect];
 //    }
-    
-    
-//    // Fetch the user entries from persistent data store
-//    NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
-//    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UserEntry"];
-//    xmppUserEntries = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
-
 }
 #pragma mark - end
 
@@ -154,6 +156,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     DDLogVerbose(@"%@: %@", THIS_FILE, THIS_METHOD);
     
     [self teardownStream];
+    [self saveContext];
 }
 #pragma mark - end
 
@@ -419,11 +422,24 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     NSXMLElement *queryElement = [NSXMLElement elementWithName:@"query" xmlns:@"jabber:iq:roster"];
     
     NSXMLElement *vcardInfo = [iq elementForName:@"vCard"];
-    NSArray *successStoryArray = [vcardInfo elementsForName:@"EMAILADDRESS"];
-    NSLog(@"successStoryArray: %@", successStoryArray);
+    if (vcardInfo!=nil) {
+        NSXMLElement *registerUserInfo = [vcardInfo elementForName:@"RegisterUserId"];
+        if (registerUserInfo!=nil) {
+            NSLog(@"%@",[registerUserInfo stringValue]);
+            [self insertEntryInXmppUserModel:[registerUserInfo stringValue] xmppName:[[vcardInfo elementForName:@"NICKNAME"] stringValue] xmppPhoneNumber:[[vcardInfo elementForName:@"TEL"] stringValue] xmppUserStatus:[[vcardInfo elementForName:@"USERSTATUS"] stringValue] xmppDescription:[[vcardInfo elementForName:@"DESC"] stringValue] xmppAddress:[[vcardInfo elementForName:@"ADDRESS"] stringValue] xmppEmailAddress:[[vcardInfo elementForName:@"EMAILADDRESS"] stringValue] xmppUserBirthDay:[[vcardInfo elementForName:@"BDAY"] stringValue] xmppGender:[[vcardInfo elementForName:@"GENDER"] stringValue]];
+        }
+    }
     
-//    <iq xmlns="jabber:client" type="set" id="100-166" to="1111111111@192.168.1.171/8nbo21q8fn"><query xmlns="jabber:iq:roster"><item jid="9999666666@192.168.1.171" name="p" subscription="both"><group>Ranosys</group></item></query></iq>
-//    <iq xmlns="jabber:client" type="set" id="827-142" to="1111111111@192.168.1.171/8nbo21q8fn"><query xmlns="jabber:iq:roster"><item jid="5555888888@192.168.1.171" subscription="remove"></item></query></iq>
+    NSXMLElement *removeQueryElement = [iq elementForName:@"query"];
+    if (removeQueryElement!=nil) {
+         NSXMLElement *removeitemElement = [removeQueryElement elementForName:@"item"];
+        if (removeitemElement!=nil) {
+            NSString *removeSubscriptionElement = [[removeitemElement attributeForName:@"subscription"] stringValue];
+            if ((removeSubscriptionElement!=nil)&&[removeSubscriptionElement isEqualToString:@"remove"]) {
+                [self deleteDataModelEntry:[[removeitemElement attributeForName:@"jid"] stringValue]];
+            }
+        }
+    }
     
     if (queryElement) {
         NSArray *itemElements = [queryElement elementsForName: @"item"];
@@ -435,6 +451,74 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         }
     }
     return NO;
+}
+
+- (void)deleteDataModelEntry:(NSString *)registredUserId {
+    
+    NSManagedObjectContext *context = [self managedObjectContext];
+    NSMutableArray *results = [[NSMutableArray alloc]init];
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"xmppRegisterId == %@", registredUserId];
+    
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"UserEntry"];
+    [fetchRequest setPredicate:pred];
+    results = [[context executeFetchRequest:fetchRequest error:nil] mutableCopy];
+    
+    if (results.count > 0) {
+        
+        [context deleteObject:[results objectAtIndex:0]];
+        NSError *error = nil;
+        if (![context save:&error]) {
+            NSLog(@"Can't Delete! %@ %@", error, [error localizedDescription]);
+            return;
+        }
+    }
+}
+
+- (void)insertEntryInXmppUserModel:(NSString *)registredUserId xmppName:(NSString *)xmppName xmppPhoneNumber:(NSString *)xmppPhoneNumber xmppUserStatus:(NSString *)xmppUserStatus xmppDescription:(NSString *)xmppDescription xmppAddress:(NSString *)xmppAddress xmppEmailAddress:(NSString *)xmppEmailAddress xmppUserBirthDay:(NSString *)xmppUserBirthDay xmppGender:(NSString *)xmppGender {
+
+    NSManagedObjectContext *context = [self managedObjectContext];
+    NSMutableArray *results = [[NSMutableArray alloc]init];
+    NSPredicate *pred;
+    
+    pred = [NSPredicate predicateWithFormat:@"xmppRegisterId == %@", registredUserId];
+    NSLog(@"predicate: %@",pred);
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"UserEntry"];
+    [fetchRequest setPredicate:pred];
+    results = [[context executeFetchRequest:fetchRequest error:nil] mutableCopy];
+
+    if (results.count > 0) {
+         NSManagedObject* xmppDataEntry = [results objectAtIndex:0];
+        [xmppDataEntry setValue:registredUserId forKey:@"xmppRegisterId"];
+        [xmppDataEntry setValue:xmppName forKey:@"xmppName"];
+        [xmppDataEntry setValue:xmppPhoneNumber forKey:@"xmppPhoneNumber"];
+        [xmppDataEntry setValue:xmppUserStatus forKey:@"xmppUserStatus"];
+        [xmppDataEntry setValue:xmppDescription forKey:@"xmppDescription"];
+        [xmppDataEntry setValue:xmppAddress forKey:@"xmppAddress"];
+        [xmppDataEntry setValue:xmppEmailAddress forKey:@"xmppEmailAddress"];
+        [xmppDataEntry setValue:xmppUserBirthDay forKey:@"xmppUserBirthDay"];
+        [xmppDataEntry setValue:xmppGender forKey:@"xmppGender"];
+        [context save:nil];
+    } else {
+        NSManagedObject *xmppDataEntry = [NSEntityDescription insertNewObjectForEntityForName:@"UserEntry" inManagedObjectContext:context];
+        [xmppDataEntry setValue:registredUserId forKey:@"xmppRegisterId"];
+        [xmppDataEntry setValue:xmppName forKey:@"xmppName"];
+        [xmppDataEntry setValue:xmppPhoneNumber forKey:@"xmppPhoneNumber"];
+        [xmppDataEntry setValue:xmppUserStatus forKey:@"xmppUserStatus"];
+        [xmppDataEntry setValue:xmppDescription forKey:@"xmppDescription"];
+        [xmppDataEntry setValue:xmppAddress forKey:@"xmppAddress"];
+        [xmppDataEntry setValue:xmppEmailAddress forKey:@"xmppEmailAddress"];
+        [xmppDataEntry setValue:xmppUserBirthDay forKey:@"xmppUserBirthDay"];
+        [xmppDataEntry setValue:xmppGender forKey:@"xmppGender"];
+        NSError *error = nil;
+        // Save the object to persistent store
+        if (![context save:&error]) {
+            NSLog(@"Can't Save! %@ %@", error, [error localizedDescription]);
+        }
+    }
+    
+    if (isUpdatePofile && [updateProfileUserId isEqualToString:registredUserId]) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"UpdatedProfile" object:nil];
+    }
 }
 
 - (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message
@@ -498,6 +582,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     NSLog(@" Printing full jid of user %@",[[sender myJID] full]);
     NSLog(@"Printing full jid of user %@",[[sender myJID] resource]);
     NSLog(@"From user %@",[[presence from] full]);
+     NSLog(@"From user %@",presenceType);
     
     int myCount = [[XMPPUserDefaultManager getValue:@"CountValue"] intValue];
     
@@ -621,49 +706,85 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     NSLog(@"a");
 }
 
--(void)editProfileImageUploading{
-    
+-(void)editProfileImageUploading:(NSMutableDictionary *)profileData {
+//    
+////    NSXMLElement *vCardXML = [NSXMLElement elementWithName:@"vCard" xmlns:@"vcard-temp"];
+////    XMPPvCardTemp *newvCardTemp = [XMPPvCardTemp vCardTempFromElement:vCardXML];
+////    NSData *pictureData = UIImageJPEGRepresentation(editProfileImge, 0.5);
+////    
+////    [newvCardTemp setPhoto:pictureData];
+////    XMPPvCardCoreDataStorage * xmppvCardStorage1 = [XMPPvCardCoreDataStorage sharedInstance];
+////    XMPPvCardTempModule * xmppvCardTempModule1 = [[XMPPvCardTempModule alloc] initWithvCardStorage:xmppvCardStorage1];
+////    [xmppvCardTempModule1  activate:[self xmppStream]];
+////    [xmppvCardTempModule1 updateMyvCardTemp:newvCardTemp];
+//    
 //    NSXMLElement *vCardXML = [NSXMLElement elementWithName:@"vCard" xmlns:@"vcard-temp"];
 //    XMPPvCardTemp *newvCardTemp = [XMPPvCardTemp vCardTempFromElement:vCardXML];
-//    NSData *pictureData = UIImageJPEGRepresentation(editProfileImge, 0.5);
+////    NSData *pictureData;
+////    if (nil!=self.userProfileImageDataValue) {
+////        
+////        pictureData = UIImageJPEGRepresentation([UIImage imageWithData:self.userProfileImageDataValue], 1.0);
+////        [newvCardTemp setPhoto:pictureData];
+////    }
 //    
-//    [newvCardTemp setPhoto:pictureData];
-//    XMPPvCardCoreDataStorage * xmppvCardStorage1 = [XMPPvCardCoreDataStorage sharedInstance];
-//    XMPPvCardTempModule * xmppvCardTempModule1 = [[XMPPvCardTempModule alloc] initWithvCardStorage:xmppvCardStorage1];
-//    [xmppvCardTempModule1  activate:[self xmppStream]];
-//    [xmppvCardTempModule1 updateMyvCardTemp:newvCardTemp];
+//    /*//Other variables
+//     [newvCardTemp setNickname:@"aaaaaa"];
+//     NSArray *interestsArray= [[NSArray alloc] initWithObjects:@"food", nil];
+//     [newvCardTemp setLabels:interestsArray];
+//     [newvCardTemp setMiddleName:@"Stt"];
+//     [newvCardTemp setUserStatus:@"I am available"];
+//     [newvCardTemp setAddress:@"rohitm@ranosys.com"];
+//     [newvCardTemp setEmailAddresses:[NSMutableArray arrayWithObjects:@"rohitmodi@ranosys.com",@"rohitm@ranosys.com", nil]];
+//     */
+//    
+////    [newvCardTemp setRegisterUserId:[self setProfileDataValue:profileData key:@"xmppRegisterId"]];
+////    [newvCardTemp setNickname:[self setProfileDataValue:profileData key:@"xmppName"]];
+////    [newvCardTemp setTelecomsAddress:[self setProfileDataValue:profileData key:@"xmppPhoneNumber"]];
+//    [newvCardTemp setUserStatus:@"tenth status"];
+////    [newvCardTemp setDesc:[self setProfileDataValue:profileData key:@"xmppDescription"]];
+////    [newvCardTemp setAddress:[self setProfileDataValue:profileData key:@"xmppAddress"]];
+//    [newvCardTemp setEmailAddress:@"newemail@c.com"];
+//    [newvCardTemp setNickname:@"newemail@c.com"];
+////    [newvCardTemp setBday:[self setProfileDataValue:profileData key:@"xmppUserBirthDay"]];
+////    [newvCardTemp setGender:[self setProfileDataValue:profileData key:@"xmppGender"]];
+//    
+//    [xmppvCardTempModule updateMyvCardTemp:newvCardTemp];
+
     
-    NSXMLElement *vCardXML = [NSXMLElement elementWithName:@"vCard" xmlns:@"vcard-temp"];
-    XMPPvCardTemp *newvCardTemp = [XMPPvCardTemp vCardTempFromElement:vCardXML];
-//    NSData *pictureData;
-//    if (nil!=self.userProfileImageDataValue) {
-//        
-//        pictureData = UIImageJPEGRepresentation([UIImage imageWithData:self.userProfileImageDataValue], 1.0);
-//        [newvCardTemp setPhoto:pictureData];
-//    }
     
-    /*//Other variables
-     [newvCardTemp setNickname:@"aaaaaa"];
-     NSArray *interestsArray= [[NSArray alloc] initWithObjects:@"food", nil];
-     [newvCardTemp setLabels:interestsArray];
-     [newvCardTemp setMiddleName:@"Stt"];
-     [newvCardTemp setUserStatus:@"I am available"];
-     [newvCardTemp setAddress:@"rohitm@ranosys.com"];
-     [newvCardTemp setEmailAddresses:[NSMutableArray arrayWithObjects:@"rohitmodi@ranosys.com",@"rohitm@ranosys.com", nil]];
-     */
+//    :(NSMutableDictionary *)profileData {
     
-//    [newvCardTemp setRegisterUserId:[self setProfileDataValue:profileData key:@"xmppRegisterId"]];
-//    [newvCardTemp setNickname:[self setProfileDataValue:profileData key:@"xmppName"]];
-//    [newvCardTemp setTelecomsAddress:[self setProfileDataValue:profileData key:@"xmppPhoneNumber"]];
-    [newvCardTemp setUserStatus:@"tenth status"];
-//    [newvCardTemp setDesc:[self setProfileDataValue:profileData key:@"xmppDescription"]];
-//    [newvCardTemp setAddress:[self setProfileDataValue:profileData key:@"xmppAddress"]];
-    [newvCardTemp setEmailAddress:@"newemail@c.com"];
-    [newvCardTemp setNickname:@"newemail@c.com"];
-//    [newvCardTemp setBday:[self setProfileDataValue:profileData key:@"xmppUserBirthDay"]];
-//    [newvCardTemp setGender:[self setProfileDataValue:profileData key:@"xmppGender"]];
-    
-    [xmppvCardTempModule updateMyvCardTemp:newvCardTemp];
+        NSXMLElement *vCardXML = [NSXMLElement elementWithName:@"vCard" xmlns:@"vcard-temp"];
+        XMPPvCardTemp *newvCardTemp = [XMPPvCardTemp vCardTempFromElement:vCardXML];
+        NSData *pictureData;
+        if (nil!=self.userProfileImageDataValue) {
+            
+            pictureData = UIImageJPEGRepresentation([UIImage imageWithData:self.userProfileImageDataValue], 1.0);
+            [newvCardTemp setPhoto:pictureData];
+        }
+        
+        /*//Other variables
+         [newvCardTemp setNickname:@"aaaaaa"];
+         NSArray *interestsArray= [[NSArray alloc] initWithObjects:@"food", nil];
+         [newvCardTemp setLabels:interestsArray];
+         [newvCardTemp setMiddleName:@"Stt"];
+         [newvCardTemp setUserStatus:@"I am available"];
+         [newvCardTemp setAddress:@"rohitm@ranosys.com"];
+         [newvCardTemp setEmailAddresses:[NSMutableArray arrayWithObjects:@"rohitmodi@ranosys.com",@"rohitm@ranosys.com", nil]];
+         */
+        
+        [newvCardTemp setRegisterUserId:[self setProfileDataValue:profileData key:@"xmppRegisterId"]];
+        [newvCardTemp setNickname:[self setProfileDataValue:profileData key:@"xmppName"]];
+        [newvCardTemp setTelecomsAddress:[self setProfileDataValue:profileData key:@"xmppPhoneNumber"]];
+        [newvCardTemp setUserStatus:[self setProfileDataValue:profileData key:@"xmppUserStatus"]];
+        //    [newvCardTemp setUserStatus:@"old status"];
+        [newvCardTemp setDesc:[self setProfileDataValue:profileData key:@"xmppDescription"]];
+        [newvCardTemp setAddress:[self setProfileDataValue:profileData key:@"xmppAddress"]];
+        [newvCardTemp setEmailAddress:[self setProfileDataValue:profileData key:@"xmppEmailAddress"]];
+        [newvCardTemp setBday:[self setProfileDataValue:profileData key:@"xmppUserBirthDay"]];
+        [newvCardTemp setGender:[self setProfileDataValue:profileData key:@"xmppGender"]];
+        
+        [xmppvCardTempModule updateMyvCardTemp:newvCardTemp];
     
 }
 
@@ -819,38 +940,122 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 }
 #pragma mark - end
 
+#pragma mark - Core Data stack
+// Returns the managed object context for the application.
+// If the context doesn't already exist, it is created and bound to the persistent store coordinator for the application.
+- (NSManagedObjectContext *)managedObjectContext
+{
+    if (_managedObjectContext != nil) {
+        return _managedObjectContext;
+    }
+    
+    NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
+    if (coordinator != nil) {
+        _managedObjectContext = [[NSManagedObjectContext alloc] init];
+        [_managedObjectContext setPersistentStoreCoordinator:coordinator];
+    }
+    return _managedObjectContext;
+}
 
-//- (NSManagedObjectContext *)managedObjectContext
-//{
-//    NSManagedObjectContext *context = nil;
-//    id delegate = [[UIApplication sharedApplication] delegate];
-//    if ([delegate performSelector:@selector(managedObjectContext)]) {
-//        context = [delegate managedObjectContext];
-//    }
-//    return context;
-//}
+// Returns the managed object model for the application.
+// If the model doesn't already exist, it is created from the application's model.
+- (NSManagedObjectModel *)managedObjectModel {
+    
+    if (_managedObjectModel != nil) {
+        return _managedObjectModel;
+    }
+    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"XmppStorageModel" withExtension:@"momd"];
+    _managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
+    return _managedObjectModel;
+}
 
-//[[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPvCardTempModuleDidUpdateMyvCardSuccess" object:nil];
-//}
-//
-//- (void)xmppvCardTempModule:(XMPPvCardTempModule *)vCardTempModule failedToUpdateMyvCard:(NSXMLElement *)error{
-//    //The vCard failed to update so we fetch the current one from the server
-//    [_xmppvCardTempModule fetchvCardTempForJID:[xmppStream myJID] ignoreStorage:YES];
-//    [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPvCardTempModuleDidUpdateMyvCardFail" object:nil];
+- (NSPersistentStoreCoordinator *)persistentStoreCoordinator {
+    
+    if (_persistentStoreCoordinator != nil) {
+        return _persistentStoreCoordinator;
+    }
+    
+    NSURL *storeURL = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:@"xmppUserDemo.sqlite"];
+    
+    NSError *error = nil;
+    _persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
+    if (![_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:nil error:&error]) {
+        /*
+         Replace this implementation with code to handle the error appropriately.
+         
+         abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+         
+         Typical reasons for an error here include:
+         * The persistent store is not accessible;
+         * The schema for the persistent store is incompatible with current managed object model.
+         Check the error message to determine what the actual problem was.
+         
+         
+         If the persistent store is not accessible, there is typically something wrong with the file path. Often, a file URL is pointing into the application's resources directory instead of a writeable directory.
+         
+         If you encounter schema incompatibility errors during development, you can reduce their frequency by:
+         * Simply deleting the existing store:
+         [[NSFileManager defaultManager] removeItemAtURL:storeURL error:nil]
+         
+         * Performing automatic lightweight migration by passing the following dictionary as the options parameter:
+         @{NSMigratePersistentStoresAutomaticallyOption:@YES, NSInferMappingModelAutomaticallyOption:@YES}
+         
+         Lightweight migration will only work for a limited set of schema changes; consult "Core Data Model Versioning and Data Migration Programming Guide" for details.
+         
+         */
+        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        abort();
+    }
+    
+    return _persistentStoreCoordinator;
+}
 
+- (NSURL *)applicationDocumentsDirectory
+{
+    return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+}
 
+@synthesize persistentContainer = _persistentContainer;
 
-//[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPvCardTempModuleDidUpdateMyvCardSuccess) name:@"XMPPvCardTempModuleDidUpdateMyvCardSuccess" object:nil];
-//[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPvCardTempModuleDidUpdateMyvCardFail) name:@"XMPPvCardTempModuleDidUpdateMyvCardFail" object:nil];
+- (NSPersistentContainer *)persistentContainer {
+    // The persistent container for the application. This implementation creates and returns a container, having loaded the store for the application to it.
+    @synchronized (self) {
+        if (_persistentContainer == nil) {
+            _persistentContainer = [[NSPersistentContainer alloc] initWithName:@"XmppStorageModel"];
+            [_persistentContainer loadPersistentStoresWithCompletionHandler:^(NSPersistentStoreDescription *storeDescription, NSError *error) {
+                if (error != nil) {
+                    // Replace this implementation with code to handle the error appropriately.
+                    // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+                    
+                    /*
+                     Typical reasons for an error here include:
+                     * The parent directory does not exist, cannot be created, or disallows writing.
+                     * The persistent store is not accessible, due to permissions or data protection when the device is locked.
+                     * The device is out of space.
+                     * The store could not be migrated to the current model version.
+                     Check the error message to determine what the actual problem was.
+                     */
+                    NSLog(@"Unresolved error %@, %@", error, error.userInfo);
+                    abort();
+                }
+            }];
+        }
+    }
+    
+    return _persistentContainer;
+}
 
+//Core Data Saving support
 
-
-
-
-
-
-
-
-
-
+- (void)saveContext {
+    NSManagedObjectContext *context = self.persistentContainer.viewContext;
+    NSError *error = nil;
+    if ([context hasChanges] && ![context save:&error]) {
+        // Replace this implementation with code to handle the error appropriately.
+        // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+        NSLog(@"Unresolved error %@, %@", error, error.userInfo);
+        abort();
+    }
+}
+#pragma mark - end
 @end

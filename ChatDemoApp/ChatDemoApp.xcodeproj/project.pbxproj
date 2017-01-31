@@ -24,13 +24,13 @@
 		B75126E01E30745000495348 /* LoginXMPP.m in Sources */ = {isa = PBXBuildFile; fileRef = B75126DF1E30745000495348 /* LoginXMPP.m */; };
 		B75BC5761E3F60A500E5F780 /* XmppStorageModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B75BC5741E3F60A500E5F780 /* XmppStorageModel.xcdatamodeld */; };
 		B75BC5781E3F620500E5F780 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B75BC5771E3F620500E5F780 /* CoreData.framework */; };
+		B76F75E91E40ABD8001FE579 /* DashboardXMPP.m in Sources */ = {isa = PBXBuildFile; fileRef = B76F75E81E40ABD8001FE579 /* DashboardXMPP.m */; };
 		B780E9F71E2F6E1A00437B4E /* ErrorCode.m in Sources */ = {isa = PBXBuildFile; fileRef = B780E9F61E2F6E1A00437B4E /* ErrorCode.m */; };
 		B780E9F91E2F9FC200437B4E /* ReadMe.rtf in Resources */ = {isa = PBXBuildFile; fileRef = B780E9F81E2F9FC200437B4E /* ReadMe.rtf */; };
 		B79353D61E28B28800E7EEB8 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B79353D51E28B28800E7EEB8 /* Security.framework */; };
 		B79353D81E28B28E00E7EEB8 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B79353D71E28B28E00E7EEB8 /* CFNetwork.framework */; };
 		B79353DA1E28B29500E7EEB8 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B79353D91E28B29500E7EEB8 /* SystemConfiguration.framework */; };
 		B79CA2581E30B91A007CDB23 /* images.png in Resources */ = {isa = PBXBuildFile; fileRef = B79CA2571E30B91A007CDB23 /* images.png */; };
-		B79CA25B1E30BC96007CDB23 /* LogoutXMPP.m in Sources */ = {isa = PBXBuildFile; fileRef = B79CA25A1E30BC96007CDB23 /* LogoutXMPP.m */; };
 		B79CA25E1E30BCFC007CDB23 /* XMPPUserDefaultManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B79CA25D1E30BCFC007CDB23 /* XMPPUserDefaultManager.m */; };
 		B7A7A9A01E2F64060027D2B6 /* RegisterXMPP.m in Sources */ = {isa = PBXBuildFile; fileRef = B7A7A99F1E2F64060027D2B6 /* RegisterXMPP.m */; };
 		B7B9A5661E23B17A00DB4429 /* MMMaterialDesignSpinner.m in Sources */ = {isa = PBXBuildFile; fileRef = B7B9A5651E23B17A00DB4429 /* MMMaterialDesignSpinner.m */; };
@@ -67,6 +67,8 @@
 		B75126DF1E30745000495348 /* LoginXMPP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginXMPP.m; sourceTree = "<group>"; };
 		B75BC5751E3F60A500E5F780 /* XmppStorageModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = XmppStorageModel.xcdatamodel; sourceTree = "<group>"; };
 		B75BC5771E3F620500E5F780 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		B76F75E71E40ABD8001FE579 /* DashboardXMPP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DashboardXMPP.h; sourceTree = "<group>"; };
+		B76F75E81E40ABD8001FE579 /* DashboardXMPP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DashboardXMPP.m; sourceTree = "<group>"; };
 		B780E9F51E2F6E1A00437B4E /* ErrorCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ErrorCode.h; sourceTree = "<group>"; };
 		B780E9F61E2F6E1A00437B4E /* ErrorCode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ErrorCode.m; sourceTree = "<group>"; };
 		B780E9F81E2F9FC200437B4E /* ReadMe.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = ReadMe.rtf; sourceTree = "<group>"; };
@@ -74,8 +76,6 @@
 		B79353D71E28B28E00E7EEB8 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		B79353D91E28B29500E7EEB8 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		B79CA2571E30B91A007CDB23 /* images.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = images.png; sourceTree = "<group>"; };
-		B79CA2591E30BC96007CDB23 /* LogoutXMPP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogoutXMPP.h; sourceTree = "<group>"; };
-		B79CA25A1E30BC96007CDB23 /* LogoutXMPP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogoutXMPP.m; sourceTree = "<group>"; };
 		B79CA25C1E30BCFC007CDB23 /* XMPPUserDefaultManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMPPUserDefaultManager.h; sourceTree = "<group>"; };
 		B79CA25D1E30BCFC007CDB23 /* XMPPUserDefaultManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMPPUserDefaultManager.m; sourceTree = "<group>"; };
 		B7A7A99E1E2F64060027D2B6 /* RegisterXMPP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegisterXMPP.h; sourceTree = "<group>"; };
@@ -203,8 +203,6 @@
 				B745F82E1E234D55001119BD /* ViewController.m */,
 				B75126DE1E30745000495348 /* LoginXMPP.h */,
 				B75126DF1E30745000495348 /* LoginXMPP.m */,
-				B79CA2591E30BC96007CDB23 /* LogoutXMPP.h */,
-				B79CA25A1E30BC96007CDB23 /* LogoutXMPP.m */,
 				B79CA25C1E30BCFC007CDB23 /* XMPPUserDefaultManager.h */,
 				B79CA25D1E30BCFC007CDB23 /* XMPPUserDefaultManager.m */,
 			);
@@ -228,6 +226,8 @@
 			children = (
 				B745F8471E2351FF001119BD /* DashboardViewController.h */,
 				B745F8481E2351FF001119BD /* DashboardViewController.m */,
+				B76F75E71E40ABD8001FE579 /* DashboardXMPP.h */,
+				B76F75E81E40ABD8001FE579 /* DashboardXMPP.m */,
 			);
 			name = DashboardView;
 			sourceTree = "<group>";
@@ -431,6 +431,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B76F75E91E40ABD8001FE579 /* DashboardXMPP.m in Sources */,
 				B745F85E1E2354B8001119BD /* UITextField+Validations.m in Sources */,
 				B780E9F71E2F6E1A00437B4E /* ErrorCode.m in Sources */,
 				B70AE66A1E2F1EC600554038 /* AppDelegateObjectFile.m in Sources */,
@@ -438,7 +439,6 @@
 				B745F84C1E235210001119BD /* GroupConversationViewController.m in Sources */,
 				B745F82F1E234D55001119BD /* ViewController.m in Sources */,
 				B79CA25E1E30BCFC007CDB23 /* XMPPUserDefaultManager.m in Sources */,
-				B79CA25B1E30BC96007CDB23 /* LogoutXMPP.m in Sources */,
 				B75126E01E30745000495348 /* LoginXMPP.m in Sources */,
 				B745F82C1E234D55001119BD /* AppDelegate.m in Sources */,
 				B75BC5761E3F60A500E5F780 /* XmppStorageModel.xcdatamodeld in Sources */,

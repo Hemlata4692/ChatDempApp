@@ -13,7 +13,6 @@
 #import "XMPPvCardTemp.h"
 #import "XMPPMessageArchivingCoreDataStorage.h"
 #import "XMPPvCardCoreDataStorage.h"
-#import <CoreData/CoreData.h>
 
 @class XMPPvCardTempModuleStorage;
 @interface DashboardViewController () {
@@ -27,6 +26,7 @@
 @end
 
 @implementation DashboardViewController
+@synthesize userListArray, userDetailedList;
 
 #pragma mark - Life cycle
 - (void)viewDidLoad {
@@ -42,22 +42,31 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:YES];
     
-    appDelegate.myView=@"UserListView";
-    if ([myDelegate connect])
-    {
-        [self fetchedResultsController];
-        [self.dasboardTableListing reloadData];
-        
-        //        NSData *photoData1 = [[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:@"1234567890@ranosys"]];
-        //        UIImage *imagetemp=[UIImage imageWithData:photoData1];
-        //        NSLog(@"d");
-        //         NSLog(@"a");
-//        XMPPvCardTemp *newvCardTemp = [[myDelegate xmppvCardTempModule] vCardTempForJID:[XMPPJID jidWithString:[NSString stringWithFormat:@"2222222222@%@",myDelegate.hostName]] shouldFetch:YES];
-//        
-//        NSLog(@"%@",newvCardTemp.userStatus);
-//        NSLog(@"%@",newvCardTemp.emailAddress);
-    }
+    userListArray=[NSMutableArray new];
+    userDetailedList=[NSMutableDictionary new];
+//    if ([myDelegate connect])
+//    {
+//        [self fetchedResultsController];
+    
+    [myDelegate showIndicator];
+    [self performSelector:@selector(userList) withObject:nil afterDelay:0.1];
+    [self.dasboardTableListing reloadData];
+//
+//        //        NSData *photoData1 = [[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:@"1234567890@ranosys"]];
+//        //        UIImage *imagetemp=[UIImage imageWithData:photoData1];
+//        //        NSLog(@"d");
+//        //         NSLog(@"a");
+////        XMPPvCardTemp *newvCardTemp = [[myDelegate xmppvCardTempModule] vCardTempForJID:[XMPPJID jidWithString:[NSString stringWithFormat:@"2222222222@%@",myDelegate.hostName]] shouldFetch:YES];
+////        
+////        NSLog(@"%@",newvCardTemp.userStatus);
+////        NSLog(@"%@",newvCardTemp.emailAddress);
+//    }
     [self addSegmentBar];
+}
+
+- (void)userList {
+
+    [self xmppUserConnect];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -65,64 +74,64 @@
     // Dispose of any resources that can be recreated.
 }
 
-#pragma mark - XMPP delegates
-- (XMPPStream *)xmppStream
-{
-    return [myDelegate xmppStream];
-}
-- (NSFetchedResultsController *)fetchedResultsController
-{
-    if (fetchedResultsController == nil)
-    {
-        NSManagedObjectContext *moc = [myDelegate managedObjectContext_roster];
-        NSEntityDescription *entity = [NSEntityDescription entityForName:@"XMPPUserCoreDataStorageObject"
-                                                  inManagedObjectContext:moc];
-        NSSortDescriptor *sd1 = [[NSSortDescriptor alloc] initWithKey:@"sectionNum" ascending:YES];
-        NSSortDescriptor *sd2 = [[NSSortDescriptor alloc] initWithKey:@"displayName" ascending:YES];
-        NSArray *sortDescriptors = [NSArray arrayWithObjects:sd1, sd2, nil];
-        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-        [fetchRequest setEntity:entity];
-        [fetchRequest setSortDescriptors:sortDescriptors];
-        [fetchRequest setFetchBatchSize:10];
-        fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
-                                                                       managedObjectContext:moc
-                                                                         sectionNameKeyPath:@"sectionNum"
-                                                                                  cacheName:nil];
-        [fetchedResultsController setDelegate:self];
-        NSError *error = nil;
-        if (![fetchedResultsController performFetch:&error])
-        {
-            //error
-        }
-    }
-    return fetchedResultsController;
-}
-
-- (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
-{
-//    endty=[NSMutableArray new];
-//    NSArray *sections = [[self fetchedResultsController] sections];
-//    for (int i = 0 ; i< [[[self fetchedResultsController] sections] count];i++) {
-//        for (int j = 0; j<[[sections objectAtIndex:i] numberOfObjects]; j++) {
-//
-//                    [endty addObject:[[self fetchedResultsController] objectAtIndexPath:[NSIndexPath indexPathForRow:j inSection:i]]];
-// 
-//            }
+//#pragma mark - XMPP delegates
+//- (XMPPStream *)xmppStream
+//{
+//    return [myDelegate xmppStream];
+//}
+//- (NSFetchedResultsController *)fetchedResultsController
+//{
+//    if (fetchedResultsController == nil)
+//    {
+//        NSManagedObjectContext *moc = [myDelegate managedObjectContext_roster];
+//        NSEntityDescription *entity = [NSEntityDescription entityForName:@"XMPPUserCoreDataStorageObject"
+//                                                  inManagedObjectContext:moc];
+//        NSSortDescriptor *sd1 = [[NSSortDescriptor alloc] initWithKey:@"sectionNum" ascending:YES];
+//        NSSortDescriptor *sd2 = [[NSSortDescriptor alloc] initWithKey:@"displayName" ascending:YES];
+//        NSArray *sortDescriptors = [NSArray arrayWithObjects:sd1, sd2, nil];
+//        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+//        [fetchRequest setEntity:entity];
+//        [fetchRequest setSortDescriptors:sortDescriptors];
+//        [fetchRequest setFetchBatchSize:10];
+//        fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
+//                                                                       managedObjectContext:moc
+//                                                                         sectionNameKeyPath:@"sectionNum"
+//                                                                                  cacheName:nil];
+//        [fetchedResultsController setDelegate:self];
+//        NSError *error = nil;
+//        if (![fetchedResultsController performFetch:&error])
+//        {
+//            //error
 //        }
-//NSSortDescriptor *descriptor = [NSSortDescriptor sortDescriptorWithKey:@"displayName"
-//                                                                 ascending:YES];
-//    //
-//    NSArray *results = [endty
-//                        sortedArrayUsingDescriptors:[NSArray arrayWithObject:descriptor]];
-    
-    [self.dasboardTableListing reloadData];
-}
+//    }
+//    return fetchedResultsController;
+//}
+//
+//- (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
+//{
+////    endty=[NSMutableArray new];
+////    NSArray *sections = [[self fetchedResultsController] sections];
+////    for (int i = 0 ; i< [[[self fetchedResultsController] sections] count];i++) {
+////        for (int j = 0; j<[[sections objectAtIndex:i] numberOfObjects]; j++) {
+////
+////                    [endty addObject:[[self fetchedResultsController] objectAtIndexPath:[NSIndexPath indexPathForRow:j inSection:i]]];
+//// 
+////            }
+////        }
+////NSSortDescriptor *descriptor = [NSSortDescriptor sortDescriptorWithKey:@"displayName"
+////                                                                 ascending:YES];
+////    //
+////    NSArray *results = [endty
+////                        sortedArrayUsingDescriptors:[NSArray arrayWithObject:descriptor]];
+//    
+//    [self.dasboardTableListing reloadData];
+//}
 #pragma mark - end
 
 #pragma mark - Table view delegates
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section;
 {
-    return 50;
+    return 0.01;
 }
 
 //- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)sectionIndex
@@ -159,6 +168,8 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)sectionIndex
 {
+    /*
+    //This is used to listed according to presence(offline/online)
     NSArray *sections = [[self fetchedResultsController] sections];
     
     if (sectionIndex < [sections count])
@@ -166,19 +177,34 @@
         id <NSFetchedResultsSectionInfo> sectionInfo = [sections objectAtIndex:sectionIndex];
         return sectionInfo.numberOfObjects;
     }
-    
+    //end
     return 0;
     //return 5;
+     */
+    if (customSegmentedControl.selectedSegmentIndex==1) {
+        return userListArray.count;
+    }
+    else {
+        return 0;
+    }
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
+    /*
+    //This is used to listed according to presence(offline/online)
     return [[[self fetchedResultsController] sections] count];
+    //end
+     */
+    return 1;
 }
 
+/*
+//This is used to listed according to presence(offline/online)
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
     UIView * headerView;
+    //This is used to listed according to presence(offline/online)
     NSArray *sections = [[self fetchedResultsController] sections];
     
     if (section < [sections count])
@@ -214,9 +240,10 @@
         headerView.backgroundColor = [UIColor clearColor];
         
     }
-    
+    //end
     return headerView;
 }
+*/
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -229,18 +256,24 @@
                                       reuseIdentifier:CellIdentifier];
     }
     
-    XMPPUserCoreDataStorageObject *user = [[self fetchedResultsController] objectAtIndexPath:indexPath];
-    
-    if ([user.jidStr isEqualToString:@"2222222222@ranosys"]) {
+    if (customSegmentedControl.selectedSegmentIndex==1) {
+        XMPPUserCoreDataStorageObject *user = [userDetailedList objectForKey:[userListArray objectAtIndex:indexPath.row]];
         
-        NSLog(@"a");
-//        - (XMPPvCardTemp *)vCardTempForJID:(XMPPJID *)jid xmppStream:(XMPPStream *)stream
-//        XMPPvCardTemp *newvCardTemp = [[myDelegate xmppvCardTempModule] vCardTempForJID:user.jid shouldFetch:YES];
-        NSLog(@"a");
+        if ([user.jidStr isEqualToString:@"2222222222@ranosys"]) {
+            
+            NSLog(@"a");
+            //        - (XMPPvCardTemp *)vCardTempForJID:(XMPPJID *)jid xmppStream:(XMPPStream *)stream
+            //        XMPPvCardTemp *newvCardTemp = [[myDelegate xmppvCardTempModule] vCardTempForJID:user.jid shouldFetch:YES];
+            NSLog(@"a");
+        }
+        UILabel* nameLabel = (UILabel*)[cell viewWithTag:1];
+        nameLabel.text = user.displayName;
+        [self configurePhotoForCell:cell user:user];
     }
-    UILabel* nameLabel = (UILabel*)[cell viewWithTag:1];
-    nameLabel.text = user.displayName;
-    [self configurePhotoForCell:cell user:user];
+    else {
+       
+    }
+    
     
     return cell;
 }
@@ -285,14 +318,14 @@
 //    return cell;
 //}
 
-- (NSManagedObjectContext *)managedObjectContext {
-    NSManagedObjectContext *context = nil;
-    id delegate = [[UIApplication sharedApplication] delegate];
-    if ([delegate performSelector:@selector(managedObjectContext)]) {
-        context = [delegate managedObjectContext];
-    }
-    return context;
-}
+//- (NSManagedObjectContext *)managedObjectContext {
+//    NSManagedObjectContext *context = nil;
+//    id delegate = [[UIApplication sharedApplication] delegate];
+//    if ([delegate performSelector:@selector(managedObjectContext)]) {
+//        context = [delegate managedObjectContext];
+//    }
+//    return context;
+//}
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     
@@ -416,24 +449,54 @@
 #pragma mark - Custom accessors
 - (void)addBarButton {
     
-    UIBarButtonItem *logoutBarButton;
-    CGRect framing = CGRectMake(0, 0, 60, 30.0);
+    UIBarButtonItem *logoutBarButton, *profileBarButton;
+    CGRect framing = CGRectMake(0, 0, 30, 30.0);
     UIButton *logout = [[UIButton alloc] initWithFrame:framing];
-    [logout setTitle:@"Logout" forState:UIControlStateNormal];
+//    [logout setTitle:@"Logout" forState:UIControlStateNormal];
+    [logout setImage:[UIImage imageNamed:@"logout"] forState:UIControlStateNormal];
     logoutBarButton =[[UIBarButtonItem alloc] initWithCustomView:logout];
     [logout addTarget:self action:@selector(logoutAction:) forControlEvents:UIControlEventTouchUpInside];
-    self.navigationItem.leftBarButtonItems=[NSArray arrayWithObjects:logoutBarButton, nil];
     
-    UIBarButtonItem *groupBarButton;
+    UIButton *profile = [[UIButton alloc] initWithFrame:framing];
+    //    [logout setTitle:@"Logout" forState:UIControlStateNormal];
+    [profile setImage:[UIImage imageNamed:@"profile"] forState:UIControlStateNormal];
+    profileBarButton =[[UIBarButtonItem alloc] initWithCustomView:profile];
+    [profile addTarget:self action:@selector(profileAction:) forControlEvents:UIControlEventTouchUpInside];
+    self.navigationItem.leftBarButtonItems=[NSArray arrayWithObjects:logoutBarButton,profileBarButton, nil];
+    
+    
+    UIBarButtonItem *groupBarButton, *reloadBarButton;
     UIButton *group = [[UIButton alloc] initWithFrame:framing];
-    [group setTitle:@"Group" forState:UIControlStateNormal];
+//    [group setTitle:@"Group" forState:UIControlStateNormal];
+    [group setImage:[UIImage imageNamed:@"group"] forState:UIControlStateNormal];
     groupBarButton =[[UIBarButtonItem alloc] initWithCustomView:group];
     [group addTarget:self action:@selector(groupAction:) forControlEvents:UIControlEventTouchUpInside];
-    self.navigationItem.rightBarButtonItems=[NSArray arrayWithObjects:groupBarButton, nil];
+    
+    UIButton *reload = [[UIButton alloc] initWithFrame:framing];
+    //    [group setTitle:@"Group" forState:UIControlStateNormal];
+    [reload setImage:[UIImage imageNamed:@"reload"] forState:UIControlStateNormal];
+    reloadBarButton =[[UIBarButtonItem alloc] initWithCustomView:reload];
+    [reload addTarget:self action:@selector(reloadAction:) forControlEvents:UIControlEventTouchUpInside];
+    self.navigationItem.rightBarButtonItems=[NSArray arrayWithObjects:groupBarButton,reloadBarButton, nil];
 }
 #pragma mark - end
 
 #pragma mark - IBActions
+- (void)profileAction :(id)sender {
+
+}
+
+- (void)reloadAction :(id)sender {
+    
+    [myDelegate showIndicator];
+    [self performSelector:@selector(reloadUserData) withObject:nil afterDelay:0.1];
+}
+
+- (void)reloadUserData {
+    
+    [self xmppUserRefreshResponse];
+}
+
 - (void)logoutAction :(id)sender {
     
     [UserDefaultManager removeValue:@"userName"];
@@ -482,10 +545,10 @@
 - (void)segmentedControlChangedValue:(HMSegmentedControl *)segmentedControl {
     
     if (segmentedControl.selectedSegmentIndex == 0) {
-        
+        [self.dasboardTableListing reloadData];
     }
     else if (segmentedControl.selectedSegmentIndex == 1) {
-        
+        [self.dasboardTableListing reloadData];
     }
 }
 #pragma mark - end
@@ -501,16 +564,93 @@
 //    NSLog(@"%@",newvCardTemp.emailAddress);
     
     
-    [appDelegate editProfileImageUploading];
+//    [appDelegate editProfileImageUploading];
+    
+    
+    [self showButton];
+}
+
+- (void)showButton {
+    
+//    [self xmppUserRefreshResponse];
+    NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UserEntry"];
+    NSMutableArray *devices = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
+    
+    for (int i=0; i<devices.count; i++) {
+        NSManagedObject *devicea = [devices objectAtIndex:i];
+        NSLog(@"%@",[devicea valueForKey:@"xmppRegisterId"]);
+        NSLog(@"%@",[devicea valueForKey:@"xmppName"]);
+        NSLog(@"%@",[devicea valueForKey:@"xmppPhoneNumber"]);
+        NSLog(@"%@",[devicea valueForKey:@"xmppUserStatus"]);
+        NSLog(@"%@",[devicea valueForKey:@"xmppDescription"]);
+        NSLog(@"%@",[devicea valueForKey:@"xmppAddress"]);
+        NSLog(@"%@",[devicea valueForKey:@"xmppEmailAddress"]);
+        NSLog(@"%@",[devicea valueForKey:@"xmppUserBirthDay"]);
+        NSLog(@"%@",[devicea valueForKey:@"xmppGender"]);
+        NSLog(@"\n\n");
+    }
+}
+
+- (NSManagedObjectContext *)managedObjectContext {
+    NSManagedObjectContext *context = nil;
+    id delegate = [[UIApplication sharedApplication] delegate];
+    if ([delegate performSelector:@selector(managedObjectContext)]) {
+        context = [delegate managedObjectContext];
+    }
+    return context;
 }
 
 - (void)updateProfileInformation {
 
+    [self.dasboardTableListing reloadData];
     NSLog(@"a");
     appDelegate.isUpdatePofile=false;
     appDelegate.updateProfileUserId=@"";
 
 //    [das]
+}
+
+- (void)xmppNewUserAddedNotify {
+
+    UIBarButtonItem *logoutBarButton, *profileBarButton;
+    CGRect framing = CGRectMake(0, 0, 30, 30.0);
+    UIButton *logout = [[UIButton alloc] initWithFrame:framing];
+    //    [logout setTitle:@"Logout" forState:UIControlStateNormal];
+    [logout setImage:[UIImage imageNamed:@"logout"] forState:UIControlStateNormal];
+    logoutBarButton =[[UIBarButtonItem alloc] initWithCustomView:logout];
+    [logout addTarget:self action:@selector(logoutAction:) forControlEvents:UIControlEventTouchUpInside];
+    
+    UIButton *profile = [[UIButton alloc] initWithFrame:framing];
+    //    [logout setTitle:@"Logout" forState:UIControlStateNormal];
+    [profile setImage:[UIImage imageNamed:@"profile"] forState:UIControlStateNormal];
+    profileBarButton =[[UIBarButtonItem alloc] initWithCustomView:profile];
+    [profile addTarget:self action:@selector(profileAction:) forControlEvents:UIControlEventTouchUpInside];
+    self.navigationItem.leftBarButtonItems=[NSArray arrayWithObjects:logoutBarButton,profileBarButton, nil];
+    
+    
+    UIBarButtonItem *groupBarButton, *reloadBarButton;
+    UIButton *group = [[UIButton alloc] initWithFrame:framing];
+    //    [group setTitle:@"Group" forState:UIControlStateNormal];
+    [group setImage:[UIImage imageNamed:@"group"] forState:UIControlStateNormal];
+    groupBarButton =[[UIBarButtonItem alloc] initWithCustomView:group];
+    [group addTarget:self action:@selector(groupAction:) forControlEvents:UIControlEventTouchUpInside];
+    
+    UIButton *reload = [[UIButton alloc] initWithFrame:framing];
+    //    [group setTitle:@"Group" forState:UIControlStateNormal];
+    [reload setImage:[UIImage imageNamed:@"reloadRed"] forState:UIControlStateNormal];
+    reloadBarButton =[[UIBarButtonItem alloc] initWithCustomView:reload];
+    [reload addTarget:self action:@selector(reloadAction:) forControlEvents:UIControlEventTouchUpInside];
+    self.navigationItem.rightBarButtonItems=[NSArray arrayWithObjects:groupBarButton,reloadBarButton, nil];
+}
+
+- (void)xmppUserListResponse:(NSMutableDictionary *)xmppUserDetails xmppUserListIds:(NSMutableArray *)xmppUserListIds {
+
+    [self addBarButton];
+    [myDelegate stopIndicator];
+    userDetailedList=[xmppUserDetails mutableCopy];
+    userListArray=[xmppUserListIds mutableCopy];
+    [self.dasboardTableListing reloadData];
 }
 /*
 #pragma mark - Navigation

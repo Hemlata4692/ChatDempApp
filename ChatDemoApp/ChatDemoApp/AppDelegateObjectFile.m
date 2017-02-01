@@ -70,6 +70,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 - (void)didFinishLaunchingMethod {
 
     isUpdatePofile=false;
+    self.myView=@"Other";
     updateProfileUserId=@"";
     if (nil!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"] && NULL!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"]) {
         hostName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"];
@@ -430,6 +431,17 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         }
     }
     
+    NSXMLElement *addQueryElement = [iq elementForName:@"query"];
+    if (addQueryElement!=nil) {
+        NSXMLElement *removeitemElement = [addQueryElement elementForName:@"item"];
+        if (removeitemElement!=nil) {
+            NSString *addSubscriptionElement = [[removeitemElement attributeForName:@"subscription"] stringValue];
+            if ((addSubscriptionElement!=nil)&&[addSubscriptionElement isEqualToString:@"both"]) {
+                [self insertNewUserEntryInXmppUserModel:[[removeitemElement attributeForName:@"jid"] stringValue] xmppName:[[removeitemElement attributeForName:@"name"] stringValue] xmppPhoneNumber:@"" xmppUserStatus:@"" xmppDescription:@"" xmppAddress:@"" xmppEmailAddress:@"" xmppUserBirthDay:@"" xmppGender:@""];
+            }
+        }
+    }
+    
     NSXMLElement *removeQueryElement = [iq elementForName:@"query"];
     if (removeQueryElement!=nil) {
          NSXMLElement *removeitemElement = [removeQueryElement elementForName:@"item"];
@@ -470,6 +482,46 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         if (![context save:&error]) {
             NSLog(@"Can't Delete! %@ %@", error, [error localizedDescription]);
             return;
+        }
+        if ([self.myView isEqualToString:@"XmppNewUserAdded"]) {
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"XmppNewUserAdded" object:nil];
+        }
+    }
+}
+
+- (void)insertNewUserEntryInXmppUserModel:(NSString *)registredUserId xmppName:(NSString *)xmppName xmppPhoneNumber:(NSString *)xmppPhoneNumber xmppUserStatus:(NSString *)xmppUserStatus xmppDescription:(NSString *)xmppDescription xmppAddress:(NSString *)xmppAddress xmppEmailAddress:(NSString *)xmppEmailAddress xmppUserBirthDay:(NSString *)xmppUserBirthDay xmppGender:(NSString *)xmppGender {
+    
+    NSManagedObjectContext *context = [self managedObjectContext];
+    NSMutableArray *results = [[NSMutableArray alloc]init];
+    NSPredicate *pred;
+    
+    pred = [NSPredicate predicateWithFormat:@"xmppRegisterId == %@", registredUserId];
+    NSLog(@"predicate: %@",pred);
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"UserEntry"];
+    [fetchRequest setPredicate:pred];
+    results = [[context executeFetchRequest:fetchRequest error:nil] mutableCopy];
+    
+    if (results.count == 0) {
+        NSManagedObject *xmppDataEntry = [NSEntityDescription insertNewObjectForEntityForName:@"UserEntry" inManagedObjectContext:context];
+        [xmppDataEntry setValue:registredUserId forKey:@"xmppRegisterId"];
+        [xmppDataEntry setValue:xmppName forKey:@"xmppName"];
+        [xmppDataEntry setValue:xmppPhoneNumber forKey:@"xmppPhoneNumber"];
+        [xmppDataEntry setValue:xmppUserStatus forKey:@"xmppUserStatus"];
+        [xmppDataEntry setValue:xmppDescription forKey:@"xmppDescription"];
+        [xmppDataEntry setValue:xmppAddress forKey:@"xmppAddress"];
+        [xmppDataEntry setValue:xmppEmailAddress forKey:@"xmppEmailAddress"];
+        [xmppDataEntry setValue:xmppUserBirthDay forKey:@"xmppUserBirthDay"];
+        [xmppDataEntry setValue:xmppGender forKey:@"xmppGender"];
+        NSError *error = nil;
+        // Save the object to persistent store
+        if (![context save:&error]) {
+            NSLog(@"Can't Save! %@ %@", error, [error localizedDescription]);
+        }
+        [xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:registredUserId] ignoreStorage:YES];
+        if ([self.myView isEqualToString:@"XmppNewUserAdded"]) {
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"XmppNewUserAdded" object:nil];
         }
     }
 }
@@ -850,12 +902,10 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 
 - (void)xmppRosterDidEndPopulating:(XMPPRoster *)sender
 {
-    if ([myDelegate.myView isEqualToString:@"UserListView"]) {
-        
-        
-        [myDelegate stopIndicator];
-    }
-    
+//    if ([myDelegate.myView isEqualToString:@"DashboardXmppUserList"]) {
+//        
+//        [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPUserListResponse" object:nil];
+//    }
 }
 #pragma mark - end
 

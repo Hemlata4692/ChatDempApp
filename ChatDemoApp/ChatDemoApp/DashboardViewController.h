@@ -8,12 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import "DashboardXMPP.h"
-#import <CoreData/CoreData.h>
 
-@interface DashboardViewController : DashboardXMPP<NSFetchedResultsControllerDelegate>
-{
-    NSFetchedResultsController *fetchedResultsController;
-    
-}
+@interface DashboardViewController : DashboardXMPP
 
+@property(nonatomic,strong) NSMutableDictionary *userDetailedList;
+@property(nonatomic,strong) NSMutableArray *userListArray;
 @end

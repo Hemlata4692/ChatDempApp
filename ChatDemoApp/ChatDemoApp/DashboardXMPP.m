@@ -19,14 +19,13 @@
 @implementation DashboardXMPP
 //@synthesize xmppUserDetailedList;
 //@synthesize xmppUserListArray;
-@synthesize xmppUserId;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
     appDelegate.myView=@"DashboardXmppUserList";
     appDelegate = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
-     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProfileInformation) name:@"UpdatedProfile" object:nil];
+//     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProfileInformation) name:@"XMPPProfileUpdation" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppNewUserAddedNotify) name:@"XmppNewUserAdded" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppNewUserAddedNotify) name:@"XmppUserPresenceUpdate" object:nil];
     
@@ -39,7 +38,7 @@
     [super viewWillAppear:YES];
     
     appDelegate.updateProfileUserId=@"";
-    xmppUserId=[XMPPUserDefaultManager getValue:@"LoginCred"];
+    appDelegate.xmppLogedInUserId=[XMPPUserDefaultManager getValue:@"LoginCred"];
 //    isrefresh=YES;
 //    if ([myDelegate connect])
 //    {
@@ -63,6 +62,7 @@
     
     [appDelegate disconnect];
     appDelegate.myView=@"";
+    appDelegate.xmppLogedInUserId=@"";
     [XMPPUserDefaultManager removeValue:@"LoginCred"];
     //    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",myDelegate.hostName] key:@"LoginCred"];
     [XMPPUserDefaultManager removeValue:@"PassCred"];
@@ -179,6 +179,48 @@
     {
         [self fetchedResultsController];
     }
+}
+
+- (NSDictionary *)getProfileData:(NSString *)jid {
+    
+    appDelegate.updateProfileUserId=jid;
+    [appDelegate.xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:jid] ignoreStorage:YES];
+    
+    NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
+    NSPredicate *pred;
+    NSMutableArray *results = [[NSMutableArray alloc]init];
+    pred = [NSPredicate predicateWithFormat:@"xmppRegisterId == %@",jid];
+    NSLog(@"predicate: %@",pred);
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"UserEntry"];
+    [fetchRequest setPredicate:pred];
+    
+    results = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
+    NSDictionary *profileResponse;
+    if (results.count>0) {
+        NSManagedObject *devicea = [results objectAtIndex:0];
+        profileResponse=@{
+                          @"RegisterId" : [devicea valueForKey:@"xmppRegisterId"],
+                          @"Name" : [devicea valueForKey:@"xmppName"],
+                          @"PhoneNumber" : [devicea valueForKey:@"xmppPhoneNumber"],
+                          @"UserStatus" : [devicea valueForKey:@"xmppUserStatus"],
+                          @"Description" : [devicea valueForKey:@"xmppDescription"],
+                          @"Address" : [devicea valueForKey:@"xmppAddress"],
+                          @"EmailAddress" : [devicea valueForKey:@"xmppEmailAddress"],
+                          @"UserBirthDay" : [devicea valueForKey:@"xmppUserBirthDay"],
+                          @"Gender" : [devicea valueForKey:@"xmppGender"],
+                          };
+        NSLog(@"\n\n");
+    }
+    return profileResponse;
+}
+
+- (NSManagedObjectContext *)managedObjectContext {
+    NSManagedObjectContext *context = nil;
+    id delegate = [[UIApplication sharedApplication] delegate];
+    if ([delegate performSelector:@selector(managedObjectContext)]) {
+        context = [delegate managedObjectContext];
+    }
+    return context;
 }
 /*
 #pragma mark - Navigation

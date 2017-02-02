@@ -67,6 +67,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 //end
 
 @synthesize xmppUserDetailedList, xmppUserListArray;
+@synthesize xmppLogedInUserId;
 
 #pragma mark - Intialze XMPP connection
 - (void)didFinishLaunchingMethod {
@@ -430,6 +431,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         if (registerUserInfo!=nil) {
             NSLog(@"%@",[registerUserInfo stringValue]);
             [self insertEntryInXmppUserModel:[registerUserInfo stringValue] xmppName:[[vcardInfo elementForName:@"NICKNAME"] stringValue] xmppPhoneNumber:[[vcardInfo elementForName:@"TEL"] stringValue] xmppUserStatus:[[vcardInfo elementForName:@"USERSTATUS"] stringValue] xmppDescription:[[vcardInfo elementForName:@"DESC"] stringValue] xmppAddress:[[vcardInfo elementForName:@"ADDRESS"] stringValue] xmppEmailAddress:[[vcardInfo elementForName:@"EMAILADDRESS"] stringValue] xmppUserBirthDay:[[vcardInfo elementForName:@"BDAY"] stringValue] xmppGender:[[vcardInfo elementForName:@"GENDER"] stringValue]];
+            if ([self.myView isEqualToString:@"XmppNewUserAdded"] && xmppUserListArray!=nil && [updateProfileUserId isEqualToString:[registerUserInfo stringValue]]) {
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPProfileUpdation" object:nil];
+            }
         }
     }
     
@@ -568,13 +572,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         if (![context save:&error]) {
             NSLog(@"Can't Save! %@ %@", error, [error localizedDescription]);
         }
-    }
-    
-    if (isUpdatePofile && [updateProfileUserId isEqualToString:registredUserId]) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"UpdatedProfile" object:nil];
-    }
-    else if ([self.myView isEqualToString:@"XmppNewUserAdded"] && xmppUserListArray!=nil && [updateProfileUserId isEqualToString:registredUserId]) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"FriendProfileUpdated" object:nil];
     }
 }
 
@@ -717,7 +714,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     NSData *pictureData;
     if (nil!=self.userProfileImageDataValue) {
         
-        pictureData = UIImageJPEGRepresentation([UIImage imageWithData:self.userProfileImageDataValue], 1.0);
+        pictureData = UIImageJPEGRepresentation([UIImage imageWithData:self.userProfileImageDataValue], 0.2);
         [newvCardTemp setPhoto:pictureData];
     }
 
@@ -789,85 +786,55 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 }
 
 -(void)editProfileImageUploading:(NSMutableDictionary *)profileData {
-//    
-////    NSXMLElement *vCardXML = [NSXMLElement elementWithName:@"vCard" xmlns:@"vcard-temp"];
-////    XMPPvCardTemp *newvCardTemp = [XMPPvCardTemp vCardTempFromElement:vCardXML];
-////    NSData *pictureData = UIImageJPEGRepresentation(editProfileImge, 0.5);
-////    
-////    [newvCardTemp setPhoto:pictureData];
-////    XMPPvCardCoreDataStorage * xmppvCardStorage1 = [XMPPvCardCoreDataStorage sharedInstance];
-////    XMPPvCardTempModule * xmppvCardTempModule1 = [[XMPPvCardTempModule alloc] initWithvCardStorage:xmppvCardStorage1];
-////    [xmppvCardTempModule1  activate:[self xmppStream]];
-////    [xmppvCardTempModule1 updateMyvCardTemp:newvCardTemp];
-//    
-//    NSXMLElement *vCardXML = [NSXMLElement elementWithName:@"vCard" xmlns:@"vcard-temp"];
-//    XMPPvCardTemp *newvCardTemp = [XMPPvCardTemp vCardTempFromElement:vCardXML];
-////    NSData *pictureData;
-////    if (nil!=self.userProfileImageDataValue) {
-////        
-////        pictureData = UIImageJPEGRepresentation([UIImage imageWithData:self.userProfileImageDataValue], 1.0);
-////        [newvCardTemp setPhoto:pictureData];
-////    }
-//    
-//    /*//Other variables
-//     [newvCardTemp setNickname:@"aaaaaa"];
-//     NSArray *interestsArray= [[NSArray alloc] initWithObjects:@"food", nil];
-//     [newvCardTemp setLabels:interestsArray];
-//     [newvCardTemp setMiddleName:@"Stt"];
-//     [newvCardTemp setUserStatus:@"I am available"];
-//     [newvCardTemp setAddress:@"rohitm@ranosys.com"];
-//     [newvCardTemp setEmailAddresses:[NSMutableArray arrayWithObjects:@"rohitmodi@ranosys.com",@"rohitm@ranosys.com", nil]];
-//     */
-//    
-////    [newvCardTemp setRegisterUserId:[self setProfileDataValue:profileData key:@"xmppRegisterId"]];
-////    [newvCardTemp setNickname:[self setProfileDataValue:profileData key:@"xmppName"]];
-////    [newvCardTemp setTelecomsAddress:[self setProfileDataValue:profileData key:@"xmppPhoneNumber"]];
-//    [newvCardTemp setUserStatus:@"tenth status"];
-////    [newvCardTemp setDesc:[self setProfileDataValue:profileData key:@"xmppDescription"]];
-////    [newvCardTemp setAddress:[self setProfileDataValue:profileData key:@"xmppAddress"]];
-//    [newvCardTemp setEmailAddress:@"newemail@c.com"];
-//    [newvCardTemp setNickname:@"newemail@c.com"];
-////    [newvCardTemp setBday:[self setProfileDataValue:profileData key:@"xmppUserBirthDay"]];
-////    [newvCardTemp setGender:[self setProfileDataValue:profileData key:@"xmppGender"]];
-//    
-//    [xmppvCardTempModule updateMyvCardTemp:newvCardTemp];
-
     
-    
-//    :(NSMutableDictionary *)profileData {
-    
-        NSXMLElement *vCardXML = [NSXMLElement elementWithName:@"vCard" xmlns:@"vcard-temp"];
-        XMPPvCardTemp *newvCardTemp = [XMPPvCardTemp vCardTempFromElement:vCardXML];
-        NSData *pictureData;
-        if (nil!=self.userProfileImageDataValue) {
-            
-            pictureData = UIImageJPEGRepresentation([UIImage imageWithData:self.userProfileImageDataValue], 1.0);
-            [newvCardTemp setPhoto:pictureData];
-        }
+    NSXMLElement *vCardXML = [NSXMLElement elementWithName:@"vCard" xmlns:@"vcard-temp"];
+    XMPPvCardTemp *newvCardTemp = [XMPPvCardTemp vCardTempFromElement:vCardXML];
+    NSData *pictureData;
+    if (nil!=self.userProfileImageDataValue) {
         
-        /*//Other variables
-         [newvCardTemp setNickname:@"aaaaaa"];
-         NSArray *interestsArray= [[NSArray alloc] initWithObjects:@"food", nil];
-         [newvCardTemp setLabels:interestsArray];
-         [newvCardTemp setMiddleName:@"Stt"];
-         [newvCardTemp setUserStatus:@"I am available"];
-         [newvCardTemp setAddress:@"rohitm@ranosys.com"];
-         [newvCardTemp setEmailAddresses:[NSMutableArray arrayWithObjects:@"rohitmodi@ranosys.com",@"rohitm@ranosys.com", nil]];
-         */
-        
-        [newvCardTemp setRegisterUserId:[self setProfileDataValue:profileData key:@"xmppRegisterId"]];
-        [newvCardTemp setNickname:[self setProfileDataValue:profileData key:@"xmppName"]];
-        [newvCardTemp setTelecomsAddress:[self setProfileDataValue:profileData key:@"xmppPhoneNumber"]];
-        [newvCardTemp setUserStatus:[self setProfileDataValue:profileData key:@"xmppUserStatus"]];
-        //    [newvCardTemp setUserStatus:@"old status"];
-        [newvCardTemp setDesc:[self setProfileDataValue:profileData key:@"xmppDescription"]];
-        [newvCardTemp setAddress:[self setProfileDataValue:profileData key:@"xmppAddress"]];
-        [newvCardTemp setEmailAddress:[self setProfileDataValue:profileData key:@"xmppEmailAddress"]];
-        [newvCardTemp setBday:[self setProfileDataValue:profileData key:@"xmppUserBirthDay"]];
-        [newvCardTemp setGender:[self setProfileDataValue:profileData key:@"xmppGender"]];
-        
-        [xmppvCardTempModule updateMyvCardTemp:newvCardTemp];
+        pictureData = UIImageJPEGRepresentation([UIImage imageWithData:self.userProfileImageDataValue], 0.6);
+        [newvCardTemp setPhoto:pictureData];
+    }
     
+    /*//Other variables
+     [newvCardTemp setNickname:@"aaaaaa"];
+     NSArray *interestsArray= [[NSArray alloc] initWithObjects:@"food", nil];
+     [newvCardTemp setLabels:interestsArray];
+     [newvCardTemp setMiddleName:@"Stt"];
+     [newvCardTemp setUserStatus:@"I am available"];
+     [newvCardTemp setAddress:@"rohitm@ranosys.com"];
+     [newvCardTemp setEmailAddresses:[NSMutableArray arrayWithObjects:@"rohitmodi@ranosys.com",@"rohitm@ranosys.com", nil]];
+     */
+    
+    [newvCardTemp setRegisterUserId:[self setProfileDataValue:profileData key:@"xmppRegisterId"]];
+    [newvCardTemp setNickname:[self setProfileDataValue:profileData key:@"xmppName"]];
+    [newvCardTemp setTelecomsAddress:[self setProfileDataValue:profileData key:@"xmppPhoneNumber"]];
+    [newvCardTemp setUserStatus:[self setProfileDataValue:profileData key:@"xmppUserStatus"]];
+    //    [newvCardTemp setUserStatus:@"old status"];
+    [newvCardTemp setDesc:[self setProfileDataValue:profileData key:@"xmppDescription"]];
+    [newvCardTemp setAddress:[self setProfileDataValue:profileData key:@"xmppAddress"]];
+    [newvCardTemp setEmailAddress:[self setProfileDataValue:profileData key:@"xmppEmailAddress"]];
+    [newvCardTemp setBday:[self setProfileDataValue:profileData key:@"xmppUserBirthDay"]];
+    [newvCardTemp setGender:[self setProfileDataValue:profileData key:@"xmppGender"]];
+    
+    [xmppvCardTempModule updateMyvCardTemp:newvCardTemp];
+    
+    
+    //    XMPPPresence *presence = [XMPPPresence presence];
+    //    NSString *string = [notification object]; // object contains some random string.
+    //    NSXMLElement *status = [NSXMLElement elementWithName:@"status" stringValue:@"my status"];
+    //     NSXMLElement *emailId = [NSXMLElement elementWithName:@"emailId" stringValue:@"my status"];
+    //     NSXMLElement *name = [NSXMLElement elementWithName:@"name" stringValue:@"my status"];
+    //    [presencexmpp addChild:status];
+    //    [presencexmpp addChild:[NSXMLElement elementWithName:@"emailId" stringValue:@"my status"]];
+    //    [presencexmpp addChild:[NSXMLElement elementWithName:@"name" stringValue:@"my status"]];
+    //    NSLog(@"presence info :- %@",presencexmpp);
+    //    [[self xmppStream] sendElement:presencexmpp];
+    
+    
+    //    XMPPPresence *presence = [XMPPPresence presenceWithType:@"unavailable"];
+    //
+    //    [[self xmppStream] sendElement:presence];
 }
 
 - (void)xmppStream:(XMPPStream *)sender didReceiveError:(id)error

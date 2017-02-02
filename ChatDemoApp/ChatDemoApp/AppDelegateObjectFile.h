@@ -69,10 +69,11 @@
 -(BOOL)connect;
 -(void)disconnect;
 -(void)addBadgeIcon:(NSString*)badgeValue;
--(void)editProfileImageUploading;
+-(void)editProfileImageUploading:(NSMutableDictionary *)profileData;
 -(void)addBadgeIconLastTab;
 -(void)removeBadgeIconLastTab;
 -(void)methodCalling:(NSMutableDictionary *)profileData;
+- (void)insertEntryInXmppUserModel:(NSString *)registredUserId xmppName:(NSString *)xmppName xmppPhoneNumber:(NSString *)xmppPhoneNumber xmppUserStatus:(NSString *)xmppUserStatus xmppDescription:(NSString *)xmppDescription xmppAddress:(NSString *)xmppAddress xmppEmailAddress:(NSString *)xmppEmailAddress xmppUserBirthDay:(NSString *)xmppUserBirthDay xmppGender:(NSString *)xmppGender;
 
 - (NSManagedObjectContext *)managedObjectContext_roster;
 - (NSManagedObjectContext *)managedObjectContext_capabilities;
@@ -95,7 +96,7 @@
 
 @property(nonatomic,strong) NSMutableDictionary *xmppUserDetailedList;
 @property(nonatomic,strong) NSMutableArray *xmppUserListArray;
-
+@property(nonatomic,strong) NSString *xmppLogedInUserId;
 
 
 

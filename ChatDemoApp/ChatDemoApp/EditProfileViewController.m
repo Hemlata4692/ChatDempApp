@@ -1,49 +1,54 @@
 //
-//  RegisterViewController.m
+//  EditProfileViewController.m
 //  ChatDemoApp
 //
-//  Created by Ranosys on 09/01/17.
+//  Created by Ranosys on 02/02/17.
 //  Copyright © 2017 Ranosys. All rights reserved.
 //
 
-#import "RegisterViewController.h"
+#import "EditProfileViewController.h"
+#import "BSKeyboardControls.h"
 #import "UITextField+Validations.h"
 #import "UserDefaultManager.h"
-#import "BSKeyboardControls.h"
 
-@interface RegisterViewController ()<BSKeyboardControlsDelegate,UIActionSheetDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate>
+@interface EditProfileViewController ()<BSKeyboardControlsDelegate,UIActionSheetDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate>{
+    
+    NSDictionary *profileDic;
+}
 
-@property (strong, nonatomic) IBOutlet UIImageView *profileImageView;
-@property (strong, nonatomic) IBOutlet UITextField *usernameField;
-@property (strong, nonatomic) IBOutlet UITextField *emailField;
-@property (strong, nonatomic) IBOutlet UITextField *mobileField;
-@property (strong, nonatomic) IBOutlet UITextField *password;
+@property (strong, nonatomic) IBOutlet UIImageView *profileImage;
+@property (strong, nonatomic) IBOutlet UITextField *userNameField;
+@property (strong, nonatomic) IBOutlet UITextField *emailIdField;
+@property (strong, nonatomic) IBOutlet UITextField *mobileNumberField;
 @property (strong, nonatomic) IBOutlet UITextField *userStatusField;
 
 //Declare BSKeyboard variable
 @property (strong, nonatomic) BSKeyboardControls *keyboardControls;
 @end
 
-@implementation RegisterViewController
+@implementation EditProfileViewController
 
-#pragma mark - Life cycle
+#pragma mark - View life cycle
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.navigationItem.title=@"Register";
+    self.navigationItem.title=@"Edit Profile";
     
     //Adding textfield to keyboard controls array
-    [self setKeyboardControls:[[BSKeyboardControls alloc] initWithFields:@[self.usernameField, self.emailField, self.mobileField, self.password, self.userStatusField]]];
+    [self setKeyboardControls:[[BSKeyboardControls alloc] initWithFields:@[self.userNameField, self.mobileNumberField, self.userStatusField]]];
     [self.keyboardControls setDelegate:self];
+    
+    self.profileImage.layer.cornerRadius=100/2;
+    self.profileImage.layer.masksToBounds=YES;
+    
+    [self addBarButton];
+    [self setCurrentProfileView];
     // Do any additional setup after loading the view.
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:YES];
     
-    [self addLeftBarButtonWithImage:[UIImage imageNamed:@"back_white"]];
-    self.profileImageView.layer.cornerRadius=96/2;
-    self.profileImageView.layer.masksToBounds=YES;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -53,15 +58,51 @@
 #pragma mark - end
 
 #pragma mark - Custom accessors
-- (void)addLeftBarButtonWithImage:(UIImage *)backImage {
+- (void)setCurrentProfileView {
+    
+    UIImage *tempPhoto=[self getFriendProfilePhoto:myDelegate.xmppLogedInUserId];
+    if (tempPhoto!=nil) {
+        self.profileImage.image=tempPhoto;
+    }
+    else {
+        
+        self.profileImage.image=[UIImage imageNamed:@"profile_camera"];
+    }
+    
+//    switch ([self getFriendPresenceStatus:myDelegate.xmppLogedInUserId]) {
+//        case 0:     // online/available
+
+//            break;
+//        default:    //offline
+
+//            break;
+//    }
+    dispatch_queue_t queue = dispatch_queue_create("queue", DISPATCH_QUEUE_PRIORITY_DEFAULT);
+    dispatch_async(queue, ^{
+        
+        profileDic=[self getEditProfileData:myDelegate.xmppLogedInUserId];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            self.userNameField.text=[profileDic objectForKey:@"Name"];
+            self.userStatusField.text=[profileDic objectForKey:@"UserStatus"];
+            self.mobileNumberField.text=[profileDic objectForKey:@"PhoneNumber"];
+            self.emailIdField.text=[profileDic objectForKey:@"EmailAddress"];
+
+            NSLog(@" Desc:%@ \n address:%@ \n birthDay:%@ \n gender:%@",[profileDic objectForKey:@"Description"],[profileDic objectForKey:@"Address"],[profileDic objectForKey:@"UserBirthDay"],[profileDic objectForKey:@"Gender"]);
+        });
+    });
+}
+
+- (void)addBarButton {
     
     UIBarButtonItem *backBarButton;
-    CGRect framing = CGRectMake(0, 0, backImage.size.width, backImage.size.height);
+    CGRect framing = CGRectMake(0, 0, 25, 25);
+    
     UIButton *back = [[UIButton alloc] initWithFrame:framing];
-    [back setBackgroundImage:backImage forState:UIControlStateNormal];
+    [back setImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
     backBarButton =[[UIBarButtonItem alloc] initWithCustomView:back];
-     [back addTarget:self action:@selector(backButtonAction:) forControlEvents:UIControlEventTouchUpInside];
-    self.navigationItem.leftBarButtonItems=[NSArray arrayWithObjects:backBarButton, nil];
+    [back addTarget:self action:@selector(backAction) forControlEvents:UIControlEventTouchUpInside];
+    self.navigationItem.leftBarButtonItem=backBarButton;
 }
 #pragma mark - end
 
@@ -86,7 +127,7 @@
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     
-    if(textField == self.mobileField) {
+    if(textField == self.mobileNumberField) {
         if (range.length > 0 && [string length] == 0)
         {
             return YES;
@@ -127,17 +168,13 @@
 #pragma mark - end
 
 #pragma mark - Login validation
-- (BOOL)performValidationsForRegister {
+- (BOOL)performValidationsForUpdate {
     
-    if ([self.usernameField isEmpty]&&[self.emailField isEmpty]&&[self.mobileField isEmpty]&&[self.password isEmpty]&&[self.userStatusField isEmpty]) {
+    if ([self.userNameField isEmpty]&&[self.mobileNumberField isEmpty]&&[self.userStatusField isEmpty]) {
         [UserDefaultManager showAlertMessage:@"Alert" message:@"Please fill in the required fields."];
         return NO;
     }
-    else if(![self.emailField isValidEmail]) {
-        [UserDefaultManager showAlertMessage:@"Alert" message:@"Please validate your email field."];
-        return NO;
-    }
-    else if(self.mobileField.text.length<10) {
+    else if(self.mobileNumberField.text.length<10) {
         [UserDefaultManager showAlertMessage:@"Alert" message:@"Please enter valid mobile number."];
         return NO;
     }
@@ -147,15 +184,10 @@
 }
 #pragma mark - end
 
-#pragma mark - IBActions
-//Back button action
-- (void)backButtonAction :(id)sender {
+#pragma mark - UIButton actions
+- (IBAction)changeImage:(UIButton *)sender {
     
-    [self.navigationController popViewControllerAnimated:YES];
-}
-
-- (IBAction)profilePhoto:(UIButton *)sender {
-    
+    [self.view endEditing:YES];
     UIAlertController* alert = [UIAlertController alertControllerWithTitle:@""
                                                                    message:@""
                                                             preferredStyle:UIAlertControllerStyleActionSheet];
@@ -192,21 +224,43 @@
     [self presentViewController:alert animated:YES completion:nil];
 }
 
-- (IBAction)register:(UIButton *)sender {
+- (IBAction)updateProfile:(UIButton *)sender {
     
     [self.view endEditing:YES];
-    if ([self performValidationsForRegister]) {
-    
+    if ([self performValidationsForUpdate]) {
+        
         [myDelegate showIndicator];
-        [self performSelector:@selector(userSignUp) withObject:nil afterDelay:0.1];
+        [self performSelector:@selector(userUpdateProfile) withObject:nil afterDelay:0.1];
     }
 }
+
+- (void)backAction {
+    
+    [self.navigationController popViewControllerAnimated:YES];
+}
 #pragma mark - end
+
+#pragma mark - Webservice
+- (void)userUpdateProfile {
+    
+    //You can add these optional values. if you donot add these values then set @"" as default value
+    NSMutableDictionary *profileData=[NSMutableDictionary new];
+    [profileData setObject:self.userNameField.text forKey:self.xmppName];
+    [profileData setObject:self.mobileNumberField.text forKey:self.xmppPhoneNumber];
+    [profileData setObject:[profileDic objectForKey:@"Gender"] forKey:self.xmppGender];
+    [profileData setObject:[profileDic objectForKey:@"Address"] forKey:self.xmppAddress];
+    [profileData setObject:self.userStatusField.text forKey:self.xmppUserStatus];
+    [profileData setObject:[profileDic objectForKey:@"Description"] forKey:self.xmppDescription];
+    [profileData setObject:self.emailIdField.text forKey:self.xmppEmailAddress];
+    [profileData setObject:[profileDic objectForKey:@"UserBirthDay"] forKey:self.xmppUserBirthDay];
+    
+    [self userUpdateProfileUsingVCard:profileData profilePlaceholder:@"profile_camera" profileImageView:self.profileImage.image];
+}
 
 #pragma mark - ImagePicker delegate
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingImage:(UIImage *)image1 editingInfo:(NSDictionary *)info {
     
-    self.profileImageView.image=image1;
+    self.profileImage.image=image1;
     [picker dismissViewControllerAnimated:YES completion:NULL];
 }
 
@@ -216,74 +270,46 @@
 }
 #pragma mark - end
 
-#pragma mark - Webservice
-- (void)userSignUp {
+#pragma mark - XMPPProfileView methods
+- (void)XmppUserPresenceUpdateNotify {
     
-    //If you want no password form then commented this code
-    //You can add these optional values
-    NSMutableDictionary *profileData=[NSMutableDictionary new];
-    [profileData setObject:self.usernameField.text forKey:self.xmppName];
-    [profileData setObject:self.mobileField.text forKey:self.xmppPhoneNumber];
-    [profileData setObject:@"" forKey:self.xmppGender];
-    [profileData setObject:@"" forKey:self.xmppAddress];
-    [profileData setObject:self.userStatusField.text forKey:self.xmppUserStatus];
-    [profileData setObject:@"" forKey:self.xmppDescription];
-    [profileData setObject:self.emailField.text forKey:self.xmppEmailAddress];
-    [profileData setObject:@"" forKey:self.xmppUserBirthDay];
-    
-    [self userRegistrationPassword:self.password.text userName:self.mobileField.text profileData:profileData profilePlaceholder:@"profile_camera" profileImageView:self.profileImageView.image];
-    /*//If you want no password form then uncomment this code
-    [self userRegistrationWithoutPassword:self.mobileField.text profileData:profileData profilePlaceholder:@"profile_camera" profileImageView:self.profileImageView.image];
-     */
+    switch ([self getFriendPresenceStatus:myDelegate.xmppLogedInUserId]) {
+        case 0:     // online/available
+//            _presenceStatus.backgroundColor=[UIColor greenColor];
+            break;
+        default:    //offline
+//            _presenceStatus.backgroundColor=[UIColor redColor];
+            break;
+    }
 }
 
-//Register XMPP method
-- (void)UserDidRegister {
+- (void)XmppProileUpdateNotify {
     
-    [myDelegate stopIndicator];
-    [self loginRegisteredUser:self.mobileField.text password:self.password.text];//After registration using this method, logged in user.
-    /*//If you want no password form then uncomment this code
-    [self loginRegisteredUser:self.mobileField.text];//After registration using this method, logged in user.
-     */
     
-//    [UserDefaultManager setValue:self.usernameField.text key:@"userName"];
-//    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-//    UIViewController * homeView = [storyboard instantiateViewControllerWithIdentifier:@"DashboardNavigation"];
-//    [myDelegate.window setRootViewController:homeView];
-//    [myDelegate.window makeKeyAndVisible];
 }
 
-- (void)UserDidNotRegister:(ErrorType)errorType {
-    
-    [myDelegate stopIndicator];
-    NSString *errorMessage=@"";
-    if(errorType==XMPP_UserExist){
-        
-        errorMessage=@"Username Already Exists!";
-    }
-    else if(errorType==XMPP_InvalidUserName){
-        //This error is called when your Name is as username
-        errorMessage=@"Please enter valid username";
-    }
-    else {
-        errorMessage=@"Something went wrong, Please try again.";
-    }
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Registration Failed!" message:errorMessage preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction * action){
-        // Ok action example
-    }];
-    [alert addAction:okAction];
-    [self presentViewController:alert animated:YES completion:nil];
-}
-//end
+- (void)XMPPvCardTempModuleDidUpdateMyvCardSuccessResponse {
 
-- (void)loginUserDidAuthenticatedResult {
-    NSLog(@"a");
-        [UserDefaultManager setValue:self.usernameField.text key:@"userName"];
-        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-        UIViewController * homeView = [storyboard instantiateViewControllerWithIdentifier:@"DashboardNavigation"];
-        [myDelegate.window setRootViewController:homeView];
-        [myDelegate.window makeKeyAndVisible];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [myDelegate stopIndicator];
+    });
 }
+
+- (void)XMPPvCardTempModuleDidUpdateMyvCardFailResponse {
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [myDelegate stopIndicator];
+    });
+}
+#pragma mark - end
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
 
 @end

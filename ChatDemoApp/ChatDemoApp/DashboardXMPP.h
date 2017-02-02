@@ -15,11 +15,11 @@
 }
 //@property(nonatomic,strong) NSMutableDictionary *xmppUserDetailedList;
 //@property(nonatomic,strong) NSMutableArray *xmppUserListArray;
-@property(nonatomic,strong) NSString *xmppUserId;
 
 //Post notification method declaration
 - (void)updateProfileInformation;
 - (void)xmppUserListResponse:(NSMutableDictionary *)xmppUserDetails xmppUserListIds:(NSMutableArray *)xmppUserListIds;
+- (NSDictionary *)getProfileData:(NSString *)jid;
 - (void)xmppUserRefreshResponse;
 - (void)xmppUserConnect;
 - (void)xmppNewUserAddedNotify;

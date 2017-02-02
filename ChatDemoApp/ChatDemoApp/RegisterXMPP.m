@@ -15,6 +15,7 @@
     NSMutableDictionary *xmppProfileData;
     NSString *xmppUserNameCredential, *xmppPasswordCredential, *xmppNameCredential;
     BOOL isRegisterAuthenticate;
+    int methodCallingCount;
 }
 @end
 
@@ -59,6 +60,7 @@
 #pragma mark - Set XMPP profile photo at appdelegate variable
 - (void)setXMPPProfilePhotoPlaceholder:(NSString *)profilePlaceholder profileImageView:(UIImage *)profileImageView {
 
+    methodCallingCount=0;
     UIImage* placeholderImage = [UIImage imageNamed:profilePlaceholder];
     NSData *placeholderImageData = UIImagePNGRepresentation(placeholderImage);
     NSData *profileImageData = UIImagePNGRepresentation(profileImageView);
@@ -296,7 +298,15 @@
     if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"%@@%@",appDelegate.xmppUniqueId,appDelegate.hostName]]) {
         
         if (isRegisterAuthenticate) {
-            [appDelegate methodCalling:xmppProfileData];
+            if (methodCallingCount==0) {
+                methodCallingCount=1;
+                [appDelegate methodCalling:xmppProfileData];
+            }
+            else {
+                
+                methodCallingCount=0;
+                [self XMPPvCardTempModuleDidUpdateMyvCardFail];
+            } 
         }
         else {
             [self loginUserDidAuthenticatedResult];

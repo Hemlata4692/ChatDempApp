@@ -38,20 +38,18 @@
    
     appDelegate = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
     [self addBarButton];
+    [self addSegmentBar];
+    
+    userListArray=[NSMutableArray new];
+    userDetailedList=[NSMutableDictionary new];
+    [myDelegate showIndicator];
+    [self performSelector:@selector(userList) withObject:nil afterDelay:0.1];
     // Do any additional setup after loading the view.
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:YES];
     
-    userListArray=[NSMutableArray new];
-    userDetailedList=[NSMutableDictionary new];
-//    if ([myDelegate connect])
-//    {
-//        [self fetchedResultsController];
-    
-    [myDelegate showIndicator];
-    [self performSelector:@selector(userList) withObject:nil afterDelay:0.1];
     [self.dasboardTableListing reloadData];
 //
 //        //        NSData *photoData1 = [[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:@"1234567890@ranosys"]];
@@ -63,7 +61,7 @@
 ////        NSLog(@"%@",newvCardTemp.userStatus);
 ////        NSLog(@"%@",newvCardTemp.emailAddress);
 //    }
-    [self addSegmentBar];
+  
 }
 
 - (void)userList {
@@ -259,18 +257,22 @@
     }
     
     if (customSegmentedControl.selectedSegmentIndex==1) {
-        XMPPUserCoreDataStorageObject *user = [userDetailedList objectForKey:[userListArray objectAtIndex:indexPath.row]];
-        
-        if ([user.jidStr isEqualToString:@"2222222222@ranosys"]) {
-            
-            NSLog(@"a");
-            //        - (XMPPvCardTemp *)vCardTempForJID:(XMPPJID *)jid xmppStream:(XMPPStream *)stream
-            //        XMPPvCardTemp *newvCardTemp = [[myDelegate xmppvCardTempModule] vCardTempForJID:user.jid shouldFetch:YES];
-            NSLog(@"a");
-        }
+//        XMPPUserCoreDataStorageObject *user = [userDetailedList objectForKey:[userListArray objectAtIndex:indexPath.row]];
+//        
+//        if ([user.jidStr isEqualToString:@"2222222222@ranosys"]) {
+//            
+//            NSLog(@"a");
+//            //        - (XMPPvCardTemp *)vCardTempForJID:(XMPPJID *)jid xmppStream:(XMPPStream *)stream
+//            //        XMPPvCardTemp *newvCardTemp = [[myDelegate xmppvCardTempModule] vCardTempForJID:user.jid shouldFetch:YES];
+//            NSLog(@"a");
+//        }
+//        
+        NSDictionary *profileDic=[self getProfileData:[userListArray objectAtIndex:indexPath.row]];
         UILabel* nameLabel = (UILabel*)[cell viewWithTag:1];
-        nameLabel.text = user.displayName;
-        [self configurePhotoForCell:cell user:user];
+        nameLabel.text = [profileDic objectForKey:@"Name"];
+        
+        NSLog(@" userStatus:%@ \n phoneNumber:%@ Desc:%@ \n address:%@ \n emailid:%@ \n birthDay:%@ \n gender:%@",[profileDic objectForKey:@"UserStatus"],[profileDic objectForKey:@"PhoneNumber"],[profileDic objectForKey:@"Description"],[profileDic objectForKey:@"Address"],[profileDic objectForKey:@"EmailAddress"],[profileDic objectForKey:@"UserBirthDay"],[profileDic objectForKey:@"Gender"]);
+        [self configurePhotoForCell:cell jid:[userListArray objectAtIndex:indexPath.row]];
     }
     else {
        
@@ -428,28 +430,51 @@
 //    [self.navigationController pushViewController:vc animated:YES];
 }
 
-- (void)configurePhotoForCell:(UITableViewCell *)cell user:(XMPPUserCoreDataStorageObject *)user
+//- (void)configurePhotoForCell:(UITableViewCell *)cell user:(XMPPUserCoreDataStorageObject *)user
+//{
+//    // Our xmppRosterStorage will cache photos as they arrive from the xmppvCardAvatarModule.
+//    // We only need to ask the avatar module for a photo, if the roster doesn't have it.
+//    UIImageView *userImage = (UIImageView*)[cell viewWithTag:2];
+//    
+//    if (user.photo != nil)
+//    {
+//        userImage.image = user.photo;
+//    }
+//    else
+//    {
+//        NSData *photoData = [[myDelegate xmppvCardAvatarModule] photoDataForJID:user.jid];
+//        
+//        if (photoData != nil)
+//            userImage.image = [UIImage imageWithData:photoData];
+//        else
+//            userImage.image = [UIImage imageNamed:@"images.png"];
+//        
+////        [myDelegate.userProfileImage setObject:userImage.image forKey:[NSString stringWithFormat:@"%@",user.jidStr]];
+//    }
+//}
+- (void)configurePhotoForCell:(UITableViewCell *)cell jid:(NSString *)jid
 {
     // Our xmppRosterStorage will cache photos as they arrive from the xmppvCardAvatarModule.
     // We only need to ask the avatar module for a photo, if the roster doesn't have it.
     UIImageView *userImage = (UIImageView*)[cell viewWithTag:2];
     
-    if (user.photo != nil)
-    {
-        userImage.image = user.photo;
-    }
-    else
-    {
-        NSData *photoData = [[myDelegate xmppvCardAvatarModule] photoDataForJID:user.jid];
-        
+//    if (user.photo != nil)
+//    {
+//        userImage.image = user.photo;
+//    }
+//    else
+//    {
+        NSData *photoData = [[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:jid]];
+    
         if (photoData != nil)
             userImage.image = [UIImage imageWithData:photoData];
         else
             userImage.image = [UIImage imageNamed:@"images.png"];
         
-//        [myDelegate.userProfileImage setObject:userImage.image forKey:[NSString stringWithFormat:@"%@",user.jidStr]];
-    }
+        //        [myDelegate.userProfileImage setObject:userImage.image forKey:[NSString stringWithFormat:@"%@",user.jidStr]];
+//    }
 }
+
 //{
 ////    UIImageView *userImage = (UIImageView*)[cell viewWithTag:2];
 //    
@@ -508,35 +533,40 @@
 #pragma mark - IBActions
 - (void)profileAction :(id)sender {
     
-    appDelegate.isUpdatePofile=YES;
-    appDelegate.updateProfileUserId=self.xmppUserId;
-//    [appDelegate.xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:self.xmppUserId] ignoreStorage:YES];
+    UserProfileViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"UserProfileViewController"];
+    profileObj.friendId=appDelegate.xmppLogedInUserId;
+    [self.navigationController pushViewController:profileObj animated:YES];
     
-    NSData *photoData1 = [[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:self.xmppUserId]];
-    UIImage *imagetemp=[UIImage imageWithData:photoData1];
     
-    NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
-    NSPredicate *pred;
-    NSMutableArray *results = [[NSMutableArray alloc]init];
-    pred = [NSPredicate predicateWithFormat:@"xmppRegisterId == %@",self.xmppUserId];
-    NSLog(@"predicate: %@",pred);
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"UserEntry"];
-    [fetchRequest setPredicate:pred];
-    
-    results = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
-    if (results.count>0) {
-        NSManagedObject *devicea = [results objectAtIndex:0];
-        NSLog(@"%@",[devicea valueForKey:@"xmppRegisterId"]);
-        NSLog(@"%@",[devicea valueForKey:@"xmppName"]);
-        NSLog(@"%@",[devicea valueForKey:@"xmppPhoneNumber"]);
-        NSLog(@"%@",[devicea valueForKey:@"xmppUserStatus"]);
-        NSLog(@"%@",[devicea valueForKey:@"xmppDescription"]);
-        NSLog(@"%@",[devicea valueForKey:@"xmppAddress"]);
-        NSLog(@"%@",[devicea valueForKey:@"xmppEmailAddress"]);
-        NSLog(@"%@",[devicea valueForKey:@"xmppUserBirthDay"]);
-        NSLog(@"%@",[devicea valueForKey:@"xmppGender"]);
-        NSLog(@"\n\n");
-    }
+//    appDelegate.isUpdatePofile=YES;
+//    appDelegate.updateProfileUserId=appDelegate.xmppLogedInUserId;
+////    [appDelegate.xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:self.xmppUserId] ignoreStorage:YES];
+//    
+//    NSData *photoData1 = [[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:appDelegate.xmppLogedInUserId]];
+//    UIImage *imagetemp=[UIImage imageWithData:photoData1];
+//    
+//    NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
+//    NSPredicate *pred;
+//    NSMutableArray *results = [[NSMutableArray alloc]init];
+//    pred = [NSPredicate predicateWithFormat:@"xmppRegisterId == %@",appDelegate.xmppLogedInUserId];
+//    NSLog(@"predicate: %@",pred);
+//    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"UserEntry"];
+//    [fetchRequest setPredicate:pred];
+//    
+//    results = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
+//    if (results.count>0) {
+//        NSManagedObject *devicea = [results objectAtIndex:0];
+//        NSLog(@"%@",[devicea valueForKey:@"xmppRegisterId"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppName"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppPhoneNumber"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppUserStatus"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppDescription"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppAddress"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppEmailAddress"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppUserBirthDay"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppGender"]);
+//        NSLog(@"\n\n");
+//    }
 }
 
 - (void)reloadAction :(id)sender {

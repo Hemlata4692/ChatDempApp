@@ -13,8 +13,9 @@
 
     NSFetchedResultsController *fetchedResultsController;
 }
-@property(nonatomic,strong) NSMutableDictionary *xmppUserDetailedList;
-@property(nonatomic,strong) NSMutableArray *xmppUserListArray;
+//@property(nonatomic,strong) NSMutableDictionary *xmppUserDetailedList;
+//@property(nonatomic,strong) NSMutableArray *xmppUserListArray;
+@property(nonatomic,strong) NSString *xmppUserId;
 
 //Post notification method declaration
 - (void)updateProfileInformation;

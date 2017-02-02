@@ -17,8 +17,9 @@
 @end
 
 @implementation DashboardXMPP
-@synthesize xmppUserDetailedList;
-@synthesize xmppUserListArray;
+//@synthesize xmppUserDetailedList;
+//@synthesize xmppUserListArray;
+@synthesize xmppUserId;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -27,6 +28,7 @@
     appDelegate = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
      [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProfileInformation) name:@"UpdatedProfile" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppNewUserAddedNotify) name:@"XmppNewUserAdded" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppNewUserAddedNotify) name:@"XmppUserPresenceUpdate" object:nil];
     
 //    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppUserListNotificationResponse) name:@"XMPPUserListResponse" object:nil];
     
@@ -36,11 +38,19 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:YES];
     
+    appDelegate.updateProfileUserId=@"";
+    xmppUserId=[XMPPUserDefaultManager getValue:@"LoginCred"];
 //    isrefresh=YES;
 //    if ([myDelegate connect])
 //    {
 //        [self fetchedResultsController];
 //    }
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:YES];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -134,11 +144,11 @@
             [xmppUserListArrayTemp addObject:[[results objectAtIndex:i] jidStr]];
             [xmppUserDetailedListTemp setObject:[results objectAtIndex:i] forKey:[[results objectAtIndex:i] jidStr]];
         }
-        xmppUserListArray=[xmppUserListArrayTemp mutableCopy];
-        xmppUserDetailedList=[xmppUserDetailedListTemp mutableCopy];
+        appDelegate.xmppUserListArray=[xmppUserListArrayTemp mutableCopy];
+        appDelegate.xmppUserDetailedList=[xmppUserDetailedListTemp mutableCopy];
         isrefresh=false;
         appDelegate.myView=@"XmppNewUserAdded";
-        [self xmppUserListResponse:xmppUserDetailedList xmppUserListIds:xmppUserListArray];
+        [self xmppUserListResponse:appDelegate.xmppUserDetailedList xmppUserListIds:appDelegate.xmppUserListArray];
     }
 }
 #pragma mark - end

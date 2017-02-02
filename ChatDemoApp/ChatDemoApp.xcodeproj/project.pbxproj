@@ -22,6 +22,8 @@
 		B745F85E1E2354B8001119BD /* UITextField+Validations.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F85D1E2354B8001119BD /* UITextField+Validations.m */; };
 		B745F8691E23596D001119BD /* HMSegmentedControl.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F8681E23596D001119BD /* HMSegmentedControl.m */; };
 		B75126E01E30745000495348 /* LoginXMPP.m in Sources */ = {isa = PBXBuildFile; fileRef = B75126DF1E30745000495348 /* LoginXMPP.m */; };
+		B75792581E42E22300AC48D0 /* UserProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B75792571E42E22300AC48D0 /* UserProfileViewController.m */; };
+		B757925B1E42E23800AC48D0 /* XmppProfileView.m in Sources */ = {isa = PBXBuildFile; fileRef = B757925A1E42E23800AC48D0 /* XmppProfileView.m */; };
 		B75BC5761E3F60A500E5F780 /* XmppStorageModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B75BC5741E3F60A500E5F780 /* XmppStorageModel.xcdatamodeld */; };
 		B75BC5781E3F620500E5F780 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B75BC5771E3F620500E5F780 /* CoreData.framework */; };
 		B76F75E91E40ABD8001FE579 /* DashboardXMPP.m in Sources */ = {isa = PBXBuildFile; fileRef = B76F75E81E40ABD8001FE579 /* DashboardXMPP.m */; };
@@ -65,6 +67,10 @@
 		B745F8681E23596D001119BD /* HMSegmentedControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HMSegmentedControl.m; sourceTree = "<group>"; };
 		B75126DE1E30745000495348 /* LoginXMPP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginXMPP.h; sourceTree = "<group>"; };
 		B75126DF1E30745000495348 /* LoginXMPP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginXMPP.m; sourceTree = "<group>"; };
+		B75792561E42E22300AC48D0 /* UserProfileViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserProfileViewController.h; sourceTree = "<group>"; };
+		B75792571E42E22300AC48D0 /* UserProfileViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserProfileViewController.m; sourceTree = "<group>"; };
+		B75792591E42E23800AC48D0 /* XmppProfileView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XmppProfileView.h; sourceTree = "<group>"; };
+		B757925A1E42E23800AC48D0 /* XmppProfileView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XmppProfileView.m; sourceTree = "<group>"; };
 		B75BC5751E3F60A500E5F780 /* XmppStorageModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = XmppStorageModel.xcdatamodel; sourceTree = "<group>"; };
 		B75BC5771E3F620500E5F780 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		B76F75E71E40ABD8001FE579 /* DashboardXMPP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DashboardXMPP.h; sourceTree = "<group>"; };
@@ -191,6 +197,7 @@
 				B745F8401E2351A7001119BD /* LoginView */,
 				B745F8411E2351B1001119BD /* RegisterView */,
 				B745F8421E2351B9001119BD /* DashboardView */,
+				B75792551E42E1F000AC48D0 /* UserProfile */,
 				B745F8431E2351C3001119BD /* GroupConversationView */,
 			);
 			name = Views;
@@ -304,6 +311,17 @@
 				B745F8681E23596D001119BD /* HMSegmentedControl.m */,
 			);
 			name = SegmentControl;
+			sourceTree = "<group>";
+		};
+		B75792551E42E1F000AC48D0 /* UserProfile */ = {
+			isa = PBXGroup;
+			children = (
+				B75792561E42E22300AC48D0 /* UserProfileViewController.h */,
+				B75792571E42E22300AC48D0 /* UserProfileViewController.m */,
+				B75792591E42E23800AC48D0 /* XmppProfileView.h */,
+				B757925A1E42E23800AC48D0 /* XmppProfileView.m */,
+			);
+			name = UserProfile;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -439,6 +457,7 @@
 				B745F84C1E235210001119BD /* GroupConversationViewController.m in Sources */,
 				B745F82F1E234D55001119BD /* ViewController.m in Sources */,
 				B79CA25E1E30BCFC007CDB23 /* XMPPUserDefaultManager.m in Sources */,
+				B75792581E42E22300AC48D0 /* UserProfileViewController.m in Sources */,
 				B75126E01E30745000495348 /* LoginXMPP.m in Sources */,
 				B745F82C1E234D55001119BD /* AppDelegate.m in Sources */,
 				B75BC5761E3F60A500E5F780 /* XmppStorageModel.xcdatamodeld in Sources */,
@@ -447,6 +466,7 @@
 				B745F8691E23596D001119BD /* HMSegmentedControl.m in Sources */,
 				B7B9A5661E23B17A00DB4429 /* MMMaterialDesignSpinner.m in Sources */,
 				B745F8291E234D55001119BD /* main.m in Sources */,
+				B757925B1E42E23800AC48D0 /* XmppProfileView.m in Sources */,
 				B745F8561E2353DD001119BD /* UserDefaultManager.m in Sources */,
 				B745F8461E2351F1001119BD /* RegisterViewController.m in Sources */,
 			);
@@ -579,6 +599,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "562157da-f45c-43e0-b5b9-591bd5df1653";
 				PROVISIONING_PROFILE_SPECIFIER = DwellProfile_15_09_2016;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -599,6 +620,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "562157da-f45c-43e0-b5b9-591bd5df1653";
 				PROVISIONING_PROFILE_SPECIFIER = DwellProfile_15_09_2016;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

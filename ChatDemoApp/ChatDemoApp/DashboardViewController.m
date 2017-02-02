@@ -9,10 +9,12 @@
 #import "DashboardViewController.h"
 #import "UserDefaultManager.h"
 #import "HMSegmentedControl.h"
+#import "UserProfileViewController.h"
 
 #import "XMPPvCardTemp.h"
 #import "XMPPMessageArchivingCoreDataStorage.h"
 #import "XMPPvCardCoreDataStorage.h"
+
 
 @class XMPPvCardTempModuleStorage;
 @interface DashboardViewController () {
@@ -333,12 +335,36 @@
 //    XMPPPresence *presence = [[XMPPPresence alloc] initWithType:@"type" to:[XMPPJID jidWithString:user.jidStr]];
 //    [appDelegate.xmppStream sendElement:presence];
     
-    XMPPUserCoreDataStorageObject *user = [[self fetchedResultsController] objectAtIndexPath:indexPath];
-    NSString *resource = [[[user primaryResource] jid] resource];
     
-//    XMPPUserCoreDataStorageObject *user = [[self fetchedResultsController] objectAtIndexPath:indexPath];
+    //Set presence
+//    XMPPPresence *presence = [XMPPPresence presence];
+//    NSXMLElement *status = [NSXMLElement elementWithName:@"status"];
+//    [status setStringValue:@"online/unavailable/away/busy/invisible"];
+//    [presence addChild:status];
+//    [[self xmppStream] sendElement:presence];
+    //end
+    
+    
+    
+    UserProfileViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"UserProfileViewController"];
+    profileObj.friendId=[userListArray objectAtIndex:indexPath.row];
+    [self.navigationController pushViewController:profileObj animated:YES];
+    
+    
+//    XMPPUserCoreDataStorageObject *user = [userDetailedList objectForKey:[userListArray objectAtIndex:indexPath.row]];
+    
+//    NSData *photoData1 = [[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:user.jidStr]];
+//    UIImage *imagetemp=[UIImage imageWithData:photoData1];
+//    NSString *resource = [[[user primaryResource] jid] resource];
 //    
-        NSLog(@"%@",[NSString stringWithFormat:@"%@",user.jidStr]);
+////    XMPPUserCoreDataStorageObject *user = [[self fetchedResultsController] objectAtIndexPath:indexPath];
+////    
+//        NSLog(@"%@",[NSString stringWithFormat:@"%@",user.jidStr]);
+    
+//    appDelegate.updateProfileUserId=user.jidStr;
+    
+    
+    
 //    appDelegate.isUpdatePofile=YES;
 //    appDelegate.updateProfileUserId=user.jidStr;
 //        [appDelegate.xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:user.jidStr] ignoreStorage:YES];
@@ -452,7 +478,6 @@
     UIBarButtonItem *logoutBarButton, *profileBarButton;
     CGRect framing = CGRectMake(0, 0, 30, 30.0);
     UIButton *logout = [[UIButton alloc] initWithFrame:framing];
-//    [logout setTitle:@"Logout" forState:UIControlStateNormal];
     [logout setImage:[UIImage imageNamed:@"logout"] forState:UIControlStateNormal];
     logoutBarButton =[[UIBarButtonItem alloc] initWithCustomView:logout];
     [logout addTarget:self action:@selector(logoutAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -467,7 +492,6 @@
     
     UIBarButtonItem *groupBarButton, *reloadBarButton;
     UIButton *group = [[UIButton alloc] initWithFrame:framing];
-//    [group setTitle:@"Group" forState:UIControlStateNormal];
     [group setImage:[UIImage imageNamed:@"group"] forState:UIControlStateNormal];
     groupBarButton =[[UIBarButtonItem alloc] initWithCustomView:group];
     [group addTarget:self action:@selector(groupAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -483,7 +507,36 @@
 
 #pragma mark - IBActions
 - (void)profileAction :(id)sender {
-
+    
+    appDelegate.isUpdatePofile=YES;
+    appDelegate.updateProfileUserId=self.xmppUserId;
+//    [appDelegate.xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:self.xmppUserId] ignoreStorage:YES];
+    
+    NSData *photoData1 = [[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:self.xmppUserId]];
+    UIImage *imagetemp=[UIImage imageWithData:photoData1];
+    
+    NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
+    NSPredicate *pred;
+    NSMutableArray *results = [[NSMutableArray alloc]init];
+    pred = [NSPredicate predicateWithFormat:@"xmppRegisterId == %@",self.xmppUserId];
+    NSLog(@"predicate: %@",pred);
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"UserEntry"];
+    [fetchRequest setPredicate:pred];
+    
+    results = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
+    if (results.count>0) {
+        NSManagedObject *devicea = [results objectAtIndex:0];
+        NSLog(@"%@",[devicea valueForKey:@"xmppRegisterId"]);
+        NSLog(@"%@",[devicea valueForKey:@"xmppName"]);
+        NSLog(@"%@",[devicea valueForKey:@"xmppPhoneNumber"]);
+        NSLog(@"%@",[devicea valueForKey:@"xmppUserStatus"]);
+        NSLog(@"%@",[devicea valueForKey:@"xmppDescription"]);
+        NSLog(@"%@",[devicea valueForKey:@"xmppAddress"]);
+        NSLog(@"%@",[devicea valueForKey:@"xmppEmailAddress"]);
+        NSLog(@"%@",[devicea valueForKey:@"xmppUserBirthDay"]);
+        NSLog(@"%@",[devicea valueForKey:@"xmppGender"]);
+        NSLog(@"\n\n");
+    }
 }
 
 - (void)reloadAction :(id)sender {
@@ -613,22 +666,7 @@
 
 - (void)xmppNewUserAddedNotify {
 
-    UIBarButtonItem *logoutBarButton, *profileBarButton;
     CGRect framing = CGRectMake(0, 0, 30, 30.0);
-    UIButton *logout = [[UIButton alloc] initWithFrame:framing];
-    //    [logout setTitle:@"Logout" forState:UIControlStateNormal];
-    [logout setImage:[UIImage imageNamed:@"logout"] forState:UIControlStateNormal];
-    logoutBarButton =[[UIBarButtonItem alloc] initWithCustomView:logout];
-    [logout addTarget:self action:@selector(logoutAction:) forControlEvents:UIControlEventTouchUpInside];
-    
-    UIButton *profile = [[UIButton alloc] initWithFrame:framing];
-    //    [logout setTitle:@"Logout" forState:UIControlStateNormal];
-    [profile setImage:[UIImage imageNamed:@"profile"] forState:UIControlStateNormal];
-    profileBarButton =[[UIBarButtonItem alloc] initWithCustomView:profile];
-    [profile addTarget:self action:@selector(profileAction:) forControlEvents:UIControlEventTouchUpInside];
-    self.navigationItem.leftBarButtonItems=[NSArray arrayWithObjects:logoutBarButton,profileBarButton, nil];
-    
-    
     UIBarButtonItem *groupBarButton, *reloadBarButton;
     UIButton *group = [[UIButton alloc] initWithFrame:framing];
     //    [group setTitle:@"Group" forState:UIControlStateNormal];

@@ -66,6 +66,8 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 @synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
 //end
 
+@synthesize xmppUserDetailedList, xmppUserListArray;
+
 #pragma mark - Intialze XMPP connection
 - (void)didFinishLaunchingMethod {
 
@@ -571,6 +573,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     if (isUpdatePofile && [updateProfileUserId isEqualToString:registredUserId]) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"UpdatedProfile" object:nil];
     }
+    else if ([self.myView isEqualToString:@"XmppNewUserAdded"] && xmppUserListArray!=nil && [updateProfileUserId isEqualToString:registredUserId]) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"FriendProfileUpdated" object:nil];
+    }
 }
 
 - (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message
@@ -635,14 +640,39 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     NSLog(@"Printing full jid of user %@",[[sender myJID] resource]);
     NSLog(@"From user %@",[[presence from] full]);
      NSLog(@"From user %@",presenceType);
+    NSLog(@"From user %@",[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]);
+
+//    int myCount = [[XMPPUserDefaultManager getValue:@"CountValue"] intValue];
     
-    int myCount = [[XMPPUserDefaultManager getValue:@"CountValue"] intValue];
     
-//    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-//    if ((myCount == 1)&&nil!=self.userProfileImageDataValue) {
-//        [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%d",myCount+1] key:@"CountValue"];
-//        [self performSelector:@selector(methodCalling) withObject:nil afterDelay:0.1];
-//    }
+    if ([self.myView isEqualToString:@"XmppNewUserAdded"] && xmppUserListArray!=nil && [NSString stringWithFormat:@"%@",[presence from]]!=nil && [xmppUserListArray containsObject:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]] && [updateProfileUserId isEqualToString:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]]) {
+        
+//        switch (section)
+//        {
+//            case 0  :
+//                label.text = @"Available";
+//                label.textColor=[UIColor colorWithRed:13.0/255.0 green:213.0/255.0 blue:178.0/255.0 alpha:1.0];
+//                break;
+//            case 1  :
+//                label.text =  @"Away";
+//                label.textColor=[UIColor yellowColor];
+//                break;
+//            default :
+//                label.text =  @"Offline";
+//                label.textColor=[UIColor redColor];
+//                break;
+//        }
+        
+         XMPPUserCoreDataStorageObject *user=[xmppUserDetailedList objectForKey:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]];
+        if ([presenceType isEqualToString:@"available"]) {
+            user.sectionNum=[NSNumber numberWithInt:0];
+        }
+        else {
+            user.sectionNum=[NSNumber numberWithInt:2];
+        }
+        //Send presence status and set at particular jid in xmppUserDetailedList key
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"XmppUserPresenceUpdate" object:nil];
+    }
 }
 
 - (void)xmppStreamDidRegister:(XMPPStream *)sender{

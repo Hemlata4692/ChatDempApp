@@ -93,6 +93,8 @@
 - (void)saveContext;
 //end
 
+@property(nonatomic,strong) NSMutableDictionary *xmppUserDetailedList;
+@property(nonatomic,strong) NSMutableArray *xmppUserListArray;
 
 
 

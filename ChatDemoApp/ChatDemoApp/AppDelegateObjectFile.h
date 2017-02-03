@@ -63,6 +63,7 @@
 @property(strong, nonatomic)UIImageView *userProfileImageData;
 @property(strong, nonatomic)NSData *userProfileImageDataValue;
 @property(strong, nonatomic)NSString *myView;
+@property(assign, nonatomic)BOOL isContactListIsLoaded;
 @property(assign, nonatomic)BOOL isUpdatePofile;
 @property(strong, nonatomic)NSString *updateProfileUserId;
 
@@ -97,18 +98,15 @@
 @property(nonatomic,strong) NSMutableDictionary *xmppUserDetailedList;
 @property(nonatomic,strong) NSMutableArray *xmppUserListArray;
 @property(nonatomic,strong) NSString *xmppLogedInUserId;
+- (NSString *)applicationCacheDirectory;
 
-
-
-
-
-
-
-
-
-
-
-
+@property(nonatomic,strong) NSString *folderName;
+@property(nonatomic,strong) NSString *appMediafolderName;
+@property(nonatomic,strong) NSString *appProfilePhotofolderName;
+@property(nonatomic,assign) float imageCompressionPercent;
+- (void)createCacheDirectory:(NSString *)imageFolderName;
+- (void)saveDataInCacheDirectory:(UIImage *)tempImage folderName:(NSString *)tempFolderName jid:(NSString *)jid;
+- (NSData *)listionDataFromCacheDirectoryFolderName:(NSString *)tempFolderName jid:(NSString *)jid;
 
 
 

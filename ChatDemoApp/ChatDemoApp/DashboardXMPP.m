@@ -23,12 +23,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    appDelegate.myView=@"DashboardXmppUserList";
     appDelegate = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
-//     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProfileInformation) name:@"XMPPProfileUpdation" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppNewUserAddedNotify) name:@"XmppNewUserAdded" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppNewUserAddedNotify) name:@"XmppUserPresenceUpdate" object:nil];
-    
+    appDelegate.myView=@"DashboardXmppUserList";
+    appDelegate.isContactListIsLoaded=NO;
 //    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppUserListNotificationResponse) name:@"XMPPUserListResponse" object:nil];
     
     // Do any additional setup after loading the view.
@@ -36,6 +33,10 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:YES];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProfileInformation) name:@"XMPPProfileUpdation" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppNewUserAddedNotify) name:@"XmppNewUserAdded" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppNewUserAddedNotify) name:@"XmppUserPresenceUpdate" object:nil];
     
     appDelegate.updateProfileUserId=@"";
     appDelegate.xmppLogedInUserId=[XMPPUserDefaultManager getValue:@"LoginCred"];
@@ -62,6 +63,7 @@
     
     [appDelegate disconnect];
     appDelegate.myView=@"";
+    appDelegate.isContactListIsLoaded=NO;
     appDelegate.xmppLogedInUserId=@"";
     [XMPPUserDefaultManager removeValue:@"LoginCred"];
     //    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",myDelegate.hostName] key:@"LoginCred"];
@@ -89,10 +91,7 @@
         [fetchRequest setEntity:entity];
         [fetchRequest setSortDescriptors:sortDescriptors];
         [fetchRequest setFetchBatchSize:10];
-        fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
-                                                                       managedObjectContext:moc
-                                                                         sectionNameKeyPath:@"sectionNum"
-                                                                                  cacheName:nil];
+        fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:moc sectionNameKeyPath:@"sectionNum" cacheName:nil];
         [fetchedResultsController setDelegate:self];
         NSError *error = nil;
         if (![fetchedResultsController performFetch:&error])
@@ -147,7 +146,7 @@
         appDelegate.xmppUserListArray=[xmppUserListArrayTemp mutableCopy];
         appDelegate.xmppUserDetailedList=[xmppUserDetailedListTemp mutableCopy];
         isrefresh=false;
-        appDelegate.myView=@"XmppNewUserAdded";
+        appDelegate.isContactListIsLoaded=YES;
         [self xmppUserListResponse:appDelegate.xmppUserDetailedList xmppUserListIds:appDelegate.xmppUserListArray];
     }
 }
@@ -163,6 +162,7 @@
 - (void)xmppUserRefreshResponse {
 
     isrefresh=true;
+    appDelegate.isContactListIsLoaded=NO;
 //    appDelegate.myView=@"Other";
     [myDelegate disconnect];
     if ([myDelegate connect])
@@ -184,7 +184,7 @@
 - (NSDictionary *)getProfileData:(NSString *)jid {
     
     appDelegate.updateProfileUserId=jid;
-    [appDelegate.xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:jid] ignoreStorage:YES];
+//    [appDelegate.xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:jid] ignoreStorage:YES];
     
     NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
     NSPredicate *pred;
@@ -221,6 +221,29 @@
         context = [delegate managedObjectContext];
     }
     return context;
+}
+
+- (void)getProfilePhotosJid:(NSString *)jid profileImageView:(UIImageView *)profileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(UIImage *tempImage)) completion {
+    
+    NSData *tempImageData=[appDelegate listionDataFromCacheDirectoryFolderName:appDelegate.appProfilePhotofolderName jid:jid];
+    if (nil==tempImageData) {
+        profileImageView.image=[UIImage imageNamed:placeholderImage];
+        dispatch_queue_t queue = dispatch_queue_create("profilePhotoQueue", DISPATCH_QUEUE_PRIORITY_DEFAULT);
+        dispatch_async(queue, ^
+                       {
+                           UIImage *tempPhoto=[UIImage imageWithData:[[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:jid]]];
+                           if (tempPhoto!=nil) {
+                               [appDelegate saveDataInCacheDirectory:(UIImage *)tempPhoto folderName:appDelegate.appProfilePhotofolderName jid:jid];
+                           }
+                           dispatch_async(dispatch_get_main_queue(), ^{
+                               
+                               completion(tempPhoto);
+                           });
+                       });
+    }
+    else {
+        completion([UIImage imageWithData:tempImageData]);
+    }
 }
 /*
 #pragma mark - Navigation

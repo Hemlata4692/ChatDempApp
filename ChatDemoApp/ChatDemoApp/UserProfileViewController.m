@@ -52,17 +52,9 @@
 #pragma mark - Custom accessors
 - (void)setCurrentProfileView {
 
-    UIImage *tempPhoto=[self getFriendProfilePhoto:self.friendId];
-    if (tempPhoto!=nil) {
-        self.profileImage.image=tempPhoto;
-    }
-    else {
-        
-        self.profileImage.image=[UIImage imageNamed:@"images.png"];
-    }
-    
+    [self setProfileImageUsingCompletionBlock];
     _presenceStatus.hidden=YES;
-    switch ([self getFriendPresenceStatus:self.friendId]) {
+    switch ([self getPresenceStatus:self.friendId]) {
         case 0:     // online/available
             _presenceStatus.backgroundColor=[UIColor greenColor];
             break;
@@ -70,25 +62,73 @@
             _presenceStatus.backgroundColor=[UIColor redColor];
             break;
     }
-    dispatch_queue_t queue = dispatch_queue_create("queue", DISPATCH_QUEUE_PRIORITY_DEFAULT);
-    dispatch_async(queue, ^{
+    
+    if ([self.friendId isEqualToString:myDelegate.xmppLogedInUserId]) {
+        [self setEditProfileDataUsingCompletionBlock];
+    }
+    else {
+        [self setFriendProfileDataUsingCompletionBlock];
+    }
+    
+//    dispatch_queue_t queue1 = dispatch_queue_create("queue1", DISPATCH_QUEUE_PRIORITY_DEFAULT);
+//    dispatch_async(queue1, ^{
+//        
+//        if ([self.friendId isEqualToString:myDelegate.xmppLogedInUserId]) {
+//            friendProfileDic=[self getEditProfileData:self.friendId];
+//        }
+//        else {
+//            friendProfileDic=[self getProfileData:self.friendId];
+//        }
+//        
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            
+//            self.userName.text=[friendProfileDic objectForKey:@"Name"];
+//            self.userStatus.text=[friendProfileDic objectForKey:@"UserStatus"];
+//            self.phoneNumber.text=[friendProfileDic objectForKey:@"PhoneNumber"];
+//            
+//            NSLog(@" Desc:%@ \n address:%@ \n emailid:%@ \n birthDay:%@ \n gender:%@",[friendProfileDic objectForKey:@"Description"],[friendProfileDic objectForKey:@"Address"],[friendProfileDic objectForKey:@"EmailAddress"],[friendProfileDic objectForKey:@"UserBirthDay"],[friendProfileDic objectForKey:@"Gender"]);
+//        });
+//    });
+}
+
+- (void)setEditProfileDataUsingCompletionBlock {
+    
+    [self getEditProfileData:myDelegate.xmppLogedInUserId result:^(NSDictionary *tempProfileData) {
+        // do something with your BOOL
+        friendProfileDic=tempProfileData;
+        self.userName.text=[friendProfileDic objectForKey:@"Name"];
+        self.userStatus.text=[friendProfileDic objectForKey:@"UserStatus"];
+        self.phoneNumber.text=[friendProfileDic objectForKey:@"PhoneNumber"];
         
-        if ([self.friendId isEqualToString:myDelegate.xmppLogedInUserId]) {
-            friendProfileDic=[self getEditProfileData:self.friendId];
+        NSLog(@" Desc:%@ \n address:%@ \n emailid:%@ \n birthDay:%@ \n gender:%@",[friendProfileDic objectForKey:@"Description"],[friendProfileDic objectForKey:@"Address"],[friendProfileDic objectForKey:@"EmailAddress"],[friendProfileDic objectForKey:@"UserBirthDay"],[friendProfileDic objectForKey:@"Gender"]);
+    }];
+}
+
+- (void)setFriendProfileDataUsingCompletionBlock {
+    
+    [self getProfileData:myDelegate.xmppLogedInUserId result:^(NSDictionary *tempProfileData) {
+        // do something with your BOOL
+        friendProfileDic=tempProfileData;
+        self.userName.text=[friendProfileDic objectForKey:@"Name"];
+        self.userStatus.text=[friendProfileDic objectForKey:@"UserStatus"];
+        self.phoneNumber.text=[friendProfileDic objectForKey:@"PhoneNumber"];
+        
+        NSLog(@" Desc:%@ \n address:%@ \n emailid:%@ \n birthDay:%@ \n gender:%@",[friendProfileDic objectForKey:@"Description"],[friendProfileDic objectForKey:@"Address"],[friendProfileDic objectForKey:@"EmailAddress"],[friendProfileDic objectForKey:@"UserBirthDay"],[friendProfileDic objectForKey:@"Gender"]);
+    }];
+}
+
+- (void)setProfileImageUsingCompletionBlock {
+
+    [self getProfilePhoto:self.friendId profileImageView:self.profileImage placeholderImage:@"images.png" result:^(UIImage *tempImage) {
+        // do something with your BOOL
+        if (tempImage!=nil) {
+            self.profileImage.image=tempImage;
         }
         else {
-            friendProfileDic=[self getProfileData:self.friendId];
+            
+            self.profileImage.image=[UIImage imageNamed:@"images.png"];
         }
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            
-            self.userName.text=[friendProfileDic objectForKey:@"Name"];
-            self.userStatus.text=[friendProfileDic objectForKey:@"UserStatus"];
-            self.phoneNumber.text=[friendProfileDic objectForKey:@"PhoneNumber"];
-            
-            NSLog(@" Desc:%@ \n address:%@ \n emailid:%@ \n birthDay:%@ \n gender:%@",[friendProfileDic objectForKey:@"Description"],[friendProfileDic objectForKey:@"Address"],[friendProfileDic objectForKey:@"EmailAddress"],[friendProfileDic objectForKey:@"UserBirthDay"],[friendProfileDic objectForKey:@"Gender"]);
-        });
-    });
+    }];
 }
 
 - (void)addBarButton {
@@ -127,7 +167,7 @@
 #pragma mark - XMPPProfileView methods
 - (void)XmppUserPresenceUpdateNotify {
 
-    switch ([self getFriendPresenceStatus:self.friendId]) {
+    switch ([self getPresenceStatus:self.friendId]) {
         case 0:     // online/available
             _presenceStatus.backgroundColor=[UIColor greenColor];
             break;
@@ -139,7 +179,12 @@
 
 - (void)XmppProileUpdateNotify {
 
-    
+    if ([self.friendId isEqualToString:myDelegate.xmppLogedInUserId]) {
+        [self setEditProfileDataUsingCompletionBlock];
+    }
+    else {
+        [self setFriendProfileDataUsingCompletionBlock];
+    }
 }
 #pragma mark - end
 /*

@@ -21,11 +21,12 @@
 @property(nonatomic,readonly) NSString *xmppGender;
 
 - (void)initializeFriendProfile:(NSString*)jid;
-- (UIImage *)getFriendProfilePhoto:(NSString *)jid;
-- (NSDictionary *)getProfileData:(NSString *)jid;
-- (NSDictionary *)getEditProfileData:(NSString *)jid;
-- (int)getFriendPresenceStatus:(NSString *)jid;
+- (void)getProfilePhoto:(NSString *)jid profileImageView:(UIImageView *)profileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(UIImage *tempImage)) completion;
+- (void)getProfileData:(NSString *)jid result:(void(^)(NSDictionary *tempProfileData)) completion;
+- (void)getEditProfileData:(NSString *)jid result:(void(^)(NSDictionary *tempProfileData)) completion;
+- (int)getPresenceStatus:(NSString *)jid;
 - (void)userUpdateProfileUsingVCard:(NSMutableDictionary*)profileData profilePlaceholder:(NSString *)profilePlaceholder profileImageView:(UIImage *)profileImageView;
+- (void)saveUpdatedImage:(UIImage *)profileImage placeholderImageName:(NSString *)placeholderImageName jid:(NSString *)jid;
 
 //Notification methods
 - (void)XmppUserPresenceUpdateNotify;

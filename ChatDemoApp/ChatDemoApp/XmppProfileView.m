@@ -14,7 +14,6 @@
     AppDelegateObjectFile *appDelegate;
     NSMutableDictionary *xmppProfileUpdationData;
 }
-
 @end
 
 @implementation XmppProfileView
@@ -23,13 +22,13 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    appDelegate = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
     // Do any additional setup after loading the view.
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:YES];
     
-    appDelegate = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XmppUserPresenceUpdateNotify) name:@"XmppUserPresenceUpdate" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XmppProileUpdateNotify) name:@"XMPPProfileUpdation" object:nil];
     
@@ -60,54 +59,94 @@
 - (void)XmppUserPresenceUpdateNotify {}
 - (void)XmppProileUpdateNotify {}
 
-- (UIImage *)getFriendProfilePhoto:(NSString *)jid {
-
-    NSData *photoData = [[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:jid]];
-    return [UIImage imageWithData:photoData];
+- (void)getProfilePhoto:(NSString *)jid profileImageView:(UIImageView *)profileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(UIImage *tempImage)) completion {
+    
+    NSData *tempImageData=[appDelegate listionDataFromCacheDirectoryFolderName:appDelegate.appProfilePhotofolderName jid:jid];
+    if (nil==tempImageData) {
+        profileImageView.image=[UIImage imageNamed:placeholderImage];
+    }
+    else {
+        profileImageView.image=[UIImage imageWithData:tempImageData];
+    }
+    
+    dispatch_queue_t queue = dispatch_queue_create("profilePhotoQueue", DISPATCH_QUEUE_PRIORITY_DEFAULT);
+    dispatch_async(queue, ^
+                   {
+                       UIImage *tempPhoto=[UIImage imageWithData:[[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:jid]]];
+                       if (tempPhoto!=nil) {
+                           [appDelegate saveDataInCacheDirectory:(UIImage *)tempPhoto folderName:appDelegate.appProfilePhotofolderName jid:jid];
+                       }
+                       dispatch_async(dispatch_get_main_queue(), ^{
+                           
+                            completion(tempPhoto);
+                       });
+                   });
 }
 
-- (int)getFriendPresenceStatus:(NSString *)jid {
+- (int)getPresenceStatus:(NSString *)jid {
     
     XMPPUserCoreDataStorageObject *user=[appDelegate.xmppUserDetailedList objectForKey:jid];
     return [user.sectionNum intValue];
 }
 
-- (NSDictionary *)getProfileData:(NSString *)jid {
+- (void)getProfileData:(NSString *)jid result:(void(^)(NSDictionary *tempProfileData)) completion {
     
     appDelegate.updateProfileUserId=jid;
-    [appDelegate.xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:jid] ignoreStorage:YES];
-
-    NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
-    NSPredicate *pred;
-    NSMutableArray *results = [[NSMutableArray alloc]init];
-    pred = [NSPredicate predicateWithFormat:@"xmppRegisterId == %@",jid];
-    NSLog(@"predicate: %@",pred);
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"UserEntry"];
-    [fetchRequest setPredicate:pred];
-    
-    results = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
-    NSDictionary *profileResponse;
-    if (results.count>0) {
-        NSManagedObject *devicea = [results objectAtIndex:0];
-        profileResponse=@{
-                          @"RegisterId" : [devicea valueForKey:@"xmppRegisterId"],
-                          @"Name" : [devicea valueForKey:@"xmppName"],
-                          @"PhoneNumber" : [devicea valueForKey:@"xmppPhoneNumber"],
-                          @"UserStatus" : [devicea valueForKey:@"xmppUserStatus"],
-                          @"Description" : [devicea valueForKey:@"xmppDescription"],
-                          @"Address" : [devicea valueForKey:@"xmppAddress"],
-                          @"EmailAddress" : [devicea valueForKey:@"xmppEmailAddress"],
-                          @"UserBirthDay" : [devicea valueForKey:@"xmppUserBirthDay"],
-                          @"Gender" : [devicea valueForKey:@"xmppGender"],
-                          };
-        NSLog(@"\n\n");
-    }
-    return profileResponse;
+    dispatch_queue_t queue = dispatch_queue_create("profileDataQueue", DISPATCH_QUEUE_PRIORITY_DEFAULT);
+    dispatch_async(queue, ^
+                   {
+                       [appDelegate.xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:jid] ignoreStorage:YES];
+                       NSDictionary *tempDic=[self getProfileDicData:jid];
+                       dispatch_async(dispatch_get_main_queue(), ^{
+                           
+                           completion(tempDic);
+                       });
+                   });
 }
 
-- (NSDictionary *)getEditProfileData:(NSString *)jid {
+- (void)getEditProfileData:(NSString *)jid result:(void(^)(NSDictionary *tempProfileData)) completion {
     
-    appDelegate.updateProfileUserId=jid;
+     appDelegate.updateProfileUserId=jid;
+    dispatch_queue_t queue = dispatch_queue_create("profileDataQueue", DISPATCH_QUEUE_PRIORITY_DEFAULT);
+    dispatch_async(queue, ^
+                   {
+                       NSDictionary *tempDic=[self getProfileDicData:jid];
+                       if (nil==tempDic) {
+                           [appDelegate.xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:jid] ignoreStorage:YES];
+                           tempDic=@{
+                                     @"RegisterId" : jid,
+                                     @"Name" : @"loding..",
+                                     @"PhoneNumber" : @"loding..",
+                                     @"UserStatus" : @"loding..",
+                                     @"Description" : @"loding..",
+                                     @"Address" : @"loding..",
+                                     @"EmailAddress" : @"loding..",
+                                     @"UserBirthDay" : @"loding..",
+                                     @"Gender" : @""
+                                     };
+                       }
+
+                       dispatch_async(dispatch_get_main_queue(), ^{
+                           
+                           completion(tempDic);
+                       });
+                   });
+}
+
+- (void)saveUpdatedImage:(UIImage *)profileImage placeholderImageName:(NSString *)placeholderImageName jid:(NSString *)jid {
+
+    UIImage* placeholderImage = [UIImage imageNamed:placeholderImageName];
+    NSData *placeholderImageData = UIImagePNGRepresentation(placeholderImage);
+    NSData *profileImageData = UIImagePNGRepresentation(profileImage);
+    
+    if (![profileImageData isEqualToData:placeholderImageData])
+    {
+        [appDelegate saveDataInCacheDirectory:(UIImage *)profileImage folderName:appDelegate.appProfilePhotofolderName jid:jid];
+    }
+}
+
+- (NSDictionary *)getProfileDicData:(NSString *)jid {
+    
     NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
     NSPredicate *pred;
     NSMutableArray *results = [[NSMutableArray alloc]init];

@@ -34,6 +34,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 #endif
 
 @interface AppDelegateObjectFile()
+
 - (void)setupStream;
 - (void)teardownStream;
 - (void)goOnline;
@@ -67,14 +68,25 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 //end
 
 @synthesize xmppUserDetailedList, xmppUserListArray;
-@synthesize xmppLogedInUserId;
+@synthesize xmppLogedInUserId, isContactListIsLoaded;
+@synthesize folderName, appMediafolderName, appProfilePhotofolderName;
+@synthesize imageCompressionPercent;
 
 #pragma mark - Intialze XMPP connection
 - (void)didFinishLaunchingMethod {
 
     isUpdatePofile=false;
+    imageCompressionPercent=0.3;
+    //Create cache folders
+    folderName=[[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleNameKey];
+    appMediafolderName=[NSString stringWithFormat:@"%@/%@_Media",folderName,folderName];
+    appProfilePhotofolderName=[NSString stringWithFormat:@"%@/%@_ProfilePhotos",appMediafolderName,folderName];
+    [self createCacheDirectory];
+    //end
+    
     self.myView=@"Other";
     updateProfileUserId=@"";
+    isContactListIsLoaded=NO;
     if (nil!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"] && NULL!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"]) {
         hostName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"];
     }
@@ -431,7 +443,10 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         if (registerUserInfo!=nil) {
             NSLog(@"%@",[registerUserInfo stringValue]);
             [self insertEntryInXmppUserModel:[registerUserInfo stringValue] xmppName:[[vcardInfo elementForName:@"NICKNAME"] stringValue] xmppPhoneNumber:[[vcardInfo elementForName:@"TEL"] stringValue] xmppUserStatus:[[vcardInfo elementForName:@"USERSTATUS"] stringValue] xmppDescription:[[vcardInfo elementForName:@"DESC"] stringValue] xmppAddress:[[vcardInfo elementForName:@"ADDRESS"] stringValue] xmppEmailAddress:[[vcardInfo elementForName:@"EMAILADDRESS"] stringValue] xmppUserBirthDay:[[vcardInfo elementForName:@"BDAY"] stringValue] xmppGender:[[vcardInfo elementForName:@"GENDER"] stringValue]];
-            if ([self.myView isEqualToString:@"XmppNewUserAdded"] && xmppUserListArray!=nil && [updateProfileUserId isEqualToString:[registerUserInfo stringValue]]) {
+//            if (isContactListIsLoaded && xmppUserListArray!=nil && [updateProfileUserId isEqualToString:[registerUserInfo stringValue]]) {
+//                [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPProfileUpdation" object:nil];
+//            }
+            if (isContactListIsLoaded && xmppUserListArray!=nil) {
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPProfileUpdation" object:nil];
             }
         }
@@ -441,8 +456,10 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     if (addQueryElement!=nil) {
         NSXMLElement *removeitemElement = [addQueryElement elementForName:@"item"];
         if (removeitemElement!=nil) {
+//            <iq xmlns="jabber:client" type="set" id="58-481" to="5555666664@192.168.1.171/6wwe5f57fz"><query xmlns="jabber:iq:roster"><item jid="1245217896@192.168.1.171" name="ros" subscription="both"><group>Ranosys</group></item></query></iq>
             NSString *addSubscriptionElement = [[removeitemElement attributeForName:@"subscription"] stringValue];
-            if ((addSubscriptionElement!=nil)&&[addSubscriptionElement isEqualToString:@"both"]) {
+            NSString *addSetAttribut = [[iq attributeForName:@"type"] stringValue];
+            if ((addSubscriptionElement!=nil)&&[addSubscriptionElement isEqualToString:@"both"]&&[addSetAttribut isEqualToString:@"set"]) {
                 [self insertNewUserEntryInXmppUserModel:[[removeitemElement attributeForName:@"jid"] stringValue] xmppName:[[removeitemElement attributeForName:@"name"] stringValue] xmppPhoneNumber:@"" xmppUserStatus:@"" xmppDescription:@"" xmppAddress:@"" xmppEmailAddress:@"" xmppUserBirthDay:@"" xmppGender:@""];
             }
         }
@@ -489,7 +506,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
             NSLog(@"Can't Delete! %@ %@", error, [error localizedDescription]);
             return;
         }
-        if ([self.myView isEqualToString:@"XmppNewUserAdded"]) {
+        if (isContactListIsLoaded) {
             
             [[NSNotificationCenter defaultCenter] postNotificationName:@"XmppNewUserAdded" object:nil];
         }
@@ -525,7 +542,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
             NSLog(@"Can't Save! %@ %@", error, [error localizedDescription]);
         }
         [xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:registredUserId] ignoreStorage:YES];
-        if ([self.myView isEqualToString:@"XmppNewUserAdded"]) {
+        if (isContactListIsLoaded) {
             
             [[NSNotificationCenter defaultCenter] postNotificationName:@"XmppNewUserAdded" object:nil];
         }
@@ -642,7 +659,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 //    int myCount = [[XMPPUserDefaultManager getValue:@"CountValue"] intValue];
     
     
-    if ([self.myView isEqualToString:@"XmppNewUserAdded"] && xmppUserListArray!=nil && [NSString stringWithFormat:@"%@",[presence from]]!=nil && [xmppUserListArray containsObject:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]] && [updateProfileUserId isEqualToString:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]]) {
+    if (isContactListIsLoaded && xmppUserListArray!=nil && [NSString stringWithFormat:@"%@",[presence from]]!=nil && [xmppUserListArray containsObject:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]] && [updateProfileUserId isEqualToString:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]]) {
         
 //        switch (section)
 //        {
@@ -714,7 +731,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     NSData *pictureData;
     if (nil!=self.userProfileImageDataValue) {
         
-        pictureData = UIImageJPEGRepresentation([UIImage imageWithData:self.userProfileImageDataValue], 0.2);
+        pictureData = UIImageJPEGRepresentation([UIImage imageWithData:self.userProfileImageDataValue], imageCompressionPercent);
         [newvCardTemp setPhoto:pictureData];
     }
 
@@ -769,16 +786,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     return value;
 }
 
-- (NSString *)setProfileDataValuae:value1 key:(NSString *)key {
-    
-    NSString *value=@"";
-//    if (nil!=[profileData objectForKey:key]||NULL!=[profileData objectForKey:key]||([[profileData objectForKey:key] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].length != 0)) {
-    
-        value=value1;
-//    }
-    return value;
-}
-
 - (void)xmppvCardTempModule:(XMPPvCardTempModule *)vCardTempModule
         didReceivevCardTemp:(XMPPvCardTemp *)vCardTemp
                      forJID:(XMPPJID *)jid{
@@ -792,9 +799,12 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     NSData *pictureData;
     if (nil!=self.userProfileImageDataValue) {
         
-        pictureData = UIImageJPEGRepresentation([UIImage imageWithData:self.userProfileImageDataValue], 0.6);
+        pictureData = UIImageJPEGRepresentation([UIImage imageWithData:self.userProfileImageDataValue], imageCompressionPercent);
+        
         [newvCardTemp setPhoto:pictureData];
     }
+    NSLog(@"SIZE OF IMAGE: %.2f Mb", (float)pictureData.length/1024/1024);
+
     
     /*//Other variables
      [newvCardTemp setNickname:@"aaaaaa"];
@@ -1022,6 +1032,8 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         return _persistentStoreCoordinator;
     }
     
+    NSLog(@"%@",[self applicationDocumentsDirectory]);
+    
     NSURL *storeURL = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:@"xmppUserDemo.sqlite"];
     
     NSError *error = nil;
@@ -1055,11 +1067,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     }
     
     return _persistentStoreCoordinator;
-}
-
-- (NSURL *)applicationDocumentsDirectory
-{
-    return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
 }
 
 @synthesize persistentContainer = _persistentContainer;
@@ -1103,6 +1110,57 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         NSLog(@"Unresolved error %@, %@", error, error.userInfo);
         abort();
     }
+}
+#pragma mark - end
+
+#pragma mark - Image save in cache
+- (NSURL *)applicationDocumentsDirectory
+{
+    return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+}
+
+- (NSString *)applicationCacheDirectory
+{
+    return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
+}
+
+- (void)createCacheDirectory {
+    
+    [self createCacheDirectory:folderName];
+    [self createCacheDirectory:appMediafolderName];
+    [self createCacheDirectory:appProfilePhotofolderName];
+}
+
+- (void)createCacheDirectory:(NSString *)imageFolderName {
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *imagesPath = [[self applicationCacheDirectory] stringByAppendingPathComponent:imageFolderName];
+    if (![fileManager fileExistsAtPath:imagesPath]) {
+        
+        [fileManager createDirectoryAtPath:imagesPath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+}
+
+- (void)saveDataInCacheDirectory:(UIImage *)tempImage folderName:(NSString *)tempFolderName jid:(NSString *)jid {
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *imagesPath = [[self applicationCacheDirectory] stringByAppendingPathComponent:tempFolderName];
+    if (![fileManager fileExistsAtPath:imagesPath]) {
+        
+        [fileManager createDirectoryAtPath:imagesPath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    NSString *filePath = [imagesPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_%@.jpeg",folderName,[[jid componentsSeparatedByString:@"@"] objectAtIndex:0]]];
+    NSData * imageData = UIImageJPEGRepresentation(tempImage, imageCompressionPercent);
+    [imageData writeToFile:filePath atomically:YES];
+}
+
+- (NSData *)listionDataFromCacheDirectoryFolderName:(NSString *)tempFolderName jid:(NSString *)jid {
+    
+//    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *filePath = [[self applicationCacheDirectory] stringByAppendingPathComponent:tempFolderName];
+    NSString *fileAtPath = [filePath stringByAppendingString:[NSString stringWithFormat:@"/%@_%@.jpeg",folderName,[[jid componentsSeparatedByString:@"@"] objectAtIndex:0]]];
+    NSError* error = nil;
+    return [NSData dataWithContentsOfFile:fileAtPath options:0 error:&error];
 }
 #pragma mark - end
 @end

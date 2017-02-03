@@ -23,6 +23,7 @@
 - (void)xmppUserRefreshResponse;
 - (void)xmppUserConnect;
 - (void)xmppNewUserAddedNotify;
+- (void)getProfilePhotosJid:(NSString *)jid profileImageView:(UIImageView *)profileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(UIImage *tempImage)) completion;
 //end
 
 - (NSFetchedResultsController *)fetchedResultsController;

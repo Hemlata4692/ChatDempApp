@@ -269,8 +269,16 @@
 //        
         NSDictionary *profileDic=[self getProfileData:[userListArray objectAtIndex:indexPath.row]];
         UILabel* nameLabel = (UILabel*)[cell viewWithTag:1];
-        nameLabel.text = [profileDic objectForKey:@"Name"];
+        UIImageView *userImage = (UIImageView*)[cell viewWithTag:2];
+        UIButton* profileBtn = (UIButton*)[cell viewWithTag:3];
+        profileBtn.tag=indexPath.row;
         
+        [profileBtn addTarget:self action:@selector(friendProfileAction:) forControlEvents:UIControlEventTouchUpInside];
+        userImage.layer.cornerRadius=20;
+        userImage.layer.masksToBounds=YES;
+        
+        
+        nameLabel.text = [profileDic objectForKey:@"Name"];
         NSLog(@" userStatus:%@ \n phoneNumber:%@ Desc:%@ \n address:%@ \n emailid:%@ \n birthDay:%@ \n gender:%@",[profileDic objectForKey:@"UserStatus"],[profileDic objectForKey:@"PhoneNumber"],[profileDic objectForKey:@"Description"],[profileDic objectForKey:@"Address"],[profileDic objectForKey:@"EmailAddress"],[profileDic objectForKey:@"UserBirthDay"],[profileDic objectForKey:@"Gender"]);
         [self configurePhotoForCell:cell jid:[userListArray objectAtIndex:indexPath.row]];
     }
@@ -348,9 +356,9 @@
     
     
     
-    UserProfileViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"UserProfileViewController"];
-    profileObj.friendId=[userListArray objectAtIndex:indexPath.row];
-    [self.navigationController pushViewController:profileObj animated:YES];
+//    UserProfileViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"UserProfileViewController"];
+//    profileObj.friendId=[userListArray objectAtIndex:indexPath.row];
+//    [self.navigationController pushViewController:profileObj animated:YES];
     
     
 //    XMPPUserCoreDataStorageObject *user = [userDetailedList objectForKey:[userListArray objectAtIndex:indexPath.row]];
@@ -457,22 +465,16 @@
     // Our xmppRosterStorage will cache photos as they arrive from the xmppvCardAvatarModule.
     // We only need to ask the avatar module for a photo, if the roster doesn't have it.
     UIImageView *userImage = (UIImageView*)[cell viewWithTag:2];
-    
-//    if (user.photo != nil)
-//    {
-//        userImage.image = user.photo;
-//    }
-//    else
-//    {
-        NSData *photoData = [[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:jid]];
-    
-        if (photoData != nil)
-            userImage.image = [UIImage imageWithData:photoData];
-        else
-            userImage.image = [UIImage imageNamed:@"images.png"];
-        
-        //        [myDelegate.userProfileImage setObject:userImage.image forKey:[NSString stringWithFormat:@"%@",user.jidStr]];
-//    }
+    [self getProfilePhotosJid:jid profileImageView:userImage placeholderImage:@"images.png" result:^(UIImage *tempImage) {
+        // do something with your BOOL
+        if (tempImage!=nil) {
+            userImage.image=tempImage;
+        }
+        else {
+            
+            userImage.image=[UIImage imageNamed:@"images.png"];
+        }
+    }];
 }
 
 //{
@@ -531,6 +533,14 @@
 #pragma mark - end
 
 #pragma mark - IBActions
+- (IBAction)friendProfileAction:(UIButton *)sender {
+    
+    int tagValue=[sender tag];
+    UserProfileViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"UserProfileViewController"];
+    profileObj.friendId=[userListArray objectAtIndex:tagValue];
+    [self.navigationController pushViewController:profileObj animated:YES];
+}
+
 - (void)profileAction :(id)sender {
     
     UserProfileViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"UserProfileViewController"];
@@ -687,11 +697,6 @@
 - (void)updateProfileInformation {
 
     [self.dasboardTableListing reloadData];
-    NSLog(@"a");
-    appDelegate.isUpdatePofile=false;
-    appDelegate.updateProfileUserId=@"";
-
-//    [das]
 }
 
 - (void)xmppNewUserAddedNotify {

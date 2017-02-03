@@ -60,16 +60,9 @@
 #pragma mark - Custom accessors
 - (void)setCurrentProfileView {
     
-    UIImage *tempPhoto=[self getFriendProfilePhoto:myDelegate.xmppLogedInUserId];
-    if (tempPhoto!=nil) {
-        self.profileImage.image=tempPhoto;
-    }
-    else {
-        
-        self.profileImage.image=[UIImage imageNamed:@"profile_camera"];
-    }
+    [self setProfileImageUsingCompletionBlock];
     
-//    switch ([self getFriendPresenceStatus:myDelegate.xmppLogedInUserId]) {
+//    switch ([self getPresenceStatus:myDelegate.xmppLogedInUserId]) {
 //        case 0:     // online/available
 
 //            break;
@@ -77,20 +70,37 @@
 
 //            break;
 //    }
-    dispatch_queue_t queue = dispatch_queue_create("queue", DISPATCH_QUEUE_PRIORITY_DEFAULT);
-    dispatch_async(queue, ^{
-        
-        profileDic=[self getEditProfileData:myDelegate.xmppLogedInUserId];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            
-            self.userNameField.text=[profileDic objectForKey:@"Name"];
-            self.userStatusField.text=[profileDic objectForKey:@"UserStatus"];
-            self.mobileNumberField.text=[profileDic objectForKey:@"PhoneNumber"];
-            self.emailIdField.text=[profileDic objectForKey:@"EmailAddress"];
+    
+    [self setProfileDataUsingCompletionBlock];
+}
 
-            NSLog(@" Desc:%@ \n address:%@ \n birthDay:%@ \n gender:%@",[profileDic objectForKey:@"Description"],[profileDic objectForKey:@"Address"],[profileDic objectForKey:@"UserBirthDay"],[profileDic objectForKey:@"Gender"]);
-        });
-    });
+- (void)setProfileDataUsingCompletionBlock {
+    
+    [self getEditProfileData:myDelegate.xmppLogedInUserId result:^(NSDictionary *tempProfileData) {
+        // do something with your BOOL
+        
+        profileDic=tempProfileData;
+        self.userNameField.text=[profileDic objectForKey:@"Name"];
+        self.userStatusField.text=[profileDic objectForKey:@"UserStatus"];
+        self.mobileNumberField.text=[profileDic objectForKey:@"PhoneNumber"];
+        self.emailIdField.text=[profileDic objectForKey:@"EmailAddress"];
+        
+        NSLog(@" Desc:%@ \n address:%@ \n birthDay:%@ \n gender:%@",[profileDic objectForKey:@"Description"],[profileDic objectForKey:@"Address"],[profileDic objectForKey:@"UserBirthDay"],[profileDic objectForKey:@"Gender"]);
+    }];
+}
+
+- (void)setProfileImageUsingCompletionBlock {
+    
+    [self getProfilePhoto:myDelegate.xmppLogedInUserId profileImageView:self.profileImage placeholderImage:@"images.png" result:^(UIImage *tempImage) {
+        // do something with your BOOL
+        if (tempImage!=nil) {
+            self.profileImage.image=tempImage;
+        }
+        else {
+            
+            self.profileImage.image=[UIImage imageNamed:@"profile_camera"];
+        }
+    }];
 }
 
 - (void)addBarButton {
@@ -273,7 +283,7 @@
 #pragma mark - XMPPProfileView methods
 - (void)XmppUserPresenceUpdateNotify {
     
-    switch ([self getFriendPresenceStatus:myDelegate.xmppLogedInUserId]) {
+    switch ([self getPresenceStatus:myDelegate.xmppLogedInUserId]) {
         case 0:     // online/available
 //            _presenceStatus.backgroundColor=[UIColor greenColor];
             break;
@@ -291,7 +301,9 @@
 - (void)XMPPvCardTempModuleDidUpdateMyvCardSuccessResponse {
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        [myDelegate stopIndicator];
+        
+        [self saveUpdatedImage:self.profileImage.image placeholderImageName:@"profile_camera" jid:myDelegate.xmppLogedInUserId];
+        [myDelegate stopIndicator];  
     });
 }
 

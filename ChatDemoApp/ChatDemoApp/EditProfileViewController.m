@@ -293,10 +293,10 @@
     }
 }
 
-- (void)XmppProileUpdateNotify {
-    
-    
-}
+//- (void)XmppProileUpdateNotify {
+//    
+//    
+//}
 
 - (void)XMPPvCardTempModuleDidUpdateMyvCardSuccessResponse {
 

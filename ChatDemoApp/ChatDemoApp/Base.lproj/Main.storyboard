@@ -322,7 +322,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="60" sectionHeaderHeight="1" sectionFooterHeight="1" translatesAutoresizingMaskIntoConstraints="NO" id="GaP-Z7-K9q">
-                                <rect key="frame" x="0.0" y="98" width="320" height="406"/>
+                                <rect key="frame" x="0.0" y="44" width="320" height="460"/>
                                 <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" rowHeight="60" id="dbB-AP-OHF">
@@ -371,21 +371,13 @@
                                     <outlet property="delegate" destination="Zyc-iL-roZ" id="QQM-ex-Jij"/>
                                 </connections>
                             </tableView>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RlC-vb-9YE">
-                                <rect key="frame" x="137" y="53" width="46" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
-                                <connections>
-                                    <action selector="updateProfile:" destination="Zyc-iL-roZ" eventType="touchUpInside" id="hJ4-ce-2s1"/>
-                                </connections>
-                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="GaP-Z7-K9q" secondAttribute="trailing" id="1Vs-WI-kpp"/>
                             <constraint firstItem="GaP-Z7-K9q" firstAttribute="leading" secondItem="F4E-me-lpM" secondAttribute="leading" id="ES3-km-pA6"/>
                             <constraint firstItem="Doo-9W-aRw" firstAttribute="top" secondItem="GaP-Z7-K9q" secondAttribute="bottom" id="KWU-TG-mLd"/>
-                            <constraint firstItem="GaP-Z7-K9q" firstAttribute="top" secondItem="hT0-dm-qZr" secondAttribute="bottom" constant="98" id="vUE-qT-LvT"/>
+                            <constraint firstItem="GaP-Z7-K9q" firstAttribute="top" secondItem="hT0-dm-qZr" secondAttribute="bottom" constant="44" id="vUE-qT-LvT"/>
                         </constraints>
                     </view>
                     <extendedEdge key="edgesForExtendedLayout"/>
@@ -656,7 +648,7 @@
                                 </constraints>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
+                                <textInputTraits key="textInputTraits"/>
                                 <connections>
                                     <outlet property="delegate" destination="RSN-Ri-fNF" id="PYA-Wc-wg9"/>
                                 </connections>

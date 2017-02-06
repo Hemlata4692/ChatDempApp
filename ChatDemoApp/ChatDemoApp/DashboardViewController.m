@@ -22,7 +22,8 @@
     HMSegmentedControl *customSegmentedControl;
     AppDelegateObjectFile *appDelegate;
     
-    NSMutableArray *endty;
+    NSMutableArray *historyChatData;
+    NSMutableDictionary *profileLocalDictData;
 }
 @property (strong, nonatomic) IBOutlet UITableView *dasboardTableListing;
 @end
@@ -50,6 +51,11 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:YES];
     
+    profileLocalDictData=[NSMutableDictionary new];
+    historyChatData=[NSMutableArray new];
+    if (userListArray.count>0) {
+        profileLocalDictData=[self getProfileUsersData];
+    }
     [self.dasboardTableListing reloadData];
 //
 //        //        NSData *photoData1 = [[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:@"1234567890@ranosys"]];
@@ -66,6 +72,8 @@
 
 - (void)userList {
 
+    
+    
     [self xmppUserConnect];
 }
 
@@ -257,18 +265,22 @@
     }
     
     if (customSegmentedControl.selectedSegmentIndex==1) {
-//        XMPPUserCoreDataStorageObject *user = [userDetailedList objectForKey:[userListArray objectAtIndex:indexPath.row]];
-//        
-//        if ([user.jidStr isEqualToString:@"2222222222@ranosys"]) {
-//            
-//            NSLog(@"a");
-//            //        - (XMPPvCardTemp *)vCardTempForJID:(XMPPJID *)jid xmppStream:(XMPPStream *)stream
-//            //        XMPPvCardTemp *newvCardTemp = [[myDelegate xmppvCardTempModule] vCardTempForJID:user.jid shouldFetch:YES];
-//            NSLog(@"a");
-//        }
-//        
-        NSDictionary *profileDic=[self getProfileData:[userListArray objectAtIndex:indexPath.row]];
         UILabel* nameLabel = (UILabel*)[cell viewWithTag:1];
+//        if (![[profileLocalDictData allKeys] containsObject:[userListArray objectAtIndex:indexPath.row]]) {
+//            
+//             nameLabel.backgroundColor=[UIColor lightGrayColor];
+//            [self getProfileData:[userListArray objectAtIndex:indexPath.row] result:^(NSDictionary *tempProfileData) {
+//                // do something with your BOOL
+//                if (nil!=tempProfileData) {
+//                    [profileLocalDictData setObject:tempProfileData forKey:[userListArray objectAtIndex:indexPath.row]];
+//                    nameLabel.text = [tempProfileData objectForKey:@"Name"];
+//                    nameLabel.backgroundColor=[UIColor clearColor];
+//                }
+//            }];
+//        }
+//        NSDictionary *profileDic=[self getProfileDicData:[userListArray objectAtIndex:indexPath.row]];
+        NSDictionary *profileDic=[profileLocalDictData objectForKey:[userListArray objectAtIndex:indexPath.row]];
+        
         UIImageView *userImage = (UIImageView*)[cell viewWithTag:2];
         UIButton* profileBtn = (UIButton*)[cell viewWithTag:3];
         profileBtn.tag=indexPath.row;
@@ -282,11 +294,6 @@
         NSLog(@" userStatus:%@ \n phoneNumber:%@ Desc:%@ \n address:%@ \n emailid:%@ \n birthDay:%@ \n gender:%@",[profileDic objectForKey:@"UserStatus"],[profileDic objectForKey:@"PhoneNumber"],[profileDic objectForKey:@"Description"],[profileDic objectForKey:@"Address"],[profileDic objectForKey:@"EmailAddress"],[profileDic objectForKey:@"UserBirthDay"],[profileDic objectForKey:@"Gender"]);
         [self configurePhotoForCell:cell jid:[userListArray objectAtIndex:indexPath.row]];
     }
-    else {
-       
-    }
-    
-    
     return cell;
 }
 //{
@@ -581,6 +588,8 @@
 
 - (void)reloadAction :(id)sender {
     
+    profileLocalDictData=[NSMutableDictionary new];
+    historyChatData=[NSMutableArray new];
     [myDelegate showIndicator];
     [self performSelector:@selector(reloadUserData) withObject:nil afterDelay:0.1];
 }
@@ -646,23 +655,6 @@
 }
 #pragma mark - end
 
-- (IBAction)updateProfile:(id)sender {
-    
-//    NSLog(@"%@",[NSString stringWithFormat:@"8888888899@%@",myDelegate.hostName]);
-//    [appDelegate.xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:[NSString stringWithFormat:@"8888888899@%@",myDelegate.hostName]] ignoreStorage:YES];
-    
-//    XMPPvCardTemp *newvCardTemp = [[myDelegate xmppvCardTempModule] vCardTempForJID:[XMPPJID jidWithString:[NSString stringWithFormat:@"8888888899@%@",myDelegate.hostName]] shouldFetch:YES];
-//    
-//    NSLog(@"%@",newvCardTemp.userStatus);
-//    NSLog(@"%@",newvCardTemp.emailAddress);
-    
-    
-//    [appDelegate editProfileImageUploading];
-    
-    
-    [self showButton];
-}
-
 - (void)showButton {
     
 //    [self xmppUserRefreshResponse];
@@ -696,6 +688,7 @@
 
 - (void)updateProfileInformation {
 
+    profileLocalDictData=[self getProfileUsersData];
     [self.dasboardTableListing reloadData];
 }
 
@@ -720,10 +713,17 @@
 - (void)xmppUserListResponse:(NSMutableDictionary *)xmppUserDetails xmppUserListIds:(NSMutableArray *)xmppUserListIds {
 
     [self addBarButton];
-    [myDelegate stopIndicator];
     userDetailedList=[xmppUserDetails mutableCopy];
     userListArray=[xmppUserListIds mutableCopy];
-    [self.dasboardTableListing reloadData];
+    profileLocalDictData=[self getProfileUsersData];
+    
+    [self fetchAllHistoryChat:^(NSMutableArray *tempHistoryData) {
+        // do something with your BOOL
+        
+       [myDelegate stopIndicator];
+        historyChatData=[tempHistoryData mutableCopy];
+        [self.dasboardTableListing reloadData];
+    }];
 }
 /*
 #pragma mark - Navigation

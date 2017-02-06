@@ -133,7 +133,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     if (([XMPPUserDefaultManager getValue:@"LoginCred"] != nil)) {
 //        [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",hostName] key:@"LoginCred"];
 //        [XMPPUserDefaultManager setValue:@"password" key:@"PassCred"];
-        [self connect];
+//        [self connect];
     }
 //    else {
 //    [self connect];
@@ -399,8 +399,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     if ([xmppStream isAuthenticated]) {
         
         NSLog(@"authenticated");
-//        [xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:@"test11@administrator"] ignoreStorage:YES];
-        
+        if (nil!=xmppLogedInUserId&&![xmppLogedInUserId isEqualToString:@""]) {
+//             [xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:xmppLogedInUserId] ignoreStorage:YES];
+        }
     }
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPDidAuthenticatedResponse" object:nil];
@@ -650,6 +651,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         
         [xmppRoster acceptPresenceSubscriptionRequestFrom:presence.from andAddToRoster:YES];
     }
+    NSLog(@" Printing full jid of user %@",presence);
     NSLog(@" Printing full jid of user %@",[[sender myJID] full]);
     NSLog(@"Printing full jid of user %@",[[sender myJID] resource]);
     NSLog(@"From user %@",[[presence from] full]);

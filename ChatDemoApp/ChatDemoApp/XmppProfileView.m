@@ -30,7 +30,7 @@
     [super viewWillAppear:YES];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XmppUserPresenceUpdateNotify) name:@"XmppUserPresenceUpdate" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XmppProileUpdateNotify) name:@"XMPPProfileUpdation" object:nil];
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XmppProileUpdateNotify) name:@"XMPPProfileUpdation" object:nil];
     
     //vCard update post notification
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPvCardTempModuleDidUpdateMyvCardSuccess) name:@"XMPPvCardTempModuleDidUpdateMyvCardSuccess" object:nil];
@@ -95,8 +95,11 @@
     dispatch_queue_t queue = dispatch_queue_create("profileDataQueue", DISPATCH_QUEUE_PRIORITY_DEFAULT);
     dispatch_async(queue, ^
                    {
-                       [appDelegate.xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:jid] ignoreStorage:YES];
                        NSDictionary *tempDic=[self getProfileDicData:jid];
+//                       if (nil==tempDic) {
+                           [appDelegate.xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:jid] ignoreStorage:YES];
+//                       }
+//                       NSDictionary *tempDic=[self getProfileDicData:jid];
                        dispatch_async(dispatch_get_main_queue(), ^{
                            
                            completion(tempDic);
@@ -248,6 +251,24 @@
         }
     }
     */
+    
+    //Set presence
+//        XMPPPresence *presence = [XMPPPresence presence];
+//        NSXMLElement *status = [NSXMLElement elementWithName:@"status"];
+//        [status setStringValue:@"online/unavailable/away/busy/invisible"];
+//        [presence addChild:status];
+//        [[appDelegate xmppStream] sendElement:presence];
+//    XMPPPresence *presence = [XMPPPresence presence]; // type="available" is implicit
+//    NSXMLElement *updateText = [NSXMLElement elementWithName:@"isUpdateText" stringValue:@"1"];
+//    [presence addChild:updateText];
+//    [presence removeElementForName:@"isUpdateText"];
+//    
+//    NSXMLElement *priority = [NSXMLElement elementWithName:@"priority" stringValue:@"24"];
+//    [presence addChild:priority];
+//    
+//    [[appDelegate xmppStream] sendElement:presence];
+//    //end
+    
     [appDelegate insertEntryInXmppUserModel:[xmppProfileUpdationData objectForKey:@"xmppRegisterId"] xmppName:[xmppProfileUpdationData objectForKey:@"xmppName"] xmppPhoneNumber:[xmppProfileUpdationData objectForKey:@"xmppPhoneNumber"] xmppUserStatus:[xmppProfileUpdationData objectForKey:@"xmppUserStatus"] xmppDescription:[xmppProfileUpdationData objectForKey:@"xmppDescription"] xmppAddress:[xmppProfileUpdationData objectForKey:@"xmppAddress"] xmppEmailAddress:[xmppProfileUpdationData objectForKey:@"xmppEmailAddress"] xmppUserBirthDay:[xmppProfileUpdationData objectForKey:@"xmppUserBirthDay"] xmppGender:[xmppProfileUpdationData objectForKey:@"xmppGender"]];
     [self XMPPvCardTempModuleDidUpdateMyvCardSuccessResponse];
 }

@@ -34,6 +34,9 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:YES];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(UserDidAuthenticated) name:@"XMPPDidAuthenticatedResponse" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(UserNotAuthenticated) name:@"XMPPDidNotAuthenticatedResponse" object:nil];
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProfileInformation) name:@"XMPPProfileUpdation" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppNewUserAddedNotify) name:@"XmppNewUserAdded" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppNewUserAddedNotify) name:@"XmppUserPresenceUpdate" object:nil];
@@ -155,6 +158,17 @@
 #pragma mark - Post notification action
 - (void)updateProfileInformation {}
 - (void)xmppUserListResponse:(NSMutableDictionary *)xmppUserDetails xmppUserListIds:(NSMutableArray *)xmppUserListIds {}
+
+- (void)UserDidAuthenticated {
+    
+    [self fetchedResultsController];
+}
+
+- (void)UserNotAuthenticated {
+    
+    
+}
+
 #pragma mark - end
 
 - (void)xmppNewUserAddedNotify {}
@@ -177,13 +191,27 @@
     [myDelegate disconnect];
     if ([myDelegate connect])
     {
-        [self fetchedResultsController];
+//        [self fetchedResultsController];
     }
 }
 
-- (NSDictionary *)getProfileData:(NSString *)jid {
+- (void)getProfileData:(NSString *)jid result:(void(^)(NSDictionary *tempProfileData)) completion {
     
-    appDelegate.updateProfileUserId=jid;
+//    appDelegate.updateProfileUserId=jid;
+    dispatch_queue_t queue = dispatch_queue_create("profileDataQueue", DISPATCH_QUEUE_PRIORITY_DEFAULT);
+    dispatch_async(queue, ^
+                   {
+                       [appDelegate.xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:jid] ignoreStorage:YES];
+                       NSDictionary *tempDic=[self getProfileDicData:jid];
+                       dispatch_async(dispatch_get_main_queue(), ^{
+                           
+                           completion(tempDic);
+                       });
+                   });
+}
+- (NSDictionary *)getProfileDicData:(NSString *)jid {
+    
+//    appDelegate.updateProfileUserId=jid;
 //    [appDelegate.xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:jid] ignoreStorage:YES];
     
     NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
@@ -211,7 +239,48 @@
                           };
         NSLog(@"\n\n");
     }
+//    else {
+//        profileResponse=@{
+//                          @"RegisterId" : jid,
+//                          @"Name" : @"",
+//                          @"PhoneNumber" : @"",
+//                          @"UserStatus" : @"",
+//                          @"Description" : @"",
+//                          @"Address" : @"",
+//                          @"EmailAddress" : @"",
+//                          @"UserBirthDay" : @"",
+//                          @"Gender" : @"",
+//                          };
+//
+//    }
     return profileResponse;
+}
+
+- (NSMutableDictionary *)getProfileUsersData {
+    
+    NSMutableDictionary *tempDict=[NSMutableDictionary new];
+    NSMutableArray *tempArray=[NSMutableArray new];
+    NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UserEntry"];
+    tempArray = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
+    for (NSManagedObject *tempDevice in tempArray) {
+        if (![[tempDevice valueForKey:@"xmppRegisterId"] isEqualToString:appDelegate.xmppLogedInUserId]) {
+            NSDictionary *profileResponse=@{
+                              @"RegisterId" : [tempDevice valueForKey:@"xmppRegisterId"],
+                              @"Name" : [tempDevice valueForKey:@"xmppName"],
+                              @"PhoneNumber" : [tempDevice valueForKey:@"xmppPhoneNumber"],
+                              @"UserStatus" : [tempDevice valueForKey:@"xmppUserStatus"],
+                              @"Description" : [tempDevice valueForKey:@"xmppDescription"],
+                              @"Address" : [tempDevice valueForKey:@"xmppAddress"],
+                              @"EmailAddress" : [tempDevice valueForKey:@"xmppEmailAddress"],
+                              @"UserBirthDay" : [tempDevice valueForKey:@"xmppUserBirthDay"],
+                              @"Gender" : [tempDevice valueForKey:@"xmppGender"],
+                              };
+            [tempDict setObject:profileResponse forKey:[tempDevice valueForKey:@"xmppRegisterId"]];
+        }
+    }
+    
+    return tempDict;
 }
 
 - (NSManagedObjectContext *)managedObjectContext {
@@ -245,6 +314,66 @@
         completion([UIImage imageWithData:tempImageData]);
     }
 }
+
+#pragma mark - Fetch chat history
+- (void)fetchAllHistoryChat:(void(^)(NSMutableArray *tempHistoryData)) completion {
+
+    NSManagedObjectContext *moc = [myDelegate.xmppMessageArchivingCoreDataStorage mainThreadManagedObjectContext];
+    NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"XMPPMessageArchiving_Message_CoreDataObject"
+                                                         inManagedObjectContext:moc];
+    NSFetchRequest *request = [[NSFetchRequest alloc]init];
+    [request setEntity:entityDescription];
+    NSError *error;
+    NSArray *messages_arc = [moc executeFetchRequest:request error:&error];
+//    [self print:[[NSMutableArray alloc]initWithArray:messages_arc]];
+    completion([[NSMutableArray alloc]initWithArray:messages_arc]);
+}
+
+-(void)getHistoryData{
+    
+}
+
+/*
+-(void)print:(NSMutableArray*)messages_arc{
+    NSMutableArray *tempArray = [NSMutableArray new];
+    int i = 0;
+    @autoreleasepool {
+        for (XMPPMessageArchiving_Message_CoreDataObject *message in messages_arc) {
+            NSXMLElement *element = [[NSXMLElement alloc] initWithXMLString:message.messageStr error:nil];
+            if ( [[element attributeStringValueForName:@"ToName"] caseInsensitiveCompare:[UserDefaultManager getValue:@"userName"]] == NSOrderedSame) {
+                if ([tempArray containsObject:[[element attributeStringValueForName:@"Name"] lowercaseString]]) {
+                    i = (int)[tempArray indexOfObject:[[element attributeStringValueForName:@"Name"] lowercaseString]];
+                    [tempArray removeObjectAtIndex:i];
+                    [historyArray removeObjectAtIndex:i];
+                    [tempArray addObject:[[element attributeStringValueForName:@"Name"] lowercaseString]];
+                    [historyArray addObject:element];
+                }
+                else{
+                    [tempArray addObject:[[element attributeStringValueForName:@"Name"] lowercaseString]];
+                    [historyArray addObject:element];
+                }
+            }
+            else{
+                if ([tempArray containsObject:[[element attributeStringValueForName:@"ToName"] lowercaseString]]) {
+                    i = (int)[tempArray indexOfObject:[[element attributeStringValueForName:@"ToName"] lowercaseString]];
+                    [tempArray removeObjectAtIndex:i];
+                    [historyArray removeObjectAtIndex:i];
+                    [tempArray addObject:[[element attributeStringValueForName:@"ToName"] lowercaseString]];
+                    [historyArray addObject:element];
+                }
+                else{
+                    [tempArray addObject:[[element attributeStringValueForName:@"ToName"] lowercaseString]];
+                    [historyArray addObject:element];
+                }
+            }
+        }
+        historyArray=[[[historyArray reverseObjectEnumerator] allObjects] mutableCopy];
+        [myDelegate stopIndicator];
+        [historyTableView reloadData];
+    }
+}
+ */
+#pragma mark - end
 /*
 #pragma mark - Navigation
 

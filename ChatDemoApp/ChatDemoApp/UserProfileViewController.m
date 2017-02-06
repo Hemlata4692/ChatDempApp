@@ -40,6 +40,9 @@
     if ([self.friendId isEqualToString:myDelegate.xmppLogedInUserId]) {
         [self addBarButton];
     }
+    else {
+        [self addBackBarButton];
+    }
     [self setCurrentProfileView];
 }
 
@@ -106,7 +109,7 @@
 
 - (void)setFriendProfileDataUsingCompletionBlock {
     
-    [self getProfileData:myDelegate.xmppLogedInUserId result:^(NSDictionary *tempProfileData) {
+    [self getProfileData:self.friendId result:^(NSDictionary *tempProfileData) {
         // do something with your BOOL
         friendProfileDic=tempProfileData;
         self.userName.text=[friendProfileDic objectForKey:@"Name"];
@@ -149,6 +152,18 @@
 
     self.navigationItem.rightBarButtonItem=editBarButton;
 }
+
+- (void)addBackBarButton {
+    
+    UIBarButtonItem *backBarButton;
+    CGRect framing = CGRectMake(0, 0, 25, 25);
+    
+    UIButton *back = [[UIButton alloc] initWithFrame:framing];
+    [back setImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
+    backBarButton =[[UIBarButtonItem alloc] initWithCustomView:back];
+    [back addTarget:self action:@selector(backAction) forControlEvents:UIControlEventTouchUpInside];
+    self.navigationItem.leftBarButtonItem=backBarButton;
+}
 #pragma mark - end
 - (void)backAction {
 
@@ -177,15 +192,15 @@
     }
 }
 
-- (void)XmppProileUpdateNotify {
-
-    if ([self.friendId isEqualToString:myDelegate.xmppLogedInUserId]) {
-        [self setEditProfileDataUsingCompletionBlock];
-    }
-    else {
-        [self setFriendProfileDataUsingCompletionBlock];
-    }
-}
+//- (void)XmppProileUpdateNotify {
+//
+//    if ([self.friendId isEqualToString:myDelegate.xmppLogedInUserId]) {
+//        [self setEditProfileDataUsingCompletionBlock];
+//    }
+//    else {
+//        [self setFriendProfileDataUsingCompletionBlock];
+//    }
+//}
 #pragma mark - end
 /*
 #pragma mark - Navigation

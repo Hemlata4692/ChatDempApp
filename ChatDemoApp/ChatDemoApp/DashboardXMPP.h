@@ -19,7 +19,9 @@
 //Post notification method declaration
 - (void)updateProfileInformation;
 - (void)xmppUserListResponse:(NSMutableDictionary *)xmppUserDetails xmppUserListIds:(NSMutableArray *)xmppUserListIds;
-- (NSDictionary *)getProfileData:(NSString *)jid;
+- (void)getProfileData:(NSString *)jid result:(void(^)(NSDictionary *tempProfileData)) completion;
+- (NSDictionary *)getProfileDicData:(NSString *)jid;
+- (NSMutableDictionary *)getProfileUsersData;
 - (void)xmppUserRefreshResponse;
 - (void)xmppUserConnect;
 - (void)xmppNewUserAddedNotify;
@@ -30,4 +32,7 @@
 
 //This method is used for logout user
 - (void)userLogout;
+
+//Fetch chat history
+- (void)fetchAllHistoryChat:(void(^)(NSMutableArray *tempHistoryData))completion;
 @end

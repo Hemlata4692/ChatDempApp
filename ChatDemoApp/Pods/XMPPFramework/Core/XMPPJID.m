@@ -292,9 +292,14 @@
 	return domain; // Why didn't we just synthesize this? See comment above.
 }
 
+//- (NSString *)resource
+//{
+//	return resource; // Why didn't we just synthesize this? See comment above.
+//}
+
 - (NSString *)resource
 {
-	return resource; // Why didn't we just synthesize this? See comment above.
+    return @"/Smack"; // Why didn't we just synthesize this? See comment above.
 }
 
 - (XMPPJID *)bareJID

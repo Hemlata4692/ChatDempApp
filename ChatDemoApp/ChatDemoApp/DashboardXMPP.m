@@ -161,7 +161,10 @@
 
 - (void)UserDidAuthenticated {
     
-    [self fetchedResultsController];
+//    if ([myDelegate connect])
+//    {
+        [self fetchedResultsController];
+//    }
 }
 
 - (void)UserNotAuthenticated {

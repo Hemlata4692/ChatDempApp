@@ -14,7 +14,12 @@
 #import "XMPPMessageArchivingCoreDataStorage.h"
 #import <CoreData/CoreData.h>
 
-@interface AppDelegateObjectFile : UIResponder<XMPPRosterDelegate>
+//File transfer
+#import "XMPPIncomingFileTransfer.h"
+#import "XMPPOutgoingFileTransfer.h"
+
+@interface AppDelegateObjectFile : UIResponder<XMPPRosterDelegate,XMPPStreamDelegate,
+XMPPIncomingFileTransferDelegate, XMPPOutgoingFileTransferDelegate>
 {
     XMPPStream *xmppStream;
     XMPPReconnect *xmppReconnect;
@@ -29,6 +34,10 @@
     BOOL customCertEvaluation;
     BOOL isXmppConnected;
     NSMutableArray *turnSockets;
+    
+    //File transfer
+    XMPPIncomingFileTransfer *xmppIncomingFileTransfer;
+    XMPPOutgoingFileTransfer *_fileTransfer;
 }
 
 //Delcare XMPP variables
@@ -37,6 +46,9 @@
 @property (nonatomic, strong, readonly) XMPPStream *xmppStream;
 @property (nonatomic, strong, readonly) XMPPReconnect *xmppReconnect;
 @property (nonatomic, strong, readonly) XMPPRoster *xmppRoster;
+
+@property (nonatomic, strong, readonly) XMPPIncomingFileTransfer *xmppIncomingFileTransfer;//File transfer
+
 @property (nonatomic, strong, readonly) XMPPRosterCoreDataStorage *xmppRosterStorage;
 @property (nonatomic, strong, readonly) XMPPvCardTempModule *xmppvCardTempModule;
 @property (nonatomic, strong, readonly) XMPPvCardAvatarModule *xmppvCardAvatarModule;
@@ -110,7 +122,7 @@
 
 
 
-
+- (void)sendFile:(NSData*)data fileName:(NSString *)fileName jid:(XMPPJID *)jid;
 
 
 

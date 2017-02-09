@@ -14,7 +14,7 @@
 #import "XMPPvCardTemp.h"
 #import "XMPPMessageArchivingCoreDataStorage.h"
 #import "XMPPvCardCoreDataStorage.h"
-
+#import "ChatScreenViewController.h"
 
 @class XMPPvCardTempModuleStorage;
 @interface DashboardViewController () {
@@ -347,6 +347,15 @@
 //}
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    XMPPUserCoreDataStorageObject *user = [[self fetchedResultsController] objectAtIndexPath:indexPath];
+    
+    ChatScreenViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"ChatScreenViewController"];
+    profileObj.friendUserJid=[userListArray objectAtIndex:indexPath.row];
+    profileObj.friendUserName=[[profileLocalDictData objectForKey:[userListArray objectAtIndex:indexPath.row]] objectForKey:@"Name"];
+    profileObj.loginUserName=[[profileLocalDictData objectForKey:appDelegate.xmppLogedInUserId] objectForKey:@"Name"];
+    [self.navigationController pushViewController:profileObj animated:YES];
+    
     
 //    XMPPUserCoreDataStorageObject *user = [[self fetchedResultsController] objectAtIndexPath:indexPath];
 //    XMPPPresence *presence = [[XMPPPresence alloc] initWithType:@"type" to:[XMPPJID jidWithString:user.jidStr]];

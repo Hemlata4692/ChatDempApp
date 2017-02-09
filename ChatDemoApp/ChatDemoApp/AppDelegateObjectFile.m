@@ -72,6 +72,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 @synthesize folderName, appMediafolderName, appProfilePhotofolderName;
 @synthesize imageCompressionPercent;
 
+
 #pragma mark - Intialze XMPP connection
 - (void)didFinishLaunchingMethod {
 
@@ -303,6 +304,32 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     
     [xmppStream setMyJID:[XMPPJID jidWithString:myJID]];
     xmppPassword = myPassword;
+    
+    
+    
+    
+    
+    //File transfer
+    
+    
+    _fileTransfer = [[XMPPOutgoingFileTransfer alloc] initWithDispatchQueue:dispatch_get_main_queue()];
+//    _fileTransfer.disableIBB = NO;
+//    _fileTransfer.disableSOCKS5 = NO;
+    
+    [_fileTransfer activate:xmppStream];
+    [_fileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    
+    xmppIncomingFileTransfer = [XMPPIncomingFileTransfer new];
+    
+    // Activate all modules
+    [xmppRoster activate:xmppStream];
+    [xmppIncomingFileTransfer activate:xmppStream];
+    
+    // Add ourselves as delegate to necessary methods
+    [xmppStream addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    [xmppIncomingFileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    //end
+    
     
     NSError *error = nil;
     if (![xmppStream connectWithTimeout:XMPPStreamTimeoutNone error:&error])
@@ -1165,4 +1192,78 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     return [NSData dataWithContentsOfFile:fileAtPath options:0 error:&error];
 }
 #pragma mark - end
+
+
+//File transfer
+#pragma mark - XMPPIncomingFileTransferDelegate Methods
+
+- (void)xmppIncomingFileTransfer:(XMPPIncomingFileTransfer *)sender
+                didFailWithError:(NSError *)error
+{
+    DDLogVerbose(@"%@: Incoming file transfer failed with error: %@", THIS_FILE, error);
+}
+
+- (void)xmppIncomingFileTransfer:(XMPPIncomingFileTransfer *)sender
+               didReceiveSIOffer:(XMPPIQ *)offer
+{
+    DDLogVerbose(@"%@: Incoming file transfer did receive SI offer. Accepting...", THIS_FILE);
+    [sender acceptSIOffer:offer];
+}
+
+- (void)xmppIncomingFileTransfer:(XMPPIncomingFileTransfer *)sender
+              didSucceedWithData:(NSData *)data
+                           named:(NSString *)name
+{
+    DDLogVerbose(@"%@: Incoming file transfer did succeed.", THIS_FILE);
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
+                                                         NSUserDomainMask,
+                                                         YES);
+    NSString *fullPath = [[paths lastObject] stringByAppendingPathComponent:name];
+    [data writeToFile:fullPath options:0 error:nil];
+    
+    DDLogVerbose(@"%@: Data was written to the path: %@", THIS_FILE, fullPath);
+}
+
+
+
+
+- (void)sendFile:(NSData*)data fileName:(NSString *)fileName jid:(XMPPJID *)jid {
+
+   
+    
+    NSError *err;
+    if (![_fileTransfer sendData:data
+                           named:fileName
+                     toRecipient:jid
+                     description:@"Baal's Soulstone, obviously."
+                           error:&err]) {
+        DDLogInfo(@"You messed something up: %@", err);
+    }
+}
+
+- (void)xmppOutgoingFileTransfer:(XMPPOutgoingFileTransfer *)sender
+                didFailWithError:(NSError *)error
+{
+    DDLogInfo(@"Outgoing file transfer failed with error: %@", error);
+    
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
+                                                    message:@"There was an error sending your file. See the logs."
+                                                   delegate:nil
+                                          cancelButtonTitle:@"OK"
+                                          otherButtonTitles:nil];
+    [alert show];
+}
+
+- (void)xmppOutgoingFileTransferDidSucceed:(XMPPOutgoingFileTransfer *)sender
+{
+    DDLogVerbose(@"File transfer successful.");
+    
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Success!"
+                                                    message:@"Your file was sent successfully."
+                                                   delegate:nil
+                                          cancelButtonTitle:@"OK"
+                                          otherButtonTitles:nil];
+    [alert show];
+}
 @end

@@ -20,6 +20,7 @@
 - (void)updateProfileInformation;
 - (void)xmppUserListResponse:(NSMutableDictionary *)xmppUserDetails xmppUserListIds:(NSMutableArray *)xmppUserListIds;
 - (void)getProfileData:(NSString *)jid result:(void(^)(NSDictionary *tempProfileData)) completion;
+- (void)getProfileData1:(void(^)(NSDictionary *tempProfileData)) completion;
 - (NSDictionary *)getProfileDicData:(NSString *)jid;
 - (NSMutableDictionary *)getProfileUsersData;
 - (void)xmppUserRefreshResponse;

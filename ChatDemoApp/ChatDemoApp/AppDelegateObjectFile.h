@@ -120,7 +120,8 @@ XMPPIncomingFileTransferDelegate, XMPPOutgoingFileTransferDelegate>
 - (void)saveDataInCacheDirectory:(UIImage *)tempImage folderName:(NSString *)tempFolderName jid:(NSString *)jid;
 - (NSData *)listionDataFromCacheDirectoryFolderName:(NSString *)tempFolderName jid:(NSString *)jid;
 
-
+@property(nonatomic,assign) int afterAutentication;
+@property(nonatomic,assign) int afterAutenticationRegistration;
 
 - (void)sendFile:(NSData*)data fileName:(NSString *)fileName jid:(XMPPJID *)jid;
 

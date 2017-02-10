@@ -72,6 +72,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 @synthesize folderName, appMediafolderName, appProfilePhotofolderName;
 @synthesize imageCompressionPercent;
 
+@synthesize afterAutentication,afterAutenticationRegistration;
 
 #pragma mark - Intialze XMPP connection
 - (void)didFinishLaunchingMethod {
@@ -419,6 +420,8 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 
 - (void)xmppStreamDidAuthenticate:(XMPPStream *)sender
 {
+    if (myDelegate.afterAutentication==1) {
+         myDelegate.afterAutentication=2;
     DDLogVerbose(@"%@: %@", THIS_FILE, THIS_METHOD);
     
     [self goOnline];
@@ -432,6 +435,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     }
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPDidAuthenticatedResponse" object:nil];
+    }
 }
 
 - (void)xmppvCardTempModuleDidUpdateMyvCard:(XMPPvCardTempModule *)vCardTempModule{
@@ -444,10 +448,18 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 
 - (void)xmppStream:(XMPPStream *)sender didNotAuthenticate:(NSXMLElement *)error
 {
+    if (myDelegate.afterAutentication==1) {
+        
+        myDelegate.afterAutentication=2;
     DDLogVerbose(@"%@: %@", THIS_FILE, THIS_METHOD);
 //    if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"zebra@%@",hostName]]) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPDidNotAuthenticatedResponse" object:nil];
+//    if (isRegisterCalled==0) {
+//        isRegisterCalled=1;
+         [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPDidNotAuthenticatedResponse" object:nil];
 //    }
+    
+//    }
+    }
 }
 
 -(void)fetchRosterListWithUserId:(NSString *)userId // yourID
@@ -722,14 +734,20 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     
 //    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Registration" message:@"Registration Successful!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
 //    [alert show];
-    NSMutableDictionary *registerSuccessDict=[NSMutableDictionary new];
-    [registerSuccessDict setObject:@"1" forKey:@"Status"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPDidRegisterResponse" object:registerSuccessDict];
+    if (afterAutenticationRegistration==0) {
+        afterAutenticationRegistration=1;
+        NSMutableDictionary *registerSuccessDict=[NSMutableDictionary new];
+        [registerSuccessDict setObject:@"1" forKey:@"Status"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPDidRegisterResponse" object:registerSuccessDict];
+    }
+    
 }
 
 
 - (void)xmppStream:(XMPPStream *)sender didNotRegister:(NSXMLElement *)error{
     
+    if (afterAutenticationRegistration==0) {
+        afterAutenticationRegistration=1;
     DDXMLElement *errorXML = [error elementForName:@"error"];
     NSString *errorCode  = [[errorXML attributeForName:@"code"] stringValue];
     
@@ -750,6 +768,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     }
     else {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPDidNotRegisterResponse" object:[NSNumber numberWithInt:XMPP_UserExist]];
+    }
     }
 }
 

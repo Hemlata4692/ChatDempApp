@@ -308,6 +308,7 @@
                            if (tempPhoto!=nil) {
                                [myDelegate saveDataInCacheDirectory:(UIImage *)tempPhoto folderName:myDelegate.appProfilePhotofolderName jid:jid];
                            }
+                           
                            dispatch_async(dispatch_get_main_queue(), ^{
                                
                                completion(tempPhoto);
@@ -846,11 +847,11 @@
     
     
     //PDF transfer
-     [self pdfTransfer:jid];
-     
-    /*//Image transfer
+//     [self pdfTransfer:jid];
+    
+    //Image transfer
     [self imageTransfer:jid];
-     */
+    
      
      
 //    NSError *err;

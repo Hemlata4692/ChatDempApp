@@ -279,7 +279,8 @@
 //            }];
 //        }
 //        NSDictionary *profileDic=[self getProfileDicData:[userListArray objectAtIndex:indexPath.row]];
-        NSDictionary *profileDic=[profileLocalDictData objectForKey:[userListArray objectAtIndex:indexPath.row]];
+        NSLog(@"%@",[userListArray objectAtIndex:indexPath.row]);
+        NSMutableDictionary *profileDic=[[profileLocalDictData objectForKey:[userListArray objectAtIndex:indexPath.row]] mutableCopy];
         
         UIImageView *userImage = (UIImageView*)[cell viewWithTag:2];
         UIButton* profileBtn = (UIButton*)[cell viewWithTag:3];
@@ -348,7 +349,7 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     
-    XMPPUserCoreDataStorageObject *user = [[self fetchedResultsController] objectAtIndexPath:indexPath];
+//    XMPPUserCoreDataStorageObject *user = [[self fetchedResultsController] objectAtIndexPath:indexPath];
     
     ChatScreenViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"ChatScreenViewController"];
     profileObj.friendUserJid=[userListArray objectAtIndex:indexPath.row];
@@ -724,7 +725,15 @@
     [self addBarButton];
     userDetailedList=[xmppUserDetails mutableCopy];
     userListArray=[xmppUserListIds mutableCopy];
-    profileLocalDictData=[self getProfileUsersData];
+    
+//    profileLocalDictData=[self getProfileUsersData];
+                [self getProfileData1:^(NSDictionary *tempProfileData) {
+                    // do something with your BOOL
+                    profileLocalDictData=[tempProfileData mutableCopy];
+                    [self.dasboardTableListing reloadData];
+                }];
+            
+    
     
     [self fetchAllHistoryChat:^(NSMutableArray *tempHistoryData) {
         // do something with your BOOL

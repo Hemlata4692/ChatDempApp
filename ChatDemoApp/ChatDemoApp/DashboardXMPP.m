@@ -182,6 +182,7 @@
     appDelegate.isContactListIsLoaded=NO;
 //    appDelegate.myView=@"Other";
     [myDelegate disconnect];
+    myDelegate.afterAutentication=1;
     if ([myDelegate connect])
     {
         [self fetchedResultsController];
@@ -192,6 +193,7 @@
     
     isrefresh=true;
     [myDelegate disconnect];
+    myDelegate.afterAutentication=1;
     if ([myDelegate connect])
     {
 //        [self fetchedResultsController];
@@ -204,7 +206,7 @@
     dispatch_queue_t queue = dispatch_queue_create("profileDataQueue", DISPATCH_QUEUE_PRIORITY_DEFAULT);
     dispatch_async(queue, ^
                    {
-                       [appDelegate.xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:jid] ignoreStorage:YES];
+//                       [appDelegate.xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:jid] ignoreStorage:YES];
                        NSDictionary *tempDic=[self getProfileDicData:jid];
                        dispatch_async(dispatch_get_main_queue(), ^{
                            
@@ -212,6 +214,22 @@
                        });
                    });
 }
+
+- (void)getProfileData1:(void(^)(NSDictionary *tempProfileData)) completion {
+    
+    //    appDelegate.updateProfileUserId=jid;
+    dispatch_queue_t queue = dispatch_queue_create("profileData1Queue", DISPATCH_QUEUE_PRIORITY_DEFAULT);
+    dispatch_async(queue, ^
+                   {
+                       //                       [appDelegate.xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:jid] ignoreStorage:YES];
+                       NSMutableDictionary *tempDic=[self getProfileUsersData];
+                       dispatch_async(dispatch_get_main_queue(), ^{
+                           
+                           completion(tempDic);
+                       });
+                   });
+}
+
 - (NSDictionary *)getProfileDicData:(NSString *)jid {
     
 //    appDelegate.updateProfileUserId=jid;
@@ -228,17 +246,17 @@
     results = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
     NSDictionary *profileResponse;
     if (results.count>0) {
-        NSManagedObject *devicea = [results objectAtIndex:0];
+        NSManagedObject *tempDevice = [results objectAtIndex:0];
         profileResponse=@{
-                          @"RegisterId" : [devicea valueForKey:@"xmppRegisterId"],
-                          @"Name" : [devicea valueForKey:@"xmppName"],
-                          @"PhoneNumber" : [devicea valueForKey:@"xmppPhoneNumber"],
-                          @"UserStatus" : [devicea valueForKey:@"xmppUserStatus"],
-                          @"Description" : [devicea valueForKey:@"xmppDescription"],
-                          @"Address" : [devicea valueForKey:@"xmppAddress"],
-                          @"EmailAddress" : [devicea valueForKey:@"xmppEmailAddress"],
-                          @"UserBirthDay" : [devicea valueForKey:@"xmppUserBirthDay"],
-                          @"Gender" : [devicea valueForKey:@"xmppGender"],
+                          @"RegisterId" : [self nullHandler:[tempDevice valueForKey:@"xmppRegisterId"]],
+                          @"Name" : [self nullHandler:[tempDevice valueForKey:@"xmppName"]],
+                          @"PhoneNumber" : [self nullHandler:[tempDevice valueForKey:@"xmppPhoneNumber"]],
+                          @"UserStatus" : [self nullHandler:[tempDevice valueForKey:@"xmppUserStatus"]],
+                          @"Description" : [self nullHandler:[tempDevice valueForKey:@"xmppDescription"]],
+                          @"Address" : [self nullHandler:[tempDevice valueForKey:@"xmppAddress"]],
+                          @"EmailAddress" : [self nullHandler:[tempDevice valueForKey:@"xmppEmailAddress"]],
+                          @"UserBirthDay" : [self nullHandler:[tempDevice valueForKey:@"xmppUserBirthDay"]],
+                          @"Gender" : [self nullHandler:[tempDevice valueForKey:@"xmppGender"]],
                           };
         NSLog(@"\n\n");
     }
@@ -269,21 +287,29 @@
     for (NSManagedObject *tempDevice in tempArray) {
         if (![[tempDevice valueForKey:@"xmppRegisterId"] isEqualToString:appDelegate.xmppLogedInUserId]) {
             NSDictionary *profileResponse=@{
-                              @"RegisterId" : [tempDevice valueForKey:@"xmppRegisterId"],
-                              @"Name" : [tempDevice valueForKey:@"xmppName"],
-                              @"PhoneNumber" : [tempDevice valueForKey:@"xmppPhoneNumber"],
-                              @"UserStatus" : [tempDevice valueForKey:@"xmppUserStatus"],
-                              @"Description" : [tempDevice valueForKey:@"xmppDescription"],
-                              @"Address" : [tempDevice valueForKey:@"xmppAddress"],
-                              @"EmailAddress" : [tempDevice valueForKey:@"xmppEmailAddress"],
-                              @"UserBirthDay" : [tempDevice valueForKey:@"xmppUserBirthDay"],
-                              @"Gender" : [tempDevice valueForKey:@"xmppGender"],
+                              @"RegisterId" : [self nullHandler:[tempDevice valueForKey:@"xmppRegisterId"]],
+                              @"Name" : [self nullHandler:[tempDevice valueForKey:@"xmppName"]],
+                              @"PhoneNumber" : [self nullHandler:[tempDevice valueForKey:@"xmppPhoneNumber"]],
+                              @"UserStatus" : [self nullHandler:[tempDevice valueForKey:@"xmppUserStatus"]],
+                              @"Description" : [self nullHandler:[tempDevice valueForKey:@"xmppDescription"]],
+                              @"Address" : [self nullHandler:[tempDevice valueForKey:@"xmppAddress"]],
+                              @"EmailAddress" : [self nullHandler:[tempDevice valueForKey:@"xmppEmailAddress"]],
+                              @"UserBirthDay" : [self nullHandler:[tempDevice valueForKey:@"xmppUserBirthDay"]],
+                              @"Gender" : [self nullHandler:[tempDevice valueForKey:@"xmppGender"]],
                               };
             [tempDict setObject:profileResponse forKey:[tempDevice valueForKey:@"xmppRegisterId"]];
         }
     }
     
     return tempDict;
+}
+
+- (NSString*)nullHandler:(NSString *)nullValue {
+    
+    if (nullValue!=nil && nullValue!=NULL) {
+        return nullValue;
+    }
+    return @"";
 }
 
 - (NSManagedObjectContext *)managedObjectContext {

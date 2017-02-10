@@ -38,7 +38,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(RegisterUserNotAuthenticated) name:@"XMPPDidNotAuthenticatedResponse" object:nil];
     
     //Register post notification
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(UserDidRegister:) name:@"XMPPDidRegisterResponse" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(UserDidRegister1:) name:@"XMPPDidRegisterResponse" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(UserNotRegister:) name:@"XMPPDidNotRegisterResponse" object:nil];
     
     //vCard update post notification
@@ -78,6 +78,9 @@
 #pragma mark - User registration at XMPP server(OpenFire)
 - (void)userRegistrationPassword:(NSString *)userPassword userName:(NSString*)userName profileData:(NSMutableDictionary*)profileData profilePlaceholder:(NSString *)profilePlaceholder profileImageView:(UIImage *)profileImageView {
     
+    myDelegate.afterAutentication=0;
+    myDelegate.afterAutenticationRegistration=0;
+
     [appDelegate disconnect];
     isRegisterAuthenticate=false;
     xmppProfileData=[profileData mutableCopy];
@@ -134,6 +137,7 @@
 
 - (void)createConnection {
 
+    myDelegate.afterAutentication=1;
     [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%@@%@",appDelegate.xmppUniqueId,appDelegate.hostName] key:@"LoginCred"];
     [XMPPUserDefaultManager setValue:appDelegate.defaultPassword key:@"PassCred"];
     [appDelegate connect];
@@ -207,12 +211,14 @@
     [XMPPUserDefaultManager setValue:xmppUserNameCredential key:@"LoginCred"];
     [XMPPUserDefaultManager setValue:password key:@"PassCred"];
     [XMPPUserDefaultManager setValue:@"1" key:@"CountValue"];
+    myDelegate.afterAutentication=1;
     [appDelegate connect];
 }
 #pragma mark - end
 
 #pragma mark - Login user after registration
 - (void)loginRegisteredUser:(NSString *)userName password:(NSString *)passwordValue {
+    
     
     isRegisterAuthenticate=false;
     if ([XMPPUserDefaultManager getValue:@"CountData"] == nil) {
@@ -229,6 +235,7 @@
     [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%@@%@",userName,appDelegate.hostName] key:@"LoginCred"];
     [XMPPUserDefaultManager setValue:password key:@"PassCred"];
     [XMPPUserDefaultManager setValue:@"1" key:@"CountValue"];
+    myDelegate.afterAutentication=1;
     [appDelegate connect];
     //    [self xmppConnect];
 }
@@ -256,7 +263,7 @@
 #pragma mark - end
 
 #pragma mark - Post notification called method
-- (void)UserDidRegister:(NSNotification *)notification {
+- (void)UserDidRegister1:(NSNotification *)notification {
     
     isRegisterAuthenticate=true;
     [self xmppConnect];

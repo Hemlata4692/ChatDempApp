@@ -71,8 +71,6 @@
 }
 
 - (void)userList {
-
-    
     
     [self xmppUserConnect];
 }
@@ -552,7 +550,7 @@
 #pragma mark - IBActions
 - (IBAction)friendProfileAction:(UIButton *)sender {
     
-    int tagValue=[sender tag];
+    int tagValue=(int)[sender tag];
     UserProfileViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"UserProfileViewController"];
     profileObj.friendId=[userListArray objectAtIndex:tagValue];
     [self.navigationController pushViewController:profileObj animated:YES];

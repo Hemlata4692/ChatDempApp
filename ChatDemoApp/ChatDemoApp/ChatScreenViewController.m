@@ -53,6 +53,7 @@
     [super viewDidLoad];
     self.navigationItem.title=@"Personal Chat";
     userProfileImageView = [[UIImageView alloc] init];
+    [self addBackBarButton];
     [self setUserData];
     
 //    UIImage *im=[UIImage imageNamed:@"arrow_down@3x.png"];
@@ -60,6 +61,23 @@
     
     //file transfer pdf file
     [self createCopyOfDatabaseIfNeeded];
+}
+
+- (void)addBackBarButton {
+    
+    UIBarButtonItem *backBarButton;
+    CGRect framing = CGRectMake(0, 0, 25, 25);
+    
+    UIButton *back = [[UIButton alloc] initWithFrame:framing];
+    [back setImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
+    backBarButton =[[UIBarButtonItem alloc] initWithCustomView:back];
+    [back addTarget:self action:@selector(backAction) forControlEvents:UIControlEventTouchUpInside];
+    self.navigationItem.leftBarButtonItem=backBarButton;
+}
+#pragma mark - end
+- (void)backAction {
+    
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 // Function to Create a writable copy of the bundled default database in the application Documents directory.
@@ -205,7 +223,6 @@
 
 -(void)setUserData {
    
-    
     messageTextView.text = @"";
     [messageTextView setPlaceholder:@"Type a message here..."];
     [messageTextView setFont:[UIFont systemFontOfSize:14.0]];

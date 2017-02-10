@@ -69,7 +69,14 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 
 @synthesize xmppUserDetailedList, xmppUserListArray;
 @synthesize xmppLogedInUserId, isContactListIsLoaded;
-@synthesize folderName, appMediafolderName, appProfilePhotofolderName;
+//App folders
+@synthesize folderName;
+@synthesize appMediafolderName;
+@synthesize appProfilePhotofolderName;
+@synthesize appSentPhotofolderName;
+@synthesize appReceivePhotofolderName;
+@synthesize appDocumentfolderName;
+//end
 @synthesize imageCompressionPercent;
 
 @synthesize afterAutentication,afterAutenticationRegistration;
@@ -83,6 +90,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     folderName=[[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleNameKey];
     appMediafolderName=[NSString stringWithFormat:@"%@/%@_Media",folderName,folderName];
     appProfilePhotofolderName=[NSString stringWithFormat:@"%@/%@_ProfilePhotos",appMediafolderName,folderName];
+    appSentPhotofolderName=[NSString stringWithFormat:@"%@/%@_Photos/%@_Sent",appMediafolderName,folderName,folderName];
+    appReceivePhotofolderName=[NSString stringWithFormat:@"%@/%@_Photos/%@_Receive",appMediafolderName,folderName,folderName];
+    appDocumentfolderName=[NSString stringWithFormat:@"%@/%@_Documents",folderName,folderName];
     [self createCacheDirectory];
     //end
     
@@ -779,7 +789,8 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     NSData *pictureData;
     if (nil!=self.userProfileImageDataValue) {
         
-        pictureData = UIImageJPEGRepresentation([UIImage imageWithData:self.userProfileImageDataValue], imageCompressionPercent);
+//        pictureData = UIImageJPEGRepresentation([UIImage imageWithData:self.userProfileImageDataValue], imageCompressionPercent);
+        pictureData=[self reducedImageSize:[UIImage imageWithData:self.userProfileImageDataValue]];
         [newvCardTemp setPhoto:pictureData];
     }
 
@@ -824,6 +835,96 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 //    [[self xmppStream] sendElement:presence];
 }
 
+
+- (NSData*)reducedImageSize:(UIImage *)selectedImage {
+    
+//    UIImage *cropped =[cropperView getCroppedImage];
+//    //	[delegate imageCropper:self didFinishCroppingWithImage:cropped];
+//    if(self.resultImgView)
+//        [self.resultImgView removeFromSuperview];
+//    
+//    self.resultImgView = [[[UIImageView alloc]  initWithFrame:CGRectMake(20, 80, 250, 250)] autorelease];
+//    self.resultImgView.image = cropped;
+//    self.resultImgView.backgroundColor = [UIColor darkGrayColor];
+//    self.resultImgView.contentMode = UIViewContentModeScaleAspectFit;
+//    [self.resultImgView.layer setMasksToBounds:YES];
+//    self.resultImgView.layer.cornerRadius = self.resultImgView.frame.size.width/2;
+//    self.resultImgView.clipsToBounds = YES;
+    
+    
+    
+    //    [self.view addSubview:self.resultImgView];
+    
+    NSData *imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(selectedImage, 1)];
+    
+//    int imageSize = imageData.length;
+//    NSLog(@"SIZE OF IMAGE: %.2f", (float)imageSize/1024/1024);
+    
+    selectedImage = [self imageWithRoundedCornersSize:0 usingImage:selectedImage];
+    
+    imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(selectedImage, 1)];
+    
+//    imageSize = imageData.length;
+//    NSLog(@"SIZE OF IMAGE: %.2f Mb", (float)imageSize/1024/1024);
+    CGSize mySize;
+    mySize.height = 512;
+    mySize.width = 512;
+    
+    CGFloat oldWidth = selectedImage.size.width;
+    CGFloat oldHeight = selectedImage.size.height;
+    
+    CGFloat scaleFactor = (oldWidth > oldHeight) ? mySize.width / oldWidth : mySize.height / oldHeight;
+    
+    
+    mySize.height = oldHeight * scaleFactor;
+    mySize.width = oldWidth * scaleFactor;
+    
+    
+    selectedImage = [self imageWithImage:selectedImage scaledToSize:mySize];
+    
+    
+    NSData *pngData = UIImageJPEGRepresentation(selectedImage, .1);
+//    imageSize = pngData.length;
+//    NSLog(@"SIZE OF IMAGE: %.2f Mb", (float)imageSize/1024/1024);
+//    UIImage *im=[UIImage imageWithData:pngData];
+    return pngData;
+}
+
+- (UIImage *)imageWithRoundedCornersSize:(float)cornerRadius usingImage:(UIImage *)original
+{
+    CGRect frame = CGRectMake(0, 0, original.size.width, original.size.height);
+    
+    // Begin a new image that will be the new image with the rounded corners
+    // (here with the size of an UIImageView)
+    UIGraphicsBeginImageContextWithOptions(original.size, NO, 1.0);
+    
+    // Add a clip before drawing anything, in the shape of an rounded rect
+    [[UIBezierPath bezierPathWithRoundedRect:frame
+                                cornerRadius:cornerRadius] addClip];
+    // Draw your image
+    [original drawInRect:frame];
+    
+    // Get the image, here setting the UIImageView image
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    
+    // Lets forget about that we were drawing
+    UIGraphicsEndImageContext();
+    
+    return image;
+}
+
+-(UIImage *)imageWithImage:(UIImage *)image scaledToSize:(CGSize)newSize {
+    //UIGraphicsBeginImageContext(newSize);
+    // In next line, pass 0.0 to use the current device's pixel scaling factor (and thus account for Retina resolution).
+    // Pass 1.0 to force exact pixel size.
+    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
+    [image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+}
+
+
 - (NSString *)setProfileDataValue:(NSMutableDictionary *)profileData key:(NSString *)key {
 
     NSString *value=@"";
@@ -847,8 +948,8 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     NSData *pictureData;
     if (nil!=self.userProfileImageDataValue) {
         
-        pictureData = UIImageJPEGRepresentation([UIImage imageWithData:self.userProfileImageDataValue], imageCompressionPercent);
-        
+//        pictureData = UIImageJPEGRepresentation([UIImage imageWithData:self.userProfileImageDataValue], imageCompressionPercent);
+        pictureData = [self reducedImageSize:[UIImage imageWithData:self.userProfileImageDataValue]];
         [newvCardTemp setPhoto:pictureData];
     }
     NSLog(@"SIZE OF IMAGE: %.2f Mb", (float)pictureData.length/1024/1024);
@@ -1177,15 +1278,18 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [self createCacheDirectory:folderName];
     [self createCacheDirectory:appMediafolderName];
     [self createCacheDirectory:appProfilePhotofolderName];
+    [self createCacheDirectory:appSentPhotofolderName];
+    [self createCacheDirectory:appReceivePhotofolderName];
+    [self createCacheDirectory:appDocumentfolderName];
 }
 
-- (void)createCacheDirectory:(NSString *)imageFolderName {
+- (void)createCacheDirectory:(NSString *)FolderName {
     
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSString *imagesPath = [[self applicationCacheDirectory] stringByAppendingPathComponent:imageFolderName];
-    if (![fileManager fileExistsAtPath:imagesPath]) {
+    NSString *folderPath = [[self applicationCacheDirectory] stringByAppendingPathComponent:FolderName];
+    if (![fileManager fileExistsAtPath:folderPath]) {
         
-        [fileManager createDirectoryAtPath:imagesPath withIntermediateDirectories:YES attributes:nil error:nil];
+        [fileManager createDirectoryAtPath:folderPath withIntermediateDirectories:YES attributes:nil error:nil];
     }
 }
 

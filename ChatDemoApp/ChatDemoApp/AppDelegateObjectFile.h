@@ -115,6 +115,10 @@ XMPPIncomingFileTransferDelegate, XMPPOutgoingFileTransferDelegate>
 @property(nonatomic,strong) NSString *folderName;
 @property(nonatomic,strong) NSString *appMediafolderName;
 @property(nonatomic,strong) NSString *appProfilePhotofolderName;
+@property(nonatomic,strong) NSString *appSentPhotofolderName;
+@property(nonatomic,strong) NSString *appReceivePhotofolderName;
+@property(nonatomic,strong) NSString *appDocumentfolderName;
+
 @property(nonatomic,assign) float imageCompressionPercent;
 - (void)createCacheDirectory:(NSString *)imageFolderName;
 - (void)saveDataInCacheDirectory:(UIImage *)tempImage folderName:(NSString *)tempFolderName jid:(NSString *)jid;

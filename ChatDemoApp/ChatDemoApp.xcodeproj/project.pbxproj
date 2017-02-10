@@ -38,6 +38,7 @@
 		B77DFFF51E4C32C500921126 /* XMPPOutgoingFileTransfer.m in Sources */ = {isa = PBXBuildFile; fileRef = B77DFFF21E4C32C500921126 /* XMPPOutgoingFileTransfer.m */; };
 		B77DFFF71E4C433C00921126 /* arrow_down@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = B77DFFF61E4C433C00921126 /* arrow_down@3x.png */; };
 		B77DFFF91E4C72D200921126 /* a.pdf in Resources */ = {isa = PBXBuildFile; fileRef = B77DFFF81E4C72D200921126 /* a.pdf */; };
+		B77EE6391E4DE73200A38ADD /* CustomFilterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B77EE6381E4DE73200A38ADD /* CustomFilterViewController.m */; };
 		B780E9F71E2F6E1A00437B4E /* ErrorCode.m in Sources */ = {isa = PBXBuildFile; fileRef = B780E9F61E2F6E1A00437B4E /* ErrorCode.m */; };
 		B780E9F91E2F9FC200437B4E /* ReadMe.rtf in Resources */ = {isa = PBXBuildFile; fileRef = B780E9F81E2F9FC200437B4E /* ReadMe.rtf */; };
 		B79353D61E28B28800E7EEB8 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B79353D51E28B28800E7EEB8 /* Security.framework */; };
@@ -53,6 +54,8 @@
 /* Begin PBXFileReference section */
 		B70AE6681E2F1EC600554038 /* AppDelegateObjectFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegateObjectFile.h; sourceTree = "<group>"; };
 		B70AE6691E2F1EC600554038 /* AppDelegateObjectFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegateObjectFile.m; sourceTree = "<group>"; };
+		B70F93281E4DB51C0064EF29 /* AddressBookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBookUI.framework; path = System/Library/Frameworks/AddressBookUI.framework; sourceTree = SDKROOT; };
+		B70F932A1E4DB5290064EF29 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		B745F8241E234D54001119BD /* ChatDemoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChatDemoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B745F8281E234D55001119BD /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		B745F82A1E234D55001119BD /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -106,6 +109,8 @@
 		B77DFFF21E4C32C500921126 /* XMPPOutgoingFileTransfer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMPPOutgoingFileTransfer.m; sourceTree = "<group>"; };
 		B77DFFF61E4C433C00921126 /* arrow_down@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "arrow_down@3x.png"; sourceTree = "<group>"; };
 		B77DFFF81E4C72D200921126 /* a.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = a.pdf; sourceTree = "<group>"; };
+		B77EE6371E4DE73200A38ADD /* CustomFilterViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomFilterViewController.h; sourceTree = "<group>"; };
+		B77EE6381E4DE73200A38ADD /* CustomFilterViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomFilterViewController.m; sourceTree = "<group>"; };
 		B780E9F51E2F6E1A00437B4E /* ErrorCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ErrorCode.h; sourceTree = "<group>"; };
 		B780E9F61E2F6E1A00437B4E /* ErrorCode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ErrorCode.m; sourceTree = "<group>"; };
 		B780E9F81E2F9FC200437B4E /* ReadMe.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = ReadMe.rtf; sourceTree = "<group>"; };
@@ -155,6 +160,8 @@
 		91178C8E9192B3153C7C164B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B70F932A1E4DB5290064EF29 /* AddressBook.framework */,
+				B70F93281E4DB51C0064EF29 /* AddressBookUI.framework */,
 				B75BC5771E3F620500E5F780 /* CoreData.framework */,
 				B79353D91E28B29500E7EEB8 /* SystemConfiguration.framework */,
 				B79353D71E28B28E00E7EEB8 /* CFNetwork.framework */,
@@ -366,6 +373,7 @@
 		B77DFFDC1E4C2DFD00921126 /* ChatScreenView */ = {
 			isa = PBXGroup;
 			children = (
+				B77EE6361E4DE70900A38ADD /* AddAttacment */,
 				B77DFFDD1E4C2E2100921126 /* ChatScreenViewController.h */,
 				B77DFFDE1E4C2E2100921126 /* ChatScreenViewController.m */,
 				B77DFFE01E4C2E3100921126 /* XMPPChatView.h */,
@@ -389,6 +397,15 @@
 				B77DFFEB1E4C32B500921126 /* XMPPFileTransfer.m */,
 			);
 			name = FileTransfer;
+			sourceTree = "<group>";
+		};
+		B77EE6361E4DE70900A38ADD /* AddAttacment */ = {
+			isa = PBXGroup;
+			children = (
+				B77EE6371E4DE73200A38ADD /* CustomFilterViewController.h */,
+				B77EE6381E4DE73200A38ADD /* CustomFilterViewController.m */,
+			);
+			name = AddAttacment;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -529,6 +546,7 @@
 				B745F82F1E234D55001119BD /* ViewController.m in Sources */,
 				B77DFFEC1E4C32B500921126 /* XMPPFileTransfer.m in Sources */,
 				B79CA25E1E30BCFC007CDB23 /* XMPPUserDefaultManager.m in Sources */,
+				B77EE6391E4DE73200A38ADD /* CustomFilterViewController.m in Sources */,
 				B75792581E42E22300AC48D0 /* UserProfileViewController.m in Sources */,
 				B75126E01E30745000495348 /* LoginXMPP.m in Sources */,
 				B77DFFF51E4C32C500921126 /* XMPPOutgoingFileTransfer.m in Sources */,

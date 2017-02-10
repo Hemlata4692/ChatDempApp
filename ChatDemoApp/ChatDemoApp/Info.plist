@@ -22,6 +22,8 @@
 	<string>192.168.18.171</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSContactsUsageDescription</key>
+	<string>We need to access your contacts in order to attach them</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We need to access your photos in order to attach them</string>
 	<key>PasswordRequired</key>

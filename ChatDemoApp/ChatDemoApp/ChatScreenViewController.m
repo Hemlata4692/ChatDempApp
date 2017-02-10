@@ -14,8 +14,9 @@
 #import "XMPP.h"
 #import "NSData+XMPP.h"
 #import "DataAwareTurnSocket.h"
+#import "CustomFilterViewController.h"
 
-@interface ChatScreenViewController (){
+@interface ChatScreenViewController ()<CustomFilterDelegate>{
     CGFloat messageHeight, messageYValue;
     NSMutableArray *userData;
     NSString *otherUserId;
@@ -65,7 +66,7 @@
 
 - (void)addBackBarButton {
     
-    UIBarButtonItem *backBarButton;
+    UIBarButtonItem *backBarButton,*attachmentBarButton;
     CGRect framing = CGRectMake(0, 0, 25, 25);
     
     UIButton *back = [[UIButton alloc] initWithFrame:framing];
@@ -73,11 +74,38 @@
     backBarButton =[[UIBarButtonItem alloc] initWithCustomView:back];
     [back addTarget:self action:@selector(backAction) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem=backBarButton;
+    
+    UIButton *attachment = [[UIButton alloc] initWithFrame:framing];
+    [attachment setImage:[UIImage imageNamed:@"attachment"] forState:UIControlStateNormal];
+    attachmentBarButton =[[UIBarButtonItem alloc] initWithCustomView:attachment];
+    [attachment addTarget:self action:@selector(attachmentAction) forControlEvents:UIControlEventTouchUpInside];
+    
+    self.navigationItem.rightBarButtonItem=attachmentBarButton;
 }
 #pragma mark - end
 - (void)backAction {
     
     [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (void)attachmentAction {
+    
+    UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    CustomFilterViewController *filterViewObj =[storyboard instantiateViewControllerWithIdentifier:@"CustomFilterViewController"];
+    filterViewObj.delegate=self;
+    NSMutableDictionary *tempAttachment=[NSMutableDictionary new];
+    NSMutableArray *tempAttachmentArra=[NSMutableArray new];
+    [tempAttachment setObject:[NSNumber numberWithInt:1] forKey:@"Documents"];
+    [tempAttachmentArra addObject:@"Documents"];
+    [tempAttachment setObject:[NSNumber numberWithInt:2] forKey:@"Camera"];
+    [tempAttachmentArra addObject:@"Camera"];
+    [tempAttachment setObject:[NSNumber numberWithInt:3] forKey:@"Gallery"];
+    [tempAttachmentArra addObject:@"Gallery"];
+    filterViewObj.filterDict=[tempAttachment mutableCopy];
+    filterViewObj.filterArray=[tempAttachmentArra mutableCopy];
+    
+    [filterViewObj setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+    [self presentViewController:filterViewObj animated:NO completion:nil];
 }
 
 // Function to Create a writable copy of the bundled default database in the application Documents directory.
@@ -834,9 +862,9 @@
     
     
     
- 
+ ///*
     XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",friendUserJid,[[myDelegate.xmppStream myJID] resource]]];
-    
+  
     if (!_fileTransfer) {
         _fileTransfer = [[XMPPOutgoingFileTransfer alloc]
                          initWithDispatchQueue:dispatch_get_main_queue()];
@@ -844,6 +872,7 @@
         [_fileTransfer activate:myDelegate.xmppStream];
         [_fileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
     }
+   // */
     
 //    NSString *recipient = _inputRecipient.text;
 //    NSString *filename = @"a.jpeg";
@@ -880,7 +909,11 @@
 //        NSLog(@"You messed something up: %@", err);
 //    }
     
+
+    
 }
+
+
 
 - (void)pdfTransfer:(XMPPJID *)jid {
     
@@ -938,5 +971,18 @@
     [alert show];
 }
 
-
+#pragma mark - Custom filter delegate
+- (void)customFilterDelegateAction:(int)status{
+    
+    if (status==1) {
+        NSLog(@"1");
+    }
+    else if (status==2) {
+        NSLog(@"2");
+    }
+    else if (status==3) {
+        NSLog(@"3");
+    }
+}
+#pragma mark - end
 @end

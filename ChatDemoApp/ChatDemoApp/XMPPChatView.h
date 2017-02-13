@@ -10,4 +10,7 @@
 
 @interface XMPPChatView : UIViewController
 
+
+//Set/Get profile images
+- (void)getChatProfilePhotoFriendJid:(NSString *)friendJid profileImageView:(UIImage *)profileImageView friendProfileImageView:(UIImage *)friendProfileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(NSArray *imageArray)) completion;
 @end

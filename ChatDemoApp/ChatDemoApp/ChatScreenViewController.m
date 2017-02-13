@@ -22,15 +22,18 @@
     NSString *otherUserId;
     int btnTag;
     
-    NSString *loginUserId, *friendUserId;
-    UIImageView *loginuserPhoto, *friendUserPhoto;
+//    NSString *loginUserId, *friendUserId;
+    UIImage *loginuserPhoto, *friendUserPhoto;
     NSData *tempImageData1;
 }
 
+//@property (strong, nonatomic) UIImageView *loginuserPhoto;
+//@property (strong, nonatomic) UIImageView *friendUserPhoto;
 @property (strong, nonatomic) IBOutlet UITableView *chatTableView;
 @property (strong, nonatomic) IBOutlet UIView *messageView;
 @property (strong, nonatomic) IBOutlet UIPlaceHolderTextView *messageTextView;
 @property (strong, nonatomic) IBOutlet UIButton *sendButtonOutlet;
+
 
 @property (strong, nonatomic) IBOutlet UIImageView *sendImage;
 
@@ -55,15 +58,110 @@
     self.navigationItem.title=@"Personal Chat";
     userProfileImageView = [[UIImageView alloc] init];
     [self addBackBarButton];
-    [self setUserData];
+    
     
 //    UIImage *im=[UIImage imageNamed:@"arrow_down@3x.png"];
 //    [myDelegate saveDataInCacheDirectory:(UIImage *)im folderName:myDelegate.appProfilePhotofolderName jid:friendUserJid];
     
     //file transfer pdf file
-    [self createCopyOfDatabaseIfNeeded];
+//    [self createCopyOfDatabaseIfNeeded];
 }
 
+-(void)viewWillAppear:(BOOL)animated
+{
+    //    tempImageData=[myDelegate listionDataFromCacheDirectoryFolderName:myDelegate.appProfilePhotofolderName jid:myDelegate.xmppLogedInUserId];
+//    tempImageData1=[self resizeImage:[UIImage imageWithData:[myDelegate listionDataFromCacheDirectoryFolderName:myDelegate.appProfilePhotofolderName jid:myDelegate.xmppLogedInUserId]]];
+//    self.sendImage.image=[UIImage imageWithData:tempImageData1];
+    //    NSLog(@"SIZE OF IMAGE: %.2f Mb", (float)tempImageData.length/1024/1024);
+    //
+    //    tempImageData = UIImageJPEGRepresentation([UIImage imageWithData:tempImageData], 0);
+//    NSLog(@"SIZE OF IMAGE: %.2f Mb", (float)tempImageData1.length/1024/1024);
+    [super viewWillAppear:YES];
+    [self viewInitialized];
+    
+//    self.tabBarController.tabBar.hidden=NO;
+//    [[self navigationController] setNavigationBarHidden:NO];
+//    [[UIApplication sharedApplication] setStatusBarHidden:NO];
+    [myDelegate showIndicator];
+    [self performSelector:@selector(getHistoryData) withObject:nil afterDelay:.1];
+}
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:YES];
+    //    if ([lastView isEqualToString:@"ChatViewController"] || [lastView isEqualToString:@"MeTooUserProfile"]) {
+    //        self.navigationItem.title = [userXmlDetail attributeStringValueForName:@"ToName"];
+    //        myDelegate.chatUser = [userXmlDetail attributeStringValueForName:@"to"];
+    //    }
+    //    else {
+    //        NSArray* fromUser = [userDetail.jidStr componentsSeparatedByString:@"@52.74.174.129"];
+    //        self.navigationItem.title = [fromUser objectAtIndex:0];
+    //        myDelegate.chatUser = [[userDetail.jidStr componentsSeparatedByString:@"/"] objectAtIndex:0];
+    //    }
+    //    [userData removeAllObjects];
+    //    NSString *keyName = myDelegate.chatUser;
+    //    if ([[UserDefaultManager getValue:@"CountData"] objectForKey:keyName] != nil) {
+    //        int tempCount = 0;
+    //        int badgeCount = [[[UserDefaultManager getValue:@"CountData"] objectForKey:keyName] intValue];
+    //        if (badgeCount > 0) {
+    //            [myDelegate addBadgeIcon:[NSString stringWithFormat:@"%d",[[UserDefaultManager getValue:@"BadgeCount"] intValue] - badgeCount ]];
+    //            [UserDefaultManager setValue:[NSString stringWithFormat:@"%d",[[UserDefaultManager getValue:@"BadgeCount"] intValue] - badgeCount ] key:@"BadgeCount"];
+    //        }
+    //        NSMutableDictionary *tempDict = [[UserDefaultManager getValue:@"CountData"] mutableCopy];
+    //        [tempDict setObject:[NSString stringWithFormat:@"%d",tempCount] forKey:keyName];
+    //        [UserDefaultManager setValue:tempDict key:@"CountData"];
+    //    }
+    //    [self performSelector:@selector(getHistoryData) withObject:nil afterDelay:.1];
+}
+
+
+- (void)viewInitialized {
+    
+    loginuserPhoto=[UIImage imageNamed:@"images.png"];
+    friendUserPhoto=[UIImage imageNamed:@"images.png"];
+    [self setProfileImagesUsingCompletionBlock];
+    messageTextView.text = @"";
+    [messageTextView setPlaceholder:@"Type a message here..."];
+    [messageTextView setFont:[UIFont systemFontOfSize:14.0]];
+    messageTextView.backgroundColor = [UIColor whiteColor];
+    messageTextView.contentInset = UIEdgeInsetsMake(-5, 5, 0, 0);
+    messageTextView.alwaysBounceHorizontal = NO;
+    messageTextView.bounces = NO;
+    userData = [NSMutableArray new];
+    messageView.translatesAutoresizingMaskIntoConstraints = YES;
+    messageTextView.translatesAutoresizingMaskIntoConstraints = YES;
+    messageView.backgroundColor = [UIColor lightGrayColor];
+    messageHeight = 40;
+    messageView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height- messageHeight - 10 - 64, self.view.bounds.size.width, messageHeight + 10);
+    messageTextView.frame = CGRectMake(8, 5, messageView.frame.size.width - 8 - 64, messageHeight - 8);
+    messageYValue = messageView.frame.origin.y;
+    if ([messageTextView.text isEqualToString:@""] || messageTextView.text.length == 0) {
+        sendButtonOutlet.enabled = NO;
+    }
+    else{
+        sendButtonOutlet.enabled = YES;
+    }
+    //    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(historUpdated:) name:@"UserHistory" object:nil];
+    chatTableView.translatesAutoresizingMaskIntoConstraints = YES;
+    chatTableView.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height - (messageHeight +10-64));
+}
+
+- (void)setProfileImagesUsingCompletionBlock {
+    
+    [self getChatProfilePhotoFriendJid:friendUserJid profileImageView:loginuserPhoto friendProfileImageView:friendUserPhoto placeholderImage:@"images.png" result:^(NSArray *tempImageArr) {
+        
+        loginuserPhoto=[tempImageArr objectAtIndex:0];
+        friendUserPhoto=[tempImageArr objectAtIndex:1];
+    }];
+}
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - Navigation bar button and action
 - (void)addBackBarButton {
     
     UIBarButtonItem *backBarButton,*attachmentBarButton;
@@ -82,7 +180,7 @@
     
     self.navigationItem.rightBarButtonItem=attachmentBarButton;
 }
-#pragma mark - end
+
 - (void)backAction {
     
     [self.navigationController popViewControllerAnimated:YES];
@@ -108,202 +206,126 @@
     [self presentViewController:filterViewObj animated:NO completion:nil];
 }
 
-// Function to Create a writable copy of the bundled default database in the application Documents directory.
-- (void)createCopyOfDatabaseIfNeeded {
-    // First, test for existence.
-    BOOL success;
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSError *error;
-    NSString *appDBPath = [self documentPath];
-    
-    //    NSString *filePath = [myDelegate applicationCacheDirectory];
-        NSString *filePath = [[myDelegate applicationCacheDirectory] stringByAppendingPathComponent:myDelegate.appProfilePhotofolderName];
-        NSString *fileAtPath = [filePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_%@.pdf",myDelegate.folderName,[[friendUserJid componentsSeparatedByString:@"@"] objectAtIndex:0]]];
-    //    [imagesPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_%@.jpeg",folderName,[[jid componentsSeparatedByString:@"@"] objectAtIndex:0]]]
-    
-    
-    success = [fileManager fileExistsAtPath:fileAtPath];
-    if (success) {
-        return;
-    }
-    
-    NSBundle *mainBundle = [NSBundle mainBundle];
-    NSString *filePath1 = [mainBundle pathForResource:@"a" ofType:@"pdf"];
-    success = [fileManager copyItemAtPath:filePath1 toPath:fileAtPath error:&error];
-    NSAssert(success, @"Failed to create writable database file with message '%@'.", [error localizedDescription]);
-}
 
-- (NSString *)documentPath {
-    
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    // Database filename can have extension db/sqlite.
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    return [documentsDirectory stringByAppendingPathComponent:@"a.pdf"];
-}
+//// Function to Create a writable copy of the bundled default database in the application Documents directory.
+//- (void)createCopyOfDatabaseIfNeeded {
+//    // First, test for existence.
+//    BOOL success;
+//    NSFileManager *fileManager = [NSFileManager defaultManager];
+//    NSError *error;
+//    NSString *appDBPath = [self documentPath];
+//    
+//    //    NSString *filePath = [myDelegate applicationCacheDirectory];
+//        NSString *filePath = [[myDelegate applicationCacheDirectory] stringByAppendingPathComponent:myDelegate.appProfilePhotofolderName];
+//        NSString *fileAtPath = [filePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_%@.pdf",myDelegate.folderName,[[friendUserJid componentsSeparatedByString:@"@"] objectAtIndex:0]]];
+//    //    [imagesPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_%@.jpeg",folderName,[[jid componentsSeparatedByString:@"@"] objectAtIndex:0]]]
+//    
+//    
+//    success = [fileManager fileExistsAtPath:fileAtPath];
+//    if (success) {
+//        return;
+//    }
+//    
+//    NSBundle *mainBundle = [NSBundle mainBundle];
+//    NSString *filePath1 = [mainBundle pathForResource:@"a" ofType:@"pdf"];
+//    success = [fileManager copyItemAtPath:filePath1 toPath:fileAtPath error:&error];
+//    NSAssert(success, @"Failed to create writable database file with message '%@'.", [error localizedDescription]);
+//}
+
+//- (NSString *)documentPath {
+//    
+//    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+//    // Database filename can have extension db/sqlite.
+//    NSString *documentsDirectory = [paths objectAtIndex:0];
+//    return [documentsDirectory stringByAppendingPathComponent:@"a.pdf"];
+//}
 
 
-- (NSString *)documentsDirectory
-{
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
-                                                         NSUserDomainMask,
-                                                         YES);
-    return [paths lastObject];
-}
+//- (NSString *)documentsDirectory
+//{
+//    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
+//                                                         NSUserDomainMask,
+//                                                         YES);
+//    return [paths lastObject];
+//}
 
 //UIImage *tempPhoto=[UIImage imageWithData:[[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:jid]]];
 //if (tempPhoto!=nil) {
 //    [myDelegate saveDataInCacheDirectory:(UIImage *)tempPhoto folderName:myDelegate.appProfilePhotofolderName jid:jid];
 
-- (void)setXmppData {
-
-    
-}
-
--(NSData *)resizeImage:(UIImage *)image
-{
-    float actualHeight = image.size.height;
-    float actualWidth = image.size.width;
-    float maxHeight = 300.0;
-    float maxWidth = 400.0;
-    float imgRatio = actualWidth/actualHeight;
-    float maxRatio = maxWidth/maxHeight;
-    float compressionQuality = 0.5;//50 percent compression
-    
-    if (actualHeight > maxHeight || actualWidth > maxWidth)
-    {
-        if(imgRatio < maxRatio)
-        {
-            //adjust width according to maxHeight
-            imgRatio = maxHeight / actualHeight;
-            actualWidth = imgRatio * actualWidth;
-            actualHeight = maxHeight;
-        }
-        else if(imgRatio > maxRatio)
-        {
-            //adjust height according to maxWidth
-            imgRatio = maxWidth / actualWidth;
-            actualHeight = imgRatio * actualHeight;
-            actualWidth = maxWidth;
-        }
-        else
-        {
-            actualHeight = maxHeight;
-            actualWidth = maxWidth;
-        }
-    }
-    
-    CGRect rect = CGRectMake(0.0, 0.0, actualWidth, actualHeight);
-    UIGraphicsBeginImageContext(rect.size);
-    [image drawInRect:rect];
-    UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
-    NSData *imageData = UIImageJPEGRepresentation(img, compressionQuality);
-    UIGraphicsEndImageContext();
-    
-    return imageData;
-    
-}
-
--(void)viewWillAppear:(BOOL)animated
-{
-//    tempImageData=[myDelegate listionDataFromCacheDirectoryFolderName:myDelegate.appProfilePhotofolderName jid:myDelegate.xmppLogedInUserId];
-    tempImageData1=[self resizeImage:[UIImage imageWithData:[myDelegate listionDataFromCacheDirectoryFolderName:myDelegate.appProfilePhotofolderName jid:myDelegate.xmppLogedInUserId]]];
-    self.sendImage.image=[UIImage imageWithData:tempImageData1];
-//    NSLog(@"SIZE OF IMAGE: %.2f Mb", (float)tempImageData.length/1024/1024);
+//- (void)setXmppData {
 //
-//    tempImageData = UIImageJPEGRepresentation([UIImage imageWithData:tempImageData], 0);
-     NSLog(@"SIZE OF IMAGE: %.2f Mb", (float)tempImageData1.length/1024/1024);
-    [super viewWillAppear:YES];
-    self.tabBarController.tabBar.hidden=NO;
-    [[self navigationController] setNavigationBarHidden:NO];
-    [[UIApplication sharedApplication] setStatusBarHidden:NO];
-    [myDelegate showIndicator];
-    [self performSelector:@selector(getHistoryData) withObject:nil afterDelay:.1];
-}
+//    
+//}
 
--(void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:YES];
-//    if ([lastView isEqualToString:@"ChatViewController"] || [lastView isEqualToString:@"MeTooUserProfile"]) {
-//        self.navigationItem.title = [userXmlDetail attributeStringValueForName:@"ToName"];
-//        myDelegate.chatUser = [userXmlDetail attributeStringValueForName:@"to"];
-//    }
-//    else {
-//        NSArray* fromUser = [userDetail.jidStr componentsSeparatedByString:@"@52.74.174.129"];
-//        self.navigationItem.title = [fromUser objectAtIndex:0];
-//        myDelegate.chatUser = [[userDetail.jidStr componentsSeparatedByString:@"/"] objectAtIndex:0];
-//    }
-//    [userData removeAllObjects];
-//    NSString *keyName = myDelegate.chatUser;
-//    if ([[UserDefaultManager getValue:@"CountData"] objectForKey:keyName] != nil) {
-//        int tempCount = 0;
-//        int badgeCount = [[[UserDefaultManager getValue:@"CountData"] objectForKey:keyName] intValue];
-//        if (badgeCount > 0) {
-//            [myDelegate addBadgeIcon:[NSString stringWithFormat:@"%d",[[UserDefaultManager getValue:@"BadgeCount"] intValue] - badgeCount ]];
-//            [UserDefaultManager setValue:[NSString stringWithFormat:@"%d",[[UserDefaultManager getValue:@"BadgeCount"] intValue] - badgeCount ] key:@"BadgeCount"];
+//-(NSData *)resizeImage:(UIImage *)image
+//{
+//    float actualHeight = image.size.height;
+//    float actualWidth = image.size.width;
+//    float maxHeight = 300.0;
+//    float maxWidth = 400.0;
+//    float imgRatio = actualWidth/actualHeight;
+//    float maxRatio = maxWidth/maxHeight;
+//    float compressionQuality = 0.5;//50 percent compression
+//    
+//    if (actualHeight > maxHeight || actualWidth > maxWidth)
+//    {
+//        if(imgRatio < maxRatio)
+//        {
+//            //adjust width according to maxHeight
+//            imgRatio = maxHeight / actualHeight;
+//            actualWidth = imgRatio * actualWidth;
+//            actualHeight = maxHeight;
 //        }
-//        NSMutableDictionary *tempDict = [[UserDefaultManager getValue:@"CountData"] mutableCopy];
-//        [tempDict setObject:[NSString stringWithFormat:@"%d",tempCount] forKey:keyName];
-//        [UserDefaultManager setValue:tempDict key:@"CountData"];
+//        else if(imgRatio > maxRatio)
+//        {
+//            //adjust height according to maxWidth
+//            imgRatio = maxWidth / actualWidth;
+//            actualHeight = imgRatio * actualHeight;
+//            actualWidth = maxWidth;
+//        }
+//        else
+//        {
+//            actualHeight = maxHeight;
+//            actualWidth = maxWidth;
+//        }
 //    }
-//    [self performSelector:@selector(getHistoryData) withObject:nil afterDelay:.1];
-}
+//    
+//    CGRect rect = CGRectMake(0.0, 0.0, actualWidth, actualHeight);
+//    UIGraphicsBeginImageContext(rect.size);
+//    [image drawInRect:rect];
+//    UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
+//    NSData *imageData = UIImageJPEGRepresentation(img, compressionQuality);
+//    UIGraphicsEndImageContext();
+//    
+//    return imageData;
+//    
+//}
 
 
--(void)setUserData {
-   
-    messageTextView.text = @"";
-    [messageTextView setPlaceholder:@"Type a message here..."];
-    [messageTextView setFont:[UIFont systemFontOfSize:14.0]];
-    messageTextView.backgroundColor = [UIColor whiteColor];
-    messageTextView.contentInset = UIEdgeInsetsMake(-5, 5, 0, 0);
-    messageTextView.alwaysBounceHorizontal = NO;
-    messageTextView.bounces = NO;
-    userData = [NSMutableArray new];
-    messageView.translatesAutoresizingMaskIntoConstraints = YES;
-    messageTextView.translatesAutoresizingMaskIntoConstraints = YES;
-    messageView.backgroundColor = [UIColor lightGrayColor];
-    messageHeight = 40;
-    messageView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height- messageHeight - 10 - 64, self.view.bounds.size.width, messageHeight + 10);
-    messageTextView.frame = CGRectMake(8, 5, messageView.frame.size.width - 8 - 64, messageHeight - 8);
-    messageYValue = messageView.frame.origin.y;
-    if ([messageTextView.text isEqualToString:@""] || messageTextView.text.length == 0) {
-        sendButtonOutlet.enabled = NO;
-    }
-    else{
-        sendButtonOutlet.enabled = YES;
-    }
-//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(historUpdated:) name:@"UserHistory" object:nil];
-    chatTableView.translatesAutoresizingMaskIntoConstraints = YES;
-    chatTableView.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height - (messageHeight +10-64));
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
 
 #pragma mark - Fetch chat history
--(void)getHistoryData{
+- (void)getHistoryData {
     
-    [self getProfilePhotosJid:friendUserJid profileImageView:friendUserPhoto placeholderImage:@"images.png" result:^(UIImage *tempImage) {
-        // do something with your BOOL
-        if (tempImage!=nil) {
-            friendUserPhoto.image=tempImage;
-        }
-        else {
-            friendUserPhoto.image=[UIImage imageNamed:@"images.png"];
-        }
-    }];
-    
-    [self getProfilePhotosJid:myDelegate.xmppLogedInUserId profileImageView:loginuserPhoto placeholderImage:@"images.png" result:^(UIImage *tempImage) {
-        // do something with your BOOL
-        if (tempImage!=nil) {
-            loginuserPhoto.image=tempImage;
-        }
-        else {
-            loginuserPhoto.image=[UIImage imageNamed:@"images.png"];
-        }
-    }];
+//    [self getProfilePhotosJid:friendUserJid profileImageView:friendUserPhoto placeholderImage:@"images.png" result:^(UIImage *tempImage) {
+//        // do something with your BOOL
+//        if (tempImage!=nil) {
+//            friendUserPhoto.image=tempImage;
+//        }
+//        else {
+//            friendUserPhoto.image=[UIImage imageNamed:@"images.png"];
+//        }
+//    }];
+//    
+//    [self getProfilePhotosJid:myDelegate.xmppLogedInUserId profileImageView:loginuserPhoto placeholderImage:@"images.png" result:^(UIImage *tempImage) {
+//        // do something with your BOOL
+//        if (tempImage!=nil) {
+//            loginuserPhoto.image=tempImage;
+//        }
+//        else {
+//            loginuserPhoto.image=[UIImage imageNamed:@"images.png"];
+//        }
+//    }];
 
     
     NSManagedObjectContext *moc = [myDelegate.xmppMessageArchivingCoreDataStorage mainThreadManagedObjectContext];
@@ -325,7 +347,8 @@
     NSArray *messages_arc = [moc executeFetchRequest:request error:&error];
     [self print:[[NSMutableArray alloc]initWithArray:messages_arc]];
 }
--(void)print:(NSMutableArray*)messages_arc{
+
+- (void)print:(NSMutableArray*)messages_arc {
     
     @autoreleasepool {
         for (XMPPMessageArchiving_Message_CoreDataObject *message in messages_arc) {
@@ -455,8 +478,9 @@
     }
     return YES;
 }
-- (void)textViewDidChange:(UITextView *)textView
-{
+
+- (void)textViewDidChange:(UITextView *)textView {
+    
     if (([messageTextView sizeThatFits:messageTextView.frame.size].height < 126) && ([messageTextView sizeThatFits:messageTextView.frame.size].height > 50)) {
         
         messageTextView.frame = CGRectMake(messageTextView.frame.origin.x, messageTextView.frame.origin.y, messageTextView.frame.size.width, [messageTextView sizeThatFits:messageTextView.frame.size].height);
@@ -499,20 +523,12 @@
 #pragma mark - end
 
 #pragma mark - XMPP delegates
-//- (void)turnSocket:(TURNSocket *)sender didSucceed:(GCDAsyncSocket *)socket {
-//    [turnSockets removeObject:sender];
-//}
-//
-//- (void)turnSocketDidFail:(TURNSocket *)sender {
-//    
-//    [turnSockets removeObject:sender];
-//}
-
-- (XMPPStream *)xmppStream
-{
+- (XMPPStream *)xmppStream {
+    
     return [myDelegate xmppStream];
 }
 #pragma mark - end
+
 //#pragma mark - IBAction
 //-(IBAction)sendMessage:(id)sender
 //{

@@ -13,9 +13,6 @@
 #import "XMPPFramework.h"
 #import "XMPP.h"
 #import "TURNSocket.h"
-
-
-
 #import "XMPPOutgoingFileTransfer.h"//File transfer
 
 @interface ChatScreenViewController : XMPPChatView<XMPPOutgoingFileTransferDelegate/*file transfer*/>

@@ -33,7 +33,7 @@
                                 </constraints>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no"/>
                                 <connections>
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="CvX-2e-ahc"/>
                                 </connections>
@@ -45,7 +45,7 @@
                                 </constraints>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" secureTextEntry="YES"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no" secureTextEntry="YES"/>
                                 <connections>
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="QkN-Wk-nAf"/>
                                 </connections>
@@ -143,7 +143,7 @@
                                 </constraints>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no"/>
                                 <connections>
                                     <outlet property="delegate" destination="Prw-nX-7ET" id="AKW-oU-jHs"/>
                                 </connections>
@@ -165,7 +165,7 @@
                                 </constraints>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" keyboardType="emailAddress"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no" keyboardType="emailAddress"/>
                                 <connections>
                                     <outlet property="delegate" destination="Prw-nX-7ET" id="8cL-6Q-w6j"/>
                                 </connections>
@@ -187,7 +187,7 @@
                                 </constraints>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no" keyboardType="numberPad"/>
                                 <connections>
                                     <outlet property="delegate" destination="Prw-nX-7ET" id="hdm-tg-3zz"/>
                                 </connections>
@@ -223,7 +223,7 @@
                                 </constraints>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" secureTextEntry="YES"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no" secureTextEntry="YES"/>
                                 <connections>
                                     <outlet property="delegate" destination="Prw-nX-7ET" id="6Mc-oY-7Y0"/>
                                 </connections>
@@ -245,7 +245,7 @@
                                 </constraints>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no"/>
                                 <connections>
                                     <outlet property="delegate" destination="Prw-nX-7ET" id="xdm-9y-5Bx"/>
                                 </connections>
@@ -587,7 +587,7 @@
                                 </constraints>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no"/>
                                 <connections>
                                     <outlet property="delegate" destination="RSN-Ri-fNF" id="H74-Xi-eNx"/>
                                 </connections>
@@ -631,7 +631,7 @@
                                 </constraints>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no" keyboardType="numberPad"/>
                                 <connections>
                                     <outlet property="delegate" destination="RSN-Ri-fNF" id="aUf-lT-fN4"/>
                                 </connections>
@@ -653,7 +653,7 @@
                                 </constraints>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no"/>
                                 <connections>
                                     <outlet property="delegate" destination="RSN-Ri-fNF" id="PYA-Wc-wg9"/>
                                 </connections>
@@ -829,44 +829,34 @@
                                         <rect key="frame" x="8" y="5" width="247" height="40"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences" autocorrectionType="no"/>
                                         <connections>
                                             <outlet property="delegate" destination="7Vy-6u-2xk" id="EGz-lv-pem"/>
                                         </connections>
                                     </textView>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oUq-Wn-y1W">
-                                        <rect key="frame" x="256" y="10" width="64" height="30"/>
-                                        <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oUq-Wn-y1W">
+                                        <rect key="frame" x="256" y="5" width="64" height="30"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="64" id="Np7-di-iVW"/>
                                             <constraint firstAttribute="height" constant="30" id="S5t-xe-Jcl"/>
                                         </constraints>
-                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                        <state key="normal" title="Send">
+                                        <state key="normal" image="sendIcon">
                                             <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                         <connections>
                                             <action selector="sendMessage:" destination="7Vy-6u-2xk" eventType="touchUpInside" id="xVI-jZ-Kln"/>
                                         </connections>
                                     </button>
-                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="rha-92-n2D">
-                                        <rect key="frame" x="202" y="5" width="53" height="40"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="53" id="MLf-wc-X8t"/>
-                                        </constraints>
-                                    </imageView>
                                 </subviews>
                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
                                     <constraint firstAttribute="bottom" secondItem="Fu6-Q1-hwp" secondAttribute="bottom" constant="5" id="CFR-xc-1Ba"/>
                                     <constraint firstAttribute="trailing" secondItem="oUq-Wn-y1W" secondAttribute="trailing" id="GFD-FI-c6J"/>
-                                    <constraint firstItem="rha-92-n2D" firstAttribute="top" secondItem="jST-dM-RX7" secondAttribute="top" constant="5" id="KJJ-kU-aD8"/>
                                     <constraint firstItem="oUq-Wn-y1W" firstAttribute="leading" secondItem="Fu6-Q1-hwp" secondAttribute="trailing" constant="1" id="PgN-1Z-8lW"/>
                                     <constraint firstItem="Fu6-Q1-hwp" firstAttribute="leading" secondItem="jST-dM-RX7" secondAttribute="leading" constant="8" id="UoY-w5-zJ6"/>
-                                    <constraint firstItem="oUq-Wn-y1W" firstAttribute="leading" secondItem="rha-92-n2D" secondAttribute="trailing" constant="1" id="ZAw-cl-98E"/>
                                     <constraint firstItem="Fu6-Q1-hwp" firstAttribute="top" secondItem="jST-dM-RX7" secondAttribute="top" constant="5" id="kY1-QE-1Ry"/>
-                                    <constraint firstItem="oUq-Wn-y1W" firstAttribute="top" secondItem="jST-dM-RX7" secondAttribute="top" constant="10" id="qWb-42-xE8"/>
-                                    <constraint firstAttribute="bottom" secondItem="rha-92-n2D" secondAttribute="bottom" constant="5" id="wQ0-PH-zZn"/>
+                                    <constraint firstItem="oUq-Wn-y1W" firstAttribute="top" secondItem="jST-dM-RX7" secondAttribute="top" constant="5" id="qWb-42-xE8"/>
                                 </constraints>
                             </view>
                         </subviews>
@@ -889,12 +879,11 @@
                         <outlet property="messageTextView" destination="Fu6-Q1-hwp" id="Qph-6w-k7W"/>
                         <outlet property="messageView" destination="jST-dM-RX7" id="ahI-I4-J0z"/>
                         <outlet property="sendButtonOutlet" destination="oUq-Wn-y1W" id="Fgf-hU-ZGf"/>
-                        <outlet property="sendImage" destination="rha-92-n2D" id="Dzv-Na-8VX"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tpq-b3-s9Y" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3921" y="123"/>
+            <point key="canvasLocation" x="3920.625" y="122.53521126760563"/>
         </scene>
         <!--Custom Filter View Controller-->
         <scene sceneID="bM5-WM-sGX">
@@ -1009,6 +998,7 @@
     </scenes>
     <resources>
         <image name="profile_camera" width="96" height="96"/>
+        <image name="sendIcon" width="30" height="30"/>
         <image name="upArrow" width="20" height="10"/>
     </resources>
 </document>

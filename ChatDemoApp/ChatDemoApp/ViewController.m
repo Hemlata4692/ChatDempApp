@@ -63,6 +63,20 @@
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     
+    if(textField == self.usernameField) {
+        if (range.length > 0 && [string length] == 0)
+        {
+            return YES;
+        }
+        if (textField.text.length > 9 && range.length == 0)
+        {
+            return NO;
+        }
+        else
+        {
+            return YES;
+        }
+    }
     return YES;
 }
 

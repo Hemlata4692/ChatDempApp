@@ -13,4 +13,13 @@
 
 //Set/Get profile images
 - (void)getChatProfilePhotoFriendJid:(NSString *)friendJid profileImageView:(UIImage *)profileImageView friendProfileImageView:(UIImage *)friendProfileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(NSArray *imageArray)) completion;
+- (void)getHistoryChatData:(NSString *)jid;
+- (void)initializeFriendProfile:(NSString*)jid;
+- (int)getPresenceStatus:(NSString *)jid;
+
+//Call child view controller method
+- (void)historyData:(NSMutableArray *)result;
+
+//Notification observer handler
+- (void)XmppUserPresenceUpdateNotify;
 @end

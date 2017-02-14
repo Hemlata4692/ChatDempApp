@@ -43,6 +43,7 @@
     
     appDelegate.updateProfileUserId=@"";
     appDelegate.xmppLogedInUserId=[XMPPUserDefaultManager getValue:@"LoginCred"];
+    
 //    isrefresh=YES;
 //    if ([myDelegate connect])
 //    {
@@ -68,6 +69,7 @@
     appDelegate.myView=@"";
     appDelegate.isContactListIsLoaded=NO;
     appDelegate.xmppLogedInUserId=@"";
+    appDelegate.xmppLogedInUserName=@"";
     [XMPPUserDefaultManager removeValue:@"LoginCred"];
     //    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",myDelegate.hostName] key:@"LoginCred"];
     [XMPPUserDefaultManager removeValue:@"PassCred"];
@@ -248,15 +250,15 @@
     if (results.count>0) {
         NSManagedObject *tempDevice = [results objectAtIndex:0];
         profileResponse=@{
-                          @"RegisterId" : [self nullHandler:[tempDevice valueForKey:@"xmppRegisterId"]],
-                          @"Name" : [self nullHandler:[tempDevice valueForKey:@"xmppName"]],
-                          @"PhoneNumber" : [self nullHandler:[tempDevice valueForKey:@"xmppPhoneNumber"]],
-                          @"UserStatus" : [self nullHandler:[tempDevice valueForKey:@"xmppUserStatus"]],
-                          @"Description" : [self nullHandler:[tempDevice valueForKey:@"xmppDescription"]],
-                          @"Address" : [self nullHandler:[tempDevice valueForKey:@"xmppAddress"]],
-                          @"EmailAddress" : [self nullHandler:[tempDevice valueForKey:@"xmppEmailAddress"]],
-                          @"UserBirthDay" : [self nullHandler:[tempDevice valueForKey:@"xmppUserBirthDay"]],
-                          @"Gender" : [self nullHandler:[tempDevice valueForKey:@"xmppGender"]],
+                          @"RegisterId" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppRegisterId"]],
+                          @"Name" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppName"]],
+                          @"PhoneNumber" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppPhoneNumber"]],
+                          @"UserStatus" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppUserStatus"]],
+                          @"Description" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppDescription"]],
+                          @"Address" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppAddress"]],
+                          @"EmailAddress" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppEmailAddress"]],
+                          @"UserBirthDay" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppUserBirthDay"]],
+                          @"Gender" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppGender"]],
                           };
         NSLog(@"\n\n");
     }
@@ -287,29 +289,25 @@
     for (NSManagedObject *tempDevice in tempArray) {
         if (![[tempDevice valueForKey:@"xmppRegisterId"] isEqualToString:appDelegate.xmppLogedInUserId]) {
             NSDictionary *profileResponse=@{
-                              @"RegisterId" : [self nullHandler:[tempDevice valueForKey:@"xmppRegisterId"]],
-                              @"Name" : [self nullHandler:[tempDevice valueForKey:@"xmppName"]],
-                              @"PhoneNumber" : [self nullHandler:[tempDevice valueForKey:@"xmppPhoneNumber"]],
-                              @"UserStatus" : [self nullHandler:[tempDevice valueForKey:@"xmppUserStatus"]],
-                              @"Description" : [self nullHandler:[tempDevice valueForKey:@"xmppDescription"]],
-                              @"Address" : [self nullHandler:[tempDevice valueForKey:@"xmppAddress"]],
-                              @"EmailAddress" : [self nullHandler:[tempDevice valueForKey:@"xmppEmailAddress"]],
-                              @"UserBirthDay" : [self nullHandler:[tempDevice valueForKey:@"xmppUserBirthDay"]],
-                              @"Gender" : [self nullHandler:[tempDevice valueForKey:@"xmppGender"]],
+                              @"RegisterId" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppRegisterId"]],
+                              @"Name" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppName"]],
+                              @"PhoneNumber" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppPhoneNumber"]],
+                              @"UserStatus" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppUserStatus"]],
+                              @"Description" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppDescription"]],
+                              @"Address" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppAddress"]],
+                              @"EmailAddress" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppEmailAddress"]],
+                              @"UserBirthDay" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppUserBirthDay"]],
+                              @"Gender" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppGender"]],
                               };
             [tempDict setObject:profileResponse forKey:[tempDevice valueForKey:@"xmppRegisterId"]];
+        }
+        else {
+        
+            appDelegate.xmppLogedInUserName=[appDelegate checkNilValue:[tempDevice valueForKey:@"xmppName"]];
         }
     }
     
     return tempDict;
-}
-
-- (NSString*)nullHandler:(NSString *)nullValue {
-    
-    if (nullValue!=nil && nullValue!=NULL) {
-        return nullValue;
-    }
-    return @"";
 }
 
 - (NSManagedObjectContext *)managedObjectContext {
@@ -354,8 +352,42 @@
     [request setEntity:entityDescription];
     NSError *error;
     NSArray *messages_arc = [moc executeFetchRequest:request error:&error];
+    
+    NSMutableArray *historyArray=[NSMutableArray new];
+    NSMutableArray *tempArray=[NSMutableArray new];
+    NSMutableDictionary *tempDict=[NSMutableDictionary new];
+
+    @autoreleasepool {
+        for (XMPPMessageArchiving_Message_CoreDataObject *message in messages_arc) {
+            NSXMLElement *element = [[NSXMLElement alloc] initWithXMLString:message.messageStr error:nil];
+            if (![[element attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]) {
+                
+                if ([tempArray containsObject:[element attributeStringValueForName:@"from"]]) {
+                    
+                    [tempArray removeObject:[element attributeStringValueForName:@"from"]];
+                }
+                [tempArray addObject:[element attributeStringValueForName:@"from"]];
+                [tempDict setObject:element forKey:[element attributeStringValueForName:@"from"]];
+            }
+            else {
+                
+                if ([tempArray containsObject:[element attributeStringValueForName:@"to"]]) {
+                    
+                    [tempArray removeObject:[element attributeStringValueForName:@"to"]];
+                }
+                [tempArray addObject:[element attributeStringValueForName:@"to"]];
+                [tempDict setObject:element forKey:[element attributeStringValueForName:@"to"]];
+            }
+        }
+        
+        for (int i=0; i<tempArray.count; i++) {
+            [historyArray addObject:[tempDict objectForKey:[tempArray objectAtIndex:i]]];
+        }
+        historyArray=[[[historyArray reverseObjectEnumerator] allObjects] mutableCopy];
+        completion(historyArray);
+    }
 //    [self print:[[NSMutableArray alloc]initWithArray:messages_arc]];
-    completion([[NSMutableArray alloc]initWithArray:messages_arc]);
+    
 }
 
 -(void)getHistoryData{

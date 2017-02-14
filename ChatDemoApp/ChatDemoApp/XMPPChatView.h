@@ -22,4 +22,8 @@
 
 //Notification observer handler
 - (void)XmppUserPresenceUpdateNotify;
+
+//Send text message
+- (void)sendXmppMessage:(NSString *)friendJid friendName:(NSString *)friendName messageString:(NSString *)messageString;
+- (void)XmppSendMessageResponse:(NSXMLElement *)xmpMessage;
 @end

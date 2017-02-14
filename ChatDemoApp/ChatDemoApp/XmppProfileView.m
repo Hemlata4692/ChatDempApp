@@ -163,15 +163,15 @@
     if (results.count>0) {
         NSManagedObject *devicea = [results objectAtIndex:0];
         profileResponse=@{
-                          @"RegisterId" : [devicea valueForKey:@"xmppRegisterId"],
-                          @"Name" : [devicea valueForKey:@"xmppName"],
-                          @"PhoneNumber" : [devicea valueForKey:@"xmppPhoneNumber"],
-                          @"UserStatus" : [devicea valueForKey:@"xmppUserStatus"],
-                          @"Description" : [devicea valueForKey:@"xmppDescription"],
-                          @"Address" : [devicea valueForKey:@"xmppAddress"],
-                          @"EmailAddress" : [devicea valueForKey:@"xmppEmailAddress"],
-                          @"UserBirthDay" : [devicea valueForKey:@"xmppUserBirthDay"],
-                          @"Gender" : [devicea valueForKey:@"xmppGender"],
+                          @"RegisterId" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppRegisterId"]],
+                          @"Name" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppName"]],
+                          @"PhoneNumber" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppPhoneNumber"]],
+                          @"UserStatus" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppUserStatus"]],
+                          @"Description" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppDescription"]],
+                          @"Address" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppAddress"]],
+                          @"EmailAddress" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppEmailAddress"]],
+                          @"UserBirthDay" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppUserBirthDay"]],
+                          @"Gender" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppGender"]],
                           };
         NSLog(@"\n\n");
     }

@@ -66,7 +66,6 @@
     //Initialize xmpp connection
     [self didFinishLaunchingMethod];//Call appdelegateObjectFile method
     
-    NSLog(@"customerId %@",[[NSUserDefaults standardUserDefaults] objectForKey:@"userId"]);
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@"userName"] != nil)
     {
         UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];

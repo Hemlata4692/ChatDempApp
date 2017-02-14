@@ -68,7 +68,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 //end
 
 @synthesize xmppUserDetailedList, xmppUserListArray;
-@synthesize xmppLogedInUserId, isContactListIsLoaded;
+@synthesize xmppLogedInUserId, isContactListIsLoaded, xmppLogedInUserName;
 //App folders
 @synthesize folderName;
 @synthesize appMediafolderName;
@@ -556,11 +556,42 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
             NSLog(@"Can't Delete! %@ %@", error, [error localizedDescription]);
             return;
         }
+        
+        [self removeLocalUserChat:registredUserId];
         if (isContactListIsLoaded) {
             
             [[NSNotificationCenter defaultCenter] postNotificationName:@"XmppNewUserAdded" object:nil];
         }
     }
+}
+
+- (void)removeLocalUserChat:(NSString *)userId {
+
+    //Remove local dataBase user chat
+    XMPPMessageArchivingCoreDataStorage *storage = [XMPPMessageArchivingCoreDataStorage sharedInstance];
+    NSManagedObjectContext *moc = [storage mainThreadManagedObjectContext];
+    NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"XMPPMessageArchiving_Message_CoreDataObject"
+                                                         inManagedObjectContext:moc];
+    
+    NSEntityDescription *messageEntity = [storage messageEntity:moc];
+    NSFetchRequest *fetchRequest1 = [[NSFetchRequest alloc] init];
+    [fetchRequest1 setEntity:entityDescription];
+    NSString *predicateFrmt = @"bareJidStr == %@";
+    fetchRequest1.entity = messageEntity;
+    NSError *error = nil;
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:predicateFrmt, userId];
+    fetchRequest1.predicate = predicate;
+    NSArray *messages_new = [moc executeFetchRequest:fetchRequest1 error:&error];
+    
+    for (NSManagedObject *object in messages_new) {
+        [moc deleteObject:object];
+    }
+    
+    if (![moc save:&error])
+    {
+        NSLog(@"Error deleting movie, %@", [error userInfo]);
+    }
+    //end
 }
 
 - (void)insertNewUserEntryInXmppUserModel:(NSString *)registredUserId xmppName:(NSString *)xmppName xmppPhoneNumber:(NSString *)xmppPhoneNumber xmppUserStatus:(NSString *)xmppUserStatus xmppDescription:(NSString *)xmppDescription xmppAddress:(NSString *)xmppAddress xmppEmailAddress:(NSString *)xmppEmailAddress xmppUserBirthDay:(NSString *)xmppUserBirthDay xmppGender:(NSString *)xmppGender {
@@ -931,6 +962,16 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     if (nil!=[profileData objectForKey:key]||NULL!=[profileData objectForKey:key]||([[profileData objectForKey:key] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].length != 0)) {
         
         value=[[profileData objectForKey:key] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    }
+    return value;
+}
+
+- (NSString *)checkNilValue:(id)checkValue {
+    
+    NSString *value=@"";
+    if (nil!=checkValue||NULL!=checkValue||([checkValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].length != 0)) {
+        
+        value=[checkValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     }
     return value;
 }

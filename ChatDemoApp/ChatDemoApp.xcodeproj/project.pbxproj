@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		90DC0D66A2ED385893C02E29 /* libPods-ChatDemoApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE07D7CB35D225B6FB24E1D2 /* libPods-ChatDemoApp.a */; };
 		B70AE66A1E2F1EC600554038 /* AppDelegateObjectFile.m in Sources */ = {isa = PBXBuildFile; fileRef = B70AE6691E2F1EC600554038 /* AppDelegateObjectFile.m */; };
+		B7131E5D1E52DA3A00A435A3 /* ChatScreenTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B7131E5C1E52DA3A00A435A3 /* ChatScreenTableViewCell.m */; };
 		B745F8291E234D55001119BD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F8281E234D55001119BD /* main.m */; };
 		B745F82C1E234D55001119BD /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F82B1E234D55001119BD /* AppDelegate.m */; };
 		B745F82F1E234D55001119BD /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F82E1E234D55001119BD /* ViewController.m */; };
@@ -30,7 +31,6 @@
 		B76F75E91E40ABD8001FE579 /* DashboardXMPP.m in Sources */ = {isa = PBXBuildFile; fileRef = B76F75E81E40ABD8001FE579 /* DashboardXMPP.m */; };
 		B77DFFDF1E4C2E2100921126 /* ChatScreenViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B77DFFDE1E4C2E2100921126 /* ChatScreenViewController.m */; };
 		B77DFFE21E4C2E3100921126 /* XMPPChatView.m in Sources */ = {isa = PBXBuildFile; fileRef = B77DFFE11E4C2E3100921126 /* XMPPChatView.m */; };
-		B77DFFE51E4C2E3900921126 /* DataAwareTurnSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = B77DFFE41E4C2E3900921126 /* DataAwareTurnSocket.m */; };
 		B77DFFE81E4C2F3200921126 /* UIPlaceHolderTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = B77DFFE71E4C2F3200921126 /* UIPlaceHolderTextView.m */; };
 		B77DFFEC1E4C32B500921126 /* XMPPFileTransfer.m in Sources */ = {isa = PBXBuildFile; fileRef = B77DFFEB1E4C32B500921126 /* XMPPFileTransfer.m */; };
 		B77DFFF31E4C32C500921126 /* XMPPIncomingFileTransfer.m in Sources */ = {isa = PBXBuildFile; fileRef = B77DFFEE1E4C32C500921126 /* XMPPIncomingFileTransfer.m */; };
@@ -56,6 +56,8 @@
 		B70AE6691E2F1EC600554038 /* AppDelegateObjectFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegateObjectFile.m; sourceTree = "<group>"; };
 		B70F93281E4DB51C0064EF29 /* AddressBookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBookUI.framework; path = System/Library/Frameworks/AddressBookUI.framework; sourceTree = SDKROOT; };
 		B70F932A1E4DB5290064EF29 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
+		B7131E5B1E52DA3A00A435A3 /* ChatScreenTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatScreenTableViewCell.h; sourceTree = "<group>"; };
+		B7131E5C1E52DA3A00A435A3 /* ChatScreenTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatScreenTableViewCell.m; sourceTree = "<group>"; };
 		B745F8241E234D54001119BD /* ChatDemoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChatDemoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B745F8281E234D55001119BD /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		B745F82A1E234D55001119BD /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -95,8 +97,6 @@
 		B77DFFDE1E4C2E2100921126 /* ChatScreenViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatScreenViewController.m; sourceTree = "<group>"; };
 		B77DFFE01E4C2E3100921126 /* XMPPChatView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMPPChatView.h; sourceTree = "<group>"; };
 		B77DFFE11E4C2E3100921126 /* XMPPChatView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMPPChatView.m; sourceTree = "<group>"; };
-		B77DFFE31E4C2E3900921126 /* DataAwareTurnSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataAwareTurnSocket.h; sourceTree = "<group>"; };
-		B77DFFE41E4C2E3900921126 /* DataAwareTurnSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataAwareTurnSocket.m; sourceTree = "<group>"; };
 		B77DFFE61E4C2F3200921126 /* UIPlaceHolderTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIPlaceHolderTextView.h; sourceTree = "<group>"; };
 		B77DFFE71E4C2F3200921126 /* UIPlaceHolderTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIPlaceHolderTextView.m; sourceTree = "<group>"; };
 		B77DFFEA1E4C32B500921126 /* XMPPFileTransfer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMPPFileTransfer.h; sourceTree = "<group>"; };
@@ -378,8 +378,8 @@
 				B77DFFDE1E4C2E2100921126 /* ChatScreenViewController.m */,
 				B77DFFE01E4C2E3100921126 /* XMPPChatView.h */,
 				B77DFFE11E4C2E3100921126 /* XMPPChatView.m */,
-				B77DFFE31E4C2E3900921126 /* DataAwareTurnSocket.h */,
-				B77DFFE41E4C2E3900921126 /* DataAwareTurnSocket.m */,
+				B7131E5B1E52DA3A00A435A3 /* ChatScreenTableViewCell.h */,
+				B7131E5C1E52DA3A00A435A3 /* ChatScreenTableViewCell.m */,
 			);
 			name = ChatScreenView;
 			sourceTree = "<group>";
@@ -539,7 +539,6 @@
 				B745F85E1E2354B8001119BD /* UITextField+Validations.m in Sources */,
 				B757925E1E43289300AC48D0 /* EditProfileViewController.m in Sources */,
 				B780E9F71E2F6E1A00437B4E /* ErrorCode.m in Sources */,
-				B77DFFE51E4C2E3900921126 /* DataAwareTurnSocket.m in Sources */,
 				B70AE66A1E2F1EC600554038 /* AppDelegateObjectFile.m in Sources */,
 				B745F8491E2351FF001119BD /* DashboardViewController.m in Sources */,
 				B745F84C1E235210001119BD /* GroupConversationViewController.m in Sources */,
@@ -563,6 +562,7 @@
 				B7B9A5661E23B17A00DB4429 /* MMMaterialDesignSpinner.m in Sources */,
 				B745F8291E234D55001119BD /* main.m in Sources */,
 				B757925B1E42E23800AC48D0 /* XmppProfileView.m in Sources */,
+				B7131E5D1E52DA3A00A435A3 /* ChatScreenTableViewCell.m in Sources */,
 				B745F8561E2353DD001119BD /* UserDefaultManager.m in Sources */,
 				B745F8461E2351F1001119BD /* RegisterViewController.m in Sources */,
 			);

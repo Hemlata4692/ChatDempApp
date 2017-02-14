@@ -43,6 +43,7 @@
     
     userListArray=[NSMutableArray new];
     userDetailedList=[NSMutableDictionary new];
+    historyChatData=[NSMutableArray new];
     [myDelegate showIndicator];
     [self performSelector:@selector(userList) withObject:nil afterDelay:0.1];
     // Do any additional setup after loading the view.
@@ -52,11 +53,10 @@
     [super viewWillAppear:YES];
     
     profileLocalDictData=[NSMutableDictionary new];
-    historyChatData=[NSMutableArray new];
     if (userListArray.count>0) {
         profileLocalDictData=[self getProfileUsersData];
     }
-    [self.dasboardTableListing reloadData];
+//    [self.dasboardTableListing reloadData];
 //
 //        //        NSData *photoData1 = [[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:@"1234567890@ranosys"]];
 //        //        UIImage *imagetemp=[UIImage imageWithData:photoData1];
@@ -68,6 +68,12 @@
 ////        NSLog(@"%@",newvCardTemp.emailAddress);
 //    }
   
+    [self fetchAllHistoryChat:^(NSMutableArray *tempHistoryData) {
+        // do something with your BOOL
+        
+        historyChatData=[tempHistoryData mutableCopy];
+        [self.dasboardTableListing reloadData];
+    }];
 }
 
 - (void)userList {
@@ -191,7 +197,7 @@
         return userListArray.count;
     }
     else {
-        return 0;
+        return historyChatData.count;
     }
 }
 
@@ -262,8 +268,14 @@
                                       reuseIdentifier:CellIdentifier];
     }
     
+    UILabel* nameLabel = (UILabel*)[cell viewWithTag:1];
+    UIImageView *userImage = (UIImageView*)[cell viewWithTag:2];
+    UIButton* profileBtn = (UIButton*)[cell viewWithTag:3];
+    UILabel* statusLabel = (UILabel*)[cell viewWithTag:4];
+    UILabel* dateLabel = (UILabel*)[cell viewWithTag:5];
+    
     if (customSegmentedControl.selectedSegmentIndex==1) {
-        UILabel* nameLabel = (UILabel*)[cell viewWithTag:1];
+        
 //        if (![[profileLocalDictData allKeys] containsObject:[userListArray objectAtIndex:indexPath.row]]) {
 //            
 //             nameLabel.backgroundColor=[UIColor lightGrayColor];
@@ -280,21 +292,61 @@
         NSLog(@"%@",[userListArray objectAtIndex:indexPath.row]);
         NSMutableDictionary *profileDic=[[profileLocalDictData objectForKey:[userListArray objectAtIndex:indexPath.row]] mutableCopy];
         
-        UIImageView *userImage = (UIImageView*)[cell viewWithTag:2];
-        UIButton* profileBtn = (UIButton*)[cell viewWithTag:3];
+       
+        dateLabel.hidden=YES;
+        
         profileBtn.tag=indexPath.row;
         
         [profileBtn addTarget:self action:@selector(friendProfileAction:) forControlEvents:UIControlEventTouchUpInside];
         userImage.layer.cornerRadius=20;
         userImage.layer.masksToBounds=YES;
         
-        
         nameLabel.text = [profileDic objectForKey:@"Name"];
+        statusLabel.text=[profileDic objectForKey:@"UserStatus"];
         NSLog(@" userStatus:%@ \n phoneNumber:%@ Desc:%@ \n address:%@ \n emailid:%@ \n birthDay:%@ \n gender:%@",[profileDic objectForKey:@"UserStatus"],[profileDic objectForKey:@"PhoneNumber"],[profileDic objectForKey:@"Description"],[profileDic objectForKey:@"Address"],[profileDic objectForKey:@"EmailAddress"],[profileDic objectForKey:@"UserBirthDay"],[profileDic objectForKey:@"Gender"]);
         [self configurePhotoForCell:cell jid:[userListArray objectAtIndex:indexPath.row]];
     }
+    else {
+        
+        NSXMLElement *historyElement=[historyChatData objectAtIndex:indexPath.row];
+        NSXMLElement *innerData=[historyElement elementForName:@"data"];
+//        NSMutableDictionary *profileDic;
+        
+        if (![[innerData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]) {
+            
+//            profileDic=[[profileLocalDictData objectForKey:[historyElement attributeStringValueForName:@"from"]] mutableCopy];
+            [self configurePhotoForCell:cell jid:[innerData attributeStringValueForName:@"from"]];
+             nameLabel.text = [[innerData attributeStringValueForName:@"senderName"] capitalizedString];
+        }
+        else {
+            
+//            profileDic=[[profileLocalDictData objectForKey:[historyElement attributeStringValueForName:@"to"]] mutableCopy];
+            [self configurePhotoForCell:cell jid:[innerData attributeStringValueForName:@"to"]];
+            nameLabel.text = [[innerData attributeStringValueForName:@"receiverName"] capitalizedString];
+        }
+        dateLabel.hidden=NO;
+        profileBtn.tag=indexPath.row;
+        [profileBtn addTarget:self action:@selector(friendProfileAction:) forControlEvents:UIControlEventTouchUpInside];
+        userImage.layer.cornerRadius=20;
+        userImage.layer.masksToBounds=YES;
+       
+        statusLabel.text=[[historyElement elementForName:@"body"] stringValue];
+        dateLabel.text=[self changeTimeFormat:[innerData attributeStringValueForName:@"time"]];
+//        NSLog(@" userStatus:%@ \n phoneNumber:%@ Desc:%@ \n address:%@ \n emailid:%@ \n birthDay:%@ \n gender:%@",[profileDic objectForKey:@"UserStatus"],[profileDic objectForKey:@"PhoneNumber"],[profileDic objectForKey:@"Description"],[profileDic objectForKey:@"Address"],[profileDic objectForKey:@"EmailAddress"],[profileDic objectForKey:@"UserBirthDay"],[profileDic objectForKey:@"Gender"]);
+    }
     return cell;
 }
+
+- (NSString *)changeTimeFormat:(NSString *)timeString {
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"HH:mm:ss"];
+    
+    NSDate *date = [dateFormatter dateFromString:timeString];
+    [dateFormatter setDateFormat:@"hh:mm a"];
+    return [dateFormatter stringFromDate:date];
+}
+
 //{
 //    static NSString *CellIdentifier = @"Cell";
 //    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
@@ -345,16 +397,50 @@
 //    return context;
 //}
 
--(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
 //    XMPPUserCoreDataStorageObject *user = [[self fetchedResultsController] objectAtIndexPath:indexPath];
     
+    if (customSegmentedControl.selectedSegmentIndex==1) {
     ChatScreenViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"ChatScreenViewController"];
     profileObj.friendUserJid=[userListArray objectAtIndex:indexPath.row];
     profileObj.friendUserName=[[profileLocalDictData objectForKey:[userListArray objectAtIndex:indexPath.row]] objectForKey:@"Name"];
-    profileObj.loginUserName=[[profileLocalDictData objectForKey:appDelegate.xmppLogedInUserId] objectForKey:@"Name"];
+//    profileObj.loginUserName=[[profileLocalDictData objectForKey:appDelegate.xmppLogedInUserId] objectForKey:@"Name"];
     [self.navigationController pushViewController:profileObj animated:YES];
+    }
+    else {
     
+        NSXMLElement *historyElement=[historyChatData objectAtIndex:indexPath.row];
+         NSXMLElement *innerData=[historyElement elementForName:@"data"];
+         ChatScreenViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"ChatScreenViewController"];
+        
+        
+        if (![[innerData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]) {
+          
+            profileObj.friendUserJid=[innerData attributeStringValueForName:@"from"];
+            profileObj.friendUserName=[[innerData attributeStringValueForName:@"senderName"] capitalizedString];
+        }
+        else {
+            
+            profileObj.friendUserJid=[innerData attributeStringValueForName:@"to"];
+            profileObj.friendUserName=[[innerData attributeStringValueForName:@"receiverName"] capitalizedString];
+        }
+//        dateLabel.hidden=NO;
+//        profileBtn.tag=indexPath.row;
+//        [profileBtn addTarget:self action:@selector(friendProfileAction:) forControlEvents:UIControlEventTouchUpInside];
+//        userImage.layer.cornerRadius=20;
+//        userImage.layer.masksToBounds=YES;
+//        nameLabel.text = [profileDic objectForKey:@"Name"];
+//        statusLabel.text=[[historyElement elementForName:@"body"] stringValue];
+//        dateLabel.text=[self changeTimeFormat:[historyElement attributeStringValueForName:@"time"]];
+//        NSLog(@" userStatus:%@ \n phoneNumber:%@ Desc:%@ \n address:%@ \n emailid:%@ \n birthDay:%@ \n gender:%@",[profileDic objectForKey:@"UserStatus"],[profileDic objectForKey:@"PhoneNumber"],[profileDic objectForKey:@"Description"],[profileDic objectForKey:@"Address"],[profileDic objectForKey:@"EmailAddress"],[profileDic objectForKey:@"UserBirthDay"],[profileDic objectForKey:@"Gender"]);
+        
+       
+//        profileObj.friendUserJid=[userListArray objectAtIndex:indexPath.row];
+//        profileObj.friendUserName=[[profileLocalDictData objectForKey:[userListArray objectAtIndex:indexPath.row]] objectForKey:@"Name"];
+        //    profileObj.loginUserName=[[profileLocalDictData objectForKey:appDelegate.xmppLogedInUserId] objectForKey:@"Name"];
+        [self.navigationController pushViewController:profileObj animated:YES];
+    }
     
 //    XMPPUserCoreDataStorageObject *user = [[self fetchedResultsController] objectAtIndexPath:indexPath];
 //    XMPPPresence *presence = [[XMPPPresence alloc] initWithType:@"type" to:[XMPPJID jidWithString:user.jidStr]];
@@ -551,9 +637,27 @@
 - (IBAction)friendProfileAction:(UIButton *)sender {
     
     int tagValue=(int)[sender tag];
-    UserProfileViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"UserProfileViewController"];
-    profileObj.friendId=[userListArray objectAtIndex:tagValue];
-    [self.navigationController pushViewController:profileObj animated:YES];
+    if (customSegmentedControl.selectedSegmentIndex==1) {
+        
+        UserProfileViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"UserProfileViewController"];
+        profileObj.friendId=[userListArray objectAtIndex:tagValue];
+        [self.navigationController pushViewController:profileObj animated:YES];
+    }
+    else {
+        
+        NSXMLElement *historyElement=[historyChatData objectAtIndex:tagValue];
+        NSXMLElement *innerData=[historyElement elementForName:@"data"];
+        UserProfileViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"UserProfileViewController"];
+        if (![[innerData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]) {
+            
+            profileObj.friendId=[innerData attributeStringValueForName:@"from"];
+        }
+        else {
+            
+            profileObj.friendId=[innerData attributeStringValueForName:@"to"];
+        }
+        [self.navigationController pushViewController:profileObj animated:YES];
+    }
 }
 
 - (void)profileAction :(id)sender {
@@ -662,28 +766,28 @@
     }
 }
 #pragma mark - end
-
-- (void)showButton {
-    
-//    [self xmppUserRefreshResponse];
-    NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UserEntry"];
-    NSMutableArray *devices = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
-    
-    for (int i=0; i<devices.count; i++) {
-        NSManagedObject *devicea = [devices objectAtIndex:i];
-        NSLog(@"%@",[devicea valueForKey:@"xmppRegisterId"]);
-        NSLog(@"%@",[devicea valueForKey:@"xmppName"]);
-        NSLog(@"%@",[devicea valueForKey:@"xmppPhoneNumber"]);
-        NSLog(@"%@",[devicea valueForKey:@"xmppUserStatus"]);
-        NSLog(@"%@",[devicea valueForKey:@"xmppDescription"]);
-        NSLog(@"%@",[devicea valueForKey:@"xmppAddress"]);
-        NSLog(@"%@",[devicea valueForKey:@"xmppEmailAddress"]);
-        NSLog(@"%@",[devicea valueForKey:@"xmppUserBirthDay"]);
-        NSLog(@"%@",[devicea valueForKey:@"xmppGender"]);
-        NSLog(@"\n\n");
-    }
-}
+//
+//- (void)showButton {
+//    
+////    [self xmppUserRefreshResponse];
+//    NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
+//    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UserEntry"];
+//    NSMutableArray *devices = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
+//    
+//    for (int i=0; i<devices.count; i++) {
+//        NSManagedObject *devicea = [devices objectAtIndex:i];
+//        NSLog(@"%@",[devicea valueForKey:@"xmppRegisterId"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppName"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppPhoneNumber"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppUserStatus"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppDescription"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppAddress"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppEmailAddress"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppUserBirthDay"]);
+//        NSLog(@"%@",[devicea valueForKey:@"xmppGender"]);
+//        NSLog(@"\n\n");
+//    }
+//}
 
 - (NSManagedObjectContext *)managedObjectContext {
     NSManagedObjectContext *context = nil;
@@ -731,15 +835,7 @@
                     [self.dasboardTableListing reloadData];
                 }];
             
-    
-    
-    [self fetchAllHistoryChat:^(NSMutableArray *tempHistoryData) {
-        // do something with your BOOL
-        
-       [myDelegate stopIndicator];
-        historyChatData=[tempHistoryData mutableCopy];
-        [self.dasboardTableListing reloadData];
-    }];
+    [myDelegate stopIndicator];
 }
 /*
 #pragma mark - Navigation

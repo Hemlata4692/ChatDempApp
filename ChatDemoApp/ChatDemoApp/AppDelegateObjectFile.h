@@ -110,6 +110,7 @@ XMPPIncomingFileTransferDelegate, XMPPOutgoingFileTransferDelegate>
 @property(nonatomic,strong) NSMutableDictionary *xmppUserDetailedList;
 @property(nonatomic,strong) NSMutableArray *xmppUserListArray;
 @property(nonatomic,strong) NSString *xmppLogedInUserId;
+@property(nonatomic,strong) NSString *xmppLogedInUserName;
 - (NSString *)applicationCacheDirectory;
 
 @property(nonatomic,strong) NSString *folderName;
@@ -130,8 +131,8 @@ XMPPIncomingFileTransferDelegate, XMPPOutgoingFileTransferDelegate>
 - (void)sendFile:(NSData*)data fileName:(NSString *)fileName jid:(XMPPJID *)jid;
 
 
-
-
+//Check null/nil value
+- (NSString *)checkNilValue:(id)checkValue;
 
 
 

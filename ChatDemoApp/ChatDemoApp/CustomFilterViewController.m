@@ -89,8 +89,11 @@ static int heightValue=200;
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
+    filterContainverView.frame=CGRectMake([[UIScreen mainScreen] bounds].size.width-30, 57, 0, 0);
+    self.arrowImage.frame=CGRectMake(-10, 0, 20, 11);
+    self.filterContainverView.alpha = 0.0f;
+    [self.presentingViewController dismissViewControllerAnimated:NO completion:nil];
     [_delegate customFilterDelegateAction:[[filterDict objectForKey:[filterArray objectAtIndex:indexPath.row]] intValue]];
-    [self hideViewAnimation];
 }
 #pragma mark - end
 

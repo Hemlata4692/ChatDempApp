@@ -59,7 +59,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 @synthesize presencexmpp;
 
 @synthesize portNumber, hostName, serverName, defaultPassword, xmppUniqueId;
-@synthesize isUpdatePofile, updateProfileUserId;
+@synthesize isUpdatePofile, selectedFriendUserId;
 
 //Coredata
 @synthesize managedObjectContext = _managedObjectContext;
@@ -77,7 +77,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 @synthesize appReceivePhotofolderName;
 @synthesize appDocumentfolderName;
 //end
-@synthesize imageCompressionPercent;
 
 @synthesize afterAutentication,afterAutenticationRegistration;
 
@@ -85,7 +84,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 - (void)didFinishLaunchingMethod {
 
     isUpdatePofile=false;
-    imageCompressionPercent=0.3;
     //Create cache folders
     folderName=[[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleNameKey];
     appMediafolderName=[NSString stringWithFormat:@"%@/%@_Media",folderName,folderName];
@@ -97,7 +95,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     //end
     
     self.myView=@"Other";
-    updateProfileUserId=@"";
+    selectedFriendUserId=@"";
     isContactListIsLoaded=NO;
     if (nil!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"] && NULL!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"]) {
         hostName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"HostName"];
@@ -323,21 +321,23 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     //File transfer
     
     
-    _fileTransfer = [[XMPPOutgoingFileTransfer alloc] initWithDispatchQueue:dispatch_get_main_queue()];
-//    _fileTransfer.disableIBB = NO;
-//    _fileTransfer.disableSOCKS5 = NO;
-    
-    [_fileTransfer activate:xmppStream];
-    [_fileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
+//    _fileTransfer = [[XMPPOutgoingFileTransfer alloc] initWithDispatchQueue:dispatch_get_main_queue()];
+////    _fileTransfer.disableIBB = NO;
+////    _fileTransfer.disableSOCKS5 = NO;
+//    
+//    [_fileTransfer activate:xmppStream];
+//    [_fileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
     
     xmppIncomingFileTransfer = [XMPPIncomingFileTransfer new];
-    
+    xmppIncomingFileTransfer.disableIBB = NO;
+    xmppIncomingFileTransfer.disableSOCKS5 = YES;
+//     xmppIncomingFileTransfer.disableDirectTransfers = YES;
+    xmppIncomingFileTransfer.autoAcceptFileTransfers=YES;
     // Activate all modules
     [xmppRoster activate:xmppStream];
     [xmppIncomingFileTransfer activate:xmppStream];
     
     // Add ourselves as delegate to necessary methods
-    [xmppStream addDelegate:self delegateQueue:dispatch_get_main_queue()];
     [xmppIncomingFileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
     //end
     
@@ -493,7 +493,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         if (registerUserInfo!=nil) {
             NSLog(@"%@",[registerUserInfo stringValue]);
             [self insertEntryInXmppUserModel:[registerUserInfo stringValue] xmppName:[[vcardInfo elementForName:@"NICKNAME"] stringValue] xmppPhoneNumber:[[vcardInfo elementForName:@"TEL"] stringValue] xmppUserStatus:[[vcardInfo elementForName:@"USERSTATUS"] stringValue] xmppDescription:[[vcardInfo elementForName:@"DESC"] stringValue] xmppAddress:[[vcardInfo elementForName:@"ADDRESS"] stringValue] xmppEmailAddress:[[vcardInfo elementForName:@"EMAILADDRESS"] stringValue] xmppUserBirthDay:[[vcardInfo elementForName:@"BDAY"] stringValue] xmppGender:[[vcardInfo elementForName:@"GENDER"] stringValue]];
-//            if (isContactListIsLoaded && xmppUserListArray!=nil && [updateProfileUserId isEqualToString:[registerUserInfo stringValue]]) {
+//            if (isContactListIsLoaded && xmppUserListArray!=nil && [selectedFriendUserId isEqualToString:[registerUserInfo stringValue]]) {
 //                [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPProfileUpdation" object:nil];
 //            }
             if (isContactListIsLoaded && xmppUserListArray!=nil) {
@@ -685,41 +685,43 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         NSLog(@"%@",user);
         
         
-        [message addAttributeWithName:@"fromTo" stringValue:[NSString stringWithFormat:@"%@-%@",[message attributeStringValueForName:@"to"],[[[message attributeStringValueForName:@"from"] componentsSeparatedByString:@"/"] objectAtIndex:0]]];
+//        [message addAttributeWithName:@"fromTo" stringValue:[NSString stringWithFormat:@"%@-%@",[message attributeStringValueForName:@"to"],[[[message attributeStringValueForName:@"from"] componentsSeparatedByString:@"/"] objectAtIndex:0]]];
         
         [xmppMessageArchivingCoreDataStorage archiveMessage:message outgoing:NO xmppStream:[self xmppStream]];
-        NSString *keyName = [[[message attributeStringValueForName:@"from"] componentsSeparatedByString:@"/"] objectAtIndex:0];
-        if ([[XMPPUserDefaultManager getValue:@"CountData"] objectForKey:keyName] == nil) {
-            int tempCount = 1;
-            
-            NSMutableDictionary *tempDict = [[XMPPUserDefaultManager getValue:@"CountData"] mutableCopy];
-            [tempDict setObject:[NSString stringWithFormat:@"%d",tempCount] forKey:keyName];
-            [XMPPUserDefaultManager setValue:tempDict key:@"CountData"];
-        }
-        else{
-            int tempCount = [[[XMPPUserDefaultManager getValue:@"CountData"] objectForKey:keyName] intValue];
-            tempCount = tempCount + 1;
-            NSMutableDictionary *tempDict = [[XMPPUserDefaultManager getValue:@"CountData"] mutableCopy];
-            [tempDict setObject:[NSString stringWithFormat:@"%d",tempCount] forKey:keyName];
-            [XMPPUserDefaultManager setValue:tempDict key:@"CountData"];
-        }
+//        NSString *keyName = [[[message attributeStringValueForName:@"from"] componentsSeparatedByString:@"/"] objectAtIndex:0];
+//        if ([[XMPPUserDefaultManager getValue:@"CountData"] objectForKey:keyName] == nil) {
+//            int tempCount = 1;
+//            
+//            NSMutableDictionary *tempDict = [[XMPPUserDefaultManager getValue:@"CountData"] mutableCopy];
+//            [tempDict setObject:[NSString stringWithFormat:@"%d",tempCount] forKey:keyName];
+//            [XMPPUserDefaultManager setValue:tempDict key:@"CountData"];
+//        }
+//        else{
+//            int tempCount = [[[XMPPUserDefaultManager getValue:@"CountData"] objectForKey:keyName] intValue];
+//            tempCount = tempCount + 1;
+//            NSMutableDictionary *tempDict = [[XMPPUserDefaultManager getValue:@"CountData"] mutableCopy];
+//            [tempDict setObject:[NSString stringWithFormat:@"%d",tempCount] forKey:keyName];
+//            [XMPPUserDefaultManager setValue:tempDict key:@"CountData"];
+//        }
         
-        NSArray* fromUser = [[message attributeStringValueForName:@"from"] componentsSeparatedByString:@"/"];
-        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+//        NSArray* fromUser = [[message attributeStringValueForName:@"from"] componentsSeparatedByString:@"/"];
+        NSXMLElement *innerElementData = [message elementForName:@"data"];
+        
+//        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
 
-        NSLog(@"%@",appDelegate.chatUser);
-        if ([appDelegate.chatUser isEqualToString:[fromUser objectAtIndex:0]]){
+//        NSLog(@"%@",appDelegate.chatUser);
+        if ([selectedFriendUserId isEqualToString:[innerElementData attributeStringValueForName:@"from"]]){
             [[NSNotificationCenter defaultCenter] postNotificationName:@"UserHistory" object:message];
         }
-        else if ([appDelegate.chatUser isEqualToString:@"ChatScreen"]){  //this is use for History chat screen if already open
-            [self addBadgeIcon:[NSString stringWithFormat:@"%d",[[XMPPUserDefaultManager getValue:@"BadgeCount"] intValue] + 1 ]];
-            [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%d",[[XMPPUserDefaultManager getValue:@"BadgeCount"] intValue] + 1 ] key:@"BadgeCount"];
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"ChatScreenHistory" object:nil];
-        }
-        else{
-            [self addBadgeIcon:[NSString stringWithFormat:@"%d",[[XMPPUserDefaultManager getValue:@"BadgeCount"] intValue] + 1 ]];
-            [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%d",[[XMPPUserDefaultManager getValue:@"BadgeCount"] intValue] + 1 ] key:@"BadgeCount"];
-        }
+//        else if ([appDelegate.chatUser isEqualToString:@"ChatScreen"]){  //this is use for History chat screen if already open
+//            [self addBadgeIcon:[NSString stringWithFormat:@"%d",[[XMPPUserDefaultManager getValue:@"BadgeCount"] intValue] + 1 ]];
+//            [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%d",[[XMPPUserDefaultManager getValue:@"BadgeCount"] intValue] + 1 ] key:@"BadgeCount"];
+//            [[NSNotificationCenter defaultCenter] postNotificationName:@"ChatScreenHistory" object:nil];
+//        }
+//        else{
+//            [self addBadgeIcon:[NSString stringWithFormat:@"%d",[[XMPPUserDefaultManager getValue:@"BadgeCount"] intValue] + 1 ]];
+//            [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%d",[[XMPPUserDefaultManager getValue:@"BadgeCount"] intValue] + 1 ] key:@"BadgeCount"];
+//        }
     }
 }
 
@@ -741,7 +743,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 //    int myCount = [[XMPPUserDefaultManager getValue:@"CountValue"] intValue];
     
     
-    if (isContactListIsLoaded && xmppUserListArray!=nil && [NSString stringWithFormat:@"%@",[presence from]]!=nil && [xmppUserListArray containsObject:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]] && [updateProfileUserId isEqualToString:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]]) {
+    if (isContactListIsLoaded && xmppUserListArray!=nil && [NSString stringWithFormat:@"%@",[presence from]]!=nil && [xmppUserListArray containsObject:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]] && [selectedFriendUserId isEqualToString:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]]) {
         
 //        switch (section)
 //        {
@@ -1343,7 +1345,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         [fileManager createDirectoryAtPath:imagesPath withIntermediateDirectories:YES attributes:nil error:nil];
     }
     NSString *filePath = [imagesPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_%@.jpeg",folderName,[[jid componentsSeparatedByString:@"@"] objectAtIndex:0]]];
-    NSData * imageData = UIImageJPEGRepresentation(tempImage, imageCompressionPercent);
+    NSData * imageData = UIImageJPEGRepresentation(tempImage, 1.0);
     [imageData writeToFile:filePath atomically:YES];
 }
 
@@ -1354,6 +1356,76 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     NSString *fileAtPath = [filePath stringByAppendingString:[NSString stringWithFormat:@"/%@_%@.jpeg",folderName,[[jid componentsSeparatedByString:@"@"] objectAtIndex:0]]];
     NSError* error = nil;
     return [NSData dataWithContentsOfFile:fileAtPath options:0 error:&error];
+}
+#pragma mark - end
+
+#pragma mark - Save send/Receive Images 
+- (NSString *)setOtherImageInLocalDB:(UIImage*)image {
+
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    NSLocale *locale = [[NSLocale alloc]
+                        initWithLocaleIdentifier:@"en_US"];
+    [dateFormatter setLocale:locale];
+    [dateFormatter setDateFormat:@"ddMMYYhhmmss"];
+    NSString * datestr = [dateFormatter stringFromDate:[NSDate date]];
+    NSString *fileName = [NSString stringWithFormat:@"%@_%@.jpeg",folderName,datestr];
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *imagesPath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appSentPhotofolderName];
+    if (![fileManager fileExistsAtPath:imagesPath]) {
+        
+        [fileManager createDirectoryAtPath:imagesPath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    NSData * imageData = [self sendReceiveReducedImageSize:image];
+    imagesPath=[imagesPath stringByAppendingPathComponent:fileName];
+    NSLog(@"SIZE OF IMAGE: %.2f Mb", (float)imageData.length/1024/1024);
+    [imageData writeToFile:imagesPath atomically:YES];
+    return fileName;
+}
+
+- (NSData *)listionSendAttachedImageCacheDirectoryFileName:(NSString *)fileName {
+    
+    NSString *filePath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appSentPhotofolderName];
+    NSString *fileAtPath = [filePath stringByAppendingPathComponent:fileName];
+    NSError* error = nil;
+    return [NSData dataWithContentsOfFile:fileAtPath options:0 error:&error];
+}
+
+- (NSData*)sendReceiveReducedImageSize:(UIImage *)selectedImage {
+    
+    NSData *imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(selectedImage, 1)];
+    
+//        int imageSize = imageData.length;
+//        NSLog(@"SIZE OF IMAGE: %.2f", (float)imageSize/1024/1024);
+    
+    selectedImage = [self imageWithRoundedCornersSize:0 usingImage:selectedImage];
+    
+    imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(selectedImage, 1)];
+    
+//        imageSize = imageData.length;
+//        NSLog(@"SIZE OF IMAGE: %.2f Mb", (float)imageSize/1024/1024);
+    CGSize mySize;
+    mySize.height = 200;
+    mySize.width = 200;
+    
+    CGFloat oldWidth = selectedImage.size.width;
+    CGFloat oldHeight = selectedImage.size.height;
+    
+    CGFloat scaleFactor = (oldWidth > oldHeight) ? mySize.width / oldWidth : mySize.height / oldHeight;
+    
+    
+    mySize.height = oldHeight * scaleFactor;
+    mySize.width = oldWidth * scaleFactor;
+    
+    
+    selectedImage = [self imageWithImage:selectedImage scaledToSize:mySize];
+    
+    
+    NSData *pngData = UIImageJPEGRepresentation(selectedImage, .1);
+    //    imageSize = pngData.length;
+    //    NSLog(@"SIZE OF IMAGE: %.2f Mb", (float)imageSize/1024/1024);
+    //    UIImage *im=[UIImage imageWithData:pngData];
+    return pngData;
 }
 #pragma mark - end
 
@@ -1387,47 +1459,5 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [data writeToFile:fullPath options:0 error:nil];
     
     DDLogVerbose(@"%@: Data was written to the path: %@", THIS_FILE, fullPath);
-}
-
-
-
-
-- (void)sendFile:(NSData*)data fileName:(NSString *)fileName jid:(XMPPJID *)jid {
-
-   
-    
-    NSError *err;
-    if (![_fileTransfer sendData:data
-                           named:fileName
-                     toRecipient:jid
-                     description:@"Baal's Soulstone, obviously."
-                           error:&err]) {
-        DDLogInfo(@"You messed something up: %@", err);
-    }
-}
-
-- (void)xmppOutgoingFileTransfer:(XMPPOutgoingFileTransfer *)sender
-                didFailWithError:(NSError *)error
-{
-    DDLogInfo(@"Outgoing file transfer failed with error: %@", error);
-    
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
-                                                    message:@"There was an error sending your file. See the logs."
-                                                   delegate:nil
-                                          cancelButtonTitle:@"OK"
-                                          otherButtonTitles:nil];
-    [alert show];
-}
-
-- (void)xmppOutgoingFileTransferDidSucceed:(XMPPOutgoingFileTransfer *)sender
-{
-    DDLogVerbose(@"File transfer successful.");
-    
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Success!"
-                                                    message:@"Your file was sent successfully."
-                                                   delegate:nil
-                                          cancelButtonTitle:@"OK"
-                                          otherButtonTitles:nil];
-    [alert show];
 }
 @end

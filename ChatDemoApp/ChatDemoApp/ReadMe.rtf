@@ -10,9 +10,16 @@
 \deftab543
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\f0\fs22 \cf2 \CocoaLigature0 1.) Replace this code in module.modulemap file.\
-\
-\
+\f0\fs22 \cf2 \CocoaLigature0 1.) Podfile code:\
+source 'https://github.com/CocoaPods/Specs.git'\
+platform :ios, \'918.0\'92\
+target 'ChatDemoApp' do\
+pod 'XMPPFramework'\
+pod 'XMPPFramework/XEP-0009'\
+pod 'XMPPFramework/XEP-0224'\
+end\
+ \
+2.) Replace this code in module.modulemap file.\
 //Uncomment libxml code while running on devices\cf3 \
 \cf2 //module libxml [system] \{\cf3 \
 \cf2 //	header "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/libxml2/libxml/tree.h"\cf3 \
@@ -36,7 +43,7 @@
 \
 \
 \
-2.) Please follow this link also:\
+3.) Please follow this link also:\
 \pard\pardeftab720\sl300\partightenfactor0
 
 \f1\fs26 \cf6 \expnd0\expndtw0\kerning0
@@ -72,22 +79,20 @@ asyncSocket.IPv4PreferredOverIPv6 = NO;\
 \
 
 \fs23\fsmilli11900 \cf7 \cb8 \expnd0\expndtw0\kerning0
-\CocoaLigature1 3.) For file transfer add FileTransfer files and changes in XMPPJid.m\
+\CocoaLigature1 4.) For file transfer add FileTransfer files and changes in XMPPJid.m\
 Replace this code:\
-\pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\fs22 \cf2 \cb1 \kerning1\expnd0\expndtw0 \CocoaLigature0 - (NSString *)resource\cf3 \
+\fs22 \cf2 \cb9 \kerning1\expnd0\expndtw0 \CocoaLigature0 - (NSString *)resource\cf3 \
 \cf2 \{\cf3 \
 \cf2 	return resource; // Why didn't we just synthesize this? See comment above.\cf3 \
 \cf2 \}\
 \
 With \
-\cf3 - (\cf13 NSString\cf3  *)resource\
+\cf3 - (\cf13 \cb9 NSString\cf3 \cb9  *)resource\
 \{\
-    \cf4 return\cf3  \cf5 @"/Smack"\cf3 ; \cf2 // Why didn't we just synthesize this? See comment above.\cf3 \
+    \cf4 return\cf3  \cf5 \cb9 @"/Smack"\cf3 \cb9 ; \cf2 // Why didn't we just synthesize this? See comment above.\cf3 \
 \}\
 here "/Smack" use as any string\
-\pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
 \fs23\fsmilli11900 \cf7 \cb8 \expnd0\expndtw0\kerning0
 \CocoaLigature1 \

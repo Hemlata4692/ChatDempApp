@@ -16,10 +16,9 @@
 
 //File transfer
 #import "XMPPIncomingFileTransfer.h"
-#import "XMPPOutgoingFileTransfer.h"
 
 @interface AppDelegateObjectFile : UIResponder<XMPPRosterDelegate,XMPPStreamDelegate,
-XMPPIncomingFileTransferDelegate, XMPPOutgoingFileTransferDelegate>
+XMPPIncomingFileTransferDelegate>
 {
     XMPPStream *xmppStream;
     XMPPReconnect *xmppReconnect;
@@ -37,7 +36,6 @@ XMPPIncomingFileTransferDelegate, XMPPOutgoingFileTransferDelegate>
     
     //File transfer
     XMPPIncomingFileTransfer *xmppIncomingFileTransfer;
-    XMPPOutgoingFileTransfer *_fileTransfer;
 }
 
 //Delcare XMPP variables
@@ -77,7 +75,7 @@ XMPPIncomingFileTransferDelegate, XMPPOutgoingFileTransferDelegate>
 @property(strong, nonatomic)NSString *myView;
 @property(assign, nonatomic)BOOL isContactListIsLoaded;
 @property(assign, nonatomic)BOOL isUpdatePofile;
-@property(strong, nonatomic)NSString *updateProfileUserId;
+@property(strong, nonatomic)NSString *selectedFriendUserId;
 
 -(BOOL)connect;
 -(void)disconnect;
@@ -133,8 +131,8 @@ XMPPIncomingFileTransferDelegate, XMPPOutgoingFileTransferDelegate>
 
 //Check null/nil value
 - (NSString *)checkNilValue:(id)checkValue;
-
-
+- (NSString *)setOtherImageInLocalDB:(UIImage*)image;
+- (NSData *)listionSendAttachedImageCacheDirectoryFileName:(NSString *)fileName;
 
 
 

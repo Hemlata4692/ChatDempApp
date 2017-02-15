@@ -39,13 +39,13 @@
 
 - (void)initializeFriendProfile:(NSString*)jid {
     
-    appDelegate.updateProfileUserId=jid;
+    appDelegate.selectedFriendUserId=jid;
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:YES];
     
-    appDelegate.updateProfileUserId=@"";
+    appDelegate.selectedFriendUserId=@"";
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -91,7 +91,7 @@
 
 - (void)getProfileData:(NSString *)jid result:(void(^)(NSDictionary *tempProfileData)) completion {
     
-    appDelegate.updateProfileUserId=jid;
+    appDelegate.selectedFriendUserId=jid;
     dispatch_queue_t queue = dispatch_queue_create("profileDataQueue", DISPATCH_QUEUE_PRIORITY_DEFAULT);
     dispatch_async(queue, ^
                    {
@@ -109,7 +109,7 @@
 
 - (void)getEditProfileData:(NSString *)jid result:(void(^)(NSDictionary *tempProfileData)) completion {
     
-     appDelegate.updateProfileUserId=jid;
+     appDelegate.selectedFriendUserId=jid;
     dispatch_queue_t queue = dispatch_queue_create("profileDataQueue", DISPATCH_QUEUE_PRIORITY_DEFAULT);
     dispatch_async(queue, ^
                    {
@@ -182,7 +182,7 @@
 #pragma mark - User registration at XMPP server(OpenFire)
 - (void)userUpdateProfileUsingVCard:(NSMutableDictionary*)profileData profilePlaceholder:(NSString *)profilePlaceholder profileImageView:(UIImage *)profileImageView {
     
-    appDelegate.updateProfileUserId=appDelegate.xmppLogedInUserId;
+    appDelegate.selectedFriendUserId=appDelegate.xmppLogedInUserId;
     [profileData setObject:appDelegate.xmppLogedInUserId forKey:self.xmppRegisterId];
     xmppProfileUpdationData=[profileData mutableCopy];
     [self setXMPPProfilePhotoPlaceholder:profilePlaceholder profileImageView:profileImageView];

@@ -79,7 +79,7 @@
     self.nameLabel.frame=CGRectMake(76, 5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"nameHeight"] floatValue]); //Here frame = (Namelabel_x_Space, NameLabel_TopSpace, screenWidth - (Namelabel_x_Space + Namelabel_trailingSpace), NameHeight)
     self.messageLabel.frame=CGRectMake(76, (5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+10), [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (NameLabel_TopSpace + NameLabel_Height + space_Between_NameLabel_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
     
-    self.dateLabel.text=[self changeTimeFormat:[message attributeStringValueForName:@"time"]];
+    self.dateLabel.text=[self changeTimeFormat:[innerData attributeStringValueForName:@"time"]];
 }
 
 - (void)displayMultipleMessage:(NSXMLElement *)currentMessage nextmessage:(NSXMLElement *)nextmessage previousMessage:(NSXMLElement *)previousMessage profileImageView:(UIImage *)logedInUserPhoto friendProfileImageView:(UIImage *)friendUserPhoto {
@@ -139,6 +139,7 @@
         
         self.messageLabel.translatesAutoresizingMaskIntoConstraints=YES;
         self.messageLabel.numberOfLines=0;
+        NSLog(@"%f %@",[[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue], [innerData attributeStringValueForName:@"messageBodyHeight"]);
         self.messageLabel.frame=CGRectMake(76, 5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, MessageLabel_TopSpace, screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
         self.messageLabel.text=[[[currentMessage elementForName:@"body"] stringValue] capitalizedString];
     }

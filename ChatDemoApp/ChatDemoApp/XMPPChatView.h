@@ -26,4 +26,6 @@
 //Send text message
 - (void)sendXmppMessage:(NSString *)friendJid friendName:(NSString *)friendName messageString:(NSString *)messageString;
 - (void)XmppSendMessageResponse:(NSXMLElement *)xmpMessage;
+
+- (void)sendAttachment:(NSString *)fileName imageCaption:(NSString *)imageCaption;
 @end

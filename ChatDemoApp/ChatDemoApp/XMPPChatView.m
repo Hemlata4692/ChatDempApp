@@ -7,13 +7,15 @@
 //
 
 #import "XMPPChatView.h"
+#import "XMPPOutgoingFileTransfer.h"//File transfer
+
 #define fetchUserHistoryLimit 3
 
-@interface XMPPChatView () {
+@interface XMPPChatView ()<XMPPOutgoingFileTransferDelegate/*file transfer*/> {
 
     AppDelegateObjectFile *appDelegate;
 }
-
+@property (nonatomic, strong) XMPPOutgoingFileTransfer *fileTransfer;//File transfer
 @end
 
 @implementation XMPPChatView
@@ -31,12 +33,13 @@
     [super viewWillAppear:YES];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XmppUserPresenceUpdateNotify) name:@"XmppUserPresenceUpdate" object:nil];
+     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(historUpdated:) name:@"UserHistory" object:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:YES];
     
-    appDelegate.updateProfileUserId=@"";
+    appDelegate.selectedFriendUserId=@"";
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -47,7 +50,7 @@
 
 - (void)initializeFriendProfile:(NSString*)jid {
     
-    appDelegate.updateProfileUserId=jid;
+    appDelegate.selectedFriendUserId=jid;
 }
 #pragma mark - end
 
@@ -108,7 +111,18 @@
         NSMutableArray *tempHistoryData=[NSMutableArray new];
         for (XMPPMessageArchiving_Message_CoreDataObject *message in messages_arc) {
             NSXMLElement *element = [[NSXMLElement alloc] initWithXMLString:message.messageStr error:nil];
-            [tempHistoryData addObject:element];
+            
+            NSXMLElement *innerElementData = [element elementForName:@"data"];
+            if (![[innerElementData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId] && [[innerElementData attributeStringValueForName:@"to"] isEqualToString:appDelegate.xmppLogedInUserId]) {
+                
+                    [tempHistoryData addObject:element];
+            }
+            else {
+                if ([[innerElementData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]) {
+                    [tempHistoryData addObject:element];
+                }
+            }
+            
         }
         [self historyData:tempHistoryData];
 //        [myDelegate stopIndicator];
@@ -167,8 +181,8 @@
                            
                            if (nil==tempFriendImageData) {
                                friendTempPhoto=[UIImage imageWithData:[[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:friendJid]]];
-                               if (tempPhoto!=nil) {
-                                   [appDelegate saveDataInCacheDirectory:(UIImage *)tempPhoto folderName:appDelegate.appProfilePhotofolderName jid:friendJid];
+                               if (friendTempPhoto!=nil) {
+                                   [appDelegate saveDataInCacheDirectory:(UIImage *)friendTempPhoto folderName:appDelegate.appProfilePhotofolderName jid:friendJid];
                                }
                                else {
                                    friendTempPhoto=[UIImage imageNamed:placeholderImage];
@@ -254,7 +268,7 @@
     //    }] ;
     
     [[self xmppStream] sendElement:message];
-    [self XmppSendMessageResponse:message];
+    [self XmppSendMessageResponse:[message copy]];
     
     
     
@@ -339,6 +353,76 @@
 
 #pragma mark - Notification observer handler
 - (void)XmppUserPresenceUpdateNotify {}
+
+- (void)historUpdated:(NSNotification *)notification {
+    
+//    NSString *keyName = myDelegate.chatUser;
+//    if ([[UserDefaultManager getValue:@"CountData"] objectForKey:keyName] != nil) {
+//        int tempCount = 0;
+//        NSMutableDictionary *tempDict = [[UserDefaultManager getValue:@"CountData"] mutableCopy];
+//        [tempDict setObject:[NSString stringWithFormat:@"%d",tempCount] forKey:keyName];
+//        [UserDefaultManager setValue:tempDict key:@"CountData"];
+//    }
+    NSXMLElement* message = [notification object];
+    [self historyUpdateNotify:message];
+}
+
+- (void)historyUpdateNotify:(NSXMLElement *)message {}
+#pragma mark - end
+
+
+- (void)setReceiveImage {
+
+}
+
+- (void)sendAttachment:(NSString *)fileName imageCaption:(NSString *)imageCaption {
+
+    NSData *imageData=[appDelegate listionSendAttachedImageCacheDirectoryFileName:fileName];
+    XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",appDelegate.selectedFriendUserId,[[myDelegate.xmppStream myJID] resource]]];
+//    if (!_fileTransfer) {
+        _fileTransfer = [[XMPPOutgoingFileTransfer alloc]
+                         initWithDispatchQueue:dispatch_get_main_queue()];
+        _fileTransfer.disableSOCKS5 = YES;
+        [_fileTransfer activate:myDelegate.xmppStream];
+        [_fileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
+//    }
+    NSError *err;
+    if (![_fileTransfer sendData:imageData
+                           named:fileName
+                     toRecipient:jid
+                     description:imageCaption
+                           error:&err]) {
+        NSLog(@"You messed something up: %@", err);
+    }
+}
+
+#pragma mark - XMPPOutgoingFileTransferDelegate Methods
+- (void)xmppOutgoingFileTransfer:(XMPPOutgoingFileTransfer *)sender
+                didFailWithError:(NSError *)error
+{
+    //    DDLogInfo(@"Outgoing file transfer failed with error: %@", error);
+    NSLog(@"%@",error);
+    NSLog(@"%@",error.localizedDescription);
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
+                                                    message:error.localizedDescription
+                                                   delegate:nil
+                                          cancelButtonTitle:@"OK"
+                                          otherButtonTitles:nil];
+    [alert show];
+}
+
+- (void)xmppOutgoingFileTransferDidSucceed:(XMPPOutgoingFileTransfer *)sender
+{
+    //    DDLogVerbose(@"File transfer successful.");
+    
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Success!"
+                                                    message:@"Your file was sent successfully."
+                                                   delegate:nil
+                                          cancelButtonTitle:@"OK"
+                                          otherButtonTitles:nil];
+    [alert show];
+}
+
 /*
 #pragma mark - Navigation
 

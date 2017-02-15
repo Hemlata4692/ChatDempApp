@@ -17,6 +17,8 @@
 
 #import "BSKeyboardControls.h"
 #import "ChatScreenTableViewCell.h"
+#import "SendImageViewController.h"
+
 #define navigationBarHeight 64
 #define toolbarHeight 0
 #define messageTextviewInitialHeight 40
@@ -28,7 +30,7 @@
 #define messageTextViewFont [UIFont systemFontOfSize:17]
 #define DEFAULT_FONT(size)   [UIFont systemFontOfSize:size]
 
-@interface ChatScreenViewController ()<CustomFilterDelegate,/*BSKeyboardControlsDelegate,*/UIGestureRecognizerDelegate>{
+@interface ChatScreenViewController ()<CustomFilterDelegate,/*BSKeyboardControlsDelegate,*/UIGestureRecognizerDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate, SendImageDelegate>{
     CGFloat messageHeight, messageYValue;
     NSMutableArray *userData;
     NSString *otherUserId;
@@ -43,6 +45,8 @@
     UILabel *navTitleLabel, *navStatusLabel;
     
     float keyboardHeight;
+    
+    BOOL isAttachmentOpen;
 }
 
 @property (strong, nonatomic) IBOutlet UITableView *chatTableView;
@@ -52,9 +56,6 @@
 
 
 @property (strong, nonatomic) IBOutlet UIImageView *sendImage;
-
-
-@property (nonatomic, strong) XMPPOutgoingFileTransfer *fileTransfer;//File transfer
 
 //Declare BSKeyboard variable
 //@property (strong, nonatomic) BSKeyboardControls *keyboardControls;
@@ -81,6 +82,7 @@
     [self initializeFriendProfile:friendUserJid];   //Set current friend jid
     
     chatTableView.backgroundColor=[UIColor whiteColor];
+    isAttachmentOpen=false;
 //    UIImage *im=[UIImage imageNamed:@"arrow_down@3x.png"];
 //    [myDelegate saveDataInCacheDirectory:(UIImage *)im folderName:myDelegate.appProfilePhotofolderName jid:friendUserJid];
     
@@ -97,15 +99,20 @@
     //
     //    tempImageData = UIImageJPEGRepresentation([UIImage imageWithData:tempImageData], 0);
 //    NSLog(@"SIZE OF IMAGE: %.2f Mb", (float)tempImageData1.length/1024/1024);
-    [super viewWillAppear:YES];
-    [self viewInitialized]; //Initialised view
-    [self registerForKeyboardNotifications];
-    
-//    self.tabBarController.tabBar.hidden=NO;
-//    [[self navigationController] setNavigationBarHidden:NO];
-//    [[UIApplication sharedApplication] setStatusBarHidden:NO];
-    [myDelegate showIndicator];
-    [self performSelector:@selector(getHistoryChatData) withObject:nil afterDelay:.1];
+    if (!isAttachmentOpen) {
+        [super viewWillAppear:YES];
+        [self viewInitialized]; //Initialised view
+        [self registerForKeyboardNotifications];
+        
+        //    self.tabBarController.tabBar.hidden=NO;
+        //    [[self navigationController] setNavigationBarHidden:NO];
+        //    [[UIApplication sharedApplication] setStatusBarHidden:NO];
+        [myDelegate showIndicator];
+        [self performSelector:@selector(getHistoryChatData) withObject:nil afterDelay:.1];
+    }
+    else {
+        isAttachmentOpen=false;
+    }
 }
 
 -(void)viewDidAppear:(BOOL)animated
@@ -142,9 +149,12 @@
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
+    
+    if (!isAttachmentOpen) {
     [super viewWillDisappear:YES];
     
     [navBackView removeFromSuperview];
+    }
 }
 #pragma mark - end
 
@@ -865,7 +875,40 @@
     }
     else if (status==3) {
         NSLog(@"3");
+        [self openGallery];
     }
+}
+
+- (void)openGallery {
+    
+    isAttachmentOpen=true;
+    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+    picker.delegate = self;
+    picker.allowsEditing = YES;
+    picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+    picker.navigationBar.tintColor = [UIColor whiteColor];
+    
+    [self presentViewController:picker animated:YES completion:NULL];
+}
+#pragma mark - end
+
+#pragma mark - ImagePicker delegate
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingImage:(UIImage *)image editingInfo:(NSDictionary *)info {
+    
+    [picker dismissViewControllerAnimated:NO completion:NULL];
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    
+    UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    SendImageViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"SendImageViewController"];
+    [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+    popupView.delegate=self;
+    popupView.attachImage=image;
+    [self presentViewController:popupView animated:YES completion:nil];
+}
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+    
+    [picker dismissViewControllerAnimated:YES completion:NULL];
 }
 #pragma mark - end
 
@@ -942,6 +985,14 @@
 - (void)historyData:(NSMutableArray *)result{
 
     userData=[result mutableCopy];
+    for (int i=0; i<userData.count; i++) {
+        NSXMLElement *tempMessage=[userData objectAtIndex:i];
+        NSXMLElement *innertext=[tempMessage elementForName:@"data"];
+        if (nil==[innertext attributeStringValueForName:@"messageBodyHeight"]) {
+             tempMessage=[self setHeightInMessage:tempMessage];
+            [userData replaceObjectAtIndex:i withObject:tempMessage];
+        }
+    }
     [self.chatTableView reloadData];
     if (userData.count > 0) {
         NSIndexPath* ip = [NSIndexPath indexPathForRow:userData.count-1 inSection:0];
@@ -962,11 +1013,20 @@
     }
 }
 
+- (void)historyUpdateNotify:(NSXMLElement *)message {
 
+    [self messagesData:message];
+}
 
+#pragma mark - Send image delegates
+- (void)sendImageDelegateAction:(int)status imageName:(NSString *)imageName imageCaption:(NSString *)imageCaption {
 
+    if (status==1) {
+        [self sendAttachment:imageName imageCaption:imageCaption];
+    }
+}
 
-
+#pragma mark - end
 
 /*file transfer
  - (void)pdfTransfer:(XMPPJID *)jid {

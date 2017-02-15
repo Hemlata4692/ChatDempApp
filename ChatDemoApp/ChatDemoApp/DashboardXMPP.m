@@ -41,7 +41,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppNewUserAddedNotify) name:@"XmppNewUserAdded" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppNewUserAddedNotify) name:@"XmppUserPresenceUpdate" object:nil];
     
-    appDelegate.updateProfileUserId=@"";
+    appDelegate.selectedFriendUserId=@"";
     appDelegate.xmppLogedInUserId=[XMPPUserDefaultManager getValue:@"LoginCred"];
     
 //    isrefresh=YES;
@@ -360,23 +360,27 @@
     @autoreleasepool {
         for (XMPPMessageArchiving_Message_CoreDataObject *message in messages_arc) {
             NSXMLElement *element = [[NSXMLElement alloc] initWithXMLString:message.messageStr error:nil];
-            if (![[element attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]) {
+            NSXMLElement *innerElementData = [element elementForName:@"data"];
+            if (![[innerElementData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]&&[[innerElementData attributeStringValueForName:@"to"] isEqualToString:appDelegate.xmppLogedInUserId]) {
                 
-                if ([tempArray containsObject:[element attributeStringValueForName:@"from"]]) {
+                
+                if ([tempArray containsObject:[innerElementData attributeStringValueForName:@"from"]]) {
                     
-                    [tempArray removeObject:[element attributeStringValueForName:@"from"]];
+                    [tempArray removeObject:[innerElementData attributeStringValueForName:@"from"]];
                 }
-                [tempArray addObject:[element attributeStringValueForName:@"from"]];
-                [tempDict setObject:element forKey:[element attributeStringValueForName:@"from"]];
+                [tempArray addObject:[innerElementData attributeStringValueForName:@"from"]];
+                [tempDict setObject:element forKey:[innerElementData attributeStringValueForName:@"from"]];
+                
             }
             else {
-                
-                if ([tempArray containsObject:[element attributeStringValueForName:@"to"]]) {
-                    
-                    [tempArray removeObject:[element attributeStringValueForName:@"to"]];
+                if ([[innerElementData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]) {
+                    if ([tempArray containsObject:[innerElementData attributeStringValueForName:@"to"]]) {
+                        
+                        [tempArray removeObject:[innerElementData attributeStringValueForName:@"to"]];
+                    }
+                    [tempArray addObject:[innerElementData attributeStringValueForName:@"to"]];
+                    [tempDict setObject:element forKey:[innerElementData attributeStringValueForName:@"to"]];
                 }
-                [tempArray addObject:[element attributeStringValueForName:@"to"]];
-                [tempDict setObject:element forKey:[element attributeStringValueForName:@"to"]];
             }
         }
         

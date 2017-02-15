@@ -13,9 +13,9 @@
 #import "XMPPFramework.h"
 #import "XMPP.h"
 #import "TURNSocket.h"
-#import "XMPPOutgoingFileTransfer.h"//File transfer
+//#import "XMPPOutgoingFileTransfer.h"//File transfer
 
-@interface ChatScreenViewController : XMPPChatView<XMPPOutgoingFileTransferDelegate/*file transfer*/>
+@interface ChatScreenViewController : XMPPChatView
 {
     NSMutableArray *turnSockets;
     NSMutableArray	*messages;

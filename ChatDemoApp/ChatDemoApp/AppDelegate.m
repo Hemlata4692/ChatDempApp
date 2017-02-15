@@ -196,6 +196,7 @@
     self.loaderLabel.textAlignment = NSTextAlignmentCenter;
     self.loaderLabel.text = @"Loading...";
     
+    loaderView.tag=23165;
     [self.window addSubview:loaderView];
     [self.window addSubview:self.spinnerView];
     [self.window addSubview:self.loaderLabel];
@@ -204,10 +205,10 @@
 
 - (void)stopIndicator
 {
+    [self.spinnerView stopAnimating];
     [loaderView removeFromSuperview];
     [self.spinnerView removeFromSuperview];
     [self.loaderLabel removeFromSuperview];
-    [self.spinnerView stopAnimating];
 }
 #pragma mark - end
 

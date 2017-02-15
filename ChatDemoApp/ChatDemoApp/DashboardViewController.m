@@ -701,7 +701,6 @@
 - (void)reloadAction :(id)sender {
     
     profileLocalDictData=[NSMutableDictionary new];
-    historyChatData=[NSMutableArray new];
     [myDelegate showIndicator];
     [self performSelector:@selector(reloadUserData) withObject:nil afterDelay:0.1];
 }

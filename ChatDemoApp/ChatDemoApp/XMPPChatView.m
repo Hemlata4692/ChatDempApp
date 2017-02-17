@@ -382,7 +382,8 @@
 //    if (!_fileTransfer) {
         _fileTransfer = [[XMPPOutgoingFileTransfer alloc]
                          initWithDispatchQueue:dispatch_get_main_queue()];
-        _fileTransfer.disableSOCKS5 = YES;
+    _fileTransfer.disableIBB = NO;
+    _fileTransfer.disableSOCKS5 = YES;
         [_fileTransfer activate:myDelegate.xmppStream];
         [_fileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
 //    }

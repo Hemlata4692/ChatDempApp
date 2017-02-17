@@ -115,10 +115,16 @@ NSString *const XMPPIncomingFileTransferErrorDomain = @"XMPPIncomingFileTransfer
 - (void)acceptSIOffer:(XMPPIQ *)offer
 {
   XMPPLogTrace();
-
-  if (!_autoAcceptFileTransfers) {
-    [self sendSIOfferAcceptance:offer];
-  }
+//Removed by rohit
+//  if (!_autoAcceptFileTransfers) {
+//    [self sendSIOfferAcceptance:offer];
+//  }
+    //end
+    //Added by rohit
+    if (_autoAcceptFileTransfers) {
+        [self sendSIOfferAcceptance:offer];
+    }
+    //end
 }
 
 
@@ -573,7 +579,7 @@ NSString *const XMPPIncomingFileTransferErrorDomain = @"XMPPIncomingFileTransfer
 {
   if (_transferState == XMPPIFTStateNone && [self isDiscoInfoIQ:iq]) {
     [self sendIdentity:iq];
-    _transferState = XMPPIFTStateWaitingForSIOffer;
+//    _transferState = XMPPIFTStateWaitingForSIOffer;
     return YES;
   }
 

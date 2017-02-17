@@ -811,13 +811,25 @@ NSString *const XMPPOutgoingFileTransferErrorDomain = @"XMPPOutgoingFileTransfer
 
           [data setStringValue:dataString];
           [iq addChild:data];
-
+            //Added by rohit
+            if (_sentDataSize==_blockSize) {
+                NSLog(@"a");
+            }
           [_idTracker addElement:iq
                           target:self
                         selector:@selector(handleIBBTransferQueryIQ:withInfo:)
                          timeout:OUTGOING_DEFAULT_TIMEOUT];
 
           [xmppStream sendElement:iq];
+            //Added by rohit
+            if (_sentDataSize+_blockSize>=_totalDataSize) {
+                NSLog(@"a");
+                NSLog(@"a");
+
+                NSLog(@"a");
+                [multicastDelegate xmppOutgoingFileTransferDidSucceed:self];
+               [self closeIBB];            }
+            //end
         } else {
           XMPPLogInfo(@"IBB file transfer complete. Closing stream...");
 
@@ -910,6 +922,8 @@ NSString *const XMPPOutgoingFileTransferErrorDomain = @"XMPPOutgoingFileTransfer
         // above and the recipient has successfully received the data we sent,
         // so we should now send them the next block of data.
         _sentDataSize += _blockSize;
+          
+          
         [self sendIBBData];
 
         XMPPLogVerbose(
@@ -1067,16 +1081,16 @@ NSString *const XMPPOutgoingFileTransferErrorDomain = @"XMPPOutgoingFileTransfer
         hasSOCKS5 = hasSI && hasFT && hasSOCKS5;
         hasIBB = hasSI && hasFT && hasIBB;
 
-        if (!hasSOCKS5 || !hasIBB) {
-          NSString *errMsg =
-              @"Unable to send SI offer; the recipient doesn't have the required features.";
-          XMPPLogInfo(@"%@: %@", THIS_FILE, errMsg);
-
-          NSError *err = [self localErrorWithMessage:errMsg code:-1];
-          [multicastDelegate xmppOutgoingFileTransfer:self didFailWithError:err];
-
-          return_from_block;
-        }
+//        if (!hasSOCKS5 || !hasIBB) {
+//          NSString *errMsg =
+//              @"Unable to send SI offer; the recipient doesn't have the required features.";
+//          XMPPLogInfo(@"%@: %@", THIS_FILE, errMsg);
+//
+//          NSError *err = [self localErrorWithMessage:errMsg code:-1];
+//          [multicastDelegate xmppOutgoingFileTransfer:self didFailWithError:err];
+//
+//          return_from_block;
+//        }
 
         [self querySIOffer];
 

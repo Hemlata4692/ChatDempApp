@@ -73,8 +73,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 @synthesize folderName;
 @synthesize appMediafolderName;
 @synthesize appProfilePhotofolderName;
-@synthesize appSentPhotofolderName;
-@synthesize appReceivePhotofolderName;
+@synthesize appSentReceivePhotofolderName;
 @synthesize appDocumentfolderName;
 //end
 
@@ -88,8 +87,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     folderName=[[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleNameKey];
     appMediafolderName=[NSString stringWithFormat:@"%@/%@_Media",folderName,folderName];
     appProfilePhotofolderName=[NSString stringWithFormat:@"%@/%@_ProfilePhotos",appMediafolderName,folderName];
-    appSentPhotofolderName=[NSString stringWithFormat:@"%@/%@_Photos/%@_Sent",appMediafolderName,folderName,folderName];
-    appReceivePhotofolderName=[NSString stringWithFormat:@"%@/%@_Photos/%@_Receive",appMediafolderName,folderName,folderName];
+    appSentReceivePhotofolderName=[NSString stringWithFormat:@"%@/%@_Photos/%@_Sent",appMediafolderName,folderName,folderName];
     appDocumentfolderName=[NSString stringWithFormat:@"%@/%@_Documents",folderName,folderName];
     [self createCacheDirectory];
     //end
@@ -557,41 +555,12 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
             return;
         }
         
-        [self removeLocalUserChat:registredUserId];
+        [self removeLocalMessageStorageDataBase:registredUserId];
         if (isContactListIsLoaded) {
             
             [[NSNotificationCenter defaultCenter] postNotificationName:@"XmppNewUserAdded" object:nil];
         }
     }
-}
-
-- (void)removeLocalUserChat:(NSString *)userId {
-
-    //Remove local dataBase user chat
-    XMPPMessageArchivingCoreDataStorage *storage = [XMPPMessageArchivingCoreDataStorage sharedInstance];
-    NSManagedObjectContext *moc = [storage mainThreadManagedObjectContext];
-    NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"XMPPMessageArchiving_Message_CoreDataObject"
-                                                         inManagedObjectContext:moc];
-    
-    NSEntityDescription *messageEntity = [storage messageEntity:moc];
-    NSFetchRequest *fetchRequest1 = [[NSFetchRequest alloc] init];
-    [fetchRequest1 setEntity:entityDescription];
-    NSString *predicateFrmt = @"bareJidStr == %@";
-    fetchRequest1.entity = messageEntity;
-    NSError *error = nil;
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:predicateFrmt, userId];
-    fetchRequest1.predicate = predicate;
-    NSArray *messages_new = [moc executeFetchRequest:fetchRequest1 error:&error];
-    
-    for (NSManagedObject *object in messages_new) {
-        [moc deleteObject:object];
-    }
-    
-    if (![moc save:&error])
-    {
-        NSLog(@"Error deleting movie, %@", [error userInfo]);
-    }
-    //end
 }
 
 - (void)insertNewUserEntryInXmppUserModel:(NSString *)registredUserId xmppName:(NSString *)xmppName xmppPhoneNumber:(NSString *)xmppPhoneNumber xmppUserStatus:(NSString *)xmppUserStatus xmppDescription:(NSString *)xmppDescription xmppAddress:(NSString *)xmppAddress xmppEmailAddress:(NSString *)xmppEmailAddress xmppUserBirthDay:(NSString *)xmppUserBirthDay xmppGender:(NSString *)xmppGender {
@@ -687,7 +656,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         
 //        [message addAttributeWithName:@"fromTo" stringValue:[NSString stringWithFormat:@"%@-%@",[message attributeStringValueForName:@"to"],[[[message attributeStringValueForName:@"from"] componentsSeparatedByString:@"/"] objectAtIndex:0]]];
         
-        [xmppMessageArchivingCoreDataStorage archiveMessage:message outgoing:NO xmppStream:[self xmppStream]];
+//        [xmppMessageArchivingCoreDataStorage archiveMessage:message outgoing:NO xmppStream:[self xmppStream]];
+        
+        
 //        NSString *keyName = [[[message attributeStringValueForName:@"from"] componentsSeparatedByString:@"/"] objectAtIndex:0];
 //        if ([[XMPPUserDefaultManager getValue:@"CountData"] objectForKey:keyName] == nil) {
 //            int tempCount = 1;
@@ -706,7 +677,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         
 //        NSArray* fromUser = [[message attributeStringValueForName:@"from"] componentsSeparatedByString:@"/"];
         NSXMLElement *innerElementData = [message elementForName:@"data"];
-        
+        [self insertLocalMessageStorageDataBase:[innerElementData attributeStringValueForName:@"from"] message:message];
 //        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
 
 //        NSLog(@"%@",appDelegate.chatUser);
@@ -1321,8 +1292,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [self createCacheDirectory:folderName];
     [self createCacheDirectory:appMediafolderName];
     [self createCacheDirectory:appProfilePhotofolderName];
-    [self createCacheDirectory:appSentPhotofolderName];
-    [self createCacheDirectory:appReceivePhotofolderName];
+    [self createCacheDirectory:appSentReceivePhotofolderName];
     [self createCacheDirectory:appDocumentfolderName];
 }
 
@@ -1369,23 +1339,26 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [dateFormatter setDateFormat:@"ddMMYYhhmmss"];
     NSString * datestr = [dateFormatter stringFromDate:[NSDate date]];
     NSString *fileName = [NSString stringWithFormat:@"%@_%@.jpeg",folderName,datestr];
-    
+    [self saveImageInLocalDocumentDirectory:fileName image:[self sendReceiveReducedImageSize:image]];
+    return fileName;
+}
+
+- (void)saveImageInLocalDocumentDirectory:(NSString *)fileName image:(NSData *)imageData {
+
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSString *imagesPath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appSentPhotofolderName];
+    NSString *imagesPath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appSentReceivePhotofolderName];
     if (![fileManager fileExistsAtPath:imagesPath]) {
         
         [fileManager createDirectoryAtPath:imagesPath withIntermediateDirectories:YES attributes:nil error:nil];
     }
-    NSData * imageData = [self sendReceiveReducedImageSize:image];
     imagesPath=[imagesPath stringByAppendingPathComponent:fileName];
     NSLog(@"SIZE OF IMAGE: %.2f Mb", (float)imageData.length/1024/1024);
     [imageData writeToFile:imagesPath atomically:YES];
-    return fileName;
 }
 
 - (NSData *)listionSendAttachedImageCacheDirectoryFileName:(NSString *)fileName {
     
-    NSString *filePath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appSentPhotofolderName];
+    NSString *filePath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appSentReceivePhotofolderName];
     NSString *fileAtPath = [filePath stringByAppendingPathComponent:fileName];
     NSError* error = nil;
     return [NSData dataWithContentsOfFile:fileAtPath options:0 error:&error];
@@ -1446,18 +1419,178 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [sender acceptSIOffer:offer];
 }
 
-- (void)xmppIncomingFileTransfer:(XMPPIncomingFileTransfer *)sender
-              didSucceedWithData:(NSData *)data
-                           named:(NSString *)name
-{
+//- (void)xmppIncomingFileTransfer:(XMPPIncomingFileTransfer *)sender
+//              didSucceedWithData:(NSData *)data
+//                           named:(NSString *)name
+//{
+//    DDLogVerbose(@"%@: Incoming file transfer did succeed.", THIS_FILE);
+//    
+//    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
+//                                                         NSUserDomainMask,
+//                                                         YES);
+//    NSString *fullPath = [[paths lastObject] stringByAppendingPathComponent:name];
+//    [data writeToFile:fullPath options:0 error:nil];
+//    
+//    DDLogVerbose(@"%@: Data was written to the path: %@", THIS_FILE, fullPath);
+//}
+
+- (void)xmppIncomingFileTransferWithDesc:(XMPPIncomingFileTransfer *)sender
+                      didSucceedWithData:(NSData *)data
+                                   named:(NSString *)name desc:(NSString *)desc date:(NSString *)date time:(NSString *)time to:(NSString *)to from:(NSString *)from senderName:(NSString *)senderName receiverName:(NSString *)receiverName chatType:(NSString *)chatType {
+    
     DDLogVerbose(@"%@: Incoming file transfer did succeed.", THIS_FILE);
+    NSLog(@"%@",desc);
+//    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
+//                                                         NSUserDomainMask,
+//                                                         YES);
+//    NSString *fullPath = [[paths lastObject] stringByAppendingPathComponent:name];
+//    [data writeToFile:fullPath options:0 error:nil];
     
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
-                                                         NSUserDomainMask,
-                                                         YES);
-    NSString *fullPath = [[paths lastObject] stringByAppendingPathComponent:name];
-    [data writeToFile:fullPath options:0 error:nil];
+    [self saveImageInLocalDocumentDirectory:name image:data];
+    NSXMLElement *messageData=[self convertedMessage:name date:date time:time to:to from:from senderName:senderName receiverName:receiverName messageString:desc chatType:chatType];
+     NSXMLElement *innerElementData = [messageData elementForName:@"data"];
+    [self insertLocalMessageStorageDataBase:[innerElementData attributeStringValueForName:@"from"] message:messageData];
     
-    DDLogVerbose(@"%@: Data was written to the path: %@", THIS_FILE, fullPath);
+    if ([selectedFriendUserId isEqualToString:[innerElementData attributeStringValueForName:@"from"]]){
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"UserHistory" object:messageData];
+    }
+//    DDLogVerbose(@"%@: Data was written to the path: %@", THIS_FILE, fullPath);
+    
 }
+
+- (NSXMLElement *)convertedMessage:(NSString *)imageName date:(NSString *)date time:(NSString *)time to:(NSString *)to from:(NSString *)from senderName:(NSString *)senderName receiverName:(NSString *)receiverName messageString:(NSString *)messageString chatType:(NSString *)chatType {
+    
+    NSXMLElement *body = [NSXMLElement elementWithName:@"body"];
+    
+    [body setStringValue:messageString];
+    NSXMLElement *message = [NSXMLElement elementWithName:@"message"];
+    NSXMLElement *dataTag = [NSXMLElement elementWithName:@"data"];
+    
+    [message addAttributeWithName:@"type" stringValue:chatType];
+    [message addAttributeWithName:@"to" stringValue:to];
+    [message addAttributeWithName:@"from" stringValue:from];
+    [message addAttributeWithName:@"progress" stringValue:@"1"];
+    
+    [dataTag addAttributeWithName:@"xmlns" stringValue:@"main"];
+    [dataTag addAttributeWithName:@"chatType" stringValue:@"Single"];
+    
+    [dataTag addAttributeWithName:@"to" stringValue:to];
+    [dataTag addAttributeWithName:@"fileName" stringValue:imageName];
+    
+    [dataTag addAttributeWithName:@"from" stringValue:from];
+    [dataTag addAttributeWithName:@"time" stringValue:time];
+    //        [message addAttributeWithName:@"Name" stringValue:[UserDefaultManager getValue:@"userName"]];
+    [dataTag addAttributeWithName:@"date" stringValue:date];
+    //        [message addAttributeWithName:@"from-To" stringValue:[NSString stringWithFormat:@"%@-%@",myDelegate.xmppLogedInUserId,friendUserJid]];
+    [dataTag addAttributeWithName:@"senderName" stringValue:senderName];
+    [dataTag addAttributeWithName:@"receiverName" stringValue:receiverName];
+    //    }
+    [message addChild:dataTag];
+    [message addChild:body];
+    return message;
+}
+
+//Manage local chat database
+- (void)removeLocalMessageStorageDataBase:(NSString *)userId {
+    
+    //Remove local dataBase user chat
+    NSManagedObjectContext *context = [self managedObjectContext];
+    NSString *predicateFrmt = @"bareJidStr == %@";
+    NSPredicate *pred;
+    
+    pred = [NSPredicate predicateWithFormat:predicateFrmt, userId];
+    NSLog(@"predicate: %@",pred);
+    
+    //    [request setPredicate:predicate];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"MessageHistory"];
+    [fetchRequest setPredicate:pred];
+    NSArray *results = [context executeFetchRequest:fetchRequest error:nil];
+    
+    if (results.count > 0) {
+        
+        for (NSManagedObject *object in results) {
+            [context deleteObject:object];
+        }
+        NSError *error = nil;
+        if (![context save:&error]) {
+            NSLog(@"Can't Delete! %@ %@", error, [error localizedDescription]);
+            return;
+        }
+    }
+    //end
+}
+
+- (void)insertLocalMessageStorageDataBase:(NSString *)bareJidStr message:(NSXMLElement *)message {
+    
+    [self insertMessageData:bareJidStr message:[NSString stringWithFormat:@"%@",message] uniquiId:@""];
+}
+
+- (void)insertLocalImageMessageStorageDataBase:(NSString *)bareJidStr message:(NSXMLElement *)message uniquiId:(NSString *)uniquiId {
+    
+    [self insertMessageData:bareJidStr message:[NSString stringWithFormat:@"%@",message] uniquiId:uniquiId];
+}
+
+- (void)insertMessageData:(NSString *)bareJidStr message:(NSString *)message uniquiId:(NSString *)uniquiId {
+
+    NSManagedObjectContext *context = [self managedObjectContext];
+    
+    NSManagedObject *xmppDataEntry = [NSEntityDescription insertNewObjectForEntityForName:@"MessageHistory" inManagedObjectContext:context];
+    [xmppDataEntry setValue:bareJidStr forKey:@"bareJidStr"];
+    [xmppDataEntry setValue:message forKey:@"messageString"];
+    [xmppDataEntry setValue:uniquiId forKey:@"uniqueId"];
+    
+    NSError *error = nil;
+    // Save the object to persistent store
+    if (![context save:&error]) {
+        NSLog(@"Can't Save! %@ %@", error, [error localizedDescription]);
+    }
+}
+
+- (NSArray *)readAllLocalMessageStorageDatabase {
+
+    return [self readLocalChat:@""];
+}
+
+- (NSArray *)readLocalMessageStorageDatabaseBareJidStr:(NSString *)bareJidStr {
+    
+    return [self readLocalChat:bareJidStr];
+}
+
+- (NSArray *)readLocalChat:(NSString *)bareJidStr {
+
+    NSManagedObjectContext *context = [self managedObjectContext];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"MessageHistory"];
+    if (![bareJidStr isEqualToString:@""]) {
+        NSPredicate *pred;
+        pred = [NSPredicate predicateWithFormat:@"bareJidStr == %@", bareJidStr];
+        NSLog(@"predicate: %@",pred);
+        [fetchRequest setPredicate:pred];
+    }
+    return [context executeFetchRequest:fetchRequest error:nil];
+}
+
+- (void)updateLocalMessageStorageDatabaseBareJidStr:(NSString *)bareJidStr message:(NSXMLElement *)message uniquiId:(NSString *)uniquiId {
+    
+    NSManagedObjectContext *context = [self managedObjectContext];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"MessageHistory"];
+    if (![bareJidStr isEqualToString:@""]) {
+        NSPredicate *pred;
+        pred = [NSPredicate predicateWithFormat:@"uniqueId == %@", uniquiId];
+        NSLog(@"predicate: %@",pred);
+        [fetchRequest setPredicate:pred];
+    }
+    NSArray *tempArray=[context executeFetchRequest:fetchRequest error:nil];
+    if ([tempArray count]>0) {
+        NSManagedObjectContext *context = [self managedObjectContext];
+        NSManagedObject* xmppDataEntry = [tempArray objectAtIndex:0];
+        [xmppDataEntry setValue:bareJidStr forKey:@"bareJidStr"];
+        [xmppDataEntry setValue:[NSString stringWithFormat:@"%@",message] forKey:@"messageString"];
+        [xmppDataEntry setValue:uniquiId forKey:@"uniqueId"];
+                [context save:nil];
+    }
+    else {
+        [self insertMessageData:bareJidStr message:[NSString stringWithFormat:@"%@",message] uniquiId:uniquiId];
+    }
+}
+//end
 @end

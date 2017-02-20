@@ -18,6 +18,7 @@
 #import "BSKeyboardControls.h"
 #import "ChatScreenTableViewCell.h"
 #import "SendImageViewController.h"
+#import "UserDefaultManager.h"
 
 #define navigationBarHeight 64
 #define toolbarHeight 0
@@ -46,7 +47,8 @@
     
     float keyboardHeight;
     
-    BOOL isAttachmentOpen;
+    BOOL isAttachmentOpen, isReceiptOffline;
+    UIView *imagePreviewView;
 }
 
 @property (strong, nonatomic) IBOutlet UITableView *chatTableView;
@@ -277,6 +279,12 @@
 
 - (void)attachmentAction {
     
+    if (isReceiptOffline) {
+        
+        [UserDefaultManager showAlertMessage:@"Alert" message:@"Recipient may be offline so please try again later."];
+    }
+    else {
+    [messageTextView resignFirstResponder];
     UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     CustomFilterViewController *filterViewObj =[storyboard instantiateViewControllerWithIdentifier:@"CustomFilterViewController"];
     filterViewObj.delegate=self;
@@ -293,6 +301,7 @@
     
     [filterViewObj setModalPresentationStyle:UIModalPresentationOverCurrentContext];
     [self presentViewController:filterViewObj animated:NO completion:nil];
+    }
 }
 #pragma mark - end
 
@@ -300,12 +309,14 @@
 - (void)userOnline {
     
     navStatusLabel.text=@"(Online)";
+    isReceiptOffline=false;
     navStatusLabel.textColor=[UIColor whiteColor];
 }
 
 - (void)userOffline {
     
     navStatusLabel.text=@"(Offline)";
+    isReceiptOffline=true;
     navStatusLabel.textColor=[UIColor whiteColor];
 }
 #pragma mark - end
@@ -474,6 +485,39 @@
 - (IBAction)tapGestureOnView:(UITapGestureRecognizer *)sender {
     [messageTextView resignFirstResponder];
 }
+
+- (void)tappedOnImageView:(UIGestureRecognizer *)sender {
+    
+    [self.view endEditing:YES];
+    UITapGestureRecognizer *gesture = (UITapGestureRecognizer *) sender;
+    NSXMLElement *innerData=[[userData objectAtIndex:(int)gesture.view.tag] elementForName:@"data"];
+    imagePreviewView=[[UIView alloc] initWithFrame:CGRectMake(0,self.view.bounds.size.height,self.view.bounds.size.width,self.view.bounds.size.height)];
+    UIImageView *popImage=[[UIImageView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,self.view.frame.size.height)];
+    imagePreviewView.backgroundColor = [UIColor blackColor];
+    popImage.contentMode = UIViewContentModeScaleAspectFit;
+    popImage.backgroundColor = [UIColor clearColor];
+    popImage.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+    //    [userData objectAtIndex:(int)gesture.view.tag]
+    UIButton *close_button=[[UIButton alloc]initWithFrame:CGRectMake(self.view.frame.size.width - 60,10,48,48)];
+    [close_button setImage:[UIImage imageNamed:@"cross"] forState:UIControlStateNormal];
+    [close_button addTarget:self action:@selector(closeAction:) forControlEvents:UIControlEventTouchUpInside];
+    [imagePreviewView addSubview:popImage];
+    [imagePreviewView addSubview:close_button];
+    [self.view addSubview:imagePreviewView];
+    
+    [UIView animateWithDuration:0.3f animations:^{
+        imagePreviewView.frame = CGRectMake(0,0,self.view.bounds.size.width,self.view.bounds.size.height);
+    }];
+}
+
+- (IBAction)closeAction:(id)sender {
+    
+    [UIView animateWithDuration:0.3f animations:^{
+        imagePreviewView.frame = CGRectMake(0,self.view.bounds.size.height,self.view.bounds.size.width,self.view.bounds.size.height);
+    } completion:^(BOOL finished) {
+        [imagePreviewView removeFromSuperview];
+    }];
+}
 #pragma mark - end
 
 #pragma mark - Table view delegates
@@ -489,196 +533,111 @@
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    ChatScreenTableViewCell *cell=[chatTableView dequeueReusableCellWithIdentifier:@"chatCell"];
-    if (cell == nil)
-    {
-        cell=[[ChatScreenTableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"chatCell"];
-    }
+    ChatScreenTableViewCell *cell;
+
+    cell=[chatTableView dequeueReusableCellWithIdentifier:@"chatImageAttachmentCell"];
+        if (cell == nil)
+        {
+            cell=[[ChatScreenTableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"chatImageAttachmentCell"];
+        }
     
-    if (userData.count==1) {
-        
-        [cell displaySingleMessageData:[userData objectAtIndex:indexPath.row] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto];
-    }
-    else if (userData.count>(indexPath.row+1)) {
-       
-        if ((int)indexPath.row==0) {
+        cell.attachedImageView.tag=indexPath.row;
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tappedOnImageView:)];
+//    [tap setNumberOfTouchesRequired:1];
+//    [tap setNumberOfTapsRequired:1];
+    [cell.attachedImageView addGestureRecognizer:tap];
+    [cell.attachedImageView setUserInteractionEnabled:YES];
+        if (userData.count==1) {
             
-            [cell displayFirstMessage:[userData objectAtIndex:indexPath.row] nextmessage:[userData objectAtIndex:indexPath.row+1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto];
+            [cell displaySingleMessageData:[userData objectAtIndex:indexPath.row] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto  chatType:[[userData objectAtIndex:indexPath.row] attributeStringValueForName:@"type"]];
+            
+        }
+        else if (userData.count>(indexPath.row+1)) {
+            
+            if ((int)indexPath.row==0) {
+                
+                [cell displayFirstMessage:[userData objectAtIndex:indexPath.row] nextmessage:[userData objectAtIndex:indexPath.row+1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto  chatType:[[userData objectAtIndex:indexPath.row] attributeStringValueForName:@"type"]];
+            }
+            else {
+                [cell displayMultipleMessage:[userData objectAtIndex:indexPath.row] nextmessage:[userData objectAtIndex:indexPath.row+1] previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto  chatType:[[userData objectAtIndex:indexPath.row] attributeStringValueForName:@"type"]];
+            }
         }
         else {
-            [cell displayMultipleMessage:[userData objectAtIndex:indexPath.row] nextmessage:[userData objectAtIndex:indexPath.row+1] previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto];
+            [cell displayLastMessage:[userData objectAtIndex:indexPath.row] previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto  chatType:[[userData objectAtIndex:indexPath.row] attributeStringValueForName:@"type"]];
         }
-    }
-    else {
-        [cell displayLastMessage:[userData objectAtIndex:indexPath.row] previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto];
-    }
-    
-//    NSXMLElement* message = [userData objectAtIndex:indexPath.row];
-//    float mainCellHeight=5+[[message attributeStringValueForName:@"NameHeight"] floatValue]+10+[[message attributeStringValueForName:@"messageBodyHeight"] floatValue]+10+20+5; //here mainCellHeight = NameLabel_topSpace + NameHeight + space_Between_NameLabel_And_MessageLabel + MessageHeight + space_Between_MessageLabel_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
-//    float innerCellHeight=5+[[message attributeStringValueForName:@"messageBodyHeight"] floatValue]+10+20+5; //here innerCellHeight = MessageLabel_topSpace + MessageHeight + space_Between_MessageLabel_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
-//    
-//    if (userData.count==1 || indexPath.row == 0) {
-//        if (mainCellHeight > 90) {
-//            return mainCellHeight;
-//        }
-//        else{
-//            return 90;
-//        }
-//    }
-//    else{
-//        NSXMLElement* message1 = [userData objectAtIndex:(int)indexPath.row - 1];
-//        if ([[message attributeStringValueForName:@"SenderName"] isEqualToString:[message1 attributeStringValueForName:@"SenderName"]]) {
-//            return innerCellHeight;
-//        }
-//        else{
-//            if (mainCellHeight > 90) {
-//                return mainCellHeight;
-//            }
-//            else{
-//                return 90;
-//            }
-//        }
-//    }
-    
-    
-    
-    
-//    UIImageView *userImage = (UIImageView*)[cell viewWithTag:1];
-//    UILabel *userName = (UILabel*)[cell viewWithTag:2];
-//    UILabel *userChat = (UILabel*)[cell viewWithTag:3];
-//    UILabel *chatTime = (UILabel*)[cell viewWithTag:4];
-//    UILabel *seperatorLabel = (UILabel*)[cell viewWithTag:5];
-////    MyButton *userImageBtn = (MyButton*)[cell viewWithTag:10];
-////    MyButton *nameButton = (MyButton*)[cell viewWithTag:20];
-//    userName.translatesAutoresizingMaskIntoConstraints = YES;
-//    userChat.translatesAutoresizingMaskIntoConstraints = YES;
-////    userImageBtn.translatesAutoresizingMaskIntoConstraints = YES;
-////    nameButton.translatesAutoresizingMaskIntoConstraints = YES;
-//    userImage.layer.cornerRadius = 30;
-//    userImage.layer.masksToBounds = YES;
-//    userImage.layer.borderWidth=1.5f;
-//    userImage.layer.borderColor=[UIColor colorWithRed:236.0/255.0 green:236.0/255.0 blue:236.0/255.0 alpha:1.0].CGColor;
-//    NSXMLElement* message = [userData objectAtIndex:indexPath.row];
-////    if ( [[UserDefaultManager getValue:@"userName"] caseInsensitiveCompare:[message attributeStringValueForName:@"Name"]] == NSOrderedSame)
-////    {
-////        userName.text = [UserDefaultManager getValue:@"userName"];
-////    }
-////    else
-////    {
-////        userName.text = [message attributeStringValueForName:@"Name"];
-////        otherUserId=[message attributeStringValueForName:@"senderUserId"];
-////    }
-//    userChat.text = [[message elementForName:@"body"] stringValue];
-//    NSArray* fromUser = [[message attributeStringValueForName:@"from"] componentsSeparatedByString:@"/"];
-////    if ( [[UserDefaultManager getValue:@"LoginCred"] caseInsensitiveCompare:[fromUser objectAtIndex:0]] == NSOrderedSame) {
-////        userImage.image = userProfileImageView.image;
-////        userName.textColor = [UIColor colorWithRed:13.0/255.0 green:213.0/255.0 blue:178.0/255.0 alpha:1.0];
-////    }
-////    else{
-////        userName.textColor = [UIColor blackColor];
-////        userImage.image = friendProfileImageView;
-////    }
-//    NSString *userNameValue = [message attributeStringValueForName:@"Name"];
-//    float userNameHeight;
-//    CGSize size = CGSizeMake(userTableView.frame.size.width - (10+50+20+10),50);
-//    CGRect textRect=[userNameValue
-//                     boundingRectWithSize:size
-//                     options:NSStringDrawingUsesLineFragmentOrigin
-//                     attributes:@{NSFontAttributeName:[UIFont fontWithName:@"Roboto-Medium" size:14]}
-//                     context:nil];
-//    userName.numberOfLines = 0;
-//    userNameHeight = textRect.size.height;
-//    userName.frame = CGRectMake(82, 25, userTableView.frame.size.width - (10+50+20+10), userNameHeight);
-//    nameButton.frame = userName.frame;
-//    [nameButton addTarget:self action:@selector(openProfileButtonAction:) forControlEvents:UIControlEventTouchUpInside];
-//    [userImageBtn addTarget:self action:@selector(openProfileButtonAction:) forControlEvents:UIControlEventTouchUpInside];
-//    userImageBtn.Tag=(int)indexPath.row;
-//    nameButton.Tag=(int)indexPath.row;
-//    NSString *body = [[message elementForName:@"body"] stringValue];
-//    size = CGSizeMake(userTableView.frame.size.width - (10+50+20+10),2000);
-//    textRect=[body
-//              boundingRectWithSize:size
-//              options:NSStringDrawingUsesLineFragmentOrigin
-//              attributes:@{NSFontAttributeName:[UIFont fontWithName:@"Roboto-Regular" size:14]}
-//              context:nil];
-//    userChat.numberOfLines = 0;
-//    if (userData.count == 1 || indexPath.row == 0) {
-//        userChat.frame = CGRectMake(82,  userName.frame.origin.y + userNameHeight + 9, userTableView.frame.size.width - (10+50+20+10), textRect.size.height);
-//        userImage.hidden = NO;
-//        userName.hidden = NO;
-//        nameButton.hidden=NO;
-//        userImageBtn.hidden=NO;
-//    }
-//    else{
-//        NSXMLElement* message1;
-//        message1 = [userData objectAtIndex:(int)indexPath.row - 1];
-//        if ([[message attributeStringValueForName:@"Name"] isEqualToString:[message1 attributeStringValueForName:@"Name"]]) {
-//            userChat.frame = CGRectMake(82, 5, userTableView.frame.size.width - (10+50+20+10), textRect.size.height);
-//            userImage.hidden = YES;
-//            userName.hidden = YES;
-//            nameButton.hidden=YES;
-//            userImageBtn.hidden=YES;
-//        }
-//        else{
-//            userChat.frame = CGRectMake(82,  userName.frame.origin.y + userNameHeight + 9, userTableView.frame.size.width - (10+50+20+10), textRect.size.height);
-//            userImage.hidden = NO;
-//            userName.hidden = NO;
-//            nameButton.hidden=NO;
-//            userImageBtn.hidden=NO;
-//        }
-//        
-//        
-//        
-//    }
-//    NSXMLElement *nextMessage;
-//    
-//    if (userData.count>indexPath.row+1) {
-//        nextMessage = [userData objectAtIndex:(int)indexPath.row + 1];
-//        if (![[message attributeStringValueForName:@"Name"] isEqualToString:[nextMessage attributeStringValueForName:@"Name"]]) {
-//            seperatorLabel.hidden=NO;
-//        }
-//        else
-//        {
-//            seperatorLabel.hidden=YES;
-//        }
-//        
-//    }
-//    else
-//    {
-//        seperatorLabel.hidden=NO;
-//    }
-//    chatTime.hidden = NO;
-//    chatTime.text = [message attributeStringValueForName:@"time"];
     return cell;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-   
-    NSXMLElement* message = [userData objectAtIndex:indexPath.row];
-    NSXMLElement *innerData=[message elementForName:@"data"];
-    float mainCellHeight=5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+10+[[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]+10+20+5; //here mainCellHeight = NameLabel_topSpace + NameHeight + space_Between_NameLabel_And_MessageLabel + MessageHeight + space_Between_MessageLabel_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
-    float innerCellHeight=5+[[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]+10+20+5; //here innerCellHeight = MessageLabel_topSpace + MessageHeight + space_Between_MessageLabel_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
     
-    if (userData.count==1 || indexPath.row == 0) {
-        if (mainCellHeight > 90) {
-            return mainCellHeight;
-        }
-        else{
-            return 90;
-        }
-    }
-    else{
-        NSXMLElement* message1 = [userData objectAtIndex:(int)indexPath.row - 1];
-        NSXMLElement *innerData1=[message1 elementForName:@"data"];
-        if ([[innerData attributeStringValueForName:@"from"] isEqualToString:[innerData1 attributeStringValueForName:@"from"]]) {
-            return innerCellHeight;
-        }
-        else{
+    if (![[[userData objectAtIndex:indexPath.row] attributeStringValueForName:@"type"] isEqualToString:@"ImageAttachment"]) {
+        
+        NSXMLElement* message = [userData objectAtIndex:indexPath.row];
+        NSXMLElement *innerData=[message elementForName:@"data"];
+        float mainCellHeight=5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+10+[[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]+10+20+5; //here mainCellHeight = NameLabel_topSpace + NameHeight + space_Between_NameLabel_And_MessageLabel + MessageHeight + space_Between_MessageLabel_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
+        float innerCellHeight=5+[[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]+10+20+5; //here innerCellHeight = MessageLabel_topSpace + MessageHeight + space_Between_MessageLabel_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
+        
+        if (userData.count==1 || indexPath.row == 0) {
             if (mainCellHeight > 90) {
                 return mainCellHeight;
             }
             else{
                 return 90;
+            }
+        }
+        else{
+            NSXMLElement* message1 = [userData objectAtIndex:(int)indexPath.row - 1];
+            NSXMLElement *innerData1=[message1 elementForName:@"data"];
+            if ([[innerData attributeStringValueForName:@"from"] isEqualToString:[innerData1 attributeStringValueForName:@"from"]]) {
+                return innerCellHeight;
+            }
+            else{
+                if (mainCellHeight > 90) {
+                    return mainCellHeight;
+                }
+                else{
+                    return 90;
+                }
+            }
+        }
+    }
+    else {
+        
+        NSXMLElement* message = [userData objectAtIndex:indexPath.row];
+        NSXMLElement *innerData=[message elementForName:@"data"];
+        float mainCellHeight=5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+10+[[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]+10+20+5; //here mainCellHeight = NameLabel_topSpace + NameHeight + space_Between_NameLabel_And_MessageLabel + MessageHeight + space_Between_MessageLabel_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
+        float innerCellHeight=5+[[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]+10+20+5; //here innerCellHeight = MessageLabel_topSpace + MessageHeight + space_Between_MessageLabel_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
+        
+        if (userData.count==1 || indexPath.row == 0) {
+            if (mainCellHeight > 90) {
+                return mainCellHeight + (10+128);//(10+128)=(topAndBottomSpace of image+ imageHeight)
+            }
+            else{
+                
+                if ([[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]<2.0) {
+                    return 200;
+                }
+                return 225;
+            }
+        }
+        else{
+            NSXMLElement* message1 = [userData objectAtIndex:(int)indexPath.row - 1];
+            NSXMLElement *innerData1=[message1 elementForName:@"data"];
+            if ([[innerData attributeStringValueForName:@"from"] isEqualToString:[innerData1 attributeStringValueForName:@"from"]]) {
+                
+                return innerCellHeight+(10+128);//(10+128)=(topAndBottomSpace of image+ imageHeight)
+            }
+            else{
+                if (mainCellHeight > 90) {
+                    return mainCellHeight + (10+128);//(10+128)=(topAndBottomSpace of image+ imageHeight)
+                }
+                else{
+                    
+                    if ([[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]<2.0) {
+                        return 200;
+                    }
+                    return 225;
+                }
             }
         }
     }
@@ -737,130 +696,6 @@
 -(IBAction)sendMessage:(id)sender {
     
     [self sendXmppMessage:friendUserJid friendName:self.friendUserName messageString:messageTextView.text];
-//    [myDelegate.xmppMessageArchivingModule setClientSideMessageArchivingOnly:YES];
-//    [myDelegate.xmppMessageArchivingModule activate:[self xmppStream]];    //By this line all your messages are stored in CoreData
-//    [myDelegate.xmppMessageArchivingModule addDelegate:self delegateQueue:dispatch_get_main_queue()];
-//    NSString *messageStr = [messageTextView.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-//    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-//    [dateFormatter setDateFormat:@"HH:mm:ss"];
-//    NSDate *date = [NSDate date];
-////    [dateFormatter setDateFormat:@"hh:mm a"];
-////    [dateFormatter setAMSymbol:@"am"];
-////    [dateFormatter setPMSymbol:@"pm"];
-//    NSString *formattedTime = [dateFormatter stringFromDate:date];
-//    [dateFormatter setDateFormat:@"dd/MM/yy"];
-//    NSString *formattedDate = [dateFormatter stringFromDate:date];
-//    NSXMLElement *body = [NSXMLElement elementWithName:@"body"];
-//    
-//    [body setStringValue:messageStr];
-//    NSXMLElement *message = [NSXMLElement elementWithName:@"message"];
-//    [message addAttributeWithName:@"type" stringValue:@"chat"];
-//    [message addAttributeWithName:@"chatType" stringValue:@"Single"];
-//    
-////    if ([lastView isEqualToString:@"ChatViewController"] || [lastView isEqualToString:@"MeTooUserProfile"]) {
-////        [message addAttributeWithName:@"to" stringValue:[userXmlDetail attributeStringValueForName:@"to"]];
-////        [message addAttributeWithName:@"from" stringValue:[userXmlDetail attributeStringValueForName:@"from"]];
-////        [message addAttributeWithName:@"time" stringValue:formattedTime];
-////        //        [message addAttributeWithName:@"Name" stringValue:[UserDefaultManager getValue:@"userName"]];
-////        [message addAttributeWithName:@"Date" stringValue:formattedDate];
-////        [message addAttributeWithName:@"fromTo" stringValue:[NSString stringWithFormat:@"%@-%@",[userXmlDetail attributeStringValueForName:@"to"],[userXmlDetail attributeStringValueForName:@"from"]]];
-////        [message addAttributeWithName:@"ToName" stringValue:[userXmlDetail attributeStringValueForName:@"ToName"]];
-////        //        [message addAttributeWithName:@"senderUserId" stringValue:[UserDefaultManager getValue:@"userId"]];
-////    }
-////    else{
-//        [message addAttributeWithName:@"to" stringValue:friendUserJid];
-//        [message addAttributeWithName:@"from" stringValue:myDelegate.xmppLogedInUserId];
-//        [message addAttributeWithName:@"time" stringValue:formattedTime];
-//        //        [message addAttributeWithName:@"Name" stringValue:[UserDefaultManager getValue:@"userName"]];
-//        [message addAttributeWithName:@"Date" stringValue:formattedDate];
-////        [message addAttributeWithName:@"from-To" stringValue:[NSString stringWithFormat:@"%@-%@",myDelegate.xmppLogedInUserId,friendUserJid]];
-//        [message addAttributeWithName:@"ToName" stringValue:_friendUserName];
-////    }
-//    [message addChild:body];
-//    //    [[WebService sharedManager] chatNotification:[message attributeStringValueForName:@"to"] userNameFrom:[message attributeStringValueForName:@"from"] messageString:[[message elementForName:@"body"] stringValue] success:^(id responseObject) {
-//    //        [myDelegate stopIndicator];
-//    //    } failure:^(NSError *error) {
-//    //    }] ;
-//    
-//    [[self xmppStream] sendElement:message];
-//    
-//    
-//    
-//    
-//        [self messagesData:message];
-//        messageTextView.text=@"";
-//    
-//        messageHeight = messageTextviewInitialHeight;
-//        
-//        messageTextView.frame = CGRectMake(messageTextView.frame.origin.x, messageTextView.frame.origin.y, messageTextView.frame.size.width, messageHeight-8);
-//        messageView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height-(keyboardHeight+navigationBarHeight+messageHeight+10)  , self.view.bounds.size.width, messageHeight + 10);
-//        chatTableView.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, messageView.frame.origin.y-2);
-//    
-//    
-//    
-////        if (userData.count > 0) {
-////            NSIndexPath* ip = [NSIndexPath indexPathForRow:userData.count-1 inSection:0];
-////            [chatTableView scrollToRowAtIndexPath:ip atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-////        }
-//        if (messageTextView.text.length>=1) {
-//            sendButtonOutlet.enabled=YES;
-//        }
-//        else if (messageTextView.text.length==0) {
-//            sendButtonOutlet.enabled=NO;
-//        }
-//        [chatTableView reloadData];
-    
-    
-    
- /*
-    XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",friendUserJid,[[myDelegate.xmppStream myJID] resource]]];
-  
-    if (!_fileTransfer) {
-        _fileTransfer = [[XMPPOutgoingFileTransfer alloc]
-                         initWithDispatchQueue:dispatch_get_main_queue()];
-        _fileTransfer.disableSOCKS5 = YES;
-        [_fileTransfer activate:myDelegate.xmppStream];
-        [_fileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
-    }
-    */
-    
-//    NSString *recipient = _inputRecipient.text;
-//    NSString *filename = @"a.jpeg";
-//    
-//    // do error checking fun stuff...
-//    
-////    NSString *filePath = [myDelegate applicationCacheDirectory];
-//    NSString *filePath = [[myDelegate applicationCacheDirectory] stringByAppendingPathComponent:myDelegate.appProfilePhotofolderName];
-//    NSString *fileAtPath = [filePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_%@.jpeg",myDelegate.folderName,[[friendUserJid componentsSeparatedByString:@"@"] objectAtIndex:0]]];
-////    [imagesPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_%@.jpeg",folderName,[[jid componentsSeparatedByString:@"@"] objectAtIndex:0]]]
-    
-    
-    
-    
-//    NSString *fullPath = [[self documentsDirectory] stringByAppendingPathComponent:filename];
-//    NSData *data = [NSData dataWithContentsOfFile:fileAtPath];
-    
-    
-    
-    //PDF transfer
-//     [self pdfTransfer:jid];
-    
-    //Image transfer
-   // [self imageTransfer:jid];
-    
-     
-     
-//    NSError *err;
-//    if (![_fileTransfer sendData:UIImagePNGRepresentation(self.sendImage.image)
-//                           named:@"a.png"
-//                     toRecipient:jid
-//                     description:@"Baal's Soulstone."
-//                           error:&err]) {
-//        NSLog(@"You messed something up: %@", err);
-//    }
-    
-
-    
 }
 
 
@@ -967,14 +802,20 @@
                      context:nil];
     [innerData addAttributeWithName:@"nameHeight" numberValue:[NSNumber numberWithFloat:textRect.size.height]];
     
-    //Set message height
-    size = CGSizeMake([[UIScreen mainScreen] bounds].size.width - (76+8),4000);//here (76+8) = (nameLabel.x + label trailing)
-    textRect=[[[message elementForName:@"body"] stringValue]
-              boundingRectWithSize:size
-              options:NSStringDrawingUsesLineFragmentOrigin
-              attributes:@{NSFontAttributeName:messageLabelFont}
-              context:nil];
-    [innerData addAttributeWithName:@"messageBodyHeight" numberValue:[NSNumber numberWithFloat:textRect.size.height]];
+    if (![[[message elementForName:@"body"] stringValue] isEqualToString:@""]) {
+        //Set message height
+        size = CGSizeMake([[UIScreen mainScreen] bounds].size.width - (76+8),4000);//here (76+8) = (nameLabel.x + label trailing)
+        textRect=[[[message elementForName:@"body"] stringValue]
+                  boundingRectWithSize:size
+                  options:NSStringDrawingUsesLineFragmentOrigin
+                  attributes:@{NSFontAttributeName:messageLabelFont}
+                  context:nil];
+        [innerData addAttributeWithName:@"messageBodyHeight" numberValue:[NSNumber numberWithFloat:textRect.size.height]];
+    }
+    else {
+    
+         [innerData addAttributeWithName:@"messageBodyHeight" numberValue:[NSNumber numberWithFloat:0.0]];
+    }
     
     return message;
 }
@@ -1022,10 +863,62 @@
 - (void)sendImageDelegateAction:(int)status imageName:(NSString *)imageName imageCaption:(NSString *)imageCaption {
 
     if (status==1) {
-        [self sendAttachment:imageName imageCaption:imageCaption];
+        [self sendAttachment:imageName imageCaption:imageCaption friendName:self.friendUserName];//friendName:self.friendUserName
+        
     }
 }
 
+- (void)sendImageSuccessDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId {
+
+    [self setAttachmentMessage:message uniquiId:uniqueId];
+}
+
+- (void)sendImageFailDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId {
+    
+    [self setAttachmentMessage:message uniquiId:uniqueId];
+}
+
+- (void)sendImageFileDelegate:(NSXMLElement *)message {
+    
+    [self setAttachmentMessage:message uniquiId:@""];
+}
+
+- (void)setAttachmentMessage:(NSXMLElement *)message uniquiId:(NSString *)uniqueId {
+    
+    message=[self setHeightInMessage:message];
+    
+    if ([uniqueId isEqualToString:@""]) {
+        
+        [userData addObject:message];
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:userData.count-1 inSection:0];
+        [chatTableView beginUpdates];
+        [chatTableView insertRowsAtIndexPaths:@[indexPath]
+                             withRowAnimation:UITableViewRowAnimationBottom];
+        [chatTableView endUpdates];
+        [chatTableView scrollToRowAtIndexPath:[self indexPathForLastMessage]
+                             atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    }
+    else {
+        
+        for (int i=(int)userData.count-1; i>=0; i--) {
+            
+            if ([[[userData objectAtIndex:i] attributeStringValueForName:@"type"] isEqualToString:@"ImageAttachment"]) {
+               
+                NSXMLElement *innerElementData = [[userData objectAtIndex:i] elementForName:@"data"];
+                if ([[[[innerElementData attributeStringValueForName:@"fileName"] componentsSeparatedByString:@"."] objectAtIndex:0] isEqualToString:uniqueId]) {
+                    
+                    [userData replaceObjectAtIndex:i withObject:message];
+                }
+            }
+        }
+    }
+    
+    if (userData.count > 0) {
+        NSIndexPath* ip = [NSIndexPath indexPathForRow:userData.count-1 inSection:0];
+        [chatTableView scrollToRowAtIndexPath:ip atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+    }
+    [chatTableView reloadData];
+}
 #pragma mark - end
 
 /*file transfer
@@ -1045,233 +938,6 @@
  NSLog(@"You messed something up: %@", err);
  }
  }
- 
- - (void)imageTransfer:(XMPPJID *)jid {
- 
- NSError *err;
- if (![_fileTransfer sendData:UIImagePNGRepresentation(self.sendImage.image)
- named:@"a.png"
- toRecipient:jid
- description:@"Baal's Soulstone."
- error:&err]) {
- NSLog(@"You messed something up: %@", err);
- }
- }
- 
- #pragma mark - XMPPOutgoingFileTransferDelegate Methods
- - (void)xmppOutgoingFileTransfer:(XMPPOutgoingFileTransfer *)sender
- didFailWithError:(NSError *)error
- {
- //    DDLogInfo(@"Outgoing file transfer failed with error: %@", error);
- NSLog(@"%@",error);
- NSLog(@"%@",error.localizedDescription);
- UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
- message:@"There was an error sending your file. See the logs."
- delegate:nil
- cancelButtonTitle:@"OK"
- otherButtonTitles:nil];
- [alert show];
- }
- 
- - (void)xmppOutgoingFileTransferDidSucceed:(XMPPOutgoingFileTransfer *)sender
- {
- //    DDLogVerbose(@"File transfer successful.");
- 
- UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Success!"
- message:@"Your file was sent successfully."
- delegate:nil
- cancelButtonTitle:@"OK"
- otherButtonTitles:nil];
- [alert show];
- }
- */
+*/
 
-
-//// Function to Create a writable copy of the bundled default database in the application Documents directory.
-//- (void)createCopyOfDatabaseIfNeeded {
-//    // First, test for existence.
-//    BOOL success;
-//    NSFileManager *fileManager = [NSFileManager defaultManager];
-//    NSError *error;
-//    NSString *appDBPath = [self documentPath];
-//
-//    //    NSString *filePath = [myDelegate applicationCacheDirectory];
-//        NSString *filePath = [[myDelegate applicationCacheDirectory] stringByAppendingPathComponent:myDelegate.appProfilePhotofolderName];
-//        NSString *fileAtPath = [filePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_%@.pdf",myDelegate.folderName,[[friendUserJid componentsSeparatedByString:@"@"] objectAtIndex:0]]];
-//    //    [imagesPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_%@.jpeg",folderName,[[jid componentsSeparatedByString:@"@"] objectAtIndex:0]]]
-//
-//
-//    success = [fileManager fileExistsAtPath:fileAtPath];
-//    if (success) {
-//        return;
-//    }
-//
-//    NSBundle *mainBundle = [NSBundle mainBundle];
-//    NSString *filePath1 = [mainBundle pathForResource:@"a" ofType:@"pdf"];
-//    success = [fileManager copyItemAtPath:filePath1 toPath:fileAtPath error:&error];
-//    NSAssert(success, @"Failed to create writable database file with message '%@'.", [error localizedDescription]);
-//}
-
-//- (NSString *)documentPath {
-//
-//    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-//    // Database filename can have extension db/sqlite.
-//    NSString *documentsDirectory = [paths objectAtIndex:0];
-//    return [documentsDirectory stringByAppendingPathComponent:@"a.pdf"];
-//}
-
-
-//- (NSString *)documentsDirectory
-//{
-//    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
-//                                                         NSUserDomainMask,
-//                                                         YES);
-//    return [paths lastObject];
-//}
-
-//UIImage *tempPhoto=[UIImage imageWithData:[[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:jid]]];
-//if (tempPhoto!=nil) {
-//    [myDelegate saveDataInCacheDirectory:(UIImage *)tempPhoto folderName:myDelegate.appProfilePhotofolderName jid:jid];
-
-//- (void)setXmppData {
-//
-//
-//}
-
-//-(NSData *)resizeImage:(UIImage *)image
-//{
-//    float actualHeight = image.size.height;
-//    float actualWidth = image.size.width;
-//    float maxHeight = 300.0;
-//    float maxWidth = 400.0;
-//    float imgRatio = actualWidth/actualHeight;
-//    float maxRatio = maxWidth/maxHeight;
-//    float compressionQuality = 0.5;//50 percent compression
-//
-//    if (actualHeight > maxHeight || actualWidth > maxWidth)
-//    {
-//        if(imgRatio < maxRatio)
-//        {
-//            //adjust width according to maxHeight
-//            imgRatio = maxHeight / actualHeight;
-//            actualWidth = imgRatio * actualWidth;
-//            actualHeight = maxHeight;
-//        }
-//        else if(imgRatio > maxRatio)
-//        {
-//            //adjust height according to maxWidth
-//            imgRatio = maxWidth / actualWidth;
-//            actualHeight = imgRatio * actualHeight;
-//            actualWidth = maxWidth;
-//        }
-//        else
-//        {
-//            actualHeight = maxHeight;
-//            actualWidth = maxWidth;
-//        }
-//    }
-//
-//    CGRect rect = CGRectMake(0.0, 0.0, actualWidth, actualHeight);
-//    UIGraphicsBeginImageContext(rect.size);
-//    [image drawInRect:rect];
-//    UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
-//    NSData *imageData = UIImageJPEGRepresentation(img, compressionQuality);
-//    UIGraphicsEndImageContext();
-//
-//    return imageData;
-//
-//}
-
-
-
-
-//- (void)getProfilePhotosJid:(NSString *)jid profileImageView:(UIImageView *)profileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(UIImage *tempImage)) completion {
-//
-//    NSData *tempImageData=[myDelegate listionDataFromCacheDirectoryFolderName:myDelegate.appProfilePhotofolderName jid:jid];
-//    if (nil==tempImageData) {
-//        profileImageView.image=[UIImage imageNamed:placeholderImage];
-//        dispatch_queue_t queue = dispatch_queue_create("profilePhotoQueue", DISPATCH_QUEUE_PRIORITY_DEFAULT);
-//        dispatch_async(queue, ^
-//                       {
-//                           UIImage *tempPhoto=[UIImage imageWithData:[[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:jid]]];
-//                           if (tempPhoto!=nil) {
-//                               [myDelegate saveDataInCacheDirectory:(UIImage *)tempPhoto folderName:myDelegate.appProfilePhotofolderName jid:jid];
-//                           }
-//
-//                           dispatch_async(dispatch_get_main_queue(), ^{
-//
-//                               completion(tempPhoto);
-//                           });
-//                       });
-//    }
-//    else {
-//        completion([UIImage imageWithData:tempImageData]);
-//    }
-//}
-
-
-
-
-
-//#pragma mark - IBAction
-//-(IBAction)sendMessage:(id)sender
-//{
-//    [myDelegate.xmppMessageArchivingModule setClientSideMessageArchivingOnly:YES];
-//    [myDelegate.xmppMessageArchivingModule activate:[self xmppStream]];    //By this line all your messages are stored in CoreData
-//    [myDelegate.xmppMessageArchivingModule addDelegate:self delegateQueue:dispatch_get_main_queue()];
-//    NSString *messageStr = [messageTextView.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-//    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-//    [dateFormatter setDateFormat:@"HH:mm:ss"];
-//    NSDate *date = [NSDate date];
-//    [dateFormatter setDateFormat:@"hh:mm a"];
-//    [dateFormatter setAMSymbol:@"am"];
-//    [dateFormatter setPMSymbol:@"pm"];
-//    NSString *formattedTime = [dateFormatter stringFromDate:date];
-//    [dateFormatter setDateFormat:@"dd/MM/yy"];
-//    NSString *formattedDate = [dateFormatter stringFromDate:date];
-//    NSXMLElement *body = [NSXMLElement elementWithName:@"body"];
-//    [body setStringValue:messageStr];
-//    NSXMLElement *message = [NSXMLElement elementWithName:@"message"];
-//    [message addAttributeWithName:@"type" stringValue:@"chat"];
-//
-//    if ([lastView isEqualToString:@"ChatViewController"] || [lastView isEqualToString:@"MeTooUserProfile"]) {
-//        [message addAttributeWithName:@"to" stringValue:[userXmlDetail attributeStringValueForName:@"to"]];
-//        [message addAttributeWithName:@"from" stringValue:[userXmlDetail attributeStringValueForName:@"from"]];
-//        [message addAttributeWithName:@"time" stringValue:formattedTime];
-////        [message addAttributeWithName:@"Name" stringValue:[UserDefaultManager getValue:@"userName"]];
-//        [message addAttributeWithName:@"Date" stringValue:formattedDate];
-//        [message addAttributeWithName:@"fromTo" stringValue:[NSString stringWithFormat:@"%@-%@",[userXmlDetail attributeStringValueForName:@"to"],[userXmlDetail attributeStringValueForName:@"from"]]];
-//        [message addAttributeWithName:@"ToName" stringValue:[userXmlDetail attributeStringValueForName:@"ToName"]];
-////        [message addAttributeWithName:@"senderUserId" stringValue:[UserDefaultManager getValue:@"userId"]];
-//    }
-//    else{
-//        [message addAttributeWithName:@"to" stringValue:friendUserJid];
-//        [message addAttributeWithName:@"from" stringValue:myDelegate.xmppLogedInUserId];
-//        [message addAttributeWithName:@"time" stringValue:formattedTime];
-////        [message addAttributeWithName:@"Name" stringValue:[UserDefaultManager getValue:@"userName"]];
-//        [message addAttributeWithName:@"Date" stringValue:formattedDate];
-//        [message addAttributeWithName:@"fromTo" stringValue:[NSString stringWithFormat:@"%@-%@",myDelegate.xmppLogedInUserId,friendUserJid]];
-//        [message addAttributeWithName:@"ToName" stringValue:_friendUserName];
-////        [message addAttributeWithName:@"senderUserId" stringValue:[UserDefaultManager getValue:@"userId"]];
-//    }
-//    [message addChild:body];
-////    [[WebService sharedManager] chatNotification:[message attributeStringValueForName:@"to"] userNameFrom:[message attributeStringValueForName:@"from"] messageString:[[message elementForName:@"body"] stringValue] success:^(id responseObject) {
-////        [myDelegate stopIndicator];
-////    } failure:^(NSError *error) {
-////    }] ;
-//    [[self xmppStream] sendElement:message];
-////    [self messagesData:message];
-////    messageTextView.text=@"";
-////    if (userData.count > 0) {
-////        NSIndexPath* ip = [NSIndexPath indexPathForRow:userData.count-1 inSection:0];
-////        [chatTableView scrollToRowAtIndexPath:ip atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-////    }
-////    if (messageTextView.text.length>=1) {
-////        sendButtonOutlet.enabled=YES;
-////    }
-////    else if (messageTextView.text.length==0) {
-////        sendButtonOutlet.enabled=NO;
-////    }
-////    [chatTableView reloadData];
-//}
 @end

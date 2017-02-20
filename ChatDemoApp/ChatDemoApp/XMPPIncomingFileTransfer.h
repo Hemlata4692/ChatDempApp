@@ -77,4 +77,8 @@
               didSucceedWithData:(NSData *)data
                            named:(NSString *)name;
 
+- (void)xmppIncomingFileTransferWithDesc:(XMPPIncomingFileTransfer *)sender
+              didSucceedWithData:(NSData *)data
+                           named:(NSString *)name desc:(NSString *)desc date:(NSString *)date time:(NSString *)time to:(NSString *)to from:(NSString *)from senderName:(NSString *)senderName receiverName:(NSString *)receiverName chatType:(NSString *)chatType;
+
 @end

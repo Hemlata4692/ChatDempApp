@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="11542" systemVersion="16A323" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="MessageHistory" representedClassName="MessageHistory" syncable="YES" codeGenerationType="class">
+        <attribute name="bareJidStr" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="messageString" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="uniqueId" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
     <entity name="UserEntry" representedClassName="UserEntry" isAbstract="YES" syncable="YES" codeGenerationType="class">
         <attribute name="xmppAddress" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="xmppDescription" optional="YES" attributeType="String" syncable="YES"/>
@@ -13,5 +18,6 @@
     </entity>
     <elements>
         <element name="UserEntry" positionX="-63" positionY="-18" width="128" height="178"/>
+        <element name="MessageHistory" positionX="-63" positionY="45" width="128" height="90"/>
     </elements>
 </model>

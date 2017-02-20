@@ -56,6 +56,16 @@ NSString *const XMPPIncomingFileTransferErrorDomain = @"XMPPIncomingFileTransfer
 
   NSMutableData *_receivedData;
   NSString *_receivedFileName;
+    //Added by rohit
+    NSString *_receivedDescription;
+    NSString *_receivedDate;
+    NSString *_receivedTime;
+    NSString *_receivedTo;
+    NSString *_receivedFrom;
+    NSString *_receivedSenderName;
+    NSString *_receivedReceiverName;
+    NSString *_receivedChatType;
+    //end
   NSUInteger _totalDataSize;
   NSUInteger _receivedDataSize;
 
@@ -227,7 +237,17 @@ NSString *const XMPPIncomingFileTransferErrorDomain = @"XMPPIncomingFileTransfer
 
         // Store the name of the file for later use
         _receivedFileName = [inFile attributeStringValueForName:@"name"];
-
+          
+          //Added by rohit
+        _receivedDescription = [[inFile elementForName:@"desc"] stringValue];
+          _receivedTo = [inFile attributeStringValueForName:@"to"];
+          _receivedDate = [inFile attributeStringValueForName:@"date"];
+          _receivedTime = [inFile attributeStringValueForName:@"time"];
+          _receivedFrom = [inFile attributeStringValueForName:@"from"];
+          _receivedSenderName = [inFile attributeStringValueForName:@"senderName"];
+          _receivedReceiverName = [inFile attributeStringValueForName:@"receiverName"];
+          _receivedChatType = [inFile attributeStringValueForName:@"chatType"];
+          //end
         // Outgoing
         XMPPIQ *iq = [XMPPIQ iqWithType:@"result"
                                      to:offer.from
@@ -488,11 +508,13 @@ NSString *const XMPPIncomingFileTransferErrorDomain = @"XMPPIncomingFileTransfer
 
   dispatch_block_t block = ^{
       @autoreleasepool {
-        [self cancelIBBTimer];
+//        [self cancelIBBTimer];
 
-        [multicastDelegate xmppIncomingFileTransfer:self
-                                 didSucceedWithData:_receivedData
-                                              named:_receivedFileName];
+//        [multicastDelegate xmppIncomingFileTransfer:self
+//                                 didSucceedWithData:_receivedData
+//                                              named:_receivedFileName];
+          [multicastDelegate xmppIncomingFileTransferWithDesc:self didSucceedWithData:_receivedData named:_receivedFileName desc:_receivedDescription date:_receivedDate time:_receivedTime to:_receivedTo from:_receivedFrom senderName:_receivedSenderName receiverName:_receivedReceiverName chatType:(NSString *)_receivedChatType];
+          
         [self cleanUp];
       }
   };
@@ -523,6 +545,7 @@ NSString *const XMPPIncomingFileTransferErrorDomain = @"XMPPIncomingFileTransfer
   _streamhostUsed = nil;
   _receivedData = nil;
   _receivedFileName = nil;
+    _receivedDescription=nil;
   _totalDataSize = 0;
   _receivedDataSize = 0;
 }

@@ -250,6 +250,41 @@ NSString *const XMPPOutgoingFileTransferErrorDomain = @"XMPPOutgoingFileTransfer
   return [self startFileTransfer:errPtr];
 }
 
+- (BOOL)sendCustomizedData:(NSData *)data
+           named:(NSString *)name
+     toRecipient:(XMPPJID *)recipient
+     description:(NSString *)description
+    date:(NSString *)date
+    time:(NSString *)time
+    senderId:(NSString *)senderId
+    chatType:(NSString *)chatType
+senderName:(NSString *)senderName
+receiverName:(NSString *)receiverName
+           error:(NSError **)errPtr
+{
+    if (_transferState != XMPPOFTStateNone) {
+        if (errPtr) {
+            NSString *errMsg = @"Transfer already in progress.";
+            *errPtr = [self localErrorWithMessage:errMsg code:-1];
+        }
+        
+        return NO;
+    }
+    
+    self.outgoingData = data;
+    self.outgoingFileName = name;
+    self.recipientJID = recipient;
+    self.outgoingFileDescription = description;
+    self.outgoingFileDate = date;
+    self.outgoingFileTime = time;
+    self.outgoingFileSender = senderId;
+    self.outgoingFileType = chatType;
+    self.outgoingFileSenderName = senderName;
+    self.outgoingFileReveiverName = receiverName;
+    return [self startFileTransfer:errPtr];
+}
+
+
 
 #pragma mark - Private Methods
 
@@ -377,6 +412,13 @@ NSString *const XMPPOutgoingFileTransferErrorDomain = @"XMPPOutgoingFileTransfer
                                                                     (unsigned long) [_outgoingData length]]];//TODO
         [si addChild:file];
 
+          [file addAttributeWithName:@"chatType" stringValue:_outgoingFileType];
+          [file addAttributeWithName:@"date" stringValue:_outgoingFileDate];
+          [file addAttributeWithName:@"time" stringValue:_outgoingFileTime];
+          [file addAttributeWithName:@"from" stringValue:_outgoingFileSender];
+          [file addAttributeWithName:@"senderName" stringValue:_outgoingFileSenderName];
+          [file addAttributeWithName:@"receiverName" stringValue:_outgoingFileReveiverName];
+          [file addAttributeWithName:@"to" stringValue:[[[NSString stringWithFormat:@"%@",_recipientJID] componentsSeparatedByString:@"/"] objectAtIndex:0]];
         // Only include description if it's provided
         if (_outgoingFileDescription) {
           NSXMLElement *desc = [NSXMLElement elementWithName:@"desc"
@@ -811,10 +853,6 @@ NSString *const XMPPOutgoingFileTransferErrorDomain = @"XMPPOutgoingFileTransfer
 
           [data setStringValue:dataString];
           [iq addChild:data];
-            //Added by rohit
-            if (_sentDataSize==_blockSize) {
-                NSLog(@"a");
-            }
           [_idTracker addElement:iq
                           target:self
                         selector:@selector(handleIBBTransferQueryIQ:withInfo:)
@@ -823,12 +861,14 @@ NSString *const XMPPOutgoingFileTransferErrorDomain = @"XMPPOutgoingFileTransfer
           [xmppStream sendElement:iq];
             //Added by rohit
             if (_sentDataSize+_blockSize>=_totalDataSize) {
-                NSLog(@"a");
-                NSLog(@"a");
-
-                NSLog(@"a");
-                [multicastDelegate xmppOutgoingFileTransferDidSucceed:self];
-               [self closeIBB];            }
+                
+                NSLog(@"%@",_outgoingFileName);
+                
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPFileTransferSuccessFully" object:nil];
+//                [multicastDelegate xmppOutgoingFileTransferDidSucceed:self];
+//               [self closeIBB];
+                //add post notification
+            }
             //end
         } else {
           XMPPLogInfo(@"IBB file transfer complete. Closing stream...");
@@ -1663,6 +1703,7 @@ NSString *const XMPPOutgoingFileTransferErrorDomain = @"XMPPOutgoingFileTransfer
   NSString *type = iq.type;
 
   if ([type isEqualToString:@"result"] || [type isEqualToString:@"error"]) {
+      
     return [_idTracker invokeForElement:iq withObject:iq];
   }
 

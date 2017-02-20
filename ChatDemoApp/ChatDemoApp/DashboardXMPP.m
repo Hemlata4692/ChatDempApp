@@ -345,21 +345,48 @@
 #pragma mark - Fetch chat history
 - (void)fetchAllHistoryChat:(void(^)(NSMutableArray *tempHistoryData)) completion {
 
-    NSManagedObjectContext *moc = [myDelegate.xmppMessageArchivingCoreDataStorage mainThreadManagedObjectContext];
-    NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"XMPPMessageArchiving_Message_CoreDataObject"
-                                                         inManagedObjectContext:moc];
-    NSFetchRequest *request = [[NSFetchRequest alloc]init];
-    [request setEntity:entityDescription];
-    NSError *error;
-    NSArray *messages_arc = [moc executeFetchRequest:request error:&error];
+//    NSManagedObjectContext *moc = [myDelegate.xmppMessageArchivingCoreDataStorage mainThreadManagedObjectContext];
+//    NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"XMPPMessageArchiving_Message_CoreDataObject"
+//                                                         inManagedObjectContext:moc];
+//    NSFetchRequest *request = [[NSFetchRequest alloc]init];
+//    [request setEntity:entityDescription];
+//    NSError *error;
+    NSArray *messages_arc = [[myDelegate readAllLocalMessageStorageDatabase] copy];
     
     NSMutableArray *historyArray=[NSMutableArray new];
     NSMutableArray *tempArray=[NSMutableArray new];
     NSMutableDictionary *tempDict=[NSMutableDictionary new];
 
     @autoreleasepool {
-        for (XMPPMessageArchiving_Message_CoreDataObject *message in messages_arc) {
-            NSXMLElement *element = [[NSXMLElement alloc] initWithXMLString:message.messageStr error:nil];
+//        for (XMPPMessageArchiving_Message_CoreDataObject *message in messages_arc) {
+//            NSXMLElement *element = [[NSXMLElement alloc] initWithXMLString:message.messageStr error:nil];
+//            NSXMLElement *innerElementData = [element elementForName:@"data"];
+//            if (![[innerElementData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]&&[[innerElementData attributeStringValueForName:@"to"] isEqualToString:appDelegate.xmppLogedInUserId]) {
+//                
+//                
+//                if ([tempArray containsObject:[innerElementData attributeStringValueForName:@"from"]]) {
+//                    
+//                    [tempArray removeObject:[innerElementData attributeStringValueForName:@"from"]];
+//                }
+//                [tempArray addObject:[innerElementData attributeStringValueForName:@"from"]];
+//                [tempDict setObject:element forKey:[innerElementData attributeStringValueForName:@"from"]];
+//                
+//            }
+//            else {
+//                if ([[innerElementData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]) {
+//                    if ([tempArray containsObject:[innerElementData attributeStringValueForName:@"to"]]) {
+//                        
+//                        [tempArray removeObject:[innerElementData attributeStringValueForName:@"to"]];
+//                    }
+//                    [tempArray addObject:[innerElementData attributeStringValueForName:@"to"]];
+//                    [tempDict setObject:element forKey:[innerElementData attributeStringValueForName:@"to"]];
+//                }
+//            }
+//        }
+//        NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
+        for (NSManagedObject *message in messages_arc) {
+            
+            NSXMLElement *element = [[NSXMLElement alloc] initWithXMLString:[message valueForKey:@"messageString"] error:nil];
             NSXMLElement *innerElementData = [element elementForName:@"data"];
             if (![[innerElementData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]&&[[innerElementData attributeStringValueForName:@"to"] isEqualToString:appDelegate.xmppLogedInUserId]) {
                 
@@ -383,6 +410,7 @@
                 }
             }
         }
+
         
         for (int i=0; i<tempArray.count; i++) {
             [historyArray addObject:[tempDict objectForKey:[tempArray objectAtIndex:i]]];

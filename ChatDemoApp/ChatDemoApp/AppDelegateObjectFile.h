@@ -114,8 +114,7 @@ XMPPIncomingFileTransferDelegate>
 @property(nonatomic,strong) NSString *folderName;
 @property(nonatomic,strong) NSString *appMediafolderName;
 @property(nonatomic,strong) NSString *appProfilePhotofolderName;
-@property(nonatomic,strong) NSString *appSentPhotofolderName;
-@property(nonatomic,strong) NSString *appReceivePhotofolderName;
+@property(nonatomic,strong) NSString *appSentReceivePhotofolderName;
 @property(nonatomic,strong) NSString *appDocumentfolderName;
 
 @property(nonatomic,assign) float imageCompressionPercent;
@@ -135,7 +134,15 @@ XMPPIncomingFileTransferDelegate>
 - (NSData *)listionSendAttachedImageCacheDirectoryFileName:(NSString *)fileName;
 
 
-
+//Manage local chat database
+- (void)insertLocalMessageStorageDataBase:(NSString *)bareJidStr message:(NSXMLElement *)message;
+- (void)insertLocalImageMessageStorageDataBase:(NSString *)bareJidStr message:(NSXMLElement *)message uniquiId:(NSString *)uniquiId;
+- (void)removeLocalMessageStorageDataBase:(NSString *)userId;
+- (NSArray *)readAllLocalMessageStorageDatabase;
+- (NSArray *)readLocalMessageStorageDatabaseBareJidStr:(NSString *)bareJidStr;
+- (void)updateLocalMessageStorageDatabaseBareJidStr:(NSString *)bareJidStr message:(NSXMLElement *)message uniquiId:(NSString *)uniquiId;
+//end
+- (NSManagedObjectContext *)managedObjectContext;
 
 
 

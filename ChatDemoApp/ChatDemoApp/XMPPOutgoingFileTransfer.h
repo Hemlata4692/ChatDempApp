@@ -44,6 +44,18 @@
 */
 @property (nonatomic, copy) NSString *outgoingFileDescription;
 
+//Added by rohit
+
+@property (nonatomic, copy) NSString *outgoingFileSender;
+@property (nonatomic, copy) NSString *outgoingFileDate;
+@property (nonatomic, copy) NSString *outgoingFileTime;
+@property (nonatomic, copy) NSString *outgoingFileType;
+@property (nonatomic, copy) NSString *outgoingFileSenderName;
+@property (nonatomic, copy) NSString *outgoingFileReveiverName;
+//end
+
+
+
 /**
 * (Optional)
 *
@@ -104,6 +116,19 @@
      description:(NSString *)description
            error:(NSError **)errPtr;
 
+//Added by rohit
+- (BOOL)sendCustomizedData:(NSData *)data
+                     named:(NSString *)name
+               toRecipient:(XMPPJID *)recipient
+               description:(NSString *)description
+                      date:(NSString *)date
+                      time:(NSString *)time
+                  senderId:(NSString *)senderId
+                  chatType:(NSString *)chatType
+                senderName:(NSString *)senderName
+              receiverName:(NSString *)receiverName
+                     error:(NSError **)errPtr;
+//end
 @end
 
 

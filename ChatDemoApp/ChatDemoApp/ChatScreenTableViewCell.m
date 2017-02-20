@@ -21,15 +21,15 @@
     // Configure the view for the selected state
 }
 
-- (void)displaySingleMessageData:(NSXMLElement *)message profileImageView:(UIImage *)logedInUserPhoto friendProfileImageView:(UIImage *)friendUserPhoto {
+- (void)displaySingleMessageData:(NSXMLElement *)message profileImageView:(UIImage *)logedInUserPhoto friendProfileImageView:(UIImage *)friendUserPhoto chatType:(NSString *)chatType {
     
-    [self displaySingleTypeMessageData:message profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto];
+    [self displaySingleTypeMessageData:message profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto chatType:chatType];
     self.separatorLabel.hidden=false;
 }
 
-- (void)displayFirstMessage:(NSXMLElement *)currentMessage nextmessage:(NSXMLElement *)nextmessage profileImageView:(UIImage *)logedInUserPhoto friendProfileImageView:(UIImage *)friendUserPhoto {
+- (void)displayFirstMessage:(NSXMLElement *)currentMessage nextmessage:(NSXMLElement *)nextmessage profileImageView:(UIImage *)logedInUserPhoto friendProfileImageView:(UIImage *)friendUserPhoto chatType:(NSString *)chatType {
     
-    [self displaySingleTypeMessageData:currentMessage profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto];
+    [self displaySingleTypeMessageData:currentMessage profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto chatType:chatType];
     NSXMLElement *innerData=[currentMessage elementForName:@"data"];
     NSXMLElement *innerData1=[nextmessage elementForName:@"data"];
 
@@ -43,7 +43,7 @@
     }
 }
 
-- (void)displaySingleTypeMessageData:(NSXMLElement *)message profileImageView:(UIImage *)logedInUserPhoto friendProfileImageView:(UIImage *)friendUserPhoto {
+- (void)displaySingleTypeMessageData:(NSXMLElement *)message profileImageView:(UIImage *)logedInUserPhoto friendProfileImageView:(UIImage *)friendUserPhoto chatType:(NSString *)chatType {
     
     //Unhide/hide all objects
     self.userImage.hidden=false;
@@ -52,6 +52,14 @@
     self.dateLabel.hidden=false;
     self.separatorLabel.hidden=true;
     self.halfSeparatorLabel.hidden=true;
+    self.attachedImageView.image=[UIImage imageNamed:@""];
+    if ([chatType isEqualToString:@"ImageAttachment"]) {
+        self.attachedImageView.hidden=false;
+    }
+    else {
+    
+        self.attachedImageView.hidden=true;
+    }
     
     self.userImage.layer.masksToBounds=YES;
     self.userImage.layer.cornerRadius=30.0;
@@ -68,7 +76,7 @@
     
     self.nameLabel.translatesAutoresizingMaskIntoConstraints=YES;
     self.messageLabel.translatesAutoresizingMaskIntoConstraints=YES;
-    //    self.dateLabel.translatesAutoresizingMaskIntoConstraints=YES;
+    self.attachedImageView.translatesAutoresizingMaskIntoConstraints=YES;
     
     self.nameLabel.numberOfLines=0;
     self.messageLabel.numberOfLines=0;
@@ -77,12 +85,23 @@
     self.messageLabel.text=[[message elementForName:@"body"] stringValue];
     
     self.nameLabel.frame=CGRectMake(76, 5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"nameHeight"] floatValue]); //Here frame = (Namelabel_x_Space, NameLabel_TopSpace, screenWidth - (Namelabel_x_Space + Namelabel_trailingSpace), NameHeight)
-    self.messageLabel.frame=CGRectMake(76, (5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+10), [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (NameLabel_TopSpace + NameLabel_Height + space_Between_NameLabel_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
+    
+    if ([chatType isEqualToString:@"ImageAttachment"]) {
+        self.attachedImageView.frame=CGRectMake(76, (5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+5), 200, 128); //Here frame = (AttachedImage_x_Space, (NameLabel_TopSpace + NameLabel_Height + space_Between_NameLabel_And_AttachedImage), AttachedImage_width, AttachedImage_height
+        self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+    }
+    else {
+        
+        self.attachedImageView.frame=CGRectMake(76, (5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+5), 200, 0); //Here frame = (AttachedImage_x_Space, (NameLabel_TopSpace + NameLabel_Height + space_Between_NameLabel_And_AttachedImage), AttachedImage_width, AttachedImage_height
+    }
+    
+    
+    self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
     
     self.dateLabel.text=[self changeTimeFormat:[innerData attributeStringValueForName:@"time"]];
 }
 
-- (void)displayMultipleMessage:(NSXMLElement *)currentMessage nextmessage:(NSXMLElement *)nextmessage previousMessage:(NSXMLElement *)previousMessage profileImageView:(UIImage *)logedInUserPhoto friendProfileImageView:(UIImage *)friendUserPhoto {
+- (void)displayMultipleMessage:(NSXMLElement *)currentMessage nextmessage:(NSXMLElement *)nextmessage previousMessage:(NSXMLElement *)previousMessage profileImageView:(UIImage *)logedInUserPhoto friendProfileImageView:(UIImage *)friendUserPhoto chatType:(NSString *)chatType {
     
     //Unhide/hide all objects
     self.userImage.hidden=true;
@@ -92,6 +111,14 @@
     self.separatorLabel.hidden=true;
     self.halfSeparatorLabel.hidden=true;
     
+    if ([chatType isEqualToString:@"ImageAttachment"]) {
+        self.attachedImageView.hidden=false;
+    }
+    else {
+        
+        self.attachedImageView.hidden=true;
+    }
+    
     NSXMLElement *innerData=[currentMessage elementForName:@"data"];
     NSXMLElement *innerData1=[nextmessage elementForName:@"data"];
     NSXMLElement *innerData2=[previousMessage elementForName:@"data"];
@@ -100,26 +127,48 @@
         
         self.halfSeparatorLabel.hidden=false;
         self.messageLabel.translatesAutoresizingMaskIntoConstraints=YES;
+        self.attachedImageView.translatesAutoresizingMaskIntoConstraints=YES;
         self.messageLabel.numberOfLines=0;
         self.messageLabel.text=[[[currentMessage elementForName:@"body"] stringValue] capitalizedString];
-        self.messageLabel.frame=CGRectMake(76, 5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, MessageLabel_TopSpace, screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
+        if ([chatType isEqualToString:@"ImageAttachment"]) {
+            self.attachedImageView.frame=CGRectMake(76, 5, 200, 128); //Here frame = (AttachedImage_x_Space, attachedImageView_TopSpace, AttachedImage_width, AttachedImage_height
+            self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+        }
+        else {
+            
+            self.attachedImageView.frame=CGRectMake(76, 5, 200, 0); //Here frame = (AttachedImage_x_Space, (NameLabel_TopSpace + NameLabel_Height + space_Between_NameLabel_And_AttachedImage), AttachedImage_width, AttachedImage_height
+        }
+        
+        
+        self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
     }
     else if ([[innerData attributeStringValueForName:@"from"] isEqualToString:[innerData2 attributeStringValueForName:@"from"]] && ![[innerData attributeStringValueForName:@"from"] isEqualToString:[innerData1 attributeStringValueForName:@"from"]]) {
         
         self.separatorLabel.hidden=false;
         self.messageLabel.translatesAutoresizingMaskIntoConstraints=YES;
+        self.attachedImageView.translatesAutoresizingMaskIntoConstraints=YES;
         self.messageLabel.numberOfLines=0;
         self.messageLabel.text=[[[currentMessage elementForName:@"body"] stringValue] capitalizedString];
-        self.messageLabel.frame=CGRectMake(76, 5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, MessageLabel_TopSpace, screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
+        if ([chatType isEqualToString:@"ImageAttachment"]) {
+            self.attachedImageView.frame=CGRectMake(76, 5, 200, 128); //Here frame = (AttachedImage_x_Space, attachedImageView_TopSpace, AttachedImage_width, AttachedImage_height
+            self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+        }
+        else {
+            
+            self.attachedImageView.frame=CGRectMake(76, 5, 200, 0); //Here frame = (AttachedImage_x_Space, (NameLabel_TopSpace + NameLabel_Height + space_Between_NameLabel_And_AttachedImage), AttachedImage_width, AttachedImage_height
+        }
+        
+        
+        self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
     }
     else /*if (![[currentMessage attributeStringValueForName:@"from"] isEqualToString:[previousMessage attributeStringValueForName:@"from"]] && [[currentMessage attributeStringValueForName:@"from"] isEqualToString:[nextmessage attributeStringValueForName:@"from"]])*/ {
         
-        [self displayFirstMessage:currentMessage nextmessage:nextmessage profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto];
+        [self displayFirstMessage:currentMessage nextmessage:nextmessage profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto chatType:chatType];
     }
     self.dateLabel.text=[self changeTimeFormat:[innerData attributeStringValueForName:@"time"]];
 }
 
-- (void)displayLastMessage:(NSXMLElement *)currentMessage previousMessage:(NSXMLElement *)previousMessage profileImageView:(UIImage *)logedInUserPhoto friendProfileImageView:(UIImage *)friendUserPhoto {
+- (void)displayLastMessage:(NSXMLElement *)currentMessage previousMessage:(NSXMLElement *)previousMessage profileImageView:(UIImage *)logedInUserPhoto friendProfileImageView:(UIImage *)friendUserPhoto chatType:(NSString *)chatType {
     
     //Unhide/hide all objects
     self.userImage.hidden=false;
@@ -128,6 +177,14 @@
     self.dateLabel.hidden=false;
     self.separatorLabel.hidden=true;
     self.halfSeparatorLabel.hidden=true;
+    
+    if ([chatType isEqualToString:@"ImageAttachment"]) {
+        self.attachedImageView.hidden=false;
+    }
+    else {
+        
+        self.attachedImageView.hidden=true;
+    }
     
     NSXMLElement *innerData=[currentMessage elementForName:@"data"];
     NSXMLElement *innerData1=[previousMessage elementForName:@"data"];
@@ -138,14 +195,24 @@
         self.nameLabel.hidden=true;
         
         self.messageLabel.translatesAutoresizingMaskIntoConstraints=YES;
+        self.attachedImageView.translatesAutoresizingMaskIntoConstraints=YES;
         self.messageLabel.numberOfLines=0;
         NSLog(@"%f %@",[[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue], [innerData attributeStringValueForName:@"messageBodyHeight"]);
-        self.messageLabel.frame=CGRectMake(76, 5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, MessageLabel_TopSpace, screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
+        if ([chatType isEqualToString:@"ImageAttachment"]) {
+            self.attachedImageView.frame=CGRectMake(76, 5, 200, 128); //Here frame = (AttachedImage_x_Space, attachedImageView_TopSpace, AttachedImage_width, AttachedImage_height
+            self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+        }
+        else {
+            
+            self.attachedImageView.frame=CGRectMake(76, 5, 200, 0); //Here frame = (AttachedImage_x_Space, (NameLabel_TopSpace + NameLabel_Height + space_Between_NameLabel_And_AttachedImage), AttachedImage_width, AttachedImage_height
+        }
+        
+        self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
         self.messageLabel.text=[[[currentMessage elementForName:@"body"] stringValue] capitalizedString];
     }
     else {
         
-        [self displaySingleTypeMessageData:currentMessage profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto];
+        [self displaySingleTypeMessageData:currentMessage profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto chatType:chatType];
     }
     self.dateLabel.text=[self changeTimeFormat:[innerData attributeStringValueForName:@"time"]];
     self.separatorLabel.hidden=false;

@@ -46,23 +46,6 @@
 }
 #pragma mark - end
 
-//#pragma mark - Get image name
-//- (NSString *)getImageName:(UIImage*)image {
-//    
-//    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-//    NSLocale *locale = [[NSLocale alloc]
-//                        initWithLocaleIdentifier:@"en_US"];
-//    [dateFormatter setLocale:locale];
-//    [dateFormatter setDateFormat:@"ddMMYYhhmmss"];
-//    NSString * datestr = [dateFormatter stringFromDate:[NSDate date]];
-//    NSString *fileName = [NSString stringWithFormat:@"%@_%@.jpeg",datestr,[UserDefaultManager getValue:@"userId"]];
-//    NSString *filePath = [[NSTemporaryDirectory() stringByAppendingPathComponent:@"upload"] stringByAppendingPathComponent:fileName];
-//    NSData * imageData = UIImageJPEGRepresentation(image, 0.1);
-//    [imageData writeToFile:filePath atomically:YES];
-//    return fileName;
-//}
-//#pragma mark - end
-
 #pragma mark - UIAction
 - (IBAction)cancel:(UIButton *)sender {
     

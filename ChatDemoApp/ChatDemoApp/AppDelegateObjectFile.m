@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegateObjectFile.h"
+#import <UserNotifications/UserNotifications.h>
 
 //Uncomment libxml code while running on devices in module.modulemap
 #import "XMPPFramework.h"
@@ -34,7 +35,13 @@ static const int ddLogLevel = LOG_LEVEL_VERBOSE;
 static const int ddLogLevel = LOG_LEVEL_INFO;
 #endif
 
-@interface AppDelegateObjectFile()
+@interface AppDelegateObjectFile() {
+
+    UIView *notificationView;
+    UIImageView *notificationImage;
+    UILabel *notificationTitle, *notificationMessage;
+//    UIWindow* window;
+}
 
 - (void)setupStream;
 - (void)teardownStream;
@@ -81,7 +88,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 @synthesize afterAutentication,afterAutenticationRegistration;
 
 #pragma mark - Intialze XMPP connection
-- (void)didFinishLaunchingMethod {
+- (void)didFinishLaunchingMethod{
 
     isUpdatePofile=false;
     //Create cache folders
@@ -141,8 +148,84 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         NSMutableDictionary* countData = [NSMutableDictionary new];
         [XMPPUserDefaultManager setValue:countData key:@"XMPPBadgeIndicator"];
     }
+    
+    [self createNotificationView];
 }
 #pragma mark - end
+
+- (void)createNotificationView{
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+//        UIView *redView = [[UIView alloc] initWithFrame:CGRectMake(100,100, 100, 100)];
+//        [redView setBackgroundColor:[UIColor redColor]];
+//        [[appDelegate window] addSubview:redView];
+        
+        notificationView.translatesAutoresizingMaskIntoConstraints=YES;
+        notificationView=[[UIView alloc] initWithFrame:CGRectMake(3, -90, [[UIScreen mainScreen] bounds].size.width-6, 80)];
+        notificationImage=[[UIImageView alloc] initWithFrame:CGRectMake(10, (notificationView.frame.size.height/2)-20, 40, 40)];
+        notificationTitle=[[UILabel alloc] initWithFrame:CGRectMake(notificationImage.frame.origin.x+notificationImage.frame.size.width+10, 10, [[UIScreen mainScreen] bounds].size.width-(notificationImage.frame.origin.x+notificationImage.frame.size.width+10), 30)];
+        notificationMessage=[[UILabel alloc] initWithFrame:CGRectMake(notificationImage.frame.origin.x+notificationImage.frame.size.width+10, 35, [[UIScreen mainScreen] bounds].size.width-(notificationImage.frame.origin.x+notificationImage.frame.size.width+10)-10, 30)];
+        
+        notificationView.layer.masksToBounds=YES;
+        notificationView.layer.cornerRadius=5;
+        notificationView.backgroundColor=[UIColor colorWithWhite:0 alpha:0.7];
+        
+        notificationImage.layer.masksToBounds=YES;
+        notificationImage.layer.cornerRadius=20;
+        notificationImage.contentMode=UIViewContentModeScaleToFill;
+        
+        notificationTitle.textAlignment=NSTextAlignmentLeft;
+        notificationTitle.font=[UIFont boldSystemFontOfSize:16];
+        notificationTitle.textColor=[UIColor whiteColor];
+        
+        notificationMessage.textAlignment=NSTextAlignmentLeft;
+        notificationMessage.font=[UIFont systemFontOfSize:15];
+        notificationMessage.textColor=[UIColor whiteColor];
+        
+        [notificationView addSubview:notificationImage];
+        [notificationView addSubview:notificationTitle];
+        [notificationView addSubview:notificationMessage];
+        [[appDelegate window] addSubview:notificationView];
+    });
+}
+
+- (void)showNotificationViewWithAnimation:(NSString *)userId alertTitle:(NSString *)alertTitle alertMessage:(NSString *)alertMessage {
+
+//    [window bringSubviewToFront:notificationView];
+    
+    notificationTitle.text=alertTitle;
+    notificationMessage.text=alertMessage;
+        NSData *tempImageData=[self listionDataFromCacheDirectoryFolderName:appProfilePhotofolderName jid:userId];
+        if (nil!=tempImageData) {
+            notificationImage.image=[UIImage imageWithData:tempImageData];
+        }
+        else {
+            notificationImage.image=[UIImage imageNamed:@"images.png"];
+        }
+    
+    [UIView animateWithDuration:0.2f animations:^{
+        //To Frame
+       notificationView.frame=CGRectMake(3, 5, [[UIScreen mainScreen] bounds].size.width-6, 80);
+    } completion:^(BOOL completed) {
+        
+        [self hideNotificationViewWithAnimation];
+    }];
+}
+
+- (void)hideNotificationViewWithAnimation {
+    
+    [UIView animateWithDuration:0.2
+                          delay:2.0
+                        options: UIViewAnimationOptionTransitionCrossDissolve
+                     animations:^{ // anything animatable
+                         notificationView.frame=CGRectMake(3, -90, [[UIScreen mainScreen] bounds].size.width-6, 80);
+                     }
+                     completion:^(BOOL finished) {
+                         
+                     }];
+                         
+}
 
 #pragma mark - Background/Foreground/Termination mode XMPP coding
 - (void)enterBackgroundMethod :(UIApplication *)application {
@@ -528,12 +611,14 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         NSXMLElement *innerElementData = [message elementForName:@"data"];
         [[XmppCoreDataHandler sharedManager] insertLocalMessageStorageDataBase:[innerElementData attributeStringValueForName:@"from"] message:message];
         if (![selectedFriendUserId isEqualToString:[innerElementData attributeStringValueForName:@"from"]]){
-//           
-//        }
-//        else {
+            
+            [self addLocalNotification:[innerElementData attributeStringValueForName:@"senderName"] message:[[message elementForName:@"body"] stringValue] userId:[innerElementData attributeStringValueForName:@"from"]];
             [XMPPUserDefaultManager setXMPPBadgeIndicatorKey:[innerElementData attributeStringValueForName:@"from"]];
         }
+        else {
          [[NSNotificationCenter defaultCenter] postNotificationName:@"UserHistory" object:message];
+        }
+        
     }
 }
 
@@ -1160,12 +1245,16 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
      NSXMLElement *innerElementData = [messageData elementForName:@"data"];
     [[XmppCoreDataHandler sharedManager] insertLocalMessageStorageDataBase:[innerElementData attributeStringValueForName:@"from"] message:messageData];
     
-    if ([selectedFriendUserId isEqualToString:[innerElementData attributeStringValueForName:@"from"]]){
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"UserHistory" object:messageData];
+    if (![selectedFriendUserId isEqualToString:[innerElementData attributeStringValueForName:@"from"]]){
+        
+        [self addLocalNotification:senderName message:desc userId:[innerElementData attributeStringValueForName:@"from"]];
+        [XMPPUserDefaultManager setXMPPBadgeIndicatorKey:[innerElementData attributeStringValueForName:@"from"]];
+        
     }
     else {
-        [XMPPUserDefaultManager setXMPPBadgeIndicatorKey:[innerElementData attributeStringValueForName:@"from"]];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"UserHistory" object:messageData];
     }
+    
 //    DDLogVerbose(@"%@: Data was written to the path: %@", THIS_FILE, fullPath);
     
 }
@@ -1200,5 +1289,56 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [message addChild:dataTag];
     [message addChild:body];
     return message;
+}
+
+- (void)addLocalNotification:(NSString *)title message:(NSString *)message userId:(NSString *)userId {
+    
+    [self showNotificationViewWithAnimation:userId alertTitle:title alertMessage:message];
+    
+////    UILocalNotification* localNotification = [[UILocalNotification alloc] init];
+////    localNotification.fireDate = [NSDate dateWithTimeIntervalSinceNow:10];
+////    localNotification.alertBody = @"Your alert message";
+////    localNotification.timeZone = [NSTimeZone defaultTimeZone];
+////    [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
+//    
+//    
+////    NSData *tempImageData=[self listionDataFromCacheDirectoryFolderName:appProfilePhotofolderName jid:userId];
+////    if (nil!=tempImageData) {
+////        notification.alertLaunchImage=[UIImage imageWithData:tempImageData];
+////    }
+////    else {
+////        
+    UILocalNotification *notification = [[UILocalNotification alloc] init];
+    notification.fireDate = [NSDate dateWithTimeIntervalSinceNow:0];
+    notification.alertBody = message;
+    notification.alertTitle=title;
+    notification.timeZone = [NSTimeZone defaultTimeZone];
+    notification.soundName = UILocalNotificationDefaultSoundName;
+    notification.applicationIconBadgeNumber = 0;
+//    NSDictionary *infoDict = [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"You have notification(s) pending!"] forKey:@"userInfo"];
+//    notification.userInfo = infoDict;
+    [[UIApplication sharedApplication] scheduleLocalNotification:notification];
+//
+////    UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
+////    content.title = [NSString localizedUserNotificationStringForKey:@"Hello!" arguments:nil];
+////    content.body = [NSString localizedUserNotificationStringForKey:@"Hello_message_body"
+////                                                         arguments:nil];
+////    content.sound = [UNNotificationSound defaultSound];
+////    
+////    // Deliver the notification in five seconds.
+////    UNTimeIntervalNotificationTrigger* trigger = [UNTimeIntervalNotificationTrigger
+////                                                  triggerWithTimeInterval:5 repeats:NO];
+////    UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier:@"FiveSecond"
+////                                                                          content:content trigger:trigger];
+////    
+////    // Schedule the notification.
+////    UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
+//////    [center addNotificationRequest:request completionHandler:nil];
+////    [center addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
+////        if (error != nil) {
+////            NSLog(@"Something went wrong: %@",error);
+////        }
+////    }];
+
 }
 @end

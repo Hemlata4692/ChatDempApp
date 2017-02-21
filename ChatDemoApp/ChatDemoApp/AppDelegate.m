@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "MMMaterialDesignSpinner.h"
+
 //Uncomment libxml code while running on devices in module.modulemap
 //#import "XMPPFramework.h"
 
@@ -39,8 +40,32 @@
 
     self.navigationController = (UINavigationController *)[self.window rootViewController];
     
+    //ios9 or later
+//    center = [UNUserNotificationCenter currentNotificationCenter];
+//    [center requestAuthorizationWithOptions:(UNAuthorizationOptionAlert + UNAuthorizationOptionSound)
+//                          completionHandler:^(BOOL granted, NSError * _Nullable error) {
+//                              // Enable or disable features based on authorization.
+//                              if (!granted) {
+//                                  NSLog(@"Something went wrong");
+//                              }
+//                          }];
+    //end
     
+    //permission for local notification
+    if ([application respondsToSelector:@selector(registerUserNotificationSettings:)])
+    {
+        [application registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert|UIUserNotificationTypeBadge|UIUserNotificationTypeSound categories:nil]];
+    }
     
+    UILocalNotification *localNotiInfo = [launchOptions objectForKey: UIApplicationLaunchOptionsLocalNotificationKey];
+    
+    //Accept local notification when app is not open
+    if (localNotiInfo)
+    {
+        [self application:application didReceiveLocalNotification:localNotiInfo];
+    }
+    
+//    
 //    userProfileImageData = [[UIImageView alloc] init];
 //    
 //    userHistoryArr = [NSMutableArray new];
@@ -87,6 +112,44 @@
 //        [self application:application didReceiveRemoteNotification:remoteNotifiInfo];
 //    }
     return YES;
+}
+
+#pragma mark - Push notification methods
+-(void)registerDeviceForNotification
+{
+    if ([[UIApplication sharedApplication] respondsToSelector:@selector(registerUserNotificationSettings:)])
+    {
+        [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge) categories:nil]];
+        [[UIApplication sharedApplication] registerForRemoteNotifications];
+    }
+    else
+    {
+        
+        [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge) categories:nil]];
+        [[UIApplication sharedApplication] registerForRemoteNotifications];
+    }
+}
+
+- (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken1
+{
+    NSString *token = [[deviceToken1 description] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"<>"]];
+    token = [token stringByReplacingOccurrencesOfString:@" " withString:@""];
+//    self.deviceToken = token;
+     NSLog(@"device token...........%@",token);
+
+}
+
+#pragma mark - Local notification
+-(void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
+{
+    
+    if (application.applicationState == UIApplicationStateActive) {
+        
+    }
+    else {
+        
+        [[UIApplication sharedApplication] cancelLocalNotification:notification];
+    }
 }
 
 

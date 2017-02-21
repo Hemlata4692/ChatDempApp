@@ -97,6 +97,7 @@
 		B75BC5771E3F620500E5F780 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		B75E7EF41E5BF1E600634A68 /* XmppCoreDataHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XmppCoreDataHandler.h; sourceTree = "<group>"; };
 		B75E7EF51E5BF1E600634A68 /* XmppCoreDataHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XmppCoreDataHandler.m; sourceTree = "<group>"; };
+		B75E7EF71E5C1CA200634A68 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		B76F75E71E40ABD8001FE579 /* DashboardXMPP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DashboardXMPP.h; sourceTree = "<group>"; };
 		B76F75E81E40ABD8001FE579 /* DashboardXMPP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DashboardXMPP.m; sourceTree = "<group>"; };
 		B77DFFDD1E4C2E2100921126 /* ChatScreenViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatScreenViewController.h; sourceTree = "<group>"; };
@@ -166,6 +167,7 @@
 		91178C8E9192B3153C7C164B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B75E7EF71E5C1CA200634A68 /* UserNotifications.framework */,
 				B70F932A1E4DB5290064EF29 /* AddressBook.framework */,
 				B70F93281E4DB51C0064EF29 /* AddressBookUI.framework */,
 				B75BC5771E3F620500E5F780 /* CoreData.framework */,

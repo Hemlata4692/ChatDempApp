@@ -68,12 +68,7 @@
 ////        NSLog(@"%@",newvCardTemp.emailAddress);
 //    }
   
-    [self fetchAllHistoryChat:^(NSMutableArray *tempHistoryData) {
-        // do something with your BOOL
-        
-        historyChatData=[tempHistoryData mutableCopy];
-        [self.dasboardTableListing reloadData];
-    }];
+    [self historyUpdateNotify];
 }
 
 - (void)userList {
@@ -273,7 +268,9 @@
     UIButton* profileBtn = (UIButton*)[cell viewWithTag:3];
     UILabel* statusLabel = (UILabel*)[cell viewWithTag:4];
     UILabel* dateLabel = (UILabel*)[cell viewWithTag:5];
+    UILabel* badgeLabel = (UILabel*)[cell viewWithTag:6];
     
+    badgeLabel.hidden=YES;
     if (customSegmentedControl.selectedSegmentIndex==1) {
         
 //        if (![[profileLocalDictData allKeys] containsObject:[userListArray objectAtIndex:indexPath.row]]) {
@@ -308,6 +305,9 @@
     }
     else {
         
+        badgeLabel.layer.masksToBounds=YES;
+        badgeLabel.layer.cornerRadius=10;
+        
         NSXMLElement *historyElement=[historyChatData objectAtIndex:indexPath.row];
         NSXMLElement *innerData=[historyElement elementForName:@"data"];
 //        NSMutableDictionary *profileDic;
@@ -317,13 +317,22 @@
 //            profileDic=[[profileLocalDictData objectForKey:[historyElement attributeStringValueForName:@"from"]] mutableCopy];
             [self configurePhotoForCell:cell jid:[innerData attributeStringValueForName:@"from"]];
              nameLabel.text = [[innerData attributeStringValueForName:@"senderName"] capitalizedString];
+            if ([[XMPPUserDefaultManager getXMPPBadgeIndicatorValue:[innerData attributeStringValueForName:@"from"]] intValue]!=0) {
+                badgeLabel.hidden=NO;
+                badgeLabel.text=[XMPPUserDefaultManager getXMPPBadgeIndicatorValue:[innerData attributeStringValueForName:@"from"]];
+            }
         }
         else {
             
 //            profileDic=[[profileLocalDictData objectForKey:[historyElement attributeStringValueForName:@"to"]] mutableCopy];
             [self configurePhotoForCell:cell jid:[innerData attributeStringValueForName:@"to"]];
             nameLabel.text = [[innerData attributeStringValueForName:@"receiverName"] capitalizedString];
+            if ([[XMPPUserDefaultManager getXMPPBadgeIndicatorValue:[innerData attributeStringValueForName:@"to"]] intValue]!=0) {
+                badgeLabel.hidden=NO;
+                badgeLabel.text=[XMPPUserDefaultManager getXMPPBadgeIndicatorValue:[innerData attributeStringValueForName:@"to"]];
+            }
         }
+        
         dateLabel.hidden=NO;
         profileBtn.tag=indexPath.row;
         [profileBtn addTarget:self action:@selector(friendProfileAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -601,6 +610,39 @@
 
 
 #pragma mark - Custom accessors
+- (void)addSegmentBar {
+    
+    customSegmentedControl = [[HMSegmentedControl alloc] initWithSectionTitles:
+                              @[@"History", @"Contacts"]];
+    customSegmentedControl.autoresizingMask = UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleWidth;
+    customSegmentedControl.frame = CGRectMake(0, 0, self.view.frame.size.width, 44);
+    customSegmentedControl.backgroundColor=[UIColor darkGrayColor];
+    customSegmentedControl.segmentEdgeInset = UIEdgeInsetsMake(0, 10, 0, 10);
+    customSegmentedControl.selectionIndicatorColor = [UIColor whiteColor];
+    customSegmentedControl.selectionIndicatorHeight = 3.0;
+    customSegmentedControl.selectionStyle = HMSegmentedControlSelectionStyleFullWidthStripe;//
+    customSegmentedControl.selectionIndicatorLocation = HMSegmentedControlSelectionIndicatorLocationDown;
+    customSegmentedControl.segmentWidthStyle = HMSegmentedControlSegmentWidthStyleFixed;
+    NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                [UIFont fontWithName:@"Helvetica-Bold" size:16], NSFontAttributeName,
+                                [UIColor grayColor].CGColor, NSForegroundColorAttributeName, nil];
+    
+    [customSegmentedControl setTitleTextAttributes:attributes];
+    
+    [customSegmentedControl addTarget:self action:@selector(segmentedControlChangedValue:) forControlEvents:UIControlEventValueChanged];
+    [self.view addSubview:customSegmentedControl];
+}
+
+- (void)segmentedControlChangedValue:(HMSegmentedControl *)segmentedControl {
+    
+    if (segmentedControl.selectedSegmentIndex == 0) {
+        [self.dasboardTableListing reloadData];
+    }
+    else if (segmentedControl.selectedSegmentIndex == 1) {
+        [self.dasboardTableListing reloadData];
+    }
+}
+
 - (void)addBarButton {
     
     UIBarButtonItem *logoutBarButton, *profileBarButton;
@@ -732,69 +774,15 @@
 }
 #pragma mark - end
 
-- (void)addSegmentBar {
+#pragma mark - Post notification handler
+- (void)historyUpdateNotify{
     
-    customSegmentedControl = [[HMSegmentedControl alloc] initWithSectionTitles:
-                              @[@"History", @"Contacts"]];
-    customSegmentedControl.autoresizingMask = UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleWidth;
-    customSegmentedControl.frame = CGRectMake(0, 0, self.view.frame.size.width, 44);
-    customSegmentedControl.backgroundColor=[UIColor darkGrayColor];
-    customSegmentedControl.segmentEdgeInset = UIEdgeInsetsMake(0, 10, 0, 10);
-    customSegmentedControl.selectionIndicatorColor = [UIColor whiteColor];
-    customSegmentedControl.selectionIndicatorHeight = 3.0;
-    customSegmentedControl.selectionStyle = HMSegmentedControlSelectionStyleFullWidthStripe;//
-    customSegmentedControl.selectionIndicatorLocation = HMSegmentedControlSelectionIndicatorLocationDown;
-    customSegmentedControl.segmentWidthStyle = HMSegmentedControlSegmentWidthStyleFixed;
-    NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                                [UIFont fontWithName:@"Helvetica-Bold" size:16], NSFontAttributeName,
-                                [UIColor grayColor].CGColor, NSForegroundColorAttributeName, nil];
-    
-    [customSegmentedControl setTitleTextAttributes:attributes];
-    
-    [customSegmentedControl addTarget:self action:@selector(segmentedControlChangedValue:) forControlEvents:UIControlEventValueChanged];
-    [self.view addSubview:customSegmentedControl];
-}
-
-- (void)segmentedControlChangedValue:(HMSegmentedControl *)segmentedControl {
-    
-    if (segmentedControl.selectedSegmentIndex == 0) {
+    [self fetchAllHistoryChat:^(NSMutableArray *tempHistoryData) {
+        // do something with your BOOL
+        
+        historyChatData=[tempHistoryData mutableCopy];
         [self.dasboardTableListing reloadData];
-    }
-    else if (segmentedControl.selectedSegmentIndex == 1) {
-        [self.dasboardTableListing reloadData];
-    }
-}
-#pragma mark - end
-//
-//- (void)showButton {
-//    
-////    [self xmppUserRefreshResponse];
-//    NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
-//    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UserEntry"];
-//    NSMutableArray *devices = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
-//    
-//    for (int i=0; i<devices.count; i++) {
-//        NSManagedObject *devicea = [devices objectAtIndex:i];
-//        NSLog(@"%@",[devicea valueForKey:@"xmppRegisterId"]);
-//        NSLog(@"%@",[devicea valueForKey:@"xmppName"]);
-//        NSLog(@"%@",[devicea valueForKey:@"xmppPhoneNumber"]);
-//        NSLog(@"%@",[devicea valueForKey:@"xmppUserStatus"]);
-//        NSLog(@"%@",[devicea valueForKey:@"xmppDescription"]);
-//        NSLog(@"%@",[devicea valueForKey:@"xmppAddress"]);
-//        NSLog(@"%@",[devicea valueForKey:@"xmppEmailAddress"]);
-//        NSLog(@"%@",[devicea valueForKey:@"xmppUserBirthDay"]);
-//        NSLog(@"%@",[devicea valueForKey:@"xmppGender"]);
-//        NSLog(@"\n\n");
-//    }
-//}
-
-- (NSManagedObjectContext *)managedObjectContext {
-    NSManagedObjectContext *context = nil;
-    id delegate = [[UIApplication sharedApplication] delegate];
-    if ([delegate performSelector:@selector(managedObjectContext)]) {
-        context = [delegate managedObjectContext];
-    }
-    return context;
+    }];
 }
 
 - (void)updateProfileInformation {
@@ -820,6 +808,7 @@
     [reload addTarget:self action:@selector(reloadAction:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.rightBarButtonItems=[NSArray arrayWithObjects:groupBarButton,reloadBarButton, nil];
 }
+#pragma mark - end
 
 - (void)xmppUserListResponse:(NSMutableDictionary *)xmppUserDetails xmppUserListIds:(NSMutableArray *)xmppUserListIds {
 

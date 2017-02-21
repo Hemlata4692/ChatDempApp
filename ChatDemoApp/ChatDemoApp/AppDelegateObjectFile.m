@@ -26,6 +26,7 @@
 
 #import "ErrorCode.h"
 #import "XMPPUserDefaultManager.h"
+#import "XmppCoreDataHandler.h"
 
 #if DEBUG
 static const int ddLogLevel = LOG_LEVEL_VERBOSE;
@@ -116,10 +117,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         portNumber = 0;
     }
     
-//    if (nil!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"PasswordRequired"] && NULL!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"PasswordRequired"] && ![[NSBundle mainBundle] objectForInfoDictionaryKey:@"PasswordRequired"]) {
-        defaultPassword = @"password";
-//    }
-    
+    defaultPassword = @"password";
     xmppUniqueId=@"Zebra123456";
     userProfileImageData = [[UIImageView alloc] init];
     
@@ -138,14 +136,11 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [DDLog addLogger:[DDTTYLogger sharedInstance] withLogLevel:XMPP_LOG_FLAG_SEND_RECV];
     [self setupStream];
     NSLog(@"%@",[XMPPUserDefaultManager getValue:@"LoginCred"]);
-    if (([XMPPUserDefaultManager getValue:@"LoginCred"] != nil)) {
-//        [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",hostName] key:@"LoginCred"];
-//        [XMPPUserDefaultManager setValue:@"password" key:@"PassCred"];
-//        [self connect];
+    
+    if ([XMPPUserDefaultManager getValue:@"XMPPBadgeIndicator"] == nil) {
+        NSMutableDictionary* countData = [NSMutableDictionary new];
+        [XMPPUserDefaultManager setValue:countData key:@"XMPPBadgeIndicator"];
     }
-//    else {
-//    [self connect];
-//    }
 }
 #pragma mark - end
 
@@ -312,20 +307,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [xmppStream setMyJID:[XMPPJID jidWithString:myJID]];
     xmppPassword = myPassword;
     
-    
-    
-    
-    
-    //File transfer
-    
-    
-//    _fileTransfer = [[XMPPOutgoingFileTransfer alloc] initWithDispatchQueue:dispatch_get_main_queue()];
-////    _fileTransfer.disableIBB = NO;
-////    _fileTransfer.disableSOCKS5 = NO;
-//    
-//    [_fileTransfer activate:xmppStream];
-//    [_fileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
-    
+    //Added by rohit File transfer
     xmppIncomingFileTransfer = [XMPPIncomingFileTransfer new];
     xmppIncomingFileTransfer.disableIBB = NO;
     xmppIncomingFileTransfer.disableSOCKS5 = YES;
@@ -460,13 +442,8 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         
         myDelegate.afterAutentication=2;
     DDLogVerbose(@"%@: %@", THIS_FILE, THIS_METHOD);
-//    if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"zebra@%@",hostName]]) {
-//    if (isRegisterCalled==0) {
-//        isRegisterCalled=1;
-         [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPDidNotAuthenticatedResponse" object:nil];
-//    }
-    
-//    }
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPDidNotAuthenticatedResponse" object:nil];
+
     }
 }
 
@@ -486,43 +463,44 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     NSXMLElement *queryElement = [NSXMLElement elementWithName:@"query" xmlns:@"jabber:iq:roster"];
     
     NSXMLElement *vcardInfo = [iq elementForName:@"vCard"];
+    
+    //Insert/Update users data in local storage
     if (vcardInfo!=nil) {
         NSXMLElement *registerUserInfo = [vcardInfo elementForName:@"RegisterUserId"];
         if (registerUserInfo!=nil) {
             NSLog(@"%@",[registerUserInfo stringValue]);
-            [self insertEntryInXmppUserModel:[registerUserInfo stringValue] xmppName:[[vcardInfo elementForName:@"NICKNAME"] stringValue] xmppPhoneNumber:[[vcardInfo elementForName:@"TEL"] stringValue] xmppUserStatus:[[vcardInfo elementForName:@"USERSTATUS"] stringValue] xmppDescription:[[vcardInfo elementForName:@"DESC"] stringValue] xmppAddress:[[vcardInfo elementForName:@"ADDRESS"] stringValue] xmppEmailAddress:[[vcardInfo elementForName:@"EMAILADDRESS"] stringValue] xmppUserBirthDay:[[vcardInfo elementForName:@"BDAY"] stringValue] xmppGender:[[vcardInfo elementForName:@"GENDER"] stringValue]];
-//            if (isContactListIsLoaded && xmppUserListArray!=nil && [selectedFriendUserId isEqualToString:[registerUserInfo stringValue]]) {
-//                [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPProfileUpdation" object:nil];
-//            }
+            [[XmppCoreDataHandler sharedManager] insertEntryInXmppUserModel:[registerUserInfo stringValue] xmppName:[[vcardInfo elementForName:@"NICKNAME"] stringValue] xmppPhoneNumber:[[vcardInfo elementForName:@"TEL"] stringValue] xmppUserStatus:[[vcardInfo elementForName:@"USERSTATUS"] stringValue] xmppDescription:[[vcardInfo elementForName:@"DESC"] stringValue] xmppAddress:[[vcardInfo elementForName:@"ADDRESS"] stringValue] xmppEmailAddress:[[vcardInfo elementForName:@"EMAILADDRESS"] stringValue] xmppUserBirthDay:[[vcardInfo elementForName:@"BDAY"] stringValue] xmppGender:[[vcardInfo elementForName:@"GENDER"] stringValue]];
             if (isContactListIsLoaded && xmppUserListArray!=nil) {
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPProfileUpdation" object:nil];
             }
         }
     }
     
+    //New user entry in local storage
     NSXMLElement *addQueryElement = [iq elementForName:@"query"];
     if (addQueryElement!=nil) {
         NSXMLElement *removeitemElement = [addQueryElement elementForName:@"item"];
         if (removeitemElement!=nil) {
-//            <iq xmlns="jabber:client" type="set" id="58-481" to="5555666664@192.168.1.171/6wwe5f57fz"><query xmlns="jabber:iq:roster"><item jid="1245217896@192.168.1.171" name="ros" subscription="both"><group>Ranosys</group></item></query></iq>
             NSString *addSubscriptionElement = [[removeitemElement attributeForName:@"subscription"] stringValue];
             NSString *addSetAttribut = [[iq attributeForName:@"type"] stringValue];
             if ((addSubscriptionElement!=nil)&&[addSubscriptionElement isEqualToString:@"both"]&&[addSetAttribut isEqualToString:@"set"]) {
-                [self insertNewUserEntryInXmppUserModel:[[removeitemElement attributeForName:@"jid"] stringValue] xmppName:[[removeitemElement attributeForName:@"name"] stringValue] xmppPhoneNumber:@"" xmppUserStatus:@"" xmppDescription:@"" xmppAddress:@"" xmppEmailAddress:@"" xmppUserBirthDay:@"" xmppGender:@""];
+                [[XmppCoreDataHandler sharedManager] insertNewUserEntryInXmppUserModel:[[removeitemElement attributeForName:@"jid"] stringValue] xmppName:[[removeitemElement attributeForName:@"name"] stringValue] xmppPhoneNumber:@"" xmppUserStatus:@"" xmppDescription:@"" xmppAddress:@"" xmppEmailAddress:@"" xmppUserBirthDay:@"" xmppGender:@""];
             }
         }
     }
     
+    //Remove user entry if it is deleted
     NSXMLElement *removeQueryElement = [iq elementForName:@"query"];
     if (removeQueryElement!=nil) {
          NSXMLElement *removeitemElement = [removeQueryElement elementForName:@"item"];
         if (removeitemElement!=nil) {
             NSString *removeSubscriptionElement = [[removeitemElement attributeForName:@"subscription"] stringValue];
             if ((removeSubscriptionElement!=nil)&&[removeSubscriptionElement isEqualToString:@"remove"]) {
-                [self deleteDataModelEntry:[[removeitemElement attributeForName:@"jid"] stringValue]];
+                [[XmppCoreDataHandler sharedManager] deleteDataModelEntry:[[removeitemElement attributeForName:@"jid"] stringValue]];
             }
         }
     }
+    //end
     
     if (queryElement) {
         NSArray *itemElements = [queryElement elementsForName: @"item"];
@@ -536,112 +514,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     return NO;
 }
 
-- (void)deleteDataModelEntry:(NSString *)registredUserId {
-    
-    NSManagedObjectContext *context = [self managedObjectContext];
-    NSMutableArray *results = [[NSMutableArray alloc]init];
-    NSPredicate *pred = [NSPredicate predicateWithFormat:@"xmppRegisterId == %@", registredUserId];
-    
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"UserEntry"];
-    [fetchRequest setPredicate:pred];
-    results = [[context executeFetchRequest:fetchRequest error:nil] mutableCopy];
-    
-    if (results.count > 0) {
-        
-        [context deleteObject:[results objectAtIndex:0]];
-        NSError *error = nil;
-        if (![context save:&error]) {
-            NSLog(@"Can't Delete! %@ %@", error, [error localizedDescription]);
-            return;
-        }
-        
-        [self removeLocalMessageStorageDataBase:registredUserId];
-        if (isContactListIsLoaded) {
-            
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"XmppNewUserAdded" object:nil];
-        }
-    }
-}
-
-- (void)insertNewUserEntryInXmppUserModel:(NSString *)registredUserId xmppName:(NSString *)xmppName xmppPhoneNumber:(NSString *)xmppPhoneNumber xmppUserStatus:(NSString *)xmppUserStatus xmppDescription:(NSString *)xmppDescription xmppAddress:(NSString *)xmppAddress xmppEmailAddress:(NSString *)xmppEmailAddress xmppUserBirthDay:(NSString *)xmppUserBirthDay xmppGender:(NSString *)xmppGender {
-    
-    NSManagedObjectContext *context = [self managedObjectContext];
-    NSMutableArray *results = [[NSMutableArray alloc]init];
-    NSPredicate *pred;
-    
-    pred = [NSPredicate predicateWithFormat:@"xmppRegisterId == %@", registredUserId];
-    NSLog(@"predicate: %@",pred);
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"UserEntry"];
-    [fetchRequest setPredicate:pred];
-    results = [[context executeFetchRequest:fetchRequest error:nil] mutableCopy];
-    
-    if (results.count == 0) {
-        NSManagedObject *xmppDataEntry = [NSEntityDescription insertNewObjectForEntityForName:@"UserEntry" inManagedObjectContext:context];
-        [xmppDataEntry setValue:registredUserId forKey:@"xmppRegisterId"];
-        [xmppDataEntry setValue:xmppName forKey:@"xmppName"];
-        [xmppDataEntry setValue:xmppPhoneNumber forKey:@"xmppPhoneNumber"];
-        [xmppDataEntry setValue:xmppUserStatus forKey:@"xmppUserStatus"];
-        [xmppDataEntry setValue:xmppDescription forKey:@"xmppDescription"];
-        [xmppDataEntry setValue:xmppAddress forKey:@"xmppAddress"];
-        [xmppDataEntry setValue:xmppEmailAddress forKey:@"xmppEmailAddress"];
-        [xmppDataEntry setValue:xmppUserBirthDay forKey:@"xmppUserBirthDay"];
-        [xmppDataEntry setValue:xmppGender forKey:@"xmppGender"];
-        NSError *error = nil;
-        // Save the object to persistent store
-        if (![context save:&error]) {
-            NSLog(@"Can't Save! %@ %@", error, [error localizedDescription]);
-        }
-        [xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:registredUserId] ignoreStorage:YES];
-        if (isContactListIsLoaded) {
-            
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"XmppNewUserAdded" object:nil];
-        }
-    }
-}
-
-- (void)insertEntryInXmppUserModel:(NSString *)registredUserId xmppName:(NSString *)xmppName xmppPhoneNumber:(NSString *)xmppPhoneNumber xmppUserStatus:(NSString *)xmppUserStatus xmppDescription:(NSString *)xmppDescription xmppAddress:(NSString *)xmppAddress xmppEmailAddress:(NSString *)xmppEmailAddress xmppUserBirthDay:(NSString *)xmppUserBirthDay xmppGender:(NSString *)xmppGender {
-
-    NSManagedObjectContext *context = [self managedObjectContext];
-    NSMutableArray *results = [[NSMutableArray alloc]init];
-    NSPredicate *pred;
-    
-    pred = [NSPredicate predicateWithFormat:@"xmppRegisterId == %@", registredUserId];
-    NSLog(@"predicate: %@",pred);
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"UserEntry"];
-    [fetchRequest setPredicate:pred];
-    results = [[context executeFetchRequest:fetchRequest error:nil] mutableCopy];
-
-    if (results.count > 0) {
-         NSManagedObject* xmppDataEntry = [results objectAtIndex:0];
-        [xmppDataEntry setValue:registredUserId forKey:@"xmppRegisterId"];
-        [xmppDataEntry setValue:xmppName forKey:@"xmppName"];
-        [xmppDataEntry setValue:xmppPhoneNumber forKey:@"xmppPhoneNumber"];
-        [xmppDataEntry setValue:xmppUserStatus forKey:@"xmppUserStatus"];
-        [xmppDataEntry setValue:xmppDescription forKey:@"xmppDescription"];
-        [xmppDataEntry setValue:xmppAddress forKey:@"xmppAddress"];
-        [xmppDataEntry setValue:xmppEmailAddress forKey:@"xmppEmailAddress"];
-        [xmppDataEntry setValue:xmppUserBirthDay forKey:@"xmppUserBirthDay"];
-        [xmppDataEntry setValue:xmppGender forKey:@"xmppGender"];
-        [context save:nil];
-    } else {
-        NSManagedObject *xmppDataEntry = [NSEntityDescription insertNewObjectForEntityForName:@"UserEntry" inManagedObjectContext:context];
-        [xmppDataEntry setValue:registredUserId forKey:@"xmppRegisterId"];
-        [xmppDataEntry setValue:xmppName forKey:@"xmppName"];
-        [xmppDataEntry setValue:xmppPhoneNumber forKey:@"xmppPhoneNumber"];
-        [xmppDataEntry setValue:xmppUserStatus forKey:@"xmppUserStatus"];
-        [xmppDataEntry setValue:xmppDescription forKey:@"xmppDescription"];
-        [xmppDataEntry setValue:xmppAddress forKey:@"xmppAddress"];
-        [xmppDataEntry setValue:xmppEmailAddress forKey:@"xmppEmailAddress"];
-        [xmppDataEntry setValue:xmppUserBirthDay forKey:@"xmppUserBirthDay"];
-        [xmppDataEntry setValue:xmppGender forKey:@"xmppGender"];
-        NSError *error = nil;
-        // Save the object to persistent store
-        if (![context save:&error]) {
-            NSLog(@"Can't Save! %@ %@", error, [error localizedDescription]);
-        }
-    }
-}
-
 - (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message
 {
     DDLogVerbose(@"%@: %@", THIS_FILE, THIS_METHOD);
@@ -653,46 +525,15 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
                                                        managedObjectContext:[self managedObjectContext_roster]];
         NSLog(@"%@",user);
         
-        
-//        [message addAttributeWithName:@"fromTo" stringValue:[NSString stringWithFormat:@"%@-%@",[message attributeStringValueForName:@"to"],[[[message attributeStringValueForName:@"from"] componentsSeparatedByString:@"/"] objectAtIndex:0]]];
-        
-//        [xmppMessageArchivingCoreDataStorage archiveMessage:message outgoing:NO xmppStream:[self xmppStream]];
-        
-        
-//        NSString *keyName = [[[message attributeStringValueForName:@"from"] componentsSeparatedByString:@"/"] objectAtIndex:0];
-//        if ([[XMPPUserDefaultManager getValue:@"CountData"] objectForKey:keyName] == nil) {
-//            int tempCount = 1;
-//            
-//            NSMutableDictionary *tempDict = [[XMPPUserDefaultManager getValue:@"CountData"] mutableCopy];
-//            [tempDict setObject:[NSString stringWithFormat:@"%d",tempCount] forKey:keyName];
-//            [XMPPUserDefaultManager setValue:tempDict key:@"CountData"];
-//        }
-//        else{
-//            int tempCount = [[[XMPPUserDefaultManager getValue:@"CountData"] objectForKey:keyName] intValue];
-//            tempCount = tempCount + 1;
-//            NSMutableDictionary *tempDict = [[XMPPUserDefaultManager getValue:@"CountData"] mutableCopy];
-//            [tempDict setObject:[NSString stringWithFormat:@"%d",tempCount] forKey:keyName];
-//            [XMPPUserDefaultManager setValue:tempDict key:@"CountData"];
-//        }
-        
-//        NSArray* fromUser = [[message attributeStringValueForName:@"from"] componentsSeparatedByString:@"/"];
         NSXMLElement *innerElementData = [message elementForName:@"data"];
-        [self insertLocalMessageStorageDataBase:[innerElementData attributeStringValueForName:@"from"] message:message];
-//        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-
-//        NSLog(@"%@",appDelegate.chatUser);
-        if ([selectedFriendUserId isEqualToString:[innerElementData attributeStringValueForName:@"from"]]){
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"UserHistory" object:message];
+        [[XmppCoreDataHandler sharedManager] insertLocalMessageStorageDataBase:[innerElementData attributeStringValueForName:@"from"] message:message];
+        if (![selectedFriendUserId isEqualToString:[innerElementData attributeStringValueForName:@"from"]]){
+//           
+//        }
+//        else {
+            [XMPPUserDefaultManager setXMPPBadgeIndicatorKey:[innerElementData attributeStringValueForName:@"from"]];
         }
-//        else if ([appDelegate.chatUser isEqualToString:@"ChatScreen"]){  //this is use for History chat screen if already open
-//            [self addBadgeIcon:[NSString stringWithFormat:@"%d",[[XMPPUserDefaultManager getValue:@"BadgeCount"] intValue] + 1 ]];
-//            [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%d",[[XMPPUserDefaultManager getValue:@"BadgeCount"] intValue] + 1 ] key:@"BadgeCount"];
-//            [[NSNotificationCenter defaultCenter] postNotificationName:@"ChatScreenHistory" object:nil];
-//        }
-//        else{
-//            [self addBadgeIcon:[NSString stringWithFormat:@"%d",[[XMPPUserDefaultManager getValue:@"BadgeCount"] intValue] + 1 ]];
-//            [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%d",[[XMPPUserDefaultManager getValue:@"BadgeCount"] intValue] + 1 ] key:@"BadgeCount"];
-//        }
+         [[NSNotificationCenter defaultCenter] postNotificationName:@"UserHistory" object:message];
     }
 }
 
@@ -820,44 +661,10 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [newvCardTemp setGender:[self setProfileDataValue:profileData key:@"xmppGender"]];
     
     [xmppvCardTempModule updateMyvCardTemp:newvCardTemp];
-    
-    
-//    XMPPPresence *presence = [XMPPPresence presence];
-    //    NSString *string = [notification object]; // object contains some random string.
-//    NSXMLElement *status = [NSXMLElement elementWithName:@"status" stringValue:@"my status"];
-//     NSXMLElement *emailId = [NSXMLElement elementWithName:@"emailId" stringValue:@"my status"];
-//     NSXMLElement *name = [NSXMLElement elementWithName:@"name" stringValue:@"my status"];
-//    [presencexmpp addChild:status];
-//    [presencexmpp addChild:[NSXMLElement elementWithName:@"emailId" stringValue:@"my status"]];
-//    [presencexmpp addChild:[NSXMLElement elementWithName:@"name" stringValue:@"my status"]];
-//    NSLog(@"presence info :- %@",presencexmpp);
-//    [[self xmppStream] sendElement:presencexmpp];
-    
-    
-//    XMPPPresence *presence = [XMPPPresence presenceWithType:@"unavailable"];
-//    
-//    [[self xmppStream] sendElement:presence];
 }
 
 
 - (NSData*)reducedImageSize:(UIImage *)selectedImage {
-    
-//    UIImage *cropped =[cropperView getCroppedImage];
-//    //	[delegate imageCropper:self didFinishCroppingWithImage:cropped];
-//    if(self.resultImgView)
-//        [self.resultImgView removeFromSuperview];
-//    
-//    self.resultImgView = [[[UIImageView alloc]  initWithFrame:CGRectMake(20, 80, 250, 250)] autorelease];
-//    self.resultImgView.image = cropped;
-//    self.resultImgView.backgroundColor = [UIColor darkGrayColor];
-//    self.resultImgView.contentMode = UIViewContentModeScaleAspectFit;
-//    [self.resultImgView.layer setMasksToBounds:YES];
-//    self.resultImgView.layer.cornerRadius = self.resultImgView.frame.size.width/2;
-//    self.resultImgView.clipsToBounds = YES;
-    
-    
-    
-    //    [self.view addSubview:self.resultImgView];
     
     NSData *imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(selectedImage, 1)];
     
@@ -991,23 +798,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [newvCardTemp setGender:[self setProfileDataValue:profileData key:@"xmppGender"]];
     
     [xmppvCardTempModule updateMyvCardTemp:newvCardTemp];
-    
-    
-    //    XMPPPresence *presence = [XMPPPresence presence];
-    //    NSString *string = [notification object]; // object contains some random string.
-    //    NSXMLElement *status = [NSXMLElement elementWithName:@"status" stringValue:@"my status"];
-    //     NSXMLElement *emailId = [NSXMLElement elementWithName:@"emailId" stringValue:@"my status"];
-    //     NSXMLElement *name = [NSXMLElement elementWithName:@"name" stringValue:@"my status"];
-    //    [presencexmpp addChild:status];
-    //    [presencexmpp addChild:[NSXMLElement elementWithName:@"emailId" stringValue:@"my status"]];
-    //    [presencexmpp addChild:[NSXMLElement elementWithName:@"name" stringValue:@"my status"]];
-    //    NSLog(@"presence info :- %@",presencexmpp);
-    //    [[self xmppStream] sendElement:presencexmpp];
-    
-    
-    //    XMPPPresence *presence = [XMPPPresence presenceWithType:@"unavailable"];
-    //
-    //    [[self xmppStream] sendElement:presence];
 }
 
 - (void)xmppStream:(XMPPStream *)sender didReceiveError:(id)error
@@ -1076,87 +866,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 //        
 //        [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPUserListResponse" object:nil];
 //    }
-}
-#pragma mark - end
-
-#pragma mark - Add badge icon
--(void)addBadgeIcon:(NSString*)badgeValue{
-    
-    //    if ([badgeValue intValue] < 1) {
-    //        [self removeBadgeIcon];
-    //    }
-    //    else{
-    //        for (UILabel *subview in myDelegate.tabBarView.tabBar.subviews)
-    //        {
-    //            if ([subview isKindOfClass:[UILabel class]])
-    //            {
-    //                if (subview.tag == 2365) {
-    //                    [subview removeFromSuperview];
-    //                }
-    //            }
-    //        }
-    //
-    //        UILabel *a = [[UILabel alloc] init];
-    //        a.frame = CGRectMake(([UIScreen mainScreen].bounds.size.width/5) + (([UIScreen mainScreen].bounds.size.width/5)/2) , 0, 25, 20);
-    //        a.backgroundColor = [UIColor colorWithRed:255.0/255.0 green:83.0/255.0 blue:77.0/255.0 alpha:1.0];
-    //        a.layer.cornerRadius = 10;
-    //        a.layer.masksToBounds = YES;
-    //        a.text = badgeValue;
-    //        a.tag = 2365;
-    //        a.textAlignment = NSTextAlignmentCenter;
-    //        [a setFont:[UIFont fontWithName:@"Roboto-Regular" size:10.0]];
-    //        a.textColor = [UIColor whiteColor];
-    //        [myDelegate.tabBarView.tabBar addSubview:a];
-    //    }
-    
-}
--(void)addBadgeIconLastTab
-{
-    
-    //    for (UILabel *subview in myDelegate.tabBarView.tabBar.subviews)
-    //    {
-    //        if ([subview isKindOfClass:[UILabel class]])
-    //        {
-    //            if (subview.tag == 3365) {
-    //                [subview removeFromSuperview];
-    //            }
-    //        }
-    //    }
-    //
-    //    UILabel *notificationBadge = [[UILabel alloc] init];
-    //    notificationBadge.frame = CGRectMake((([UIScreen mainScreen].bounds.size.width/5)*4) + (([UIScreen mainScreen].bounds.size.width/5)/2) + 8 , 8, 8, 8);
-    //    notificationBadge.backgroundColor = [UIColor colorWithRed:255.0/255.0 green:83.0/255.0 blue:77.0/255.0 alpha:1.0];
-    //    notificationBadge.layer.cornerRadius = 5;
-    //    notificationBadge.layer.masksToBounds = YES;
-    //    notificationBadge.tag = 3365;
-    //    [myDelegate.tabBarView.tabBar addSubview:notificationBadge];
-}
-#pragma mark - end
-
-#pragma mark - Remove badge icon
--(void)removeBadgeIcon{
-    //    for (UILabel *subview in myDelegate.tabBarView.tabBar.subviews)
-    //    {
-    //        if ([subview isKindOfClass:[UILabel class]])
-    //        {
-    //            if (subview.tag == 2365) {
-    //                [subview removeFromSuperview];
-    //            }
-    //        }
-    //    }
-}
-
--(void)removeBadgeIconLastTab
-{
-    //    for (UILabel *subview in myDelegate.tabBarView.tabBar.subviews)
-    //    {
-    //        if ([subview isKindOfClass:[UILabel class]])
-    //        {
-    //            if (subview.tag == 3365) {
-    //                [subview removeFromSuperview];
-    //            }
-    //        }
-    //    }
 }
 #pragma mark - end
 
@@ -1449,10 +1158,13 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [self saveImageInLocalDocumentDirectory:name image:data];
     NSXMLElement *messageData=[self convertedMessage:name date:date time:time to:to from:from senderName:senderName receiverName:receiverName messageString:desc chatType:chatType];
      NSXMLElement *innerElementData = [messageData elementForName:@"data"];
-    [self insertLocalMessageStorageDataBase:[innerElementData attributeStringValueForName:@"from"] message:messageData];
+    [[XmppCoreDataHandler sharedManager] insertLocalMessageStorageDataBase:[innerElementData attributeStringValueForName:@"from"] message:messageData];
     
     if ([selectedFriendUserId isEqualToString:[innerElementData attributeStringValueForName:@"from"]]){
         [[NSNotificationCenter defaultCenter] postNotificationName:@"UserHistory" object:messageData];
+    }
+    else {
+        [XMPPUserDefaultManager setXMPPBadgeIndicatorKey:[innerElementData attributeStringValueForName:@"from"]];
     }
 //    DDLogVerbose(@"%@: Data was written to the path: %@", THIS_FILE, fullPath);
     
@@ -1489,108 +1201,4 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [message addChild:body];
     return message;
 }
-
-//Manage local chat database
-- (void)removeLocalMessageStorageDataBase:(NSString *)userId {
-    
-    //Remove local dataBase user chat
-    NSManagedObjectContext *context = [self managedObjectContext];
-    NSString *predicateFrmt = @"bareJidStr == %@";
-    NSPredicate *pred;
-    
-    pred = [NSPredicate predicateWithFormat:predicateFrmt, userId];
-    NSLog(@"predicate: %@",pred);
-    
-    //    [request setPredicate:predicate];
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"MessageHistory"];
-    [fetchRequest setPredicate:pred];
-    NSArray *results = [context executeFetchRequest:fetchRequest error:nil];
-    
-    if (results.count > 0) {
-        
-        for (NSManagedObject *object in results) {
-            [context deleteObject:object];
-        }
-        NSError *error = nil;
-        if (![context save:&error]) {
-            NSLog(@"Can't Delete! %@ %@", error, [error localizedDescription]);
-            return;
-        }
-    }
-    //end
-}
-
-- (void)insertLocalMessageStorageDataBase:(NSString *)bareJidStr message:(NSXMLElement *)message {
-    
-    [self insertMessageData:bareJidStr message:[NSString stringWithFormat:@"%@",message] uniquiId:@""];
-}
-
-- (void)insertLocalImageMessageStorageDataBase:(NSString *)bareJidStr message:(NSXMLElement *)message uniquiId:(NSString *)uniquiId {
-    
-    [self insertMessageData:bareJidStr message:[NSString stringWithFormat:@"%@",message] uniquiId:uniquiId];
-}
-
-- (void)insertMessageData:(NSString *)bareJidStr message:(NSString *)message uniquiId:(NSString *)uniquiId {
-
-    NSManagedObjectContext *context = [self managedObjectContext];
-    
-    NSManagedObject *xmppDataEntry = [NSEntityDescription insertNewObjectForEntityForName:@"MessageHistory" inManagedObjectContext:context];
-    [xmppDataEntry setValue:bareJidStr forKey:@"bareJidStr"];
-    [xmppDataEntry setValue:message forKey:@"messageString"];
-    [xmppDataEntry setValue:uniquiId forKey:@"uniqueId"];
-    
-    NSError *error = nil;
-    // Save the object to persistent store
-    if (![context save:&error]) {
-        NSLog(@"Can't Save! %@ %@", error, [error localizedDescription]);
-    }
-}
-
-- (NSArray *)readAllLocalMessageStorageDatabase {
-
-    return [self readLocalChat:@""];
-}
-
-- (NSArray *)readLocalMessageStorageDatabaseBareJidStr:(NSString *)bareJidStr {
-    
-    return [self readLocalChat:bareJidStr];
-}
-
-- (NSArray *)readLocalChat:(NSString *)bareJidStr {
-
-    NSManagedObjectContext *context = [self managedObjectContext];
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"MessageHistory"];
-    if (![bareJidStr isEqualToString:@""]) {
-        NSPredicate *pred;
-        pred = [NSPredicate predicateWithFormat:@"bareJidStr == %@", bareJidStr];
-        NSLog(@"predicate: %@",pred);
-        [fetchRequest setPredicate:pred];
-    }
-    return [context executeFetchRequest:fetchRequest error:nil];
-}
-
-- (void)updateLocalMessageStorageDatabaseBareJidStr:(NSString *)bareJidStr message:(NSXMLElement *)message uniquiId:(NSString *)uniquiId {
-    
-    NSManagedObjectContext *context = [self managedObjectContext];
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"MessageHistory"];
-    if (![bareJidStr isEqualToString:@""]) {
-        NSPredicate *pred;
-        pred = [NSPredicate predicateWithFormat:@"uniqueId == %@", uniquiId];
-        NSLog(@"predicate: %@",pred);
-        [fetchRequest setPredicate:pred];
-    }
-    NSArray *tempArray=[context executeFetchRequest:fetchRequest error:nil];
-    if ([tempArray count]>0) {
-        NSManagedObjectContext *context = [self managedObjectContext];
-        NSManagedObject* xmppDataEntry = [tempArray objectAtIndex:0];
-        [xmppDataEntry setValue:bareJidStr forKey:@"bareJidStr"];
-        [xmppDataEntry setValue:[NSString stringWithFormat:@"%@",message] forKey:@"messageString"];
-        [xmppDataEntry setValue:uniquiId forKey:@"uniqueId"];
-                [context save:nil];
-    }
-    else {
-        [self insertMessageData:bareJidStr message:[NSString stringWithFormat:@"%@",message] uniquiId:uniquiId];
-    }
-}
-//end
 @end

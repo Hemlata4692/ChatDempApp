@@ -29,6 +29,7 @@
 		B757925E1E43289300AC48D0 /* EditProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B757925D1E43289300AC48D0 /* EditProfileViewController.m */; };
 		B75BC5761E3F60A500E5F780 /* XmppStorageModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B75BC5741E3F60A500E5F780 /* XmppStorageModel.xcdatamodeld */; };
 		B75BC5781E3F620500E5F780 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B75BC5771E3F620500E5F780 /* CoreData.framework */; };
+		B75E7EF61E5BF1E600634A68 /* XmppCoreDataHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = B75E7EF51E5BF1E600634A68 /* XmppCoreDataHandler.m */; };
 		B76F75E91E40ABD8001FE579 /* DashboardXMPP.m in Sources */ = {isa = PBXBuildFile; fileRef = B76F75E81E40ABD8001FE579 /* DashboardXMPP.m */; };
 		B77DFFDF1E4C2E2100921126 /* ChatScreenViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B77DFFDE1E4C2E2100921126 /* ChatScreenViewController.m */; };
 		B77DFFE21E4C2E3100921126 /* XMPPChatView.m in Sources */ = {isa = PBXBuildFile; fileRef = B77DFFE11E4C2E3100921126 /* XMPPChatView.m */; };
@@ -94,6 +95,8 @@
 		B757925D1E43289300AC48D0 /* EditProfileViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditProfileViewController.m; sourceTree = "<group>"; };
 		B75BC5751E3F60A500E5F780 /* XmppStorageModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = XmppStorageModel.xcdatamodel; sourceTree = "<group>"; };
 		B75BC5771E3F620500E5F780 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		B75E7EF41E5BF1E600634A68 /* XmppCoreDataHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XmppCoreDataHandler.h; sourceTree = "<group>"; };
+		B75E7EF51E5BF1E600634A68 /* XmppCoreDataHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XmppCoreDataHandler.m; sourceTree = "<group>"; };
 		B76F75E71E40ABD8001FE579 /* DashboardXMPP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DashboardXMPP.h; sourceTree = "<group>"; };
 		B76F75E81E40ABD8001FE579 /* DashboardXMPP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DashboardXMPP.m; sourceTree = "<group>"; };
 		B77DFFDD1E4C2E2100921126 /* ChatScreenViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatScreenViewController.h; sourceTree = "<group>"; };
@@ -228,6 +231,8 @@
 				B745F82B1E234D55001119BD /* AppDelegate.m */,
 				B70AE6681E2F1EC600554038 /* AppDelegateObjectFile.h */,
 				B70AE6691E2F1EC600554038 /* AppDelegateObjectFile.m */,
+				B75E7EF41E5BF1E600634A68 /* XmppCoreDataHandler.h */,
+				B75E7EF51E5BF1E600634A68 /* XmppCoreDataHandler.m */,
 				B780E9F51E2F6E1A00437B4E /* ErrorCode.h */,
 				B780E9F61E2F6E1A00437B4E /* ErrorCode.m */,
 				B75BC5741E3F60A500E5F780 /* XmppStorageModel.xcdatamodeld */,
@@ -567,6 +572,7 @@
 				B7A7A9A01E2F64060027D2B6 /* RegisterXMPP.m in Sources */,
 				B77DFFE21E4C2E3100921126 /* XMPPChatView.m in Sources */,
 				B77DFFE81E4C2F3200921126 /* UIPlaceHolderTextView.m in Sources */,
+				B75E7EF61E5BF1E600634A68 /* XmppCoreDataHandler.m in Sources */,
 				B745F85A1E235435001119BD /* BSKeyboardControls.m in Sources */,
 				B745F8691E23596D001119BD /* HMSegmentedControl.m in Sources */,
 				B77DFFF31E4C32C500921126 /* XMPPIncomingFileTransfer.m in Sources */,

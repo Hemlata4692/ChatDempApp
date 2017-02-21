@@ -18,4 +18,13 @@
 //Remove data in userDefault
 + (void)removeValue:(NSString *)key;
 #pragma mark - end
+
+#pragma mark - Get/Set/Remove data in userDefault for XMPPBadgeIndicator
+//Set data in userDefault for XMPPBadgeIndicator
++ (void)setXMPPBadgeIndicatorKey:(NSString *)key;
+//Fetch data in userDefault for XMPPBadgeIndicator
++ (id)getXMPPBadgeIndicatorValue:(NSString *)key;
+//Remove data in userDefault for XMPPBadgeIndicator
++ (void)removeXMPPBadgeIndicatorValue:(NSString *)key;
+#pragma mark - end
 @end

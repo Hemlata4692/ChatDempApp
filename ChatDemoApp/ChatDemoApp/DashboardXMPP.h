@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <CoreData/CoreData.h>
+#import "XMPPUserDefaultManager.h"
 
 @interface DashboardXMPP : UIViewController<NSFetchedResultsControllerDelegate> {
 
@@ -26,6 +27,7 @@
 - (void)xmppUserRefreshResponse;
 - (void)xmppUserConnect;
 - (void)xmppNewUserAddedNotify;
+- (void)historyUpdateNotify;
 - (void)getProfilePhotosJid:(NSString *)jid profileImageView:(UIImageView *)profileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(UIImage *tempImage)) completion;
 //end
 

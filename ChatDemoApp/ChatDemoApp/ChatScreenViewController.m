@@ -19,6 +19,7 @@
 #import "ChatScreenTableViewCell.h"
 #import "SendImageViewController.h"
 #import "UserDefaultManager.h"
+#import <AVFoundation/AVFoundation.h>
 
 #define navigationBarHeight 64
 #define toolbarHeight 0
@@ -92,15 +93,8 @@
 //    [self createCopyOfDatabaseIfNeeded];
 }
 
--(void)viewWillAppear:(BOOL)animated
-{
-    //    tempImageData=[myDelegate listionDataFromCacheDirectoryFolderName:myDelegate.appProfilePhotofolderName jid:myDelegate.xmppLogedInUserId];
-//    tempImageData1=[self resizeImage:[UIImage imageWithData:[myDelegate listionDataFromCacheDirectoryFolderName:myDelegate.appProfilePhotofolderName jid:myDelegate.xmppLogedInUserId]]];
-//    self.sendImage.image=[UIImage imageWithData:tempImageData1];
-    //    NSLog(@"SIZE OF IMAGE: %.2f Mb", (float)tempImageData.length/1024/1024);
-    //
-    //    tempImageData = UIImageJPEGRepresentation([UIImage imageWithData:tempImageData], 0);
-//    NSLog(@"SIZE OF IMAGE: %.2f Mb", (float)tempImageData1.length/1024/1024);
+- (void)viewWillAppear:(BOOL)animated {
+
     if (!isAttachmentOpen) {
         [super viewWillAppear:YES];
         [self viewInitialized]; //Initialised view
@@ -117,8 +111,8 @@
     }
 }
 
--(void)viewDidAppear:(BOOL)animated
-{
+- (void)viewDidAppear:(BOOL)animated {
+    
     [super viewDidAppear:YES];
     //    if ([lastView isEqualToString:@"ChatViewController"] || [lastView isEqualToString:@"MeTooUserProfile"]) {
     //        self.navigationItem.title = [userXmlDetail attributeStringValueForName:@"ToName"];
@@ -270,38 +264,6 @@
     [attachment addTarget:self action:@selector(attachmentAction) forControlEvents:UIControlEventTouchUpInside];
     
     self.navigationItem.rightBarButtonItem=attachmentBarButton;
-}
-
-- (void)backAction {
-    
-    [self.navigationController popViewControllerAnimated:YES];
-}
-
-- (void)attachmentAction {
-    
-    if (isReceiptOffline) {
-        
-        [UserDefaultManager showAlertMessage:@"Alert" message:@"Recipient may be offline so please try again later."];
-    }
-    else {
-    [messageTextView resignFirstResponder];
-    UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-    CustomFilterViewController *filterViewObj =[storyboard instantiateViewControllerWithIdentifier:@"CustomFilterViewController"];
-    filterViewObj.delegate=self;
-    NSMutableDictionary *tempAttachment=[NSMutableDictionary new];
-    NSMutableArray *tempAttachmentArra=[NSMutableArray new];
-    [tempAttachment setObject:[NSNumber numberWithInt:1] forKey:@"Documents"];
-    [tempAttachmentArra addObject:@"Documents"];
-    [tempAttachment setObject:[NSNumber numberWithInt:2] forKey:@"Camera"];
-    [tempAttachmentArra addObject:@"Camera"];
-    [tempAttachment setObject:[NSNumber numberWithInt:3] forKey:@"Gallery"];
-    [tempAttachmentArra addObject:@"Gallery"];
-    filterViewObj.filterDict=[tempAttachment mutableCopy];
-    filterViewObj.filterArray=[tempAttachmentArra mutableCopy];
-    
-    [filterViewObj setModalPresentationStyle:UIModalPresentationOverCurrentContext];
-    [self presentViewController:filterViewObj animated:NO completion:nil];
-    }
 }
 #pragma mark - end
 
@@ -518,6 +480,46 @@
         [imagePreviewView removeFromSuperview];
     }];
 }
+
+-(IBAction)sendMessage:(id)sender {
+    
+    [self sendXmppMessage:friendUserJid friendName:self.friendUserName messageString:messageTextView.text];
+}
+
+- (void)backAction {
+    
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (void)attachmentAction {
+    
+    if (isReceiptOffline) {
+        
+        [UserDefaultManager showAlertMessage:@"Alert" message:@"Recipient may be offline so please try again later."];
+    }
+    else {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            [messageTextView resignFirstResponder];
+            UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+            CustomFilterViewController *filterViewObj =[storyboard instantiateViewControllerWithIdentifier:@"CustomFilterViewController"];
+            filterViewObj.delegate=self;
+            NSMutableDictionary *tempAttachment=[NSMutableDictionary new];
+            NSMutableArray *tempAttachmentArra=[NSMutableArray new];
+            [tempAttachment setObject:[NSNumber numberWithInt:1] forKey:@"Documents"];
+            [tempAttachmentArra addObject:@"Documents"];
+            [tempAttachment setObject:[NSNumber numberWithInt:2] forKey:@"Camera"];
+            [tempAttachmentArra addObject:@"Camera"];
+            [tempAttachment setObject:[NSNumber numberWithInt:3] forKey:@"Gallery"];
+            [tempAttachmentArra addObject:@"Gallery"];
+            filterViewObj.filterDict=[tempAttachment mutableCopy];
+            filterViewObj.filterArray=[tempAttachmentArra mutableCopy];
+            
+            [filterViewObj setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+            [self presentViewController:filterViewObj animated:NO completion:nil];
+        });
+    }
+}
 #pragma mark - end
 
 #pragma mark - Table view delegates
@@ -529,16 +531,15 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     
     return userData.count;
-//    return 0;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
     ChatScreenTableViewCell *cell;
 
-    cell=[chatTableView dequeueReusableCellWithIdentifier:@"chatImageAttachmentCell"];
+    cell=[chatTableView dequeueReusableCellWithIdentifier:@"chatCell"];
         if (cell == nil)
         {
-            cell=[[ChatScreenTableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"chatImageAttachmentCell"];
+            cell=[[ChatScreenTableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"chatCell"];
         }
     
         cell.attachedImageView.tag=indexPath.row;
@@ -692,13 +693,6 @@
 }
 #pragma mark - end
 
-#pragma mark - IBAction
--(IBAction)sendMessage:(id)sender {
-    
-    [self sendXmppMessage:friendUserJid friendName:self.friendUserName messageString:messageTextView.text];
-}
-
-
 #pragma mark - Custom filter delegate
 - (void)customFilterDelegateAction:(int)status{
     
@@ -707,6 +701,7 @@
     }
     else if (status==2) {
         NSLog(@"2");
+        [self openCamera];
     }
     else if (status==3) {
         NSLog(@"3");
@@ -724,6 +719,46 @@
     picker.navigationBar.tintColor = [UIColor whiteColor];
     
     [self presentViewController:picker animated:YES completion:NULL];
+}
+
+- (void)openCamera {
+    
+    isAttachmentOpen=true;
+    AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    if(authStatus == AVAuthorizationStatusAuthorized) {
+        
+        UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+        picker.delegate = self;
+        picker.allowsEditing = YES;
+        picker.sourceType = UIImagePickerControllerSourceTypeCamera;
+        [self presentViewController:picker animated:YES completion:NULL];
+    }
+    else if(authStatus == AVAuthorizationStatusDenied){
+        
+        
+        [UserDefaultManager showAlertMessage:@"Camera Access" message:@"Without permission to use your camera, you won't be able to take photo.\nGo to your device settings and then Privacy to grant permission."];
+    }
+    else if(authStatus == AVAuthorizationStatusRestricted){
+        
+        [UserDefaultManager showAlertMessage:@"Camera Access" message:@"Without permission to use your camera, you won't be able to take photo.\nGo to your device settings and then Privacy to grant permission."];
+    }
+    else if(authStatus == AVAuthorizationStatusNotDetermined){
+        
+        [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
+            if(granted){
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    
+                    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+                    picker.delegate = self;
+                    picker.allowsEditing = YES;
+                    picker.sourceType = UIImagePickerControllerSourceTypeCamera;
+                    [self presentViewController:picker animated:YES completion:NULL];
+                });
+            }
+            
+        }];
+    }
 }
 #pragma mark - end
 

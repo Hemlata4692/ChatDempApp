@@ -7,7 +7,7 @@
 //
 
 #import "DashboardXMPP.h"
-#import "XMPPUserDefaultManager.h"
+#import "XmppCoreDataHandler.h"
 
 @interface DashboardXMPP (){
     
@@ -41,6 +41,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppNewUserAddedNotify) name:@"XmppNewUserAdded" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppNewUserAddedNotify) name:@"XmppUserPresenceUpdate" object:nil];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(historUpdated:) name:@"UserHistory" object:nil];
     appDelegate.selectedFriendUserId=@"";
     appDelegate.xmppLogedInUserId=[XMPPUserDefaultManager getValue:@"LoginCred"];
     
@@ -169,11 +170,14 @@
 //    }
 }
 
-- (void)UserNotAuthenticated {
+- (void)UserNotAuthenticated {}
+
+- (void)historUpdated:(NSNotification *)notification {
     
-    
+    [self historyUpdateNotify];
 }
 
+- (void)historyUpdateNotify{}
 #pragma mark - end
 
 - (void)xmppNewUserAddedNotify {}
@@ -234,89 +238,12 @@
 
 - (NSDictionary *)getProfileDicData:(NSString *)jid {
     
-//    appDelegate.updateProfileUserId=jid;
-//    [appDelegate.xmppvCardTempModule fetchvCardTempForJID:[XMPPJID jidWithString:jid] ignoreStorage:YES];
-    
-    NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
-    NSPredicate *pred;
-    NSMutableArray *results = [[NSMutableArray alloc]init];
-    pred = [NSPredicate predicateWithFormat:@"xmppRegisterId == %@",jid];
-    NSLog(@"predicate: %@",pred);
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"UserEntry"];
-    [fetchRequest setPredicate:pred];
-    
-    results = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
-    NSDictionary *profileResponse;
-    if (results.count>0) {
-        NSManagedObject *tempDevice = [results objectAtIndex:0];
-        profileResponse=@{
-                          @"RegisterId" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppRegisterId"]],
-                          @"Name" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppName"]],
-                          @"PhoneNumber" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppPhoneNumber"]],
-                          @"UserStatus" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppUserStatus"]],
-                          @"Description" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppDescription"]],
-                          @"Address" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppAddress"]],
-                          @"EmailAddress" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppEmailAddress"]],
-                          @"UserBirthDay" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppUserBirthDay"]],
-                          @"Gender" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppGender"]],
-                          };
-        NSLog(@"\n\n");
-    }
-//    else {
-//        profileResponse=@{
-//                          @"RegisterId" : jid,
-//                          @"Name" : @"",
-//                          @"PhoneNumber" : @"",
-//                          @"UserStatus" : @"",
-//                          @"Description" : @"",
-//                          @"Address" : @"",
-//                          @"EmailAddress" : @"",
-//                          @"UserBirthDay" : @"",
-//                          @"Gender" : @"",
-//                          };
-//
-//    }
-    return profileResponse;
+    return [[XmppCoreDataHandler sharedManager] getProfileDicData:jid];
 }
 
 - (NSMutableDictionary *)getProfileUsersData {
     
-    NSMutableDictionary *tempDict=[NSMutableDictionary new];
-    NSMutableArray *tempArray=[NSMutableArray new];
-    NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UserEntry"];
-    tempArray = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
-    for (NSManagedObject *tempDevice in tempArray) {
-        if (![[tempDevice valueForKey:@"xmppRegisterId"] isEqualToString:appDelegate.xmppLogedInUserId]) {
-            NSDictionary *profileResponse=@{
-                              @"RegisterId" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppRegisterId"]],
-                              @"Name" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppName"]],
-                              @"PhoneNumber" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppPhoneNumber"]],
-                              @"UserStatus" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppUserStatus"]],
-                              @"Description" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppDescription"]],
-                              @"Address" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppAddress"]],
-                              @"EmailAddress" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppEmailAddress"]],
-                              @"UserBirthDay" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppUserBirthDay"]],
-                              @"Gender" : [appDelegate checkNilValue:[tempDevice valueForKey:@"xmppGender"]],
-                              };
-            [tempDict setObject:profileResponse forKey:[tempDevice valueForKey:@"xmppRegisterId"]];
-        }
-        else {
-        
-            appDelegate.xmppLogedInUserName=[appDelegate checkNilValue:[tempDevice valueForKey:@"xmppName"]];
-        }
-    }
-    
-    return tempDict;
-}
-
-- (NSManagedObjectContext *)managedObjectContext {
-    NSManagedObjectContext *context = nil;
-    id delegate = [[UIApplication sharedApplication] delegate];
-    if ([delegate performSelector:@selector(managedObjectContext)]) {
-        context = [delegate managedObjectContext];
-    }
-    return context;
+    return [[XmppCoreDataHandler sharedManager] getProfileUsersData];
 }
 
 - (void)getProfilePhotosJid:(NSString *)jid profileImageView:(UIImageView *)profileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(UIImage *tempImage)) completion {
@@ -345,45 +272,14 @@
 #pragma mark - Fetch chat history
 - (void)fetchAllHistoryChat:(void(^)(NSMutableArray *tempHistoryData)) completion {
 
-//    NSManagedObjectContext *moc = [myDelegate.xmppMessageArchivingCoreDataStorage mainThreadManagedObjectContext];
-//    NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"XMPPMessageArchiving_Message_CoreDataObject"
-//                                                         inManagedObjectContext:moc];
-//    NSFetchRequest *request = [[NSFetchRequest alloc]init];
-//    [request setEntity:entityDescription];
-//    NSError *error;
-    NSArray *messages_arc = [[myDelegate readAllLocalMessageStorageDatabase] copy];
+    NSArray *messages_arc = [[[XmppCoreDataHandler sharedManager] readAllLocalMessageStorageDatabase] copy];
     
     NSMutableArray *historyArray=[NSMutableArray new];
     NSMutableArray *tempArray=[NSMutableArray new];
     NSMutableDictionary *tempDict=[NSMutableDictionary new];
 
     @autoreleasepool {
-//        for (XMPPMessageArchiving_Message_CoreDataObject *message in messages_arc) {
-//            NSXMLElement *element = [[NSXMLElement alloc] initWithXMLString:message.messageStr error:nil];
-//            NSXMLElement *innerElementData = [element elementForName:@"data"];
-//            if (![[innerElementData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]&&[[innerElementData attributeStringValueForName:@"to"] isEqualToString:appDelegate.xmppLogedInUserId]) {
-//                
-//                
-//                if ([tempArray containsObject:[innerElementData attributeStringValueForName:@"from"]]) {
-//                    
-//                    [tempArray removeObject:[innerElementData attributeStringValueForName:@"from"]];
-//                }
-//                [tempArray addObject:[innerElementData attributeStringValueForName:@"from"]];
-//                [tempDict setObject:element forKey:[innerElementData attributeStringValueForName:@"from"]];
-//                
-//            }
-//            else {
-//                if ([[innerElementData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]) {
-//                    if ([tempArray containsObject:[innerElementData attributeStringValueForName:@"to"]]) {
-//                        
-//                        [tempArray removeObject:[innerElementData attributeStringValueForName:@"to"]];
-//                    }
-//                    [tempArray addObject:[innerElementData attributeStringValueForName:@"to"]];
-//                    [tempDict setObject:element forKey:[innerElementData attributeStringValueForName:@"to"]];
-//                }
-//            }
-//        }
-//        NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
+
         for (NSManagedObject *message in messages_arc) {
             
             NSXMLElement *element = [[NSXMLElement alloc] initWithXMLString:[message valueForKey:@"messageString"] error:nil];
@@ -397,7 +293,6 @@
                 }
                 [tempArray addObject:[innerElementData attributeStringValueForName:@"from"]];
                 [tempDict setObject:element forKey:[innerElementData attributeStringValueForName:@"from"]];
-                
             }
             else {
                 if ([[innerElementData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]) {
@@ -410,7 +305,6 @@
                 }
             }
         }
-
         
         for (int i=0; i<tempArray.count; i++) {
             [historyArray addObject:[tempDict objectForKey:[tempArray objectAtIndex:i]]];
@@ -418,54 +312,8 @@
         historyArray=[[[historyArray reverseObjectEnumerator] allObjects] mutableCopy];
         completion(historyArray);
     }
-//    [self print:[[NSMutableArray alloc]initWithArray:messages_arc]];
-    
 }
 
--(void)getHistoryData{
-    
-}
-
-/*
--(void)print:(NSMutableArray*)messages_arc{
-    NSMutableArray *tempArray = [NSMutableArray new];
-    int i = 0;
-    @autoreleasepool {
-        for (XMPPMessageArchiving_Message_CoreDataObject *message in messages_arc) {
-            NSXMLElement *element = [[NSXMLElement alloc] initWithXMLString:message.messageStr error:nil];
-            if ( [[element attributeStringValueForName:@"ToName"] caseInsensitiveCompare:[UserDefaultManager getValue:@"userName"]] == NSOrderedSame) {
-                if ([tempArray containsObject:[[element attributeStringValueForName:@"Name"] lowercaseString]]) {
-                    i = (int)[tempArray indexOfObject:[[element attributeStringValueForName:@"Name"] lowercaseString]];
-                    [tempArray removeObjectAtIndex:i];
-                    [historyArray removeObjectAtIndex:i];
-                    [tempArray addObject:[[element attributeStringValueForName:@"Name"] lowercaseString]];
-                    [historyArray addObject:element];
-                }
-                else{
-                    [tempArray addObject:[[element attributeStringValueForName:@"Name"] lowercaseString]];
-                    [historyArray addObject:element];
-                }
-            }
-            else{
-                if ([tempArray containsObject:[[element attributeStringValueForName:@"ToName"] lowercaseString]]) {
-                    i = (int)[tempArray indexOfObject:[[element attributeStringValueForName:@"ToName"] lowercaseString]];
-                    [tempArray removeObjectAtIndex:i];
-                    [historyArray removeObjectAtIndex:i];
-                    [tempArray addObject:[[element attributeStringValueForName:@"ToName"] lowercaseString]];
-                    [historyArray addObject:element];
-                }
-                else{
-                    [tempArray addObject:[[element attributeStringValueForName:@"ToName"] lowercaseString]];
-                    [historyArray addObject:element];
-                }
-            }
-        }
-        historyArray=[[[historyArray reverseObjectEnumerator] allObjects] mutableCopy];
-        [myDelegate stopIndicator];
-        [historyTableView reloadData];
-    }
-}
- */
 #pragma mark - end
 /*
 #pragma mark - Navigation

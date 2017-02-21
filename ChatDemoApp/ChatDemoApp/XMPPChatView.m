@@ -8,6 +8,8 @@
 
 #import "XMPPChatView.h"
 #import "XMPPOutgoingFileTransfer.h"//File transfer
+#import "XmppCoreDataHandler.h"
+#import "XMPPUserDefaultManager.h"
 
 #define fetchUserHistoryLimit 3
 
@@ -55,6 +57,7 @@
 - (void)initializeFriendProfile:(NSString*)jid {
     
     appDelegate.selectedFriendUserId=jid;
+    [XMPPUserDefaultManager removeXMPPBadgeIndicatorValue:jid];
 }
 #pragma mark - end
 
@@ -76,29 +79,7 @@
 #pragma mark - Fetch chat history
 - (void)getHistoryChatData:(NSString *)jid {
     
-//    NSManagedObjectContext *moc = [myDelegate.xmppMessageArchivingCoreDataStorage mainThreadManagedObjectContext];
-//    NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"XMPPMessageArchiving_Message_CoreDataObject"
-//                                                         inManagedObjectContext:moc];
-//    
-//    NSFetchRequest *request = [[NSFetchRequest alloc]init];
-//    NSString *predicateFrmt = @"bareJidStr == %@";
-//    NSPredicate *predicate = [NSPredicate predicateWithFormat:predicateFrmt, jid];
-//    request.predicate = predicate;
-//    
-//    
-//    [request setEntity:entityDescription];
-//    NSError* error = nil;
-//    NSUInteger count = [moc countForFetchRequest:request error:&error];
-////    request.fetchLimit = fetchUserHistoryLimit;
-//    NSLog(@"%d",(int)count-(int)fetchUserHistoryLimit);
-////    if ((int)count-(int)fetchUserHistoryLimit<1) {
-////        request.fetchOffset=0;
-////    }
-////    else {
-////        request.fetchOffset = (int)count-(int)fetchUserHistoryLimit;
-////    }
-
-    NSArray *messages_arc = [[myDelegate readLocalMessageStorageDatabaseBareJidStr:jid] copy];
+ NSArray *messages_arc = [[[XmppCoreDataHandler sharedManager] readLocalMessageStorageDatabaseBareJidStr:jid] copy];
     if (messages_arc.count>0) {
         [self print:[[NSMutableArray alloc]initWithArray:messages_arc]];
     }
@@ -129,12 +110,6 @@
             
         }
         [self historyData:tempHistoryData];
-//        [myDelegate stopIndicator];
-        //        [chatTableView reloadData];
-        //        if (userData.count > 0) {
-        //            NSIndexPath* ip = [NSIndexPath indexPathForRow:userData.count-1 inSection:0];
-        //            [chatTableView scrollToRowAtIndexPath:ip atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-        //        }
     }
 }
 
@@ -244,17 +219,6 @@
     [message addAttributeWithName:@"to" stringValue:friendJid];
     [message addAttributeWithName:@"from" stringValue:myDelegate.xmppLogedInUserId];
     
-    //    if ([lastView isEqualToString:@"ChatViewController"] || [lastView isEqualToString:@"MeTooUserProfile"]) {
-    //        [message addAttributeWithName:@"to" stringValue:[userXmlDetail attributeStringValueForName:@"to"]];
-    //        [message addAttributeWithName:@"from" stringValue:[userXmlDetail attributeStringValueForName:@"from"]];
-    //        [message addAttributeWithName:@"time" stringValue:formattedTime];
-    //        //        [message addAttributeWithName:@"Name" stringValue:[UserDefaultManager getValue:@"userName"]];
-    //        [message addAttributeWithName:@"Date" stringValue:formattedDate];
-    //        [message addAttributeWithName:@"fromTo" stringValue:[NSString stringWithFormat:@"%@-%@",[userXmlDetail attributeStringValueForName:@"to"],[userXmlDetail attributeStringValueForName:@"from"]]];
-    //        [message addAttributeWithName:@"ToName" stringValue:[userXmlDetail attributeStringValueForName:@"ToName"]];
-    //        //        [message addAttributeWithName:@"senderUserId" stringValue:[UserDefaultManager getValue:@"userId"]];
-    //    }
-    //    else{
     [dataTag addAttributeWithName:@"to" stringValue:friendJid];
     [dataTag addAttributeWithName:@"from" stringValue:myDelegate.xmppLogedInUserId];
     [dataTag addAttributeWithName:@"time" stringValue:formattedTime];
@@ -266,91 +230,10 @@
     //    }
     [message addChild:dataTag];
     [message addChild:body];
-    //    [[WebService sharedManager] chatNotification:[message attributeStringValueForName:@"to"] userNameFrom:[message attributeStringValueForName:@"from"] messageString:[[message elementForName:@"body"] stringValue] success:^(id responseObject) {
-    //        [myDelegate stopIndicator];
-    //    } failure:^(NSError *error) {
-    //    }] ;
-    
+  
     [[self xmppStream] sendElement:message];
-    [myDelegate insertLocalMessageStorageDataBase:friendJid message:message];
+    [[XmppCoreDataHandler sharedManager] insertLocalMessageStorageDataBase:friendJid message:message];
     [self XmppSendMessageResponse:[message copy]];
-    
-    
-    
-//    [self messagesData:message];
-//    messageTextView.text=@"";
-//    
-//    messageHeight = messageTextviewInitialHeight;
-//    
-//    messageTextView.frame = CGRectMake(messageTextView.frame.origin.x, messageTextView.frame.origin.y, messageTextView.frame.size.width, messageHeight-8);
-//    messageView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height-(keyboardHeight+navigationBarHeight+messageHeight+10)  , self.view.bounds.size.width, messageHeight + 10);
-//    chatTableView.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, messageView.frame.origin.y-2);
-//    
-//    
-//    
-//    //        if (userData.count > 0) {
-//    //            NSIndexPath* ip = [NSIndexPath indexPathForRow:userData.count-1 inSection:0];
-//    //            [chatTableView scrollToRowAtIndexPath:ip atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-//    //        }
-//    if (messageTextView.text.length>=1) {
-//        sendButtonOutlet.enabled=YES;
-//    }
-//    else if (messageTextView.text.length==0) {
-//        sendButtonOutlet.enabled=NO;
-//    }
-//    [chatTableView reloadData];
-    
-    
-    
-    /*
-     XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",friendUserJid,[[myDelegate.xmppStream myJID] resource]]];
-     
-     if (!_fileTransfer) {
-     _fileTransfer = [[XMPPOutgoingFileTransfer alloc]
-     initWithDispatchQueue:dispatch_get_main_queue()];
-     _fileTransfer.disableSOCKS5 = YES;
-     [_fileTransfer activate:myDelegate.xmppStream];
-     [_fileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
-     }
-     */
-    
-    //    NSString *recipient = _inputRecipient.text;
-    //    NSString *filename = @"a.jpeg";
-    //
-    //    // do error checking fun stuff...
-    //
-    ////    NSString *filePath = [myDelegate applicationCacheDirectory];
-    //    NSString *filePath = [[myDelegate applicationCacheDirectory] stringByAppendingPathComponent:myDelegate.appProfilePhotofolderName];
-    //    NSString *fileAtPath = [filePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_%@.jpeg",myDelegate.folderName,[[friendUserJid componentsSeparatedByString:@"@"] objectAtIndex:0]]];
-    ////    [imagesPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_%@.jpeg",folderName,[[jid componentsSeparatedByString:@"@"] objectAtIndex:0]]]
-    
-    
-    
-    
-    //    NSString *fullPath = [[self documentsDirectory] stringByAppendingPathComponent:filename];
-    //    NSData *data = [NSData dataWithContentsOfFile:fileAtPath];
-    
-    
-    
-    //PDF transfer
-    //     [self pdfTransfer:jid];
-    
-    //Image transfer
-    // [self imageTransfer:jid];
-    
-    
-    
-    //    NSError *err;
-    //    if (![_fileTransfer sendData:UIImagePNGRepresentation(self.sendImage.image)
-    //                           named:@"a.png"
-    //                     toRecipient:jid
-    //                     description:@"Baal's Soulstone."
-    //                           error:&err]) {
-    //        NSLog(@"You messed something up: %@", err);
-    //    }
-    
-    
-    
 }
 
 - (void)XmppSendMessageResponse:(NSXMLElement *)xmpMessage {}
@@ -410,7 +293,7 @@
     NSXMLElement *messageData=[imageAttachmentMessage elementForName:@"data"];
     if ([_fileTransfer sendCustomizedData:imageData named:fileName toRecipient:jid description:imageCaption date:[messageData attributeStringValueForName:@"date"] time:[messageData attributeStringValueForName:@"time"] senderId:[messageData attributeStringValueForName:@"from"] chatType:@"ImageAttachment" senderName:appDelegate.xmppLogedInUserName receiverName:friendName error:&err]) {
         
-        [myDelegate insertLocalImageMessageStorageDataBase:appDelegate.selectedFriendUserId message:imageAttachmentMessage uniquiId:uniqueId];
+        [[XmppCoreDataHandler sharedManager] insertLocalImageMessageStorageDataBase:appDelegate.selectedFriendUserId message:imageAttachmentMessage uniquiId:uniqueId];
         [self sendImageFileDelegate:[imageAttachmentMessage copy]];
     }
 }
@@ -464,7 +347,7 @@
         
         NSXMLElement *failMessage=[imageAttachmentMessage copy];
         [failMessage addAttributeWithName:@"progress" stringValue:@"0"];
-        [myDelegate updateLocalMessageStorageDatabaseBareJidStr:appDelegate.selectedFriendUserId message:failMessage uniquiId:uniqueId];
+        [[XmppCoreDataHandler sharedManager] updateLocalMessageStorageDatabaseBareJidStr:appDelegate.selectedFriendUserId message:failMessage uniquiId:uniqueId];
         [self sendImageFailDelegate:failMessage uniquiId:uniqueId];
     }
 //    NSLog(@"%@",error.localizedDescription);
@@ -493,7 +376,7 @@
     NSLog(@"File transfer successful.");
     NSXMLElement *successMessage=[imageAttachmentMessage copy];
     [successMessage addAttributeWithName:@"progress" stringValue:@"1"];
-    [myDelegate updateLocalMessageStorageDatabaseBareJidStr:appDelegate.selectedFriendUserId message:successMessage uniquiId:uniqueId];
+    [[XmppCoreDataHandler sharedManager] updateLocalMessageStorageDatabaseBareJidStr:appDelegate.selectedFriendUserId message:successMessage uniquiId:uniqueId];
     [self sendImageSuccessDelegate:successMessage uniquiId:uniqueId];
 }
 

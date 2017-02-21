@@ -84,7 +84,6 @@ XMPPIncomingFileTransferDelegate>
 -(void)addBadgeIconLastTab;
 -(void)removeBadgeIconLastTab;
 -(void)methodCalling:(NSMutableDictionary *)profileData;
-- (void)insertEntryInXmppUserModel:(NSString *)registredUserId xmppName:(NSString *)xmppName xmppPhoneNumber:(NSString *)xmppPhoneNumber xmppUserStatus:(NSString *)xmppUserStatus xmppDescription:(NSString *)xmppDescription xmppAddress:(NSString *)xmppAddress xmppEmailAddress:(NSString *)xmppEmailAddress xmppUserBirthDay:(NSString *)xmppUserBirthDay xmppGender:(NSString *)xmppGender;
 
 - (NSManagedObjectContext *)managedObjectContext_roster;
 - (NSManagedObjectContext *)managedObjectContext_capabilities;
@@ -125,7 +124,7 @@ XMPPIncomingFileTransferDelegate>
 @property(nonatomic,assign) int afterAutentication;
 @property(nonatomic,assign) int afterAutenticationRegistration;
 
-- (void)sendFile:(NSData*)data fileName:(NSString *)fileName jid:(XMPPJID *)jid;
+//- (void)sendFile:(NSData*)data fileName:(NSString *)fileName jid:(XMPPJID *)jid;
 
 
 //Check null/nil value
@@ -133,15 +132,6 @@ XMPPIncomingFileTransferDelegate>
 - (NSString *)setOtherImageInLocalDB:(UIImage*)image;
 - (NSData *)listionSendAttachedImageCacheDirectoryFileName:(NSString *)fileName;
 
-
-//Manage local chat database
-- (void)insertLocalMessageStorageDataBase:(NSString *)bareJidStr message:(NSXMLElement *)message;
-- (void)insertLocalImageMessageStorageDataBase:(NSString *)bareJidStr message:(NSXMLElement *)message uniquiId:(NSString *)uniquiId;
-- (void)removeLocalMessageStorageDataBase:(NSString *)userId;
-- (NSArray *)readAllLocalMessageStorageDatabase;
-- (NSArray *)readLocalMessageStorageDatabaseBareJidStr:(NSString *)bareJidStr;
-- (void)updateLocalMessageStorageDatabaseBareJidStr:(NSString *)bareJidStr message:(NSXMLElement *)message uniquiId:(NSString *)uniquiId;
-//end
 - (NSManagedObjectContext *)managedObjectContext;
 
 

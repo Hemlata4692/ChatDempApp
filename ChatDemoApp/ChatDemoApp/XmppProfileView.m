@@ -8,6 +8,7 @@
 
 #import "XmppProfileView.h"
 #import "XMPPUserDefaultManager.h"
+#import "XmppCoreDataHandler.h"
 
 @interface XmppProfileView (){
     
@@ -150,32 +151,32 @@
 
 - (NSDictionary *)getProfileDicData:(NSString *)jid {
     
-    NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
-    NSPredicate *pred;
-    NSMutableArray *results = [[NSMutableArray alloc]init];
-    pred = [NSPredicate predicateWithFormat:@"xmppRegisterId == %@",jid];
-    NSLog(@"predicate: %@",pred);
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"UserEntry"];
-    [fetchRequest setPredicate:pred];
-    
-    results = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
-    NSDictionary *profileResponse;
-    if (results.count>0) {
-        NSManagedObject *devicea = [results objectAtIndex:0];
-        profileResponse=@{
-                          @"RegisterId" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppRegisterId"]],
-                          @"Name" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppName"]],
-                          @"PhoneNumber" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppPhoneNumber"]],
-                          @"UserStatus" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppUserStatus"]],
-                          @"Description" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppDescription"]],
-                          @"Address" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppAddress"]],
-                          @"EmailAddress" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppEmailAddress"]],
-                          @"UserBirthDay" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppUserBirthDay"]],
-                          @"Gender" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppGender"]],
-                          };
-        NSLog(@"\n\n");
-    }
-    return profileResponse;
+//    NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
+//    NSPredicate *pred;
+//    NSMutableArray *results = [[NSMutableArray alloc]init];
+//    pred = [NSPredicate predicateWithFormat:@"xmppRegisterId == %@",jid];
+//    NSLog(@"predicate: %@",pred);
+//    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"UserEntry"];
+//    [fetchRequest setPredicate:pred];
+//    
+//    results = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
+//    NSDictionary *profileResponse;
+//    if (results.count>0) {
+//        NSManagedObject *devicea = [results objectAtIndex:0];
+//        profileResponse=@{
+//                          @"RegisterId" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppRegisterId"]],
+//                          @"Name" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppName"]],
+//                          @"PhoneNumber" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppPhoneNumber"]],
+//                          @"UserStatus" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppUserStatus"]],
+//                          @"Description" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppDescription"]],
+//                          @"Address" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppAddress"]],
+//                          @"EmailAddress" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppEmailAddress"]],
+//                          @"UserBirthDay" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppUserBirthDay"]],
+//                          @"Gender" : [appDelegate checkNilValue:[devicea valueForKey:@"xmppGender"]],
+//                          };
+//        NSLog(@"\n\n");
+//    }
+    return [[XmppCoreDataHandler sharedManager] getProfileDicData:jid];
 }
 #pragma mark - end
 
@@ -210,48 +211,6 @@
 
 - (void)XMPPvCardTempModuleDidUpdateMyvCardSuccess {
     
-    /*
-    NSManagedObjectContext *context = [self managedObjectContext];
-    NSMutableArray *results = [[NSMutableArray alloc]init];
-    NSPredicate *pred;
-    
-    pred = [NSPredicate predicateWithFormat:@"xmppRegisterId == %@", [xmppProfileUpdationData objectForKey:@"xmppRegisterId"]];
-    NSLog(@"predicate: %@",pred);
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"UserEntry"];
-    [fetchRequest setPredicate:pred];
-    results = [[context executeFetchRequest:fetchRequest error:nil] mutableCopy];
-    
-    if (results.count > 0) {
-        NSManagedObject* xmppDataEntry = [results objectAtIndex:0];
-        [xmppDataEntry setValue:[xmppProfileUpdationData objectForKey:@"xmppRegisterId"] forKey:@"xmppRegisterId"];
-        [xmppDataEntry setValue:[xmppProfileUpdationData objectForKey:@"xmppName"] forKey:@"xmppName"];
-        [xmppDataEntry setValue:[xmppProfileUpdationData objectForKey:@"xmppPhoneNumber"] forKey:@"xmppPhoneNumber"];
-        [xmppDataEntry setValue:[xmppProfileUpdationData objectForKey:@"xmppUserStatus"] forKey:@"xmppUserStatus"];
-        [xmppDataEntry setValue:[xmppProfileUpdationData objectForKey:@"xmppDescription"] forKey:@"xmppDescription"];
-        [xmppDataEntry setValue:[xmppProfileUpdationData objectForKey:@"xmppAddress"] forKey:@"xmppAddress"];
-        [xmppDataEntry setValue:[xmppProfileUpdationData objectForKey:@"xmppEmailAddress"] forKey:@"xmppEmailAddress"];
-        [xmppDataEntry setValue:[xmppProfileUpdationData objectForKey:@"xmppUserBirthDay"] forKey:@"xmppUserBirthDay"];
-        [xmppDataEntry setValue:[xmppProfileUpdationData objectForKey:@"xmppGender"] forKey:@"xmppGender"];
-        [context save:nil];
-    } else {
-        NSManagedObject *xmppDataEntry = [NSEntityDescription insertNewObjectForEntityForName:@"UserEntry" inManagedObjectContext:context];
-        [xmppDataEntry setValue:[xmppProfileUpdationData objectForKey:@"xmppRegisterId"] forKey:@"xmppRegisterId"];
-        [xmppDataEntry setValue:[xmppProfileUpdationData objectForKey:@"xmppName"] forKey:@"xmppName"];
-        [xmppDataEntry setValue:[xmppProfileUpdationData objectForKey:@"xmppPhoneNumber"] forKey:@"xmppPhoneNumber"];
-        [xmppDataEntry setValue:[xmppProfileUpdationData objectForKey:@"xmppUserStatus"] forKey:@"xmppUserStatus"];
-        [xmppDataEntry setValue:[xmppProfileUpdationData objectForKey:@"xmppDescription"] forKey:@"xmppDescription"];
-        [xmppDataEntry setValue:[xmppProfileUpdationData objectForKey:@"xmppAddress"] forKey:@"xmppAddress"];
-        [xmppDataEntry setValue:[xmppProfileUpdationData objectForKey:@"xmppEmailAddress"] forKey:@"xmppEmailAddress"];
-        [xmppDataEntry setValue:[xmppProfileUpdationData objectForKey:@"xmppUserBirthDay"] forKey:@"xmppUserBirthDay"];
-        [xmppDataEntry setValue:[xmppProfileUpdationData objectForKey:@"xmppGender"] forKey:@"xmppGender"];
-        NSError *error = nil;
-        // Save the object to persistent store
-        if (![context save:&error]) {
-            NSLog(@"Can't Save! %@ %@", error, [error localizedDescription]);
-        }
-    }
-    */
-    
     //Set presence
 //        XMPPPresence *presence = [XMPPPresence presence];
 //        NSXMLElement *status = [NSXMLElement elementWithName:@"status"];
@@ -269,7 +228,7 @@
 //    [[appDelegate xmppStream] sendElement:presence];
 //    //end
     
-    [appDelegate insertEntryInXmppUserModel:[xmppProfileUpdationData objectForKey:@"xmppRegisterId"] xmppName:[xmppProfileUpdationData objectForKey:@"xmppName"] xmppPhoneNumber:[xmppProfileUpdationData objectForKey:@"xmppPhoneNumber"] xmppUserStatus:[xmppProfileUpdationData objectForKey:@"xmppUserStatus"] xmppDescription:[xmppProfileUpdationData objectForKey:@"xmppDescription"] xmppAddress:[xmppProfileUpdationData objectForKey:@"xmppAddress"] xmppEmailAddress:[xmppProfileUpdationData objectForKey:@"xmppEmailAddress"] xmppUserBirthDay:[xmppProfileUpdationData objectForKey:@"xmppUserBirthDay"] xmppGender:[xmppProfileUpdationData objectForKey:@"xmppGender"]];
+    [[XmppCoreDataHandler sharedManager] insertEntryInXmppUserModel:[xmppProfileUpdationData objectForKey:@"xmppRegisterId"] xmppName:[xmppProfileUpdationData objectForKey:@"xmppName"] xmppPhoneNumber:[xmppProfileUpdationData objectForKey:@"xmppPhoneNumber"] xmppUserStatus:[xmppProfileUpdationData objectForKey:@"xmppUserStatus"] xmppDescription:[xmppProfileUpdationData objectForKey:@"xmppDescription"] xmppAddress:[xmppProfileUpdationData objectForKey:@"xmppAddress"] xmppEmailAddress:[xmppProfileUpdationData objectForKey:@"xmppEmailAddress"] xmppUserBirthDay:[xmppProfileUpdationData objectForKey:@"xmppUserBirthDay"] xmppGender:[xmppProfileUpdationData objectForKey:@"xmppGender"]];
     [self XMPPvCardTempModuleDidUpdateMyvCardSuccessResponse];
 }
 
@@ -282,14 +241,14 @@
 - (void)XMPPvCardTempModuleDidUpdateMyvCardFailResponse {};
 #pragma mark - end
 
-- (NSManagedObjectContext *)managedObjectContext {
-    NSManagedObjectContext *context = nil;
-    id delegate = [[UIApplication sharedApplication] delegate];
-    if ([delegate performSelector:@selector(managedObjectContext)]) {
-        context = [delegate managedObjectContext];
-    }
-    return context;
-}
+//- (NSManagedObjectContext *)managedObjectContext {
+//    NSManagedObjectContext *context = nil;
+//    id delegate = [[UIApplication sharedApplication] delegate];
+//    if ([delegate performSelector:@selector(managedObjectContext)]) {
+//        context = [delegate managedObjectContext];
+//    }
+//    return context;
+//}
 
 #pragma mark - Set static value
 - (NSString *)xmppRegisterId {

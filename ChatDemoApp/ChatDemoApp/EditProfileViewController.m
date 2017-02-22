@@ -35,7 +35,7 @@
     self.navigationItem.title=@"Edit Profile";
     
     //Adding textfield to keyboard controls array
-    [self setKeyboardControls:[[BSKeyboardControls alloc] initWithFields:@[self.userNameField, self.mobileNumberField, self.userStatusField]]];
+    [self setKeyboardControls:[[BSKeyboardControls alloc] initWithFields:@[self.userNameField, self.userStatusField]]];
     [self.keyboardControls setDelegate:self];
     
     self.profileImage.layer.cornerRadius=100/2;

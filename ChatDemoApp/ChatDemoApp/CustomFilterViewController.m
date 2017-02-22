@@ -8,9 +8,11 @@
 
 #import "CustomFilterViewController.h"
 static int const widthValue=250;
-static int heightValue=200;
 
-@interface CustomFilterViewController ()
+@interface CustomFilterViewController () {
+
+    int heightValue;
+}
 
 @property (strong, nonatomic) IBOutlet UIView *tapGestureView;
 @property (strong, nonatomic) IBOutlet UITableView *filterTableView;
@@ -22,21 +24,28 @@ static int heightValue=200;
 @synthesize filterDict;
 @synthesize isAllSelected;
 
-@synthesize filterArray;
+@synthesize filterArray,filterImageArray;
+@synthesize tableCellheightValue;
 
 #pragma mark - View life cycle
 - (void)viewDidLoad {
     [super viewDidLoad];
     
     self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:0.4f];
-    heightValue=(80*(int)filterArray.count)+15;
+    
+    // Do any additional setup after loading the view.
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:YES];
+    
+    heightValue=(tableCellheightValue*(int)filterArray.count)+15;
     if (heightValue>[[UIScreen mainScreen] bounds].size.height-64) {
         heightValue=[[UIScreen mainScreen] bounds].size.height-64;
     }
     [self removeAutolayout];
     [self layoutViewObjects];
     [self.filterTableView reloadData];
-    // Do any additional setup after loading the view.
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -70,29 +79,22 @@ static int heightValue=200;
     
     statusLabel.text=[filterArray objectAtIndex:indexPath.row];
     statusLabel.textColor=[UIColor colorWithRed:98.0/255 green:98.0/255.0 blue:98.0/255.0 alpha:1.0];
-    if ([[filterDict objectForKey:[filterArray objectAtIndex:indexPath.row]] intValue]==1) {
-        NSLog(@"1");
-        checkedImage.image=[UIImage imageNamed:@"documentsAttachment"];
-    }
-    else if ([[filterDict objectForKey:[filterArray objectAtIndex:indexPath.row]] intValue]==2) {
-        NSLog(@"2");
-        checkedImage.image=[UIImage imageNamed:@"cameraAttachment"];
-    }
-    else {
-        NSLog(@"3");
-        checkedImage.image=[UIImage imageNamed:@"galleryAttachment"];
-    }
-    
-    
+    checkedImage.image=[UIImage imageNamed:[filterImageArray objectAtIndex:indexPath.row]];
     return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return tableCellheightValue;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
+    [self.presentingViewController dismissViewControllerAnimated:NO completion:nil];
     filterContainverView.frame=CGRectMake([[UIScreen mainScreen] bounds].size.width-30, 57, 0, 0);
     self.arrowImage.frame=CGRectMake(-10, 0, 20, 11);
     self.filterContainverView.alpha = 0.0f;
-    [self.presentingViewController dismissViewControllerAnimated:NO completion:nil];
+    
     [_delegate customFilterDelegateAction:[[filterDict objectForKey:[filterArray objectAtIndex:indexPath.row]] intValue]];
 }
 #pragma mark - end

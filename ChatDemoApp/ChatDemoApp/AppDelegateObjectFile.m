@@ -224,7 +224,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
                      completion:^(BOOL finished) {
                          
                      }];
-                         
 }
 
 #pragma mark - Background/Foreground/Termination mode XMPP coding

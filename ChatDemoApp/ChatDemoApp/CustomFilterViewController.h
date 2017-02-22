@@ -21,4 +21,7 @@
 @property (strong, nonatomic) NSMutableDictionary *filterDict;
 @property (assign, nonatomic) BOOL isAllSelected;
 @property (strong, nonatomic) NSMutableArray *filterArray;
+@property (strong, nonatomic) NSMutableArray *filterImageArray;
+
+@property (assign, nonatomic) int tableCellheightValue;
 @end

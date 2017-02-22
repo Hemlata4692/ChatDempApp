@@ -11,6 +11,7 @@
 		B70AE66A1E2F1EC600554038 /* AppDelegateObjectFile.m in Sources */ = {isa = PBXBuildFile; fileRef = B70AE6691E2F1EC600554038 /* AppDelegateObjectFile.m */; };
 		B7131E5D1E52DA3A00A435A3 /* ChatScreenTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B7131E5C1E52DA3A00A435A3 /* ChatScreenTableViewCell.m */; };
 		B71B73CD1E542BC600D57E7D /* SendImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B71B73CC1E542BC600D57E7D /* SendImageViewController.m */; };
+		B72DD0781E5DAC0A0017C488 /* EditUserStatusViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B72DD0771E5DAC0A0017C488 /* EditUserStatusViewController.m */; };
 		B745F8291E234D55001119BD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F8281E234D55001119BD /* main.m */; };
 		B745F82C1E234D55001119BD /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F82B1E234D55001119BD /* AppDelegate.m */; };
 		B745F82F1E234D55001119BD /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F82E1E234D55001119BD /* ViewController.m */; };
@@ -62,6 +63,8 @@
 		B7131E5C1E52DA3A00A435A3 /* ChatScreenTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatScreenTableViewCell.m; sourceTree = "<group>"; };
 		B71B73CB1E542BC600D57E7D /* SendImageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SendImageViewController.h; sourceTree = "<group>"; };
 		B71B73CC1E542BC600D57E7D /* SendImageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SendImageViewController.m; sourceTree = "<group>"; };
+		B72DD0761E5DAC0A0017C488 /* EditUserStatusViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditUserStatusViewController.h; sourceTree = "<group>"; };
+		B72DD0771E5DAC0A0017C488 /* EditUserStatusViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditUserStatusViewController.m; sourceTree = "<group>"; };
 		B745F8241E234D54001119BD /* ChatDemoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChatDemoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B745F8281E234D55001119BD /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		B745F82A1E234D55001119BD /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -179,6 +182,15 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		B72DD0751E5DABF20017C488 /* EditUserStatus */ = {
+			isa = PBXGroup;
+			children = (
+				B72DD0761E5DAC0A0017C488 /* EditUserStatusViewController.h */,
+				B72DD0771E5DAC0A0017C488 /* EditUserStatusViewController.m */,
+			);
+			name = EditUserStatus;
+			sourceTree = "<group>";
+		};
 		B745F81B1E234D54001119BD = {
 			isa = PBXGroup;
 			children = (
@@ -245,6 +257,7 @@
 		B745F83F1E23519A001119BD /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				B72DD0751E5DABF20017C488 /* EditUserStatus */,
 				B745F8401E2351A7001119BD /* LoginView */,
 				B745F8411E2351B1001119BD /* RegisterView */,
 				B745F8421E2351B9001119BD /* DashboardView */,
@@ -562,6 +575,7 @@
 				B745F84C1E235210001119BD /* GroupConversationViewController.m in Sources */,
 				B745F82F1E234D55001119BD /* ViewController.m in Sources */,
 				B77DFFEC1E4C32B500921126 /* XMPPFileTransfer.m in Sources */,
+				B72DD0781E5DAC0A0017C488 /* EditUserStatusViewController.m in Sources */,
 				B79CA25E1E30BCFC007CDB23 /* XMPPUserDefaultManager.m in Sources */,
 				B77EE6391E4DE73200A38ADD /* CustomFilterViewController.m in Sources */,
 				B75792581E42E22300AC48D0 /* UserProfileViewController.m in Sources */,

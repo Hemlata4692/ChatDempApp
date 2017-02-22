@@ -504,16 +504,22 @@
             UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
             CustomFilterViewController *filterViewObj =[storyboard instantiateViewControllerWithIdentifier:@"CustomFilterViewController"];
             filterViewObj.delegate=self;
+            filterViewObj.tableCellheightValue=80;
             NSMutableDictionary *tempAttachment=[NSMutableDictionary new];
             NSMutableArray *tempAttachmentArra=[NSMutableArray new];
+            NSMutableArray *tempAttachmentImageArra=[NSMutableArray new];
             [tempAttachment setObject:[NSNumber numberWithInt:1] forKey:@"Documents"];
             [tempAttachmentArra addObject:@"Documents"];
+            [tempAttachmentImageArra addObject:@"documentsAttachment"];
             [tempAttachment setObject:[NSNumber numberWithInt:2] forKey:@"Camera"];
             [tempAttachmentArra addObject:@"Camera"];
+            [tempAttachmentImageArra addObject:@"cameraAttachment"];
             [tempAttachment setObject:[NSNumber numberWithInt:3] forKey:@"Gallery"];
             [tempAttachmentArra addObject:@"Gallery"];
+            [tempAttachmentImageArra addObject:@"galleryAttachment"];
             filterViewObj.filterDict=[tempAttachment mutableCopy];
             filterViewObj.filterArray=[tempAttachmentArra mutableCopy];
+            filterViewObj.filterImageArray=[tempAttachmentImageArra mutableCopy];
             
             [filterViewObj setModalPresentationStyle:UIModalPresentationOverCurrentContext];
             [self presentViewController:filterViewObj animated:NO completion:nil];
@@ -532,6 +538,7 @@
     
     return userData.count;
 }
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
     ChatScreenTableViewCell *cell;

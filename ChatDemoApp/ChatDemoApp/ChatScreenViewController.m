@@ -33,7 +33,10 @@
 #define messageTextViewFont [UIFont systemFontOfSize:17]
 #define DEFAULT_FONT(size)   [UIFont systemFontOfSize:size]
 
-@interface ChatScreenViewController ()<CustomFilterDelegate,/*BSKeyboardControlsDelegate,*/UIGestureRecognizerDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate, SendImageDelegate, SendDocumentDelegate,UIDocumentInteractionControllerDelegate>{
+@import GoogleMaps;
+@import GooglePlacePicker;
+
+@interface ChatScreenViewController ()<CustomFilterDelegate,/*BSKeyboardControlsDelegate,*/UIGestureRecognizerDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate, SendImageDelegate, SendDocumentDelegate,UIDocumentInteractionControllerDelegate,GMSMapViewDelegate>{
     CGFloat messageHeight, messageYValue;
     NSMutableArray *userData;
     NSString *otherUserId;
@@ -700,7 +703,61 @@
         }
         else if (status==2) {
             NSLog(@"2");
-            [self openCamera];
+//            [self openCamera];
+            
+                
+                CLLocationCoordinate2D center;
+                CLLocationCoordinate2D northEast;
+                CLLocationCoordinate2D southWest;
+            GMSPlacePicker *placePicker;
+
+//                //    37.0902° N, 95.7129
+//                if (currentLocation.latitude!=0 && currentLocation.longitude!=0){
+//                    center = CLLocationCoordinate2DMake(currentLocation.latitude, currentLocation.longitude);
+//                    northEast = CLLocationCoordinate2DMake(center.latitude + 0.001, center.longitude + 0.001);
+//                    southWest = CLLocationCoordinate2DMake(center.latitude - 0.001, center.longitude - 0.001);
+//                }
+//                else {
+                    center = CLLocationCoordinate2DMake(37.0902, -95.7129);
+                    northEast = CLLocationCoordinate2DMake(center.latitude + 10, center.longitude + 10);
+                    southWest = CLLocationCoordinate2DMake(center.latitude - 10, center.longitude - 10);
+//                }
+                GMSCoordinateBounds *viewport = [[GMSCoordinateBounds alloc] initWithCoordinate:northEast
+                                                                                     coordinate:southWest];
+                GMSPlacePickerConfig *config = [[GMSPlacePickerConfig alloc] initWithViewport:viewport];
+                
+                placePicker = [[GMSPlacePicker alloc] initWithConfig:config];
+                
+                [placePicker pickPlaceWithCallback:^(GMSPlace *place, NSError *error) {
+                    if (error != nil) {
+                        NSLog(@"Pick Place error %@", [error localizedDescription]);
+                        return;
+                    }
+                    
+                    if (place != nil) {
+                        if (NULL!=place.formattedAddress) {
+                            //set pin om map
+                            if ([place.formattedAddress containsString:@","]&&[[[place.formattedAddress componentsSeparatedByString:@","] objectAtIndex:0] isEqualToString:place.name]) {
+//                                placeName=[NSString stringWithFormat:@"%@",place.formattedAddress];
+                            }
+                            else {
+//                                placeName=[NSString stringWithFormat:@"%@,%@",place.name,place.formattedAddress];
+                            }
+//                            currentLocation=place.coordinate;
+//                            [self setGoogleMapData:placeName];
+                        }
+//                        else {
+//                            placeName=@"";
+//                            currentLocation = place.coordinate;
+//                            [self fetchPlaceNameUsingLatLong:currentLocation];
+//                        }
+                    }
+                    else {
+                        NSLog(@"No place selected");
+                    }
+                }];
+                
+            
         }
         else if (status==3) {
             NSLog(@"3");

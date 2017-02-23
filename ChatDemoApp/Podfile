@@ -4,5 +4,8 @@ target 'ChatDemoApp' do
 pod 'XMPPFramework'
 pod 'XMPPFramework/XEP-0009'
 pod 'XMPPFramework/XEP-0224'
+pod 'GoogleMaps'
+pod 'GooglePlaces’
+pod 'GooglePlacePicker'
 end
 

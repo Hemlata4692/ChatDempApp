@@ -24,6 +24,10 @@
 	<true/>
 	<key>NSContactsUsageDescription</key>
 	<string>We need to access your contacts in order to attach them</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Allow Location</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Allow Location</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We need to access your photos in order to attach them</string>
 	<key>PasswordRequired</key>

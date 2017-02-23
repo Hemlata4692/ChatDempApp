@@ -12,6 +12,8 @@
 //Uncomment libxml code while running on devices in module.modulemap
 //#import "XMPPFramework.h"
 
+@import GoogleMaps;
+@import GooglePlacePicker;
 @interface AppDelegate () {
 
     UIImageView *spinnerBackground;
@@ -37,7 +39,9 @@
     [[UINavigationBar appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIColor whiteColor], NSForegroundColorAttributeName, [UIFont systemFontOfSize:18], NSFontAttributeName, nil]];
     [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];
     //end
-
+//https://developers.google.com/places/ios-api/start
+    [GMSServices provideAPIKey:@"AIzaSyBDfypjucz1_4wKfiKyvXg8PD7TLaIl8cc"];
+    [GMSPlacesClient provideAPIKey:@"AIzaSyBDfypjucz1_4wKfiKyvXg8PD7TLaIl8cc"];
     self.navigationController = (UINavigationController *)[self.window rootViewController];
     
     //ios9 or later

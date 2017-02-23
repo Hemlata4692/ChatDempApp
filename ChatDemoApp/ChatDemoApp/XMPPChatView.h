@@ -27,8 +27,9 @@
 - (void)sendXmppMessage:(NSString *)friendJid friendName:(NSString *)friendName messageString:(NSString *)messageString;
 - (void)XmppSendMessageResponse:(NSXMLElement *)xmpMessage;
 
-- (void)sendAttachment:(NSString *)fileName imageCaption:(NSString *)imageCaption friendName:(NSString *)friendName;
-- (void)sendImageSuccessDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId;
-- (void)sendImageFailDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId;
-- (void)sendImageFileDelegate:(NSXMLElement *)message;
+- (void)sendImageAttachment:(NSString *)fileName imageCaption:(NSString *)imageCaption friendName:(NSString *)friendName;
+- (void)sendDocumentAttachment:(NSString *)fileName friendName:(NSString *)friendName;
+- (void)sendFileSuccessDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId;
+- (void)sendFileFailDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId;
+- (void)sendFileProgressDelegate:(NSXMLElement *)message;
 @end

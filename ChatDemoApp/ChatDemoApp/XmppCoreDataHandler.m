@@ -195,6 +195,21 @@
     }
 }
 
+- (BOOL)isFileMessageExist:(NSString *)message {
+    
+    NSManagedObjectContext *context = [self managedObjectContext];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"MessageHistory"];
+    
+        NSPredicate *pred;
+        pred = [NSPredicate predicateWithFormat:@"messageString == %@", message];
+        NSLog(@"predicate: %@",pred);
+        [fetchRequest setPredicate:pred];
+    if ([[context executeFetchRequest:fetchRequest error:nil] count]>0) {
+        return true;
+    }
+    return false;
+}
+
 - (NSArray *)readAllLocalMessageStorageDatabase {
     
     return [self readLocalChat:@""];

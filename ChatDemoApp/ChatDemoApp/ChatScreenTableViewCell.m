@@ -14,7 +14,7 @@
     [super awakeFromNib];
     // Initialization code
 }
-
+//FileAttachment
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];
 
@@ -53,7 +53,8 @@
     self.separatorLabel.hidden=true;
     self.halfSeparatorLabel.hidden=true;
     self.attachedImageView.image=[UIImage imageNamed:@""];
-    if ([chatType isEqualToString:@"ImageAttachment"]) {
+    
+    if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]) {
         self.attachedImageView.hidden=false;
     }
     else {
@@ -85,16 +86,25 @@
     self.messageLabel.text=[[message elementForName:@"body"] stringValue];
     
     self.nameLabel.frame=CGRectMake(76, 5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"nameHeight"] floatValue]); //Here frame = (Namelabel_x_Space, NameLabel_TopSpace, screenWidth - (Namelabel_x_Space + Namelabel_trailingSpace), NameHeight)
-    
-    if ([chatType isEqualToString:@"ImageAttachment"]) {
+
+    if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]) {
         self.attachedImageView.frame=CGRectMake(76, (5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+5), 200, 128); //Here frame = (AttachedImage_x_Space, (NameLabel_TopSpace + NameLabel_Height + space_Between_NameLabel_And_AttachedImage), AttachedImage_width, AttachedImage_height
-        self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+        if ([chatType isEqualToString:@"FileAttachment"]) {
+            
+            self.attachedImageView.image=[UIImage imageNamed:@"pdf_placeholder.png"];
+            [myDelegate getThumbnailImagePDF:[innerData attributeStringValueForName:@"fileName"] result:^(UIImage *tempImage) {
+                // do something with your BOOL
+                self.attachedImageView.image=tempImage;
+            }];
+        }
+        else {
+            self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+        }
     }
     else {
         
         self.attachedImageView.frame=CGRectMake(76, (5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+5), 200, 0); //Here frame = (AttachedImage_x_Space, (NameLabel_TopSpace + NameLabel_Height + space_Between_NameLabel_And_AttachedImage), AttachedImage_width, AttachedImage_height
     }
-    
     
     self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
     
@@ -110,8 +120,8 @@
     self.dateLabel.hidden=false;
     self.separatorLabel.hidden=true;
     self.halfSeparatorLabel.hidden=true;
-    
-    if ([chatType isEqualToString:@"ImageAttachment"]) {
+
+    if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]) {
         self.attachedImageView.hidden=false;
     }
     else {
@@ -130,15 +140,26 @@
         self.attachedImageView.translatesAutoresizingMaskIntoConstraints=YES;
         self.messageLabel.numberOfLines=0;
         self.messageLabel.text=[[[currentMessage elementForName:@"body"] stringValue] capitalizedString];
-        if ([chatType isEqualToString:@"ImageAttachment"]) {
+        
+        if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]) {
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 128); //Here frame = (AttachedImage_x_Space, attachedImageView_TopSpace, AttachedImage_width, AttachedImage_height
-            self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+            
+            if ([chatType isEqualToString:@"FileAttachment"]) {
+                
+                self.attachedImageView.image=[UIImage imageNamed:@"pdf_placeholder.png"];
+                [myDelegate getThumbnailImagePDF:[innerData attributeStringValueForName:@"fileName"] result:^(UIImage *tempImage) {
+                    // do something with your BOOL
+                    self.attachedImageView.image=tempImage;
+                }];
+            }
+            else {
+                self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+            }
         }
         else {
             
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 0); //Here frame = (AttachedImage_x_Space, (NameLabel_TopSpace + NameLabel_Height + space_Between_NameLabel_And_AttachedImage), AttachedImage_width, AttachedImage_height
         }
-        
         
         self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
     }
@@ -149,15 +170,25 @@
         self.attachedImageView.translatesAutoresizingMaskIntoConstraints=YES;
         self.messageLabel.numberOfLines=0;
         self.messageLabel.text=[[[currentMessage elementForName:@"body"] stringValue] capitalizedString];
-        if ([chatType isEqualToString:@"ImageAttachment"]) {
+        
+        if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]) {
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 128); //Here frame = (AttachedImage_x_Space, attachedImageView_TopSpace, AttachedImage_width, AttachedImage_height
-            self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+            if ([chatType isEqualToString:@"FileAttachment"]) {
+                
+                self.attachedImageView.image=[UIImage imageNamed:@"pdf_placeholder.png"];
+                [myDelegate getThumbnailImagePDF:[innerData attributeStringValueForName:@"fileName"] result:^(UIImage *tempImage) {
+                    // do something with your BOOL
+                    self.attachedImageView.image=tempImage;
+                }];
+            }
+            else {
+                self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+            }
         }
         else {
             
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 0); //Here frame = (AttachedImage_x_Space, (NameLabel_TopSpace + NameLabel_Height + space_Between_NameLabel_And_AttachedImage), AttachedImage_width, AttachedImage_height
         }
-        
         
         self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
     }
@@ -178,7 +209,7 @@
     self.separatorLabel.hidden=true;
     self.halfSeparatorLabel.hidden=true;
     
-    if ([chatType isEqualToString:@"ImageAttachment"]) {
+    if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]) {
         self.attachedImageView.hidden=false;
     }
     else {
@@ -198,9 +229,21 @@
         self.attachedImageView.translatesAutoresizingMaskIntoConstraints=YES;
         self.messageLabel.numberOfLines=0;
         NSLog(@"%f %@",[[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue], [innerData attributeStringValueForName:@"messageBodyHeight"]);
-        if ([chatType isEqualToString:@"ImageAttachment"]) {
+        
+        if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]) {
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 128); //Here frame = (AttachedImage_x_Space, attachedImageView_TopSpace, AttachedImage_width, AttachedImage_height
-            self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+            
+            if ([chatType isEqualToString:@"FileAttachment"]) {
+                
+                self.attachedImageView.image=[UIImage imageNamed:@"pdf_placeholder.png"];
+                [myDelegate getThumbnailImagePDF:[innerData attributeStringValueForName:@"fileName"] result:^(UIImage *tempImage) {
+                    // do something with your BOOL
+                    self.attachedImageView.image=tempImage;
+                }];
+            }
+            else {
+                self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+            }
         }
         else {
             

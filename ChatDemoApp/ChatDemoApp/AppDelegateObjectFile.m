@@ -95,7 +95,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     folderName=[[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleNameKey];
     appMediafolderName=[NSString stringWithFormat:@"%@/%@_Media",folderName,folderName];
     appProfilePhotofolderName=[NSString stringWithFormat:@"%@/%@_ProfilePhotos",appMediafolderName,folderName];
-    appSentReceivePhotofolderName=[NSString stringWithFormat:@"%@/%@_Photos/%@_Sent",appMediafolderName,folderName,folderName];
+    appSentReceivePhotofolderName=[NSString stringWithFormat:@"%@/%@_Photos/%@_SentReceived",appMediafolderName,folderName,folderName];
     appDocumentfolderName=[NSString stringWithFormat:@"%@/%@_Documents",folderName,folderName];
     [self createCacheDirectory];
     //end
@@ -1233,28 +1233,37 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     
     DDLogVerbose(@"%@: Incoming file transfer did succeed.", THIS_FILE);
     NSLog(@"%@",desc);
-//    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
-//                                                         NSUserDomainMask,
-//                                                         YES);
-//    NSString *fullPath = [[paths lastObject] stringByAppendingPathComponent:name];
-//    [data writeToFile:fullPath options:0 error:nil];
+    //    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
+    //                                                         NSUserDomainMask,
+    //                                                         YES);
+    //    NSString *fullPath = [[paths lastObject] stringByAppendingPathComponent:name];
+    //    [data writeToFile:fullPath options:0 error:nil];
+    //    saveFileInLocalDocumentDirectory
     
-    [self saveImageInLocalDocumentDirectory:name image:data];
     NSXMLElement *messageData=[self convertedMessage:name date:date time:time to:to from:from senderName:senderName receiverName:receiverName messageString:desc chatType:chatType];
-     NSXMLElement *innerElementData = [messageData elementForName:@"data"];
-    [[XmppCoreDataHandler sharedManager] insertLocalMessageStorageDataBase:[innerElementData attributeStringValueForName:@"from"] message:messageData];
-    
-    if (![selectedFriendUserId isEqualToString:[innerElementData attributeStringValueForName:@"from"]]){
+    if (![[XmppCoreDataHandler sharedManager] isFileMessageExist:[NSString stringWithFormat:@"%@",messageData]]) {
         
-        [self addLocalNotification:senderName message:desc userId:[innerElementData attributeStringValueForName:@"from"]];
-        [XMPPUserDefaultManager setXMPPBadgeIndicatorKey:[innerElementData attributeStringValueForName:@"from"]];
+        NSXMLElement *innerElementData = [messageData elementForName:@"data"];
         
+        if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"ImageAttachment"]) {
+            [self saveImageInLocalDocumentDirectory:name image:data];
+        }
+        else if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"FileAttachment"]) {
+            [self saveFileInLocalDocumentDirectory:name file:data];
+        }
+        [[XmppCoreDataHandler sharedManager] insertLocalMessageStorageDataBase:[innerElementData attributeStringValueForName:@"from"] message:messageData];
+        
+        if (![selectedFriendUserId isEqualToString:[innerElementData attributeStringValueForName:@"from"]]){
+            
+            [self addLocalNotification:senderName message:desc userId:[innerElementData attributeStringValueForName:@"from"]];
+            [XMPPUserDefaultManager setXMPPBadgeIndicatorKey:[innerElementData attributeStringValueForName:@"from"]];
+            
+        }
+        else {
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"UserHistory" object:messageData];
+        }
     }
-    else {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"UserHistory" object:messageData];
-    }
-    
-//    DDLogVerbose(@"%@: Data was written to the path: %@", THIS_FILE, fullPath);
+    //    DDLogVerbose(@"%@: Data was written to the path: %@", THIS_FILE, fullPath);
     
 }
 
@@ -1266,13 +1275,13 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     NSXMLElement *message = [NSXMLElement elementWithName:@"message"];
     NSXMLElement *dataTag = [NSXMLElement elementWithName:@"data"];
     
-    [message addAttributeWithName:@"type" stringValue:chatType];
+    [message addAttributeWithName:@"type" stringValue:@"chat"];
     [message addAttributeWithName:@"to" stringValue:to];
     [message addAttributeWithName:@"from" stringValue:from];
     [message addAttributeWithName:@"progress" stringValue:@"1"];
     
     [dataTag addAttributeWithName:@"xmlns" stringValue:@"main"];
-    [dataTag addAttributeWithName:@"chatType" stringValue:@"Single"];
+    [dataTag addAttributeWithName:@"chatType" stringValue:chatType];
     
     [dataTag addAttributeWithName:@"to" stringValue:to];
     [dataTag addAttributeWithName:@"fileName" stringValue:imageName];
@@ -1339,5 +1348,93 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 ////        }
 ////    }];
 
+}
+
+- (void)getAllDocumentListing:(void(^)(NSMutableArray *tempArray))completion {
+    
+    dispatch_queue_t queue = dispatch_queue_create("documentQueue", DISPATCH_QUEUE_PRIORITY_DEFAULT);
+    dispatch_async(queue, ^
+                   {
+                       NSMutableArray *tempArray=[NSMutableArray new];
+                       
+                       NSError *error;
+                       NSFileManager* fileManager = [NSFileManager defaultManager];
+                       NSString *documentsDirectory = [[self applicationCacheDirectory] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@",self.appDocumentfolderName]];
+                       tempArray = [[fileManager contentsOfDirectoryAtPath:documentsDirectory error:&error] mutableCopy];
+                       dispatch_async(dispatch_get_main_queue(), ^{
+                           
+                           completion(tempArray);
+                       });
+                   });
+}
+
+- (NSData *)documentCacheDirectoryFileName:(NSString *)fileName {
+    
+    NSString *filePath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appDocumentfolderName];
+    NSString *fileAtPath = [filePath stringByAppendingPathComponent:fileName];
+    NSError* error = nil;
+    return [NSData dataWithContentsOfFile:fileAtPath options:0 error:&error];
+}
+
+- (NSString *)documentCacheDirectoryPathFileName:(NSString *)fileName {
+    
+    NSString *filePath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appDocumentfolderName];
+    return [filePath stringByAppendingPathComponent:fileName];
+}
+
+- (void)saveFileInLocalDocumentDirectory:(NSString *)fileName file:(NSData *)fileData {
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *filePath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appDocumentfolderName];
+    if (![fileManager fileExistsAtPath:filePath]) {
+        
+        [fileManager createDirectoryAtPath:filePath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    filePath=[filePath stringByAppendingPathComponent:fileName];
+    [fileData writeToFile:filePath atomically:YES];
+}
+
+- (void)getThumbnailImagePDF:(NSString *)fileName result:(void(^)(UIImage *tempImage))completion {
+    
+    dispatch_queue_t queue = dispatch_queue_create("pdfQueue", DISPATCH_QUEUE_PRIORITY_DEFAULT);
+    dispatch_async(queue, ^
+                   {
+                       NSURL* pdfFileUrl = [NSURL fileURLWithPath:[self documentCacheDirectoryPathFileName:fileName]];
+                       
+                       CGPDFDocumentRef pdf = CGPDFDocumentCreateWithURL((CFURLRef)pdfFileUrl);
+                       
+                       CGPDFPageRef page = CGPDFDocumentGetPage(pdf, 0 + 1);
+                       
+                       CGRect aRect =CGRectMake(0, 0, 100, 100);
+                       UIGraphicsBeginImageContext(aRect.size);
+                       CGContextRef context = UIGraphicsGetCurrentContext();
+                       UIImage* thumbnailImage;
+                       
+                       CGContextSaveGState(context);
+                       CGContextTranslateCTM(context, 0.0, aRect.size.height);
+                       CGContextScaleCTM(context, 1.0, -1.0);
+                       
+                       CGContextSetGrayFillColor(context, 1.0, 1.0);
+                       CGContextFillRect(context, aRect);
+                       
+                       
+                       CGAffineTransform pdfTransform = CGPDFPageGetDrawingTransform(page, kCGPDFMediaBox, aRect, 0, true);
+                       
+                       CGContextConcatCTM(context, pdfTransform);
+                       
+                       CGContextDrawPDFPage(context, page);
+                       
+                       thumbnailImage = UIGraphicsGetImageFromCurrentImageContext();
+                       
+                       CGContextRestoreGState(context);
+                       
+                       UIGraphicsEndImageContext();
+                       CGPDFDocumentRelease(pdf);
+                       
+                       dispatch_async(dispatch_get_main_queue(), ^{
+                           
+                           completion(thumbnailImage);
+                       });
+                   });
 }
 @end

@@ -78,8 +78,7 @@
     return 0.01;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)sectionIndex
-{
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)sectionIndex {
     
     if (customSegmentedControl.selectedSegmentIndex==2) {
         return userListArray.count;
@@ -230,8 +229,8 @@
     }
 }
 
-- (void)configurePhotoForCell:(UITableViewCell *)cell jid:(NSString *)jid
-{
+- (void)configurePhotoForCell:(UITableViewCell *)cell jid:(NSString *)jid {
+    
     // Our xmppRosterStorage will cache photos as they arrive from the xmppvCardAvatarModule.
     // We only need to ask the avatar module for a photo, if the roster doesn't have it.
     UIImageView *userImage = (UIImageView*)[cell viewWithTag:2];
@@ -391,32 +390,34 @@
 - (void)customFilterDelegateAction:(int)status{
     
     dispatch_async(dispatch_get_main_queue(), ^{
-    if (status==1) {
-        NSLog(@"1");
-        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-        UIViewController *objStatusView = [storyboard instantiateViewControllerWithIdentifier:@"EditUserStatusViewController"];
-        [self.navigationController pushViewController:objStatusView animated:YES];
-    }
-    else if (status==2) {
-        NSLog(@"2");
-        
+        if (status==1) {
+            NSLog(@"1");
+            UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+            UIViewController *objStatusView = [storyboard instantiateViewControllerWithIdentifier:@"EditUserStatusViewController"];
+            [self.navigationController pushViewController:objStatusView animated:YES];
+        }
+        else if (status==2) {
+            NSLog(@"2");
+            
             UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
             UIViewController *objGroupView = [storyboard instantiateViewControllerWithIdentifier:@"GroupConversationViewController"];
             [self.navigationController pushViewController:objGroupView animated:YES];
-        
-    }
-    else if (status==3) {
-        NSLog(@"3");
-    }
-    else if (status==4) {
-        NSLog(@"4");
-        [UserDefaultManager removeValue:@"userName"];
-        [self userLogout];
-        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-        myDelegate.navigationController = [storyboard instantiateViewControllerWithIdentifier:@"loginNavigation"];
-        myDelegate.window.rootViewController = myDelegate.navigationController;
-    }
-         });
+        }
+        else if (status==3) {
+            NSLog(@"3");
+            UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+            UIViewController *objSettingView = [storyboard instantiateViewControllerWithIdentifier:@"SettingViewController"];
+            [self.navigationController pushViewController:objSettingView animated:YES];
+        }
+        else if (status==4) {
+            NSLog(@"4");
+            [UserDefaultManager removeValue:@"userName"];
+            [self userLogout];
+            UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+            myDelegate.navigationController = [storyboard instantiateViewControllerWithIdentifier:@"loginNavigation"];
+            myDelegate.window.rootViewController = myDelegate.navigationController;
+        }
+    });
 }
 #pragma mark - end
 
@@ -440,19 +441,13 @@
 - (void)xmppNewUserAddedNotify {
 
     CGRect framing = CGRectMake(0, 0, 30, 30.0);
-    UIBarButtonItem *groupBarButton, *reloadBarButton;
-    UIButton *group = [[UIButton alloc] initWithFrame:framing];
-    //    [group setTitle:@"Group" forState:UIControlStateNormal];
-    [group setImage:[UIImage imageNamed:@"group"] forState:UIControlStateNormal];
-    groupBarButton =[[UIBarButtonItem alloc] initWithCustomView:group];
-    [group addTarget:self action:@selector(groupAction:) forControlEvents:UIControlEventTouchUpInside];
-    
+    UIBarButtonItem *reloadBarButton;    
     UIButton *reload = [[UIButton alloc] initWithFrame:framing];
     //    [group setTitle:@"Group" forState:UIControlStateNormal];
     [reload setImage:[UIImage imageNamed:@"reloadRed"] forState:UIControlStateNormal];
     reloadBarButton =[[UIBarButtonItem alloc] initWithCustomView:reload];
     [reload addTarget:self action:@selector(reloadAction:) forControlEvents:UIControlEventTouchUpInside];
-    self.navigationItem.rightBarButtonItems=[NSArray arrayWithObjects:groupBarButton,reloadBarButton, nil];
+    self.navigationItem.rightBarButtonItems=[NSArray arrayWithObjects:reloadBarButton, nil];
 }
 #pragma mark - end
 

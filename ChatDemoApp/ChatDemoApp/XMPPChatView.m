@@ -16,7 +16,7 @@
 @interface XMPPChatView ()<XMPPOutgoingFileTransferDelegate/*file transfer*/> {
 
     AppDelegateObjectFile *appDelegate;
-    NSXMLElement *imageAttachmentMessage;
+    NSXMLElement *fileAttachmentMessage;
     NSString *uniqueId;
 }
 @property (nonatomic, strong) XMPPOutgoingFileTransfer *fileTransfer;//File transfer
@@ -39,7 +39,6 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XmppUserPresenceUpdateNotify) name:@"XmppUserPresenceUpdate" object:nil];
      [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(historUpdated:) name:@"UserHistory" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileTransferSuccessFully) name:@"XMPPFileTransferSuccessFully" object:nil];
-    
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -263,9 +262,9 @@
 
 }
 
-- (void)sendAttachment:(NSString *)fileName imageCaption:(NSString *)imageCaption friendName:(NSString *)friendName {
+- (void)sendImageAttachment:(NSString *)fileName imageCaption:(NSString *)imageCaption friendName:(NSString *)friendName {
 
-    imageAttachmentMessage=nil;
+    fileAttachmentMessage=nil;
     uniqueId=@"";
     NSData *imageData=[appDelegate listionSendAttachedImageCacheDirectoryFileName:fileName];
     XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",appDelegate.selectedFriendUserId,[[myDelegate.xmppStream myJID] resource]]];
@@ -279,7 +278,7 @@
 //    }
     
     uniqueId=[[fileName componentsSeparatedByString:@"."] objectAtIndex:0];
-    imageAttachmentMessage=[self convertedMessage:appDelegate.selectedFriendUserId friendName:friendName imageName:fileName messageString:imageCaption];
+    fileAttachmentMessage=[self convertedMessage:appDelegate.selectedFriendUserId friendName:friendName fileName:fileName messageString:imageCaption fileType:@"ImageAttachment"];
     NSError *err;
 //    if (![_fileTransfer sendData:imageData
 //                           named:fileName
@@ -290,15 +289,50 @@
 //    }
     
 
-    NSXMLElement *messageData=[imageAttachmentMessage elementForName:@"data"];
+    NSXMLElement *messageData=[fileAttachmentMessage elementForName:@"data"];
     if ([_fileTransfer sendCustomizedData:imageData named:fileName toRecipient:jid description:imageCaption date:[messageData attributeStringValueForName:@"date"] time:[messageData attributeStringValueForName:@"time"] senderId:[messageData attributeStringValueForName:@"from"] chatType:@"ImageAttachment" senderName:appDelegate.xmppLogedInUserName receiverName:friendName error:&err]) {
         
-        [[XmppCoreDataHandler sharedManager] insertLocalImageMessageStorageDataBase:appDelegate.selectedFriendUserId message:imageAttachmentMessage uniquiId:uniqueId];
-        [self sendImageFileDelegate:[imageAttachmentMessage copy]];
+        [[XmppCoreDataHandler sharedManager] insertLocalImageMessageStorageDataBase:appDelegate.selectedFriendUserId message:fileAttachmentMessage uniquiId:uniqueId];
+        [self sendFileProgressDelegate:[fileAttachmentMessage copy]];
     }
 }
 
-- (NSXMLElement *)convertedMessage:(NSString *)to friendName:(NSString *)friendName imageName:(NSString *)imageName messageString:(NSString *)messageString {
+- (void)sendDocumentAttachment:(NSString *)fileName friendName:(NSString *)friendName {
+    
+    fileAttachmentMessage=nil;
+    uniqueId=@"";
+    NSData *fileData=[appDelegate documentCacheDirectoryFileName:fileName];
+    XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",appDelegate.selectedFriendUserId,[[myDelegate.xmppStream myJID] resource]]];
+    //    if (!_fileTransfer) {
+    _fileTransfer = [[XMPPOutgoingFileTransfer alloc]
+                     initWithDispatchQueue:dispatch_get_main_queue()];
+    _fileTransfer.disableIBB = NO;
+    _fileTransfer.disableSOCKS5 = YES;
+    [_fileTransfer activate:myDelegate.xmppStream];
+    [_fileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    //    }
+    
+    uniqueId=[[fileName componentsSeparatedByString:@"."] objectAtIndex:0];
+    fileAttachmentMessage=[self convertedMessage:appDelegate.selectedFriendUserId friendName:friendName fileName:fileName messageString:fileName fileType:@"FileAttachment"];
+    NSError *err;
+    //    if (![_fileTransfer sendData:imageData
+    //                           named:fileName
+    //                     toRecipient:jid
+    //                     description:imageCaption
+    //                           error:&err]) {
+    //        NSLog(@"You messed something up: %@", err);
+    //    }
+    
+    
+    NSXMLElement *messageData=[fileAttachmentMessage elementForName:@"data"];
+    if ([_fileTransfer sendCustomizedData:fileData named:fileName toRecipient:jid description:fileName date:[messageData attributeStringValueForName:@"date"] time:[messageData attributeStringValueForName:@"time"] senderId:[messageData attributeStringValueForName:@"from"] chatType:@"FileAttachment" senderName:appDelegate.xmppLogedInUserName receiverName:friendName error:&err]) {
+        
+        [[XmppCoreDataHandler sharedManager] insertLocalImageMessageStorageDataBase:appDelegate.selectedFriendUserId message:fileAttachmentMessage uniquiId:uniqueId];
+        [self sendFileProgressDelegate:[fileAttachmentMessage copy]];
+    }
+}
+
+- (NSXMLElement *)convertedMessage:(NSString *)to friendName:(NSString *)friendName fileName:(NSString *)fileName messageString:(NSString *)messageString fileType:(NSString *)fileType {
 
     NSString *messageStr = [messageString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
@@ -313,16 +347,16 @@
     NSXMLElement *message = [NSXMLElement elementWithName:@"message"];
     NSXMLElement *dataTag = [NSXMLElement elementWithName:@"data"];
     
-    [message addAttributeWithName:@"type" stringValue:@"ImageAttachment"];
+    [message addAttributeWithName:@"type" stringValue:@"chat"];
     [message addAttributeWithName:@"to" stringValue:to];
     [message addAttributeWithName:@"from" stringValue:appDelegate.xmppLogedInUserId];
     [message addAttributeWithName:@"progress" stringValue:@"2"];
     
     [dataTag addAttributeWithName:@"xmlns" stringValue:@"main"];
-    [dataTag addAttributeWithName:@"chatType" stringValue:@"Single"];
+    [dataTag addAttributeWithName:@"chatType" stringValue:fileType];
 
     [dataTag addAttributeWithName:@"to" stringValue:to];
-    [dataTag addAttributeWithName:@"fileName" stringValue:imageName];
+    [dataTag addAttributeWithName:@"fileName" stringValue:fileName];
 
     [dataTag addAttributeWithName:@"from" stringValue:appDelegate.xmppLogedInUserId];
     [dataTag addAttributeWithName:@"time" stringValue:formattedTime];
@@ -345,10 +379,10 @@
     NSLog(@"%ld",(long)error.code);
     if (error.code!=-1) {
         
-        NSXMLElement *failMessage=[imageAttachmentMessage copy];
+        NSXMLElement *failMessage=[fileAttachmentMessage copy];
         [failMessage addAttributeWithName:@"progress" stringValue:@"0"];
         [[XmppCoreDataHandler sharedManager] updateLocalMessageStorageDatabaseBareJidStr:appDelegate.selectedFriendUserId message:failMessage uniquiId:uniqueId];
-        [self sendImageFailDelegate:failMessage uniquiId:uniqueId];
+        [self sendFileFailDelegate:failMessage uniquiId:uniqueId];
     }
 //    NSLog(@"%@",error.localizedDescription);
 //    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
@@ -374,15 +408,15 @@
 - (void)fileTransferSuccessFully {
 
     NSLog(@"File transfer successful.");
-    NSXMLElement *successMessage=[imageAttachmentMessage copy];
+    NSXMLElement *successMessage=[fileAttachmentMessage copy];
     [successMessage addAttributeWithName:@"progress" stringValue:@"1"];
     [[XmppCoreDataHandler sharedManager] updateLocalMessageStorageDatabaseBareJidStr:appDelegate.selectedFriendUserId message:successMessage uniquiId:uniqueId];
-    [self sendImageSuccessDelegate:successMessage uniquiId:uniqueId];
+    [self sendFileSuccessDelegate:successMessage uniquiId:uniqueId];
 }
 
-- (void)sendImageSuccessDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId{}
-- (void)sendImageFailDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId{}
-- (void)sendImageFileDelegate:(NSXMLElement *)message{}
+- (void)sendFileSuccessDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId{}
+- (void)sendFileFailDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId{}
+- (void)sendFileProgressDelegate:(NSXMLElement *)message{}
 /*
 #pragma mark - Navigation
 

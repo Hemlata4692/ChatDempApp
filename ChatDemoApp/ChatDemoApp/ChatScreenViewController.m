@@ -18,6 +18,7 @@
 #import "BSKeyboardControls.h"
 #import "ChatScreenTableViewCell.h"
 #import "SendImageViewController.h"
+#import "DocumentAttachmentViewController.h"
 #import "UserDefaultManager.h"
 #import <AVFoundation/AVFoundation.h>
 
@@ -32,7 +33,7 @@
 #define messageTextViewFont [UIFont systemFontOfSize:17]
 #define DEFAULT_FONT(size)   [UIFont systemFontOfSize:size]
 
-@interface ChatScreenViewController ()<CustomFilterDelegate,/*BSKeyboardControlsDelegate,*/UIGestureRecognizerDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate, SendImageDelegate>{
+@interface ChatScreenViewController ()<CustomFilterDelegate,/*BSKeyboardControlsDelegate,*/UIGestureRecognizerDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate, SendImageDelegate, SendDocumentDelegate,UIDocumentInteractionControllerDelegate>{
     CGFloat messageHeight, messageYValue;
     NSMutableArray *userData;
     NSString *otherUserId;
@@ -57,7 +58,7 @@
 @property (strong, nonatomic) IBOutlet UIPlaceHolderTextView *messageTextView;
 @property (strong, nonatomic) IBOutlet UIButton *sendButtonOutlet;
 
-
+@property (retain,nonatomic) UIDocumentInteractionController *docController;
 @property (strong, nonatomic) IBOutlet UIImageView *sendImage;
 
 //Declare BSKeyboard variable
@@ -114,29 +115,6 @@
 - (void)viewDidAppear:(BOOL)animated {
     
     [super viewDidAppear:YES];
-    //    if ([lastView isEqualToString:@"ChatViewController"] || [lastView isEqualToString:@"MeTooUserProfile"]) {
-    //        self.navigationItem.title = [userXmlDetail attributeStringValueForName:@"ToName"];
-    //        myDelegate.chatUser = [userXmlDetail attributeStringValueForName:@"to"];
-    //    }
-    //    else {
-    //        NSArray* fromUser = [userDetail.jidStr componentsSeparatedByString:@"@52.74.174.129"];
-    //        self.navigationItem.title = [fromUser objectAtIndex:0];
-    //        myDelegate.chatUser = [[userDetail.jidStr componentsSeparatedByString:@"/"] objectAtIndex:0];
-    //    }
-    //    [userData removeAllObjects];
-    //    NSString *keyName = myDelegate.chatUser;
-    //    if ([[UserDefaultManager getValue:@"CountData"] objectForKey:keyName] != nil) {
-    //        int tempCount = 0;
-    //        int badgeCount = [[[UserDefaultManager getValue:@"CountData"] objectForKey:keyName] intValue];
-    //        if (badgeCount > 0) {
-    //            [myDelegate addBadgeIcon:[NSString stringWithFormat:@"%d",[[UserDefaultManager getValue:@"BadgeCount"] intValue] - badgeCount ]];
-    //            [UserDefaultManager setValue:[NSString stringWithFormat:@"%d",[[UserDefaultManager getValue:@"BadgeCount"] intValue] - badgeCount ] key:@"BadgeCount"];
-    //        }
-    //        NSMutableDictionary *tempDict = [[UserDefaultManager getValue:@"CountData"] mutableCopy];
-    //        [tempDict setObject:[NSString stringWithFormat:@"%d",tempCount] forKey:keyName];
-    //        [UserDefaultManager setValue:tempDict key:@"CountData"];
-    //    }
-    //    [self performSelector:@selector(getHistoryData) withObject:nil afterDelay:.1];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -227,7 +205,6 @@
     
     navBackView=[[UIView alloc]initWithFrame:CGRectMake(50, 20, [[UIScreen mainScreen] bounds].size.width-100, 40)];
     navBackView.backgroundColor=[UIColor clearColor];
-    
     navTitleLabel=[[UILabel alloc]initWithFrame:CGRectMake(0, 3, navBackView.frame.size.width, 25)];
     navTitleLabel.backgroundColor=[UIColor clearColor];
     navTitleLabel.text=[self.friendUserName capitalizedString];
@@ -453,23 +430,33 @@
     [self.view endEditing:YES];
     UITapGestureRecognizer *gesture = (UITapGestureRecognizer *) sender;
     NSXMLElement *innerData=[[userData objectAtIndex:(int)gesture.view.tag] elementForName:@"data"];
-    imagePreviewView=[[UIView alloc] initWithFrame:CGRectMake(0,self.view.bounds.size.height,self.view.bounds.size.width,self.view.bounds.size.height)];
-    UIImageView *popImage=[[UIImageView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,self.view.frame.size.height)];
-    imagePreviewView.backgroundColor = [UIColor blackColor];
-    popImage.contentMode = UIViewContentModeScaleAspectFit;
-    popImage.backgroundColor = [UIColor clearColor];
-    popImage.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
-    //    [userData objectAtIndex:(int)gesture.view.tag]
-    UIButton *close_button=[[UIButton alloc]initWithFrame:CGRectMake(self.view.frame.size.width - 60,10,48,48)];
-    [close_button setImage:[UIImage imageNamed:@"cross"] forState:UIControlStateNormal];
-    [close_button addTarget:self action:@selector(closeAction:) forControlEvents:UIControlEventTouchUpInside];
-    [imagePreviewView addSubview:popImage];
-    [imagePreviewView addSubview:close_button];
-    [self.view addSubview:imagePreviewView];
     
-    [UIView animateWithDuration:0.3f animations:^{
-        imagePreviewView.frame = CGRectMake(0,0,self.view.bounds.size.width,self.view.bounds.size.height);
-    }];
+    if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"FileAttachment"]) {
+        NSURL *url = [NSURL fileURLWithPath:[myDelegate documentCacheDirectoryPathFileName:[innerData attributeStringValueForName:@"fileName"]]];
+        self.docController = [UIDocumentInteractionController interactionControllerWithURL:url];
+        self.docController.delegate = self;
+        [self.docController presentOpenInMenuFromRect:CGRectZero inView:self.view animated:YES];
+    }
+    else if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"ImageAttachment"]) {
+        
+        imagePreviewView=[[UIView alloc] initWithFrame:CGRectMake(0,self.view.bounds.size.height,self.view.bounds.size.width,self.view.bounds.size.height)];
+        UIImageView *popImage=[[UIImageView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,self.view.frame.size.height)];
+        imagePreviewView.backgroundColor = [UIColor blackColor];
+        popImage.contentMode = UIViewContentModeScaleAspectFit;
+        popImage.backgroundColor = [UIColor clearColor];
+        popImage.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+        //    [userData objectAtIndex:(int)gesture.view.tag]
+        UIButton *close_button=[[UIButton alloc]initWithFrame:CGRectMake(self.view.frame.size.width - 60,10,48,48)];
+        [close_button setImage:[UIImage imageNamed:@"cross"] forState:UIControlStateNormal];
+        [close_button addTarget:self action:@selector(closeAction:) forControlEvents:UIControlEventTouchUpInside];
+        [imagePreviewView addSubview:popImage];
+        [imagePreviewView addSubview:close_button];
+        [self.view addSubview:imagePreviewView];
+        
+        [UIView animateWithDuration:0.3f animations:^{
+            imagePreviewView.frame = CGRectMake(0,0,self.view.bounds.size.width,self.view.bounds.size.height);
+        }];
+    }
 }
 
 - (IBAction)closeAction:(id)sender {
@@ -542,77 +529,46 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
     ChatScreenTableViewCell *cell;
-
-    cell=[chatTableView dequeueReusableCellWithIdentifier:@"chatCell"];
-        if (cell == nil)
-        {
-            cell=[[ChatScreenTableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"chatCell"];
-        }
     
-        cell.attachedImageView.tag=indexPath.row;
+    cell=[chatTableView dequeueReusableCellWithIdentifier:@"chatCell"];
+    if (cell == nil)
+    {
+        cell=[[ChatScreenTableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"chatCell"];
+    }
+    
+    cell.attachedImageView.tag=indexPath.row;
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tappedOnImageView:)];
-//    [tap setNumberOfTouchesRequired:1];
-//    [tap setNumberOfTapsRequired:1];
     [cell.attachedImageView addGestureRecognizer:tap];
     [cell.attachedImageView setUserInteractionEnabled:YES];
-        if (userData.count==1) {
+    
+    NSXMLElement* message = [userData objectAtIndex:indexPath.row];
+    NSXMLElement *innerData=[message elementForName:@"data"];
+    if (userData.count==1) {
+        
+        [cell displaySingleMessageData:message profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto chatType:[innerData attributeStringValueForName:@"chatType"]];
+    }
+    else if (userData.count>(indexPath.row+1)) {
+        
+        if ((int)indexPath.row==0) {
             
-            [cell displaySingleMessageData:[userData objectAtIndex:indexPath.row] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto  chatType:[[userData objectAtIndex:indexPath.row] attributeStringValueForName:@"type"]];
-            
-        }
-        else if (userData.count>(indexPath.row+1)) {
-            
-            if ((int)indexPath.row==0) {
-                
-                [cell displayFirstMessage:[userData objectAtIndex:indexPath.row] nextmessage:[userData objectAtIndex:indexPath.row+1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto  chatType:[[userData objectAtIndex:indexPath.row] attributeStringValueForName:@"type"]];
-            }
-            else {
-                [cell displayMultipleMessage:[userData objectAtIndex:indexPath.row] nextmessage:[userData objectAtIndex:indexPath.row+1] previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto  chatType:[[userData objectAtIndex:indexPath.row] attributeStringValueForName:@"type"]];
-            }
+            [cell displayFirstMessage:message nextmessage:[userData objectAtIndex:indexPath.row+1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto chatType:[innerData attributeStringValueForName:@"chatType"]];
         }
         else {
-            [cell displayLastMessage:[userData objectAtIndex:indexPath.row] previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto  chatType:[[userData objectAtIndex:indexPath.row] attributeStringValueForName:@"type"]];
+            [cell displayMultipleMessage:message nextmessage:[userData objectAtIndex:indexPath.row+1] previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto  chatType:[innerData attributeStringValueForName:@"chatType"]];
         }
+    }
+    else {
+        [cell displayLastMessage:message previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto  chatType:[innerData attributeStringValueForName:@"chatType"]];
+    }
     return cell;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    if (![[[userData objectAtIndex:indexPath.row] attributeStringValueForName:@"type"] isEqualToString:@"ImageAttachment"]) {
+    NSXMLElement* message = [userData objectAtIndex:indexPath.row];
+    NSXMLElement *innerData=[message elementForName:@"data"];
+    if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"ImageAttachment"]||[[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"FileAttachment"]) {
         
-        NSXMLElement* message = [userData objectAtIndex:indexPath.row];
-        NSXMLElement *innerData=[message elementForName:@"data"];
-        float mainCellHeight=5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+10+[[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]+10+20+5; //here mainCellHeight = NameLabel_topSpace + NameHeight + space_Between_NameLabel_And_MessageLabel + MessageHeight + space_Between_MessageLabel_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
-        float innerCellHeight=5+[[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]+10+20+5; //here innerCellHeight = MessageLabel_topSpace + MessageHeight + space_Between_MessageLabel_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
-        
-        if (userData.count==1 || indexPath.row == 0) {
-            if (mainCellHeight > 90) {
-                return mainCellHeight;
-            }
-            else{
-                return 90;
-            }
-        }
-        else{
-            NSXMLElement* message1 = [userData objectAtIndex:(int)indexPath.row - 1];
-            NSXMLElement *innerData1=[message1 elementForName:@"data"];
-            if ([[innerData attributeStringValueForName:@"from"] isEqualToString:[innerData1 attributeStringValueForName:@"from"]]) {
-                return innerCellHeight;
-            }
-            else{
-                if (mainCellHeight > 90) {
-                    return mainCellHeight;
-                }
-                else{
-                    return 90;
-                }
-            }
-        }
-    }
-    else {
-        
-        NSXMLElement* message = [userData objectAtIndex:indexPath.row];
-        NSXMLElement *innerData=[message elementForName:@"data"];
         float mainCellHeight=5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+10+[[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]+10+20+5; //here mainCellHeight = NameLabel_topSpace + NameHeight + space_Between_NameLabel_And_MessageLabel + MessageHeight + space_Between_MessageLabel_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
         float innerCellHeight=5+[[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]+10+20+5; //here innerCellHeight = MessageLabel_topSpace + MessageHeight + space_Between_MessageLabel_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
         
@@ -649,33 +605,62 @@
             }
         }
     }
-}
-
-- (BOOL)tableView:(UITableView *)tableView canPerformAction:(SEL)action forRowAtIndexPath:(NSIndexPath *)indexPath withSender:(id)sender {
-    
-    return (action == @selector(copy:));
-}
-- (void)tableView:(UITableView *)tableView performAction:(SEL)action forRowAtIndexPath:(NSIndexPath *)indexPath withSender:(id)sender {
-    
-    if (action == @selector(copy:)) {
-        UITableViewCell *cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];
-        UILabel *userChat = (UILabel*)[cell viewWithTag:3];
-        [[UIPasteboard generalPasteboard] setString:userChat.text];
+    else {
+        
+        float mainCellHeight=5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+10+[[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]+10+20+5; //here mainCellHeight = NameLabel_topSpace + NameHeight + space_Between_NameLabel_And_MessageLabel + MessageHeight + space_Between_MessageLabel_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
+        float innerCellHeight=5+[[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]+10+20+5; //here innerCellHeight = MessageLabel_topSpace + MessageHeight + space_Between_MessageLabel_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
+        
+        if (userData.count==1 || indexPath.row == 0) {
+            if (mainCellHeight > 90) {
+                return mainCellHeight;
+            }
+            else{
+                return 90;
+            }
+        }
+        else{
+            NSXMLElement* message1 = [userData objectAtIndex:(int)indexPath.row - 1];
+            NSXMLElement *innerData1=[message1 elementForName:@"data"];
+            if ([[innerData attributeStringValueForName:@"from"] isEqualToString:[innerData1 attributeStringValueForName:@"from"]]) {
+                return innerCellHeight;
+            }
+            else{
+                if (mainCellHeight > 90) {
+                    return mainCellHeight;
+                }
+                else{
+                    return 90;
+                }
+            }
+        }
     }
 }
-- (BOOL)tableView:(UITableView *)tableView shouldShowMenuForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 1;
-}
 
-- (void)tableViewScrollToBottomAnimated:(BOOL)animated
-{
-    NSInteger numberOfRows = userData.count;
-    if (numberOfRows)
-    {
-        [chatTableView scrollToRowAtIndexPath:[self indexPathForLastMessage]
-                             atScrollPosition:UITableViewScrollPositionBottom animated:animated];
-    }
-}
+//- (BOOL)tableView:(UITableView *)tableView canPerformAction:(SEL)action forRowAtIndexPath:(NSIndexPath *)indexPath withSender:(id)sender {
+//    
+//    return (action == @selector(copy:));
+//}
+//- (void)tableView:(UITableView *)tableView performAction:(SEL)action forRowAtIndexPath:(NSIndexPath *)indexPath withSender:(id)sender {
+//    
+//    if (action == @selector(copy:)) {
+//        UITableViewCell *cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];
+//        UILabel *userChat = (UILabel*)[cell viewWithTag:3];
+//        [[UIPasteboard generalPasteboard] setString:userChat.text];
+//    }
+//}
+//- (BOOL)tableView:(UITableView *)tableView shouldShowMenuForRowAtIndexPath:(NSIndexPath *)indexPath {
+//    return 1;
+//}
+
+//- (void)tableViewScrollToBottomAnimated:(BOOL)animated
+//{
+//    NSInteger numberOfRows = userData.count;
+//    if (numberOfRows)
+//    {
+//        [chatTableView scrollToRowAtIndexPath:[self indexPathForLastMessage]
+//                             atScrollPosition:UITableViewScrollPositionBottom animated:animated];
+//    }
+//}
 -(NSIndexPath *)indexPathForLastMessage
 {
     NSInteger lastSection = 0;
@@ -703,17 +688,25 @@
 #pragma mark - Custom filter delegate
 - (void)customFilterDelegateAction:(int)status{
     
-    if (status==1) {
-        NSLog(@"1");
-    }
-    else if (status==2) {
-        NSLog(@"2");
-        [self openCamera];
-    }
-    else if (status==3) {
-        NSLog(@"3");
-        [self openGallery];
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (status==1) {
+            NSLog(@"1");
+            
+            UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+            DocumentAttachmentViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"DocumentAttachmentViewController"];
+            [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+            popupView.delegate=self;
+            [self presentViewController:popupView animated:YES completion:nil];
+        }
+        else if (status==2) {
+            NSLog(@"2");
+            [self openCamera];
+        }
+        else if (status==3) {
+            NSLog(@"3");
+            [self openGallery];
+        }
+    });
 }
 
 - (void)openGallery {
@@ -905,22 +898,22 @@
 - (void)sendImageDelegateAction:(int)status imageName:(NSString *)imageName imageCaption:(NSString *)imageCaption {
 
     if (status==1) {
-        [self sendAttachment:imageName imageCaption:imageCaption friendName:self.friendUserName];//friendName:self.friendUserName
-        
+    
+        [self sendImageAttachment:imageName imageCaption:imageCaption friendName:self.friendUserName];//friendName:self.friendUserName
     }
 }
 
-- (void)sendImageSuccessDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId {
+- (void)sendFileSuccessDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId {
 
     [self setAttachmentMessage:message uniquiId:uniqueId];
 }
 
-- (void)sendImageFailDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId {
+- (void)sendFileFailDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId {
     
     [self setAttachmentMessage:message uniquiId:uniqueId];
 }
 
-- (void)sendImageFileDelegate:(NSXMLElement *)message {
+- (void)sendFileProgressDelegate:(NSXMLElement *)message {
     
     [self setAttachmentMessage:message uniquiId:@""];
 }
@@ -944,9 +937,9 @@
         
         for (int i=(int)userData.count-1; i>=0; i--) {
             
-            if ([[[userData objectAtIndex:i] attributeStringValueForName:@"type"] isEqualToString:@"ImageAttachment"]) {
+            NSXMLElement *innerElementData = [[userData objectAtIndex:i] elementForName:@"data"];
+            if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"ImageAttachment"]||[[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"FileAttachment"]) {
                
-                NSXMLElement *innerElementData = [[userData objectAtIndex:i] elementForName:@"data"];
                 if ([[[[innerElementData attributeStringValueForName:@"fileName"] componentsSeparatedByString:@"."] objectAtIndex:0] isEqualToString:uniqueId]) {
                     
                     [userData replaceObjectAtIndex:i withObject:message];
@@ -960,6 +953,14 @@
         [chatTableView scrollToRowAtIndexPath:ip atScrollPosition:UITableViewScrollPositionBottom animated:NO];
     }
     [chatTableView reloadData];
+}
+#pragma mark - end
+
+#pragma mark - Send file delegates
+- (void)sendDocumentDelegateAction:(NSString *)documentName {
+
+//    [self sendImageAttachment:imageName imageCaption:imageCaption friendName:self.friendUserName]
+    [self sendDocumentAttachment:documentName friendName:self.friendUserName];
 }
 #pragma mark - end
 

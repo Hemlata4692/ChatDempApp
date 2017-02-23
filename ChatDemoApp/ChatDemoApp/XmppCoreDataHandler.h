@@ -26,6 +26,7 @@
 - (NSArray *)readAllLocalMessageStorageDatabase;
 - (NSArray *)readLocalMessageStorageDatabaseBareJidStr:(NSString *)bareJidStr;
 - (void)updateLocalMessageStorageDatabaseBareJidStr:(NSString *)bareJidStr message:(NSXMLElement *)message uniquiId:(NSString *)uniquiId;
+- (BOOL)isFileMessageExist:(NSString *)message;
 //end
 
 //DashboardXmpp storage methods

@@ -47,8 +47,9 @@
     
     currentStatus=@"";
     tempImageView=[[UIImageView alloc]init];
-    self.editStatusTextView.textContainer.maximumNumberOfLines = 1;
-    self.editStatusTextView.textContainer.lineBreakMode = NSLineBreakByTruncatingHead;
+    [self.editStatusField addTarget:self
+                  action:@selector(editingChanged:)
+        forControlEvents:UIControlEventEditingChanged];
     [self addToolBar];
     [self customizedView:NO];
     
@@ -78,11 +79,12 @@
 - (void)customizedView:(bool)isEdit {
 
     if (isEdit) {
+        self.navigationItem.hidesBackButton=YES;
         self.navigationItem.leftBarButtonItem=nil;
         self.showStatusView.hidden=true;
         self.editStatusView.hidden=false;
         self.statusTitle.text=@"Add new status";
-        [self.editStatusTextView becomeFirstResponder];
+        [self.editStatusField becomeFirstResponder];
     }
     else {
         [self addBackBarButton];
@@ -95,6 +97,7 @@
         self.showStatusSeperetor.translatesAutoresizingMaskIntoConstraints=YES;
         self.editStatusButton.translatesAutoresizingMaskIntoConstraints=YES;
         
+        self.showStatusLabel.numberOfLines=0;
         CGSize size = CGSizeMake([[UIScreen mainScreen] bounds].size.width - 72,200);
         CGRect textRect=[currentStatus
                          boundingRectWithSize:size
@@ -104,6 +107,7 @@
         self.showStatusLabel.frame=CGRectMake(0, 8, [[UIScreen mainScreen] bounds].size.width - 72, textRect.size.height);
         self.showStatusView.frame=CGRectMake(8, 49, [[UIScreen mainScreen] bounds].size.width - 16, self.showStatusLabel.frame.size.height+16);
         self.showStatusSeperetor.frame=CGRectMake(self.showStatusLabel.frame.origin.x+self.showStatusLabel.frame.size.width+11, (self.showStatusView.frame.size.height/2)-(43/2), 1, 43);
+        
         self.editStatusButton.frame=CGRectMake(self.showStatusView.frame.size.width-30-8, (self.showStatusView.frame.size.height/2)-(30/2), 30, 30);
     }
 }
@@ -119,7 +123,7 @@
     
     [toolBar setItems:[NSArray arrayWithObjects: cancelButton, flexSpace, doneButton, nil] animated:NO];
     
-    [self.editStatusTextView setInputAccessoryView:toolBar];
+    [self.editStatusField setInputAccessoryView:toolBar];
 }
 #pragma mark - end
 
@@ -160,27 +164,47 @@
 
 #pragma mark - end
 
-#pragma mark - TextView delegates
-- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+#pragma mark - Textfield delegates
+- (void)textFieldDidBeginEditing:(UITextField *)textField {}
+
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     
-    if(textView.text.length>=textLimit && range.length == 0) {
-        
-        return NO;
-    }
-    else if ([text isEqualToString:@"\n"]) {
-        [textView resignFirstResponder];
-        return NO;
-    }
+        if (range.length > 0 && [string length] == 0)
+        {
+            return YES;
+        }
+        if (textField.text.length > 99 && range.length == 0)
+        {
+            return NO;
+        }
+        else
+        {
+            return YES;
+        }
     return YES;
 }
 
-- (void)textViewDidChange:(UITextView *)textView {
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
     
-    self.statusCount.text = [NSString stringWithFormat:@"%lu",textLimit - textView.text.length];
+    [self doneActionMethod];
+    return YES;
 }
 #pragma mark - end
 
 #pragma mark - UIButton actions
+-(void) editingChanged:(id)sender {
+    // your code
+    
+    if ((textLimit - (int)self.editStatusField.text.length)>=0) {
+        self.statusCount.text = [NSString stringWithFormat:@"%d",textLimit - (int)self.editStatusField.text.length];
+    }
+    else {
+        
+        self.editStatusField.text=[self.editStatusField.text substringToIndex:[self.editStatusField.text length]+(textLimit - (int)self.editStatusField.text.length)];
+        self.statusCount.text = [NSString stringWithFormat:@"%d",textLimit - (int)self.editStatusField.text.length];
+    }
+}
+
 - (void)backAction {
     
     [self.navigationController popViewControllerAnimated:YES];
@@ -188,22 +212,27 @@
 
 - (IBAction)editStatus:(UIButton *)sender {
     
-    self.editStatusTextView.text=currentStatus;
+    self.editStatusField.text=currentStatus;
     [self customizedView:YES];
 }
 
 - (IBAction)doneAction:(UIBarButtonItem *)sender {
     
+    [self doneActionMethod];
+}
+
+- (void)doneActionMethod {
+    
     [self.view endEditing:YES];
     [myDelegate showIndicator];
     [self performSelector:@selector(userUpdateProfile) withObject:nil afterDelay:0.1];
     
-     NSLog(@" Desc:%@ \n address:%@ \n birthDay:%@ \n gender:%@",[profileDic objectForKey:@"Description"],[profileDic objectForKey:@"Address"],[profileDic objectForKey:@"UserBirthDay"],[profileDic objectForKey:@"Gender"]);
+    NSLog(@" Desc:%@ \n address:%@ \n birthDay:%@ \n gender:%@",[profileDic objectForKey:@"Description"],[profileDic objectForKey:@"Address"],[profileDic objectForKey:@"UserBirthDay"],[profileDic objectForKey:@"Gender"]);
 }
 
 - (IBAction)cancelAction:(UIBarButtonItem *)sender {
     
-    [self.editStatusTextView resignFirstResponder];
+    [self.editStatusField resignFirstResponder];
     [self customizedView:NO];
 }
 #pragma mark - end
@@ -217,7 +246,7 @@
     [profileData setObject:[profileDic objectForKey:@"PhoneNumber"] forKey:self.xmppPhoneNumber];
     [profileData setObject:[profileDic objectForKey:@"Gender"] forKey:self.xmppGender];
     [profileData setObject:[profileDic objectForKey:@"Address"] forKey:self.xmppAddress];
-    [profileData setObject:self.editStatusTextView.text forKey:self.xmppUserStatus];
+    [profileData setObject:self.editStatusField.text forKey:self.xmppUserStatus];
     [profileData setObject:[profileDic objectForKey:@"Description"] forKey:self.xmppDescription];
     [profileData setObject:[profileDic objectForKey:@"EmailAddress"] forKey:self.xmppEmailAddress];
     [profileData setObject:[profileDic objectForKey:@"UserBirthDay"] forKey:self.xmppUserBirthDay];
@@ -231,7 +260,7 @@
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         
-        currentStatus=self.editStatusTextView.text;
+        currentStatus=self.editStatusField.text;
         [self customizedView:NO];
         [myDelegate stopIndicator];
     });

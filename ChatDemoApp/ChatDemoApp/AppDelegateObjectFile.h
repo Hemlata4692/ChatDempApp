@@ -79,10 +79,7 @@ XMPPIncomingFileTransferDelegate>
 
 -(BOOL)connect;
 -(void)disconnect;
--(void)addBadgeIcon:(NSString*)badgeValue;
 -(void)editProfileImageUploading:(NSMutableDictionary *)profileData;
--(void)addBadgeIconLastTab;
--(void)removeBadgeIconLastTab;
 -(void)methodCalling:(NSMutableDictionary *)profileData;
 
 - (NSManagedObjectContext *)managedObjectContext_roster;
@@ -134,6 +131,9 @@ XMPPIncomingFileTransferDelegate>
 
 - (NSManagedObjectContext *)managedObjectContext;
 
-
-
+- (void)getAllDocumentListing:(void(^)(NSMutableArray *tempArray))completion;
+- (NSData *)documentCacheDirectoryFileName:(NSString *)fileName;
+- (NSString *)documentCacheDirectoryPathFileName:(NSString *)fileName;
+- (void)getThumbnailImagePDF:(NSString *)fileName result:(void(^)(UIImage *tempImage))completion;
+- (void)saveFileInLocalDocumentDirectory:(NSString *)fileName file:(NSData *)fileData;
 @end

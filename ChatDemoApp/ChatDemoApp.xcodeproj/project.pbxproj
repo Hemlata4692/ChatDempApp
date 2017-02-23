@@ -10,6 +10,10 @@
 		90DC0D66A2ED385893C02E29 /* libPods-ChatDemoApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE07D7CB35D225B6FB24E1D2 /* libPods-ChatDemoApp.a */; };
 		B70AE66A1E2F1EC600554038 /* AppDelegateObjectFile.m in Sources */ = {isa = PBXBuildFile; fileRef = B70AE6691E2F1EC600554038 /* AppDelegateObjectFile.m */; };
 		B7131E5D1E52DA3A00A435A3 /* ChatScreenTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B7131E5C1E52DA3A00A435A3 /* ChatScreenTableViewCell.m */; };
+		B715A0B91E5E9BE100B36D16 /* SettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B715A0B81E5E9BE000B36D16 /* SettingViewController.m */; };
+		B715A0BE1E5E9F7700B36D16 /* SettingTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B715A0BD1E5E9F7700B36D16 /* SettingTableViewCell.m */; };
+		B715A0C31E5EB55300B36D16 /* DocumentAttachmentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B715A0C21E5EB55300B36D16 /* DocumentAttachmentViewController.m */; };
+		B715A0C81E5EF47E00B36D16 /* pdf_placeholder.png in Resources */ = {isa = PBXBuildFile; fileRef = B715A0C71E5EF47E00B36D16 /* pdf_placeholder.png */; };
 		B71B73CD1E542BC600D57E7D /* SendImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B71B73CC1E542BC600D57E7D /* SendImageViewController.m */; };
 		B72DD0781E5DAC0A0017C488 /* EditUserStatusViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B72DD0771E5DAC0A0017C488 /* EditUserStatusViewController.m */; };
 		B745F8291E234D55001119BD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F8281E234D55001119BD /* main.m */; };
@@ -61,6 +65,13 @@
 		B70F932A1E4DB5290064EF29 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		B7131E5B1E52DA3A00A435A3 /* ChatScreenTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatScreenTableViewCell.h; sourceTree = "<group>"; };
 		B7131E5C1E52DA3A00A435A3 /* ChatScreenTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatScreenTableViewCell.m; sourceTree = "<group>"; };
+		B715A0B71E5E9BE000B36D16 /* SettingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingViewController.h; sourceTree = "<group>"; };
+		B715A0B81E5E9BE000B36D16 /* SettingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingViewController.m; sourceTree = "<group>"; };
+		B715A0BC1E5E9F7700B36D16 /* SettingTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingTableViewCell.h; sourceTree = "<group>"; };
+		B715A0BD1E5E9F7700B36D16 /* SettingTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingTableViewCell.m; sourceTree = "<group>"; };
+		B715A0C11E5EB55300B36D16 /* DocumentAttachmentViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DocumentAttachmentViewController.h; sourceTree = "<group>"; };
+		B715A0C21E5EB55300B36D16 /* DocumentAttachmentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DocumentAttachmentViewController.m; sourceTree = "<group>"; };
+		B715A0C71E5EF47E00B36D16 /* pdf_placeholder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pdf_placeholder.png; sourceTree = "<group>"; };
 		B71B73CB1E542BC600D57E7D /* SendImageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SendImageViewController.h; sourceTree = "<group>"; };
 		B71B73CC1E542BC600D57E7D /* SendImageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SendImageViewController.m; sourceTree = "<group>"; };
 		B72DD0761E5DAC0A0017C488 /* EditUserStatusViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditUserStatusViewController.h; sourceTree = "<group>"; };
@@ -182,6 +193,59 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		B715A0B51E5E9BA700B36D16 /* SettingView */ = {
+			isa = PBXGroup;
+			children = (
+				B715A0B61E5E9BB200B36D16 /* SettingView */,
+			);
+			name = SettingView;
+			sourceTree = "<group>";
+		};
+		B715A0B61E5E9BB200B36D16 /* SettingView */ = {
+			isa = PBXGroup;
+			children = (
+				B715A0BB1E5E9F5B00B36D16 /* SettingController */,
+				B715A0BA1E5E9F5000B36D16 /* SettingTableCell */,
+			);
+			name = SettingView;
+			sourceTree = "<group>";
+		};
+		B715A0BA1E5E9F5000B36D16 /* SettingTableCell */ = {
+			isa = PBXGroup;
+			children = (
+				B715A0BC1E5E9F7700B36D16 /* SettingTableViewCell.h */,
+				B715A0BD1E5E9F7700B36D16 /* SettingTableViewCell.m */,
+			);
+			name = SettingTableCell;
+			sourceTree = "<group>";
+		};
+		B715A0BB1E5E9F5B00B36D16 /* SettingController */ = {
+			isa = PBXGroup;
+			children = (
+				B715A0B71E5E9BE000B36D16 /* SettingViewController.h */,
+				B715A0B81E5E9BE000B36D16 /* SettingViewController.m */,
+			);
+			name = SettingController;
+			sourceTree = "<group>";
+		};
+		B715A0BF1E5EB42D00B36D16 /* DocumentAttachment */ = {
+			isa = PBXGroup;
+			children = (
+				B715A0C11E5EB55300B36D16 /* DocumentAttachmentViewController.h */,
+				B715A0C21E5EB55300B36D16 /* DocumentAttachmentViewController.m */,
+			);
+			name = DocumentAttachment;
+			sourceTree = "<group>";
+		};
+		B715A0C01E5EB43C00B36D16 /* ImageAttachment */ = {
+			isa = PBXGroup;
+			children = (
+				B71B73CB1E542BC600D57E7D /* SendImageViewController.h */,
+				B71B73CC1E542BC600D57E7D /* SendImageViewController.m */,
+			);
+			name = ImageAttachment;
+			sourceTree = "<group>";
+		};
 		B72DD0751E5DABF20017C488 /* EditUserStatus */ = {
 			isa = PBXGroup;
 			children = (
@@ -228,6 +292,7 @@
 		B745F8271E234D54001119BD /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				B715A0C71E5EF47E00B36D16 /* pdf_placeholder.png */,
 				B7E0D99C1E4048C500397393 /* RegistrationProcess.rtf */,
 				B77DFFF61E4C433C00921126 /* arrow_down@3x.png */,
 				B79CA2571E30B91A007CDB23 /* images.png */,
@@ -257,6 +322,7 @@
 		B745F83F1E23519A001119BD /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				B715A0B51E5E9BA700B36D16 /* SettingView */,
 				B72DD0751E5DABF20017C488 /* EditUserStatus */,
 				B745F8401E2351A7001119BD /* LoginView */,
 				B745F8411E2351B1001119BD /* RegisterView */,
@@ -396,6 +462,8 @@
 		B77DFFDC1E4C2DFD00921126 /* ChatScreenView */ = {
 			isa = PBXGroup;
 			children = (
+				B715A0C01E5EB43C00B36D16 /* ImageAttachment */,
+				B715A0BF1E5EB42D00B36D16 /* DocumentAttachment */,
 				B77EE6361E4DE70900A38ADD /* AddAttacment */,
 				B77DFFDD1E4C2E2100921126 /* ChatScreenViewController.h */,
 				B77DFFDE1E4C2E2100921126 /* ChatScreenViewController.m */,
@@ -403,8 +471,6 @@
 				B77DFFE11E4C2E3100921126 /* XMPPChatView.m */,
 				B7131E5B1E52DA3A00A435A3 /* ChatScreenTableViewCell.h */,
 				B7131E5C1E52DA3A00A435A3 /* ChatScreenTableViewCell.m */,
-				B71B73CB1E542BC600D57E7D /* SendImageViewController.h */,
-				B71B73CC1E542BC600D57E7D /* SendImageViewController.m */,
 			);
 			name = ChatScreenView;
 			sourceTree = "<group>";
@@ -502,6 +568,7 @@
 			files = (
 				B77DFFF91E4C72D200921126 /* a.pdf in Resources */,
 				B745F8341E234D55001119BD /* Assets.xcassets in Resources */,
+				B715A0C81E5EF47E00B36D16 /* pdf_placeholder.png in Resources */,
 				B77DFFF71E4C433C00921126 /* arrow_down@3x.png in Resources */,
 				B780E9F91E2F9FC200437B4E /* ReadMe.rtf in Resources */,
 				B7E0D99D1E4048C500397393 /* RegistrationProcess.rtf in Resources */,
@@ -584,6 +651,8 @@
 				B745F82C1E234D55001119BD /* AppDelegate.m in Sources */,
 				B77DFFDF1E4C2E2100921126 /* ChatScreenViewController.m in Sources */,
 				B75BC5761E3F60A500E5F780 /* XmppStorageModel.xcdatamodeld in Sources */,
+				B715A0B91E5E9BE100B36D16 /* SettingViewController.m in Sources */,
+				B715A0BE1E5E9F7700B36D16 /* SettingTableViewCell.m in Sources */,
 				B77DFFF41E4C32C500921126 /* XMPPNamespaces.m in Sources */,
 				B7A7A9A01E2F64060027D2B6 /* RegisterXMPP.m in Sources */,
 				B77DFFE21E4C2E3100921126 /* XMPPChatView.m in Sources */,
@@ -595,6 +664,7 @@
 				B7B9A5661E23B17A00DB4429 /* MMMaterialDesignSpinner.m in Sources */,
 				B745F8291E234D55001119BD /* main.m in Sources */,
 				B757925B1E42E23800AC48D0 /* XmppProfileView.m in Sources */,
+				B715A0C31E5EB55300B36D16 /* DocumentAttachmentViewController.m in Sources */,
 				B7131E5D1E52DA3A00A435A3 /* ChatScreenTableViewCell.m in Sources */,
 				B745F8561E2353DD001119BD /* UserDefaultManager.m in Sources */,
 				B745F8461E2351F1001119BD /* RegisterViewController.m in Sources */,

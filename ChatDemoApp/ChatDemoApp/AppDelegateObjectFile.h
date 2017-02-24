@@ -111,6 +111,8 @@ XMPPIncomingFileTransferDelegate>
 @property(nonatomic,strong) NSString *appMediafolderName;
 @property(nonatomic,strong) NSString *appProfilePhotofolderName;
 @property(nonatomic,strong) NSString *appSentReceivePhotofolderName;
+@property(nonatomic,strong) NSString *appMapPhotofolderName;
+
 @property(nonatomic,strong) NSString *appDocumentfolderName;
 
 @property(nonatomic,assign) float imageCompressionPercent;
@@ -136,4 +138,6 @@ XMPPIncomingFileTransferDelegate>
 - (NSString *)documentCacheDirectoryPathFileName:(NSString *)fileName;
 - (void)getThumbnailImagePDF:(NSString *)fileName result:(void(^)(UIImage *tempImage))completion;
 - (void)saveFileInLocalDocumentDirectory:(NSString *)fileName file:(NSData *)fileData;
+
+- (NSString *)setMapImageInLocalDB:(UIImage*)image;
 @end

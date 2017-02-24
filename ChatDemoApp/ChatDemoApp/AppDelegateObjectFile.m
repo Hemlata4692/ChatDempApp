@@ -83,6 +83,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 @synthesize appProfilePhotofolderName;
 @synthesize appSentReceivePhotofolderName;
 @synthesize appDocumentfolderName;
+@synthesize appMapPhotofolderName;
 //end
 
 @synthesize afterAutentication,afterAutenticationRegistration;
@@ -98,6 +99,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     appSentReceivePhotofolderName=[NSString stringWithFormat:@"%@/%@_Photos/%@_SentReceived",appMediafolderName,folderName,folderName];
     appDocumentfolderName=[NSString stringWithFormat:@"%@/%@_Documents",folderName,folderName];
     [self createCacheDirectory];
+    appMapPhotofolderName=[NSString stringWithFormat:@"%@/%@_Map",folderName,folderName];
+    [self createCacheDirectory];
+    
     //end
     
     self.myView=@"Other";
@@ -1195,6 +1199,52 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 }
 #pragma mark - end
 
+- (NSData*)reducedLocationImageSize:(UIImage *)selectedImage {
+    
+    NSData *imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(selectedImage, 1)];
+    selectedImage = [self imageWithRoundedCornersSize:0 usingImage:selectedImage];
+    
+    imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(selectedImage, 1)];
+    CGSize mySize;
+    mySize.height = 100;
+    mySize.width = 100;
+    
+    CGFloat oldWidth = selectedImage.size.width;
+    CGFloat oldHeight = selectedImage.size.height;
+    
+    CGFloat scaleFactor = (oldWidth > oldHeight) ? mySize.width / oldWidth : mySize.height / oldHeight;
+    mySize.height = oldHeight * scaleFactor;
+    mySize.width = oldWidth * scaleFactor;
+    selectedImage = [self imageWithImage:selectedImage scaledToSize:mySize];
+    NSData *pngData = UIImageJPEGRepresentation(selectedImage, .1);
+    return pngData;
+}
+
+- (NSString *)setMapImageInLocalDB:(UIImage*)image {
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    NSLocale *locale = [[NSLocale alloc]
+                        initWithLocaleIdentifier:@"en_US"];
+    [dateFormatter setLocale:locale];
+    [dateFormatter setDateFormat:@"ddMMYYhhmmss"];
+    NSString * datestr = [dateFormatter stringFromDate:[NSDate date]];
+    NSString *fileName = [NSString stringWithFormat:@"Map_%@.jpeg",datestr];
+    [self saveMapImageInLocalDocumentDirectory:fileName image:[self reducedLocationImageSize:image]];
+    return fileName;
+}
+
+- (void)saveMapImageInLocalDocumentDirectory:(NSString *)fileName image:(NSData *)imageData {
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *imagesPath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appMapPhotofolderName];
+    if (![fileManager fileExistsAtPath:imagesPath]) {
+        
+        [fileManager createDirectoryAtPath:imagesPath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    imagesPath=[imagesPath stringByAppendingPathComponent:fileName];
+    NSLog(@"SIZE OF IMAGE: %.3f Mb", (float)imageData.length/1024/1024);
+    [imageData writeToFile:imagesPath atomically:YES];
+}
 
 //File transfer
 #pragma mark - XMPPIncomingFileTransferDelegate Methods

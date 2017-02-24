@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		90DC0D66A2ED385893C02E29 /* libPods-ChatDemoApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE07D7CB35D225B6FB24E1D2 /* libPods-ChatDemoApp.a */; };
+		B7005C1F1E5FE62F003A56D3 /* LocationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B7005C1E1E5FE62E003A56D3 /* LocationViewController.m */; };
 		B70AE66A1E2F1EC600554038 /* AppDelegateObjectFile.m in Sources */ = {isa = PBXBuildFile; fileRef = B70AE6691E2F1EC600554038 /* AppDelegateObjectFile.m */; };
 		B7131E5D1E52DA3A00A435A3 /* ChatScreenTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B7131E5C1E52DA3A00A435A3 /* ChatScreenTableViewCell.m */; };
 		B715A0B91E5E9BE100B36D16 /* SettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B715A0B81E5E9BE000B36D16 /* SettingViewController.m */; };
@@ -59,6 +60,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B7005C1D1E5FE62E003A56D3 /* LocationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocationViewController.h; sourceTree = "<group>"; };
+		B7005C1E1E5FE62E003A56D3 /* LocationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationViewController.m; sourceTree = "<group>"; };
 		B70AE6681E2F1EC600554038 /* AppDelegateObjectFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegateObjectFile.h; sourceTree = "<group>"; };
 		B70AE6691E2F1EC600554038 /* AppDelegateObjectFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegateObjectFile.m; sourceTree = "<group>"; };
 		B70F93281E4DB51C0064EF29 /* AddressBookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBookUI.framework; path = System/Library/Frameworks/AddressBookUI.framework; sourceTree = SDKROOT; };
@@ -191,6 +194,15 @@
 				BE07D7CB35D225B6FB24E1D2 /* libPods-ChatDemoApp.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		B7005C1C1E5FE609003A56D3 /* LocationAttachment */ = {
+			isa = PBXGroup;
+			children = (
+				B7005C1D1E5FE62E003A56D3 /* LocationViewController.h */,
+				B7005C1E1E5FE62E003A56D3 /* LocationViewController.m */,
+			);
+			name = LocationAttachment;
 			sourceTree = "<group>";
 		};
 		B715A0B51E5E9BA700B36D16 /* SettingView */ = {
@@ -462,6 +474,7 @@
 		B77DFFDC1E4C2DFD00921126 /* ChatScreenView */ = {
 			isa = PBXGroup;
 			children = (
+				B7005C1C1E5FE609003A56D3 /* LocationAttachment */,
 				B715A0C01E5EB43C00B36D16 /* ImageAttachment */,
 				B715A0BF1E5EB42D00B36D16 /* DocumentAttachment */,
 				B77EE6361E4DE70900A38ADD /* AddAttacment */,
@@ -654,6 +667,7 @@
 				B715A0B91E5E9BE100B36D16 /* SettingViewController.m in Sources */,
 				B715A0BE1E5E9F7700B36D16 /* SettingTableViewCell.m in Sources */,
 				B77DFFF41E4C32C500921126 /* XMPPNamespaces.m in Sources */,
+				B7005C1F1E5FE62F003A56D3 /* LocationViewController.m in Sources */,
 				B7A7A9A01E2F64060027D2B6 /* RegisterXMPP.m in Sources */,
 				B77DFFE21E4C2E3100921126 /* XMPPChatView.m in Sources */,
 				B77DFFE81E4C2F3200921126 /* UIPlaceHolderTextView.m in Sources */,

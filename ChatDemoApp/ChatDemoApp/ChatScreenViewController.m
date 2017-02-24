@@ -21,6 +21,7 @@
 #import "DocumentAttachmentViewController.h"
 #import "UserDefaultManager.h"
 #import <AVFoundation/AVFoundation.h>
+#import "LocationViewController.h"
 
 #define navigationBarHeight 64
 #define toolbarHeight 0
@@ -85,7 +86,7 @@
 //    self.navigationItem.title=self.friendUserName;
     userProfileImageView = [[UIImageView alloc] init];
     [self addBackBarButton];    //Add navigation bar buttons
-    [self addNavigationtitle];  //Customized navigation bar
+    
     [self initializeFriendProfile:friendUserJid];   //Set current friend jid
     
     chatTableView.backgroundColor=[UIColor whiteColor];
@@ -99,6 +100,8 @@
 
 - (void)viewWillAppear:(BOOL)animated {
 
+    self.navigationController.navigationBarHidden=NO;
+    [self addNavigationtitle];  //Customized navigation bar
     if (!isAttachmentOpen) {
         [super viewWillAppear:YES];
         [self viewInitialized]; //Initialised view
@@ -206,6 +209,7 @@
 #pragma mark - Customized navigation bar using uiview and also add UIButton & UIAction
 - (void)addNavigationtitle {
     
+    [navBackView removeFromSuperview];
     navBackView=[[UIView alloc]initWithFrame:CGRectMake(50, 20, [[UIScreen mainScreen] bounds].size.width-100, 40)];
     navBackView.backgroundColor=[UIColor clearColor];
     navTitleLabel=[[UILabel alloc]initWithFrame:CGRectMake(0, 3, navBackView.frame.size.width, 25)];
@@ -507,6 +511,9 @@
             [tempAttachment setObject:[NSNumber numberWithInt:3] forKey:@"Gallery"];
             [tempAttachmentArra addObject:@"Gallery"];
             [tempAttachmentImageArra addObject:@"galleryAttachment"];
+            [tempAttachment setObject:[NSNumber numberWithInt:4] forKey:@"Location"];
+            [tempAttachmentArra addObject:@"Location"];
+            [tempAttachmentImageArra addObject:@"locationIcon"];
             filterViewObj.filterDict=[tempAttachment mutableCopy];
             filterViewObj.filterArray=[tempAttachmentArra mutableCopy];
             filterViewObj.filterImageArray=[tempAttachmentImageArra mutableCopy];
@@ -703,65 +710,20 @@
         }
         else if (status==2) {
             NSLog(@"2");
-//            [self openCamera];
-            
-                
-                CLLocationCoordinate2D center;
-                CLLocationCoordinate2D northEast;
-                CLLocationCoordinate2D southWest;
-            GMSPlacePicker *placePicker;
-
-//                //    37.0902° N, 95.7129
-//                if (currentLocation.latitude!=0 && currentLocation.longitude!=0){
-//                    center = CLLocationCoordinate2DMake(currentLocation.latitude, currentLocation.longitude);
-//                    northEast = CLLocationCoordinate2DMake(center.latitude + 0.001, center.longitude + 0.001);
-//                    southWest = CLLocationCoordinate2DMake(center.latitude - 0.001, center.longitude - 0.001);
-//                }
-//                else {
-                    center = CLLocationCoordinate2DMake(37.0902, -95.7129);
-                    northEast = CLLocationCoordinate2DMake(center.latitude + 10, center.longitude + 10);
-                    southWest = CLLocationCoordinate2DMake(center.latitude - 10, center.longitude - 10);
-//                }
-                GMSCoordinateBounds *viewport = [[GMSCoordinateBounds alloc] initWithCoordinate:northEast
-                                                                                     coordinate:southWest];
-                GMSPlacePickerConfig *config = [[GMSPlacePickerConfig alloc] initWithViewport:viewport];
-                
-                placePicker = [[GMSPlacePicker alloc] initWithConfig:config];
-                
-                [placePicker pickPlaceWithCallback:^(GMSPlace *place, NSError *error) {
-                    if (error != nil) {
-                        NSLog(@"Pick Place error %@", [error localizedDescription]);
-                        return;
-                    }
-                    
-                    if (place != nil) {
-                        if (NULL!=place.formattedAddress) {
-                            //set pin om map
-                            if ([place.formattedAddress containsString:@","]&&[[[place.formattedAddress componentsSeparatedByString:@","] objectAtIndex:0] isEqualToString:place.name]) {
-//                                placeName=[NSString stringWithFormat:@"%@",place.formattedAddress];
-                            }
-                            else {
-//                                placeName=[NSString stringWithFormat:@"%@,%@",place.name,place.formattedAddress];
-                            }
-//                            currentLocation=place.coordinate;
-//                            [self setGoogleMapData:placeName];
-                        }
-//                        else {
-//                            placeName=@"";
-//                            currentLocation = place.coordinate;
-//                            [self fetchPlaceNameUsingLatLong:currentLocation];
-//                        }
-                    }
-                    else {
-                        NSLog(@"No place selected");
-                    }
-                }];
-                
-            
+            [self openCamera];            
         }
         else if (status==3) {
             NSLog(@"3");
             [self openGallery];
+        }
+        else if (status==4) {
+            NSLog(@"3");
+            isAttachmentOpen=true;
+            UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+            LocationViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"LocationViewController"];
+            [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+//            popupView.delegate=self;
+            [self.navigationController pushViewController:popupView animated:YES];
         }
     });
 }

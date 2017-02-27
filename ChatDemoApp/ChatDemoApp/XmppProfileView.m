@@ -86,8 +86,15 @@
 
 - (int)getPresenceStatus:(NSString *)jid {
     
+    if (appDelegate.xmppUserDetailedList==nil || appDelegate.xmppUserDetailedList.count==0) {
+
+        NSMutableDictionary *temp=[XMPPUserDefaultManager getValue:@"xmppUserDetailedList"];
+        return [[temp objectForKey:jid] intValue];
+    }
+    else {
     XMPPUserCoreDataStorageObject *user=[appDelegate.xmppUserDetailedList objectForKey:jid];
     return [user.sectionNum intValue];
+    }
 }
 
 - (void)getProfileData:(NSString *)jid result:(void(^)(NSDictionary *tempProfileData)) completion {

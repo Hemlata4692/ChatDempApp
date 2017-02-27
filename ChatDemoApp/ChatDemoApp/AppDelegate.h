@@ -17,5 +17,7 @@
 //Indicator method
 - (void)showIndicator;
 - (void)stopIndicator;
+
+- (void)onOffNotificationSound:(BOOL)isOn;
 @end
 

@@ -136,6 +136,15 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     
     xmppMessageArchivingCoreDataStorage = [XMPPMessageArchivingCoreDataStorage sharedInstance];
     xmppMessageArchivingModule = [[XMPPMessageArchiving alloc]initWithMessageArchivingStorage:xmppMessageArchivingCoreDataStorage];
+    
+
+    if ([XMPPUserDefaultManager getValue:@"xmppUserListArray"] == nil) {
+        NSMutableDictionary* tempDict = [NSMutableDictionary new];
+        NSMutableArray* tempArray = [NSMutableArray new];
+        [XMPPUserDefaultManager setValue:tempArray key:@"xmppUserListArray"];
+        [XMPPUserDefaultManager setValue:tempDict key:@"xmppUserDetailedList"];
+    }
+    
     if ([XMPPUserDefaultManager getValue:@"CountData"] == nil) {
         NSMutableDictionary* countData = [NSMutableDictionary new];
         [XMPPUserDefaultManager setValue:countData key:@"CountData"];

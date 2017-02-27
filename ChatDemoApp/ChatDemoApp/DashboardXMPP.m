@@ -151,6 +151,16 @@
         }
         appDelegate.xmppUserListArray=[xmppUserListArrayTemp mutableCopy];
         appDelegate.xmppUserDetailedList=[xmppUserDetailedListTemp mutableCopy];
+        
+        [XMPPUserDefaultManager setValue:appDelegate.xmppUserListArray key:@"xmppUserListArray"];
+        NSMutableDictionary *tempDict=[NSMutableDictionary new];
+//        XMPPUserCoreDataStorageObject *user=[appDelegate.xmppUserDetailedList objectForKey:jid];
+//        return [user.sectionNum intValue];
+        for (int i=0; i<appDelegate.xmppUserListArray.count; i++) {
+            
+            [tempDict setObject:[[appDelegate.xmppUserDetailedList objectForKey:[appDelegate.xmppUserListArray objectAtIndex:i]] sectionNum] forKey:[appDelegate.xmppUserListArray objectAtIndex:i]];
+        }
+        [XMPPUserDefaultManager setValue:tempDict key:@"xmppUserDetailedList"];
         isrefresh=false;
         appDelegate.isContactListIsLoaded=YES;
         [self xmppUserListResponse:appDelegate.xmppUserDetailedList xmppUserListIds:appDelegate.xmppUserListArray];
@@ -196,6 +206,14 @@
 }
 
 - (void)xmppUserConnect {
+    
+
+//    //If net is not available
+//    appDelegate.xmppUserListArray=[[XMPPUserDefaultManager getValue:@"xmppUserListArray"] mutableCopy];
+//    appDelegate.xmppUserDetailedList=[NSMutableDictionary new];
+//    isrefresh=false;
+//    appDelegate.isContactListIsLoaded=YES;
+//    [self xmppUserListResponse:appDelegate.xmppUserDetailedList xmppUserListIds:appDelegate.xmppUserListArray];
     
     isrefresh=true;
     [myDelegate disconnect];

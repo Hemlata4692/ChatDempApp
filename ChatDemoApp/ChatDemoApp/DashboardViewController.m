@@ -46,6 +46,7 @@
     userListArray=[NSMutableArray new];
     userDetailedList=[NSMutableDictionary new];
     historyChatData=[NSMutableArray new];
+    
     [myDelegate showIndicator];
     [self performSelector:@selector(userList) withObject:nil afterDelay:0.1];
     // Do any additional setup after loading the view.
@@ -392,16 +393,18 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         if (status==1) {
             NSLog(@"1");
-            UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-            UIViewController *objStatusView = [storyboard instantiateViewControllerWithIdentifier:@"EditUserStatusViewController"];
-            [self.navigationController pushViewController:objStatusView animated:YES];
+//            UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+//            UIViewController *objStatusView = [storyboard instantiateViewControllerWithIdentifier:@"EditUserStatusViewController"];
+//            [self.navigationController pushViewController:objStatusView animated:YES];
+            [myDelegate onOffNotificationSound:YES];
         }
         else if (status==2) {
             NSLog(@"2");
             
-            UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-            UIViewController *objGroupView = [storyboard instantiateViewControllerWithIdentifier:@"GroupConversationViewController"];
-            [self.navigationController pushViewController:objGroupView animated:YES];
+             [myDelegate onOffNotificationSound:NO];
+//            UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+//            UIViewController *objGroupView = [storyboard instantiateViewControllerWithIdentifier:@"GroupConversationViewController"];
+//            [self.navigationController pushViewController:objGroupView animated:YES];
         }
         else if (status==3) {
             NSLog(@"3");

@@ -234,22 +234,22 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     //    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
     //    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
     //
-    DDLogVerbose(@"%@: %@", THIS_FILE, THIS_METHOD);
-    
-#if TARGET_IPHONE_SIMULATOR
-    DDLogError(@"The iPhone simulator does not process background network traffic. "
-               @"Inbound traffic is queued until the keepAliveTimeout:handler: fires.");
-#endif
-    
-    if ([application respondsToSelector:@selector(setKeepAliveTimeout:handler:)])
-    {
-        [application setKeepAliveTimeout:600 handler:^{
-            
-            DDLogVerbose(@"KeepAliveHandler");
-            
-            // Do other keep alive stuff here.
-        }];
-    }
+//    DDLogVerbose(@"%@: %@", THIS_FILE, THIS_METHOD);
+//    
+//#if TARGET_IPHONE_SIMULATOR
+//    DDLogError(@"The iPhone simulator does not process background network traffic. "
+//               @"Inbound traffic is queued until the keepAliveTimeout:handler: fires.");
+//#endif
+//    
+//    if ([application respondsToSelector:@selector(setKeepAliveTimeout:handler:)])
+//    {
+//        [application setKeepAliveTimeout:600 handler:^{
+//            
+//            DDLogVerbose(@"KeepAliveHandler");
+//            
+//            // Do other keep alive stuff here.
+//        }];
+//    }
 }
 
 - (void)enterForegroundMethod :(UIApplication *)application {
@@ -306,6 +306,11 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     
     xmppCapabilities.autoFetchHashedCapabilities = YES;
     xmppCapabilities.autoFetchNonHashedCapabilities = NO;
+    
+//    xmppMessageDeliveryRecipts = [[XMPPMessageDeliveryReceipts alloc] initWithDispatchQueue:dispatch_get_main_queue()];
+//    xmppMessageDeliveryRecipts.autoSendMessageDeliveryReceipts = YES;
+//    xmppMessageDeliveryRecipts.autoSendMessageDeliveryRequests = YES;
+//    [xmppMessageDeliveryRecipts activate:xmppStream];
     
     // Activate xmpp modules
     
@@ -617,9 +622,12 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
             [self addLocalNotification:[innerElementData attributeStringValueForName:@"senderName"] message:[[message elementForName:@"body"] stringValue] userId:[innerElementData attributeStringValueForName:@"from"]];
             [XMPPUserDefaultManager setXMPPBadgeIndicatorKey:[innerElementData attributeStringValueForName:@"from"]];
         }
-        else {
-         [[NSNotificationCenter defaultCenter] postNotificationName:@"UserHistory" object:message];
+        else if ([[UIApplication sharedApplication] applicationState]==UIApplicationStateBackground) {
+            [self addLocalNotification:[innerElementData attributeStringValueForName:@"senderName"] message:[[message elementForName:@"body"] stringValue] userId:[innerElementData attributeStringValueForName:@"from"]];
         }
+//        else {
+         [[NSNotificationCenter defaultCenter] postNotificationName:@"UserHistory" object:message];
+//        }
         
     }
 }
@@ -1313,13 +1321,27 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         
         if (![selectedFriendUserId isEqualToString:[innerElementData attributeStringValueForName:@"from"]]){
             
-            [self addLocalNotification:senderName message:desc userId:[innerElementData attributeStringValueForName:@"from"]];
+            if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"ImageAttachment"]) {
+                [self addLocalNotification:senderName message:@"Image" userId:[innerElementData attributeStringValueForName:@"from"]];
+            }
+            else if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"FileAttachment"]) {
+                [self addLocalNotification:senderName message:@"File" userId:[innerElementData attributeStringValueForName:@"from"]];
+            }
             [XMPPUserDefaultManager setXMPPBadgeIndicatorKey:[innerElementData attributeStringValueForName:@"from"]];
             
         }
-        else {
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"UserHistory" object:messageData];
+        else if ([[UIApplication sharedApplication] applicationState]==UIApplicationStateBackground) {
+            if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"ImageAttachment"]) {
+                [self addLocalNotification:senderName message:@"Image" userId:[innerElementData attributeStringValueForName:@"from"]];
+            }
+            else if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"FileAttachment"]) {
+                [self addLocalNotification:senderName message:@"File" userId:[innerElementData attributeStringValueForName:@"from"]];
+            }
         }
+
+//        else {
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"UserHistory" object:messageData];
+//        }
     }
     //    DDLogVerbose(@"%@: Data was written to the path: %@", THIS_FILE, fullPath);
     

@@ -12,6 +12,7 @@
 #import "XMPPFramework.h"
 #import "TURNSocket.h"
 #import "XMPPMessageArchivingCoreDataStorage.h"
+//#import <XMPPMessageDeliveryReceipts.h>
 #import <CoreData/CoreData.h>
 
 //File transfer
@@ -29,6 +30,7 @@ XMPPIncomingFileTransferDelegate>
     XMPPvCardAvatarModule *xmppvCardAvatarModule;
     XMPPCapabilities *xmppCapabilities;
     XMPPCapabilitiesCoreDataStorage *xmppCapabilitiesStorage;
+//    XMPPMessageDeliveryReceipts *xmppMessageDeliveryRecipts;
     NSString *xmppPassword;
     BOOL customCertEvaluation;
     BOOL isXmppConnected;
@@ -55,6 +57,8 @@ XMPPIncomingFileTransferDelegate>
 
 @property(strong, nonatomic)XMPPMessageArchivingCoreDataStorage* xmppMessageArchivingCoreDataStorage;
 @property(strong, nonatomic)XMPPMessageArchiving* xmppMessageArchivingModule;
+
+//@property(strong, nonatomic)XMPPMessageDeliveryReceipts *xmppMessageDeliveryRecipts;
 //end
 
 //Declaration hostname, port and defaultpassword for complete app

@@ -38,7 +38,7 @@
 	<string>192.168.18.171</string>
 	<key>UIBackgroundModes</key>
 	<array>
-		<string>fetch</string>
+		<string>voip</string>
 	</array>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>

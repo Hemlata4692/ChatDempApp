@@ -54,7 +54,7 @@
     self.halfSeparatorLabel.hidden=true;
     self.attachedImageView.image=[UIImage imageNamed:@""];
     
-    if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]) {
+    if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]) {
         self.attachedImageView.hidden=false;
     }
     else {
@@ -87,7 +87,7 @@
     
     self.nameLabel.frame=CGRectMake(76, 5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"nameHeight"] floatValue]); //Here frame = (Namelabel_x_Space, NameLabel_TopSpace, screenWidth - (Namelabel_x_Space + Namelabel_trailingSpace), NameHeight)
 
-    if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]) {
+    if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]) {
         self.attachedImageView.frame=CGRectMake(76, (5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+5), 200, 128); //Here frame = (AttachedImage_x_Space, (NameLabel_TopSpace + NameLabel_Height + space_Between_NameLabel_And_AttachedImage), AttachedImage_width, AttachedImage_height
         if ([chatType isEqualToString:@"FileAttachment"]) {
             
@@ -96,6 +96,10 @@
                 // do something with your BOOL
                 self.attachedImageView.image=tempImage;
             }];
+        }
+        else if ([chatType isEqualToString:@"Location"]) {
+        
+            self.attachedImageView.image=[UIImage imageNamed:@"locationPlaceholder.jpg"];
         }
         else {
             self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
@@ -121,7 +125,7 @@
     self.separatorLabel.hidden=true;
     self.halfSeparatorLabel.hidden=true;
 
-    if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]) {
+    if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]) {
         self.attachedImageView.hidden=false;
     }
     else {
@@ -141,7 +145,7 @@
         self.messageLabel.numberOfLines=0;
         self.messageLabel.text=[[[currentMessage elementForName:@"body"] stringValue] capitalizedString];
         
-        if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]) {
+        if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]) {
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 128); //Here frame = (AttachedImage_x_Space, attachedImageView_TopSpace, AttachedImage_width, AttachedImage_height
             
             if ([chatType isEqualToString:@"FileAttachment"]) {
@@ -151,6 +155,10 @@
                     // do something with your BOOL
                     self.attachedImageView.image=tempImage;
                 }];
+            }
+            else if ([chatType isEqualToString:@"Location"]) {
+                
+                self.attachedImageView.image=[UIImage imageNamed:@"locationPlaceholder.jpg"];
             }
             else {
                 self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
@@ -171,7 +179,7 @@
         self.messageLabel.numberOfLines=0;
         self.messageLabel.text=[[[currentMessage elementForName:@"body"] stringValue] capitalizedString];
         
-        if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]) {
+        if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]) {
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 128); //Here frame = (AttachedImage_x_Space, attachedImageView_TopSpace, AttachedImage_width, AttachedImage_height
             if ([chatType isEqualToString:@"FileAttachment"]) {
                 
@@ -180,6 +188,10 @@
                     // do something with your BOOL
                     self.attachedImageView.image=tempImage;
                 }];
+            }
+            else if ([chatType isEqualToString:@"Location"]) {
+                
+                self.attachedImageView.image=[UIImage imageNamed:@"locationPlaceholder.jpg"];
             }
             else {
                 self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
@@ -209,7 +221,7 @@
     self.separatorLabel.hidden=true;
     self.halfSeparatorLabel.hidden=true;
     
-    if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]) {
+    if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]) {
         self.attachedImageView.hidden=false;
     }
     else {
@@ -230,7 +242,7 @@
         self.messageLabel.numberOfLines=0;
         NSLog(@"%f %@",[[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue], [innerData attributeStringValueForName:@"messageBodyHeight"]);
         
-        if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]) {
+        if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]) {
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 128); //Here frame = (AttachedImage_x_Space, attachedImageView_TopSpace, AttachedImage_width, AttachedImage_height
             
             if ([chatType isEqualToString:@"FileAttachment"]) {
@@ -240,6 +252,10 @@
                     // do something with your BOOL
                     self.attachedImageView.image=tempImage;
                 }];
+            }
+            else if ([chatType isEqualToString:@"Location"]) {
+                
+                self.attachedImageView.image=[UIImage imageNamed:@"locationPlaceholder.jpg"];
             }
             else {
                 self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];

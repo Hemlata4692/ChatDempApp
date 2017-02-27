@@ -235,6 +235,58 @@
     [self XmppSendMessageResponse:[message copy]];
 }
 
+- (void)sendLocationXmppMessage:(NSString *)friendJid friendName:(NSString *)friendName messageString:(NSString *)messageString latitude:(NSString *)latitude longitude:(NSString *)longitude {
+    
+    [myDelegate.xmppMessageArchivingModule setClientSideMessageArchivingOnly:YES];
+    [myDelegate.xmppMessageArchivingModule activate:[self xmppStream]];    //By this line all your messages are stored in CoreData
+    [myDelegate.xmppMessageArchivingModule addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    NSString *messageStr = [messageString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"HH:mm:ss"];
+    NSDate *date = [NSDate date];
+    //    [dateFormatter setDateFormat:@"hh:mm a"];
+    //    [dateFormatter setAMSymbol:@"am"];
+    //    [dateFormatter setPMSymbol:@"pm"];
+    NSString *formattedTime = [dateFormatter stringFromDate:date];
+    [dateFormatter setDateFormat:@"dd/MM/yy"];
+    NSString *formattedDate = [dateFormatter stringFromDate:date];
+    NSXMLElement *body = [NSXMLElement elementWithName:@"body"];
+    
+    [body setStringValue:messageStr];
+    NSXMLElement *message = [NSXMLElement elementWithName:@"message"];
+    NSXMLElement *dataTag = [NSXMLElement elementWithName:@"data"];
+    NSXMLElement *locationTag = [NSXMLElement elementWithName:@"location"];
+    //    <message to='7777777777@192.168.18.171' id='eYbIo-34' type='chat'><body>yugigighiihhinoi</body><thread>444560f0-5904-4a06-aa87-0ec6e230bb33</thread><data xmlns='main' receiverName='test' senderName='Sender test' date='14/02/17' from='9999999999' to='7777777777' time='12:56:45'/></message>
+    
+    [message addAttributeWithName:@"type" stringValue:@"chat"];
+    [message addAttributeWithName:@"to" stringValue:friendJid];
+    [message addAttributeWithName:@"from" stringValue:myDelegate.xmppLogedInUserId];
+    
+    [dataTag addAttributeWithName:@"xmlns" stringValue:@"main"];
+    [dataTag addAttributeWithName:@"chatType" stringValue:@"Location"];
+    [message addAttributeWithName:@"to" stringValue:friendJid];
+    [message addAttributeWithName:@"from" stringValue:myDelegate.xmppLogedInUserId];
+    
+    [dataTag addAttributeWithName:@"to" stringValue:friendJid];
+    [dataTag addAttributeWithName:@"from" stringValue:myDelegate.xmppLogedInUserId];
+    [dataTag addAttributeWithName:@"time" stringValue:formattedTime];
+    [dataTag addAttributeWithName:@"date" stringValue:formattedDate];
+    [dataTag addAttributeWithName:@"senderName" stringValue:appDelegate.xmppLogedInUserName];
+    [dataTag addAttributeWithName:@"receiverName" stringValue:friendName];
+    
+    [locationTag addAttributeWithName:@"address" stringValue:messageStr];
+    [locationTag addAttributeWithName:@"latitude" stringValue:latitude];
+    [locationTag addAttributeWithName:@"longitude" stringValue:longitude];
+    
+    [message addChild:dataTag];
+    [message addChild:body];
+    [message addChild:locationTag];
+    
+    [[self xmppStream] sendElement:message];
+    [[XmppCoreDataHandler sharedManager] insertLocalMessageStorageDataBase:friendJid message:message];
+    [self XmppSendMessageResponse:[message copy]];
+}
+
 - (void)XmppSendMessageResponse:(NSXMLElement *)xmpMessage {}
 #pragma mark - end
 
@@ -291,6 +343,41 @@
 
     NSXMLElement *messageData=[fileAttachmentMessage elementForName:@"data"];
     if ([_fileTransfer sendCustomizedData:imageData named:fileName toRecipient:jid description:imageCaption date:[messageData attributeStringValueForName:@"date"] time:[messageData attributeStringValueForName:@"time"] senderId:[messageData attributeStringValueForName:@"from"] chatType:@"ImageAttachment" senderName:appDelegate.xmppLogedInUserName receiverName:friendName error:&err]) {
+        
+        [[XmppCoreDataHandler sharedManager] insertLocalImageMessageStorageDataBase:appDelegate.selectedFriendUserId message:fileAttachmentMessage uniquiId:uniqueId];
+        [self sendFileProgressDelegate:[fileAttachmentMessage copy]];
+    }
+}
+
+- (void)sendLocationAttachment:(NSString *)fileName address:(NSString *)address friendName:(NSString *)friendName latitude:(NSString *)latitude longitude:(NSString *)longitude {
+    
+    fileAttachmentMessage=nil;
+    uniqueId=@"";
+    NSData *locaitonImageData=[appDelegate listionSendAttachedLocationImageCacheDirectoryFileName:fileName];
+    XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",appDelegate.selectedFriendUserId,[[myDelegate.xmppStream myJID] resource]]];
+    //    if (!_fileTransfer) {
+    _fileTransfer = [[XMPPOutgoingFileTransfer alloc]
+                     initWithDispatchQueue:dispatch_get_main_queue()];
+    _fileTransfer.disableIBB = NO;
+    _fileTransfer.disableSOCKS5 = YES;
+    [_fileTransfer activate:myDelegate.xmppStream];
+    [_fileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    //    }
+    
+    uniqueId=[[fileName componentsSeparatedByString:@"."] objectAtIndex:0];
+    fileAttachmentMessage=[self convertedLocationMessage:appDelegate.selectedFriendUserId friendName:friendName fileName:fileName messageString:address fileType:@"Location" latitude:latitude longitude:longitude];
+    NSError *err;
+    //    if (![_fileTransfer sendData:imageData
+    //                           named:fileName
+    //                     toRecipient:jid
+    //                     description:imageCaption
+    //                           error:&err]) {
+    //        NSLog(@"You messed something up: %@", err);
+    //    }
+    
+    
+    NSXMLElement *messageData=[fileAttachmentMessage elementForName:@"data"];
+    if ([_fileTransfer sendCustomizedData:locaitonImageData named:fileName toRecipient:jid description:address date:[messageData attributeStringValueForName:@"date"] time:[messageData attributeStringValueForName:@"time"] senderId:[messageData attributeStringValueForName:@"from"] chatType:@"ImageAttachment" senderName:appDelegate.xmppLogedInUserName receiverName:friendName error:&err]) {
         
         [[XmppCoreDataHandler sharedManager] insertLocalImageMessageStorageDataBase:appDelegate.selectedFriendUserId message:fileAttachmentMessage uniquiId:uniqueId];
         [self sendFileProgressDelegate:[fileAttachmentMessage copy]];
@@ -368,6 +455,48 @@
     //    }
     [message addChild:dataTag];
     [message addChild:body];
+    return message;
+}
+
+- (NSXMLElement *)convertedLocationMessage:(NSString *)to friendName:(NSString *)friendName fileName:(NSString *)fileName messageString:(NSString *)messageString fileType:(NSString *)fileType  latitude:(NSString *)latitude longitude:(NSString *)longitude {
+    
+    NSString *messageStr = [messageString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"HH:mm:ss"];
+    NSDate *date = [NSDate date];
+    NSString *formattedTime = [dateFormatter stringFromDate:date];
+    [dateFormatter setDateFormat:@"dd/MM/yy"];
+    NSString *formattedDate = [dateFormatter stringFromDate:date];
+    NSXMLElement *body = [NSXMLElement elementWithName:@"body"];
+    
+    [body setStringValue:messageStr];
+    NSXMLElement *message = [NSXMLElement elementWithName:@"message"];
+    NSXMLElement *dataTag = [NSXMLElement elementWithName:@"data"];
+    NSXMLElement *locationTag = [NSXMLElement elementWithName:@"location"];
+//    <location xmlns="attach" address="Unnamed Road, Shastri Nagar, Bikaner, Rajasthan 334001, India" latitude="28.005477500000005" longitude="73.32688671875003"/>
+    
+    [message addAttributeWithName:@"type" stringValue:@"chat"];
+    [message addAttributeWithName:@"to" stringValue:to];
+    [message addAttributeWithName:@"from" stringValue:appDelegate.xmppLogedInUserId];
+    [message addAttributeWithName:@"progress" stringValue:@"2"];
+    
+    [dataTag addAttributeWithName:@"xmlns" stringValue:@"main"];
+    [dataTag addAttributeWithName:@"chatType" stringValue:fileType];
+    [dataTag addAttributeWithName:@"to" stringValue:to];
+    [dataTag addAttributeWithName:@"fileName" stringValue:fileName];
+    [dataTag addAttributeWithName:@"from" stringValue:appDelegate.xmppLogedInUserId];
+    [dataTag addAttributeWithName:@"time" stringValue:formattedTime];
+    [dataTag addAttributeWithName:@"date" stringValue:formattedDate];
+    [dataTag addAttributeWithName:@"senderName" stringValue:appDelegate.xmppLogedInUserName];
+    [dataTag addAttributeWithName:@"receiverName" stringValue:friendName];
+    
+    [locationTag addAttributeWithName:@"address" stringValue:messageStr];
+    [locationTag addAttributeWithName:@"latitude" stringValue:latitude];
+    [locationTag addAttributeWithName:@"longitude" stringValue:longitude];
+    
+    [message addChild:dataTag];
+    [message addChild:body];
+    [message addChild:locationTag];
     return message;
 }
 

@@ -10,11 +10,14 @@
 
 @protocol SendLocationDelegate <NSObject>
 @optional
-- (void)sendLocationDelegateAction:(NSString *)locationImageName locationAddress:(NSString *)locationAddress latitude:(NSString *)latitude longitude:(NSString *)longitude;
+//- (void)sendLocationDelegateAction:(NSString *)locationImageName locationAddress:(NSString *)locationAddress latitude:(NSString *)latitude longitude:(NSString *)longitude;
+- (void)sendLocationDelegateAction:(NSString *)locationAddress latitude:(NSString *)latitude longitude:(NSString *)longitude;
+
 @end
 @interface LocationViewController : UIViewController {
     id <SendLocationDelegate> _delegate;
 }
+@property (nonatomic,strong) id delegate;
 
 @property(strong,nonatomic) NSNumber *latitude;
 @property(strong,nonatomic) NSNumber *longitude;

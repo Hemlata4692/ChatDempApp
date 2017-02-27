@@ -969,7 +969,7 @@
                                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                     </textView>
                                     <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="H5f-Xp-lVm">
-                                        <rect key="frame" x="151" y="33" width="20" height="20"/>
+                                        <rect key="frame" x="150" y="33" width="20" height="20"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="20" id="Tgy-gv-MFD"/>
                                             <constraint firstAttribute="width" constant="20" id="pR5-Yd-deU"/>
@@ -1014,8 +1014,8 @@
                             <constraint firstAttribute="trailing" secondItem="9dO-ql-i40" secondAttribute="trailing" id="dyT-0U-XK4"/>
                             <constraint firstItem="Iyd-2V-XxH" firstAttribute="leading" secondItem="g8C-hq-pbi" secondAttribute="leading" id="ehh-g1-9yP"/>
                             <constraint firstItem="9dO-ql-i40" firstAttribute="leading" secondItem="g8C-hq-pbi" secondAttribute="leading" id="gw3-0x-FSN"/>
+                            <constraint firstItem="vik-vk-Cuo" firstAttribute="top" secondItem="pY3-Og-Weq" secondAttribute="bottom" constant="326" id="iNq-Sn-EjZ"/>
                             <constraint firstAttribute="trailing" secondItem="XfG-Nc-j5J" secondAttribute="trailing" id="iVK-O2-Jbp"/>
-                            <constraint firstItem="vik-vk-Cuo" firstAttribute="top" secondItem="Iyd-2V-XxH" secondAttribute="bottom" constant="68" id="mn9-Lu-63V"/>
                             <constraint firstAttribute="trailing" secondItem="Iyd-2V-XxH" secondAttribute="trailing" id="omh-yk-ezx"/>
                             <constraint firstItem="XfG-Nc-j5J" firstAttribute="leading" secondItem="g8C-hq-pbi" secondAttribute="leading" id="q8u-Nl-5hS"/>
                         </constraints>
@@ -1356,7 +1356,7 @@
                 <navigationController storyboardIdentifier="loginNavigation" automaticallyAdjustsScrollViewInsets="NO" id="g5s-l7-tBw" sceneMemberID="viewController">
                     <toolbarItems/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="Hp1-z3-vWC">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" translucent="NO" id="Hp1-z3-vWC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -1375,7 +1375,7 @@
                 <navigationController storyboardIdentifier="DashboardNavigation" automaticallyAdjustsScrollViewInsets="NO" id="Vep-JT-HHx" sceneMemberID="viewController">
                     <toolbarItems/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="pVC-3M-Vd2">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" translucent="NO" id="pVC-3M-Vd2">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -1465,7 +1465,7 @@
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qhV-xn-nHr">
                                                     <rect key="frame" x="76" y="33" width="200" height="128"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <color key="backgroundColor" red="0.88235294119999996" green="0.3921568627" blue="0.36078431370000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                 </imageView>
                                             </subviews>
                                             <constraints>

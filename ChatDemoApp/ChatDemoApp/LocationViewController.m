@@ -44,7 +44,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.navigationController.navigationBarHidden=YES;
+//    self.navigationController.navigationBarHidden=YES;
     self.NavigationTitle.text=@"Location";
     // Do any additional setup after loading the view.
 }
@@ -68,7 +68,9 @@
     self.sendButton.hidden=NO;
     marker = [[GMSMarker alloc] init];
     _placesClient = [GMSPlacesClient sharedClient];//For current location
+    _sendButton.hidden=YES;
     if (latitude) {
+        _indicator.hidden=YES;
         isSelectedLocation=YES;
         self.sendButton.hidden=YES;
         currentLocation.latitude=[latitude doubleValue];
@@ -76,12 +78,21 @@
         
         self.currentLocationView.hidden=YES;
         self.selectedLcoationView.translatesAutoresizingMaskIntoConstraints=YES;
-        self.currentLocationView.frame=CGRectMake(0, 278, self.view.bounds.size.width, 65);
+        self.selectedLcoationView.frame=CGRectMake(0, 278, self.view.bounds.size.width, 85);
+        
+        self.currentSelectedPlaceName.text = [[address componentsSeparatedByString:@","] objectAtIndex:0];
+        for (int i=1; i<[[address componentsSeparatedByString:@","] count]; i++) {
+            if (i==1) {
+                self.currentSelectedAddress.text = [[address componentsSeparatedByString:@","] objectAtIndex:i];
+            }
+            else {
+                self.currentSelectedAddress.text = [NSString stringWithFormat:@"%@,%@",self.currentSelectedAddress.text,[[address componentsSeparatedByString:@","] objectAtIndex:i]];
+            }
+        }
         [self setGoogleMapData];
     }
     else {
     
-        _sendButton.hidden=YES;
         self.indicator.hidden=NO;
         locationManager = [[CLLocationManager alloc] init];
         //Make this controller the delegate for the location manager.
@@ -149,6 +160,7 @@
                 
                 currentLocation=place.coordinate;
                 self.indicator.hidden=YES;
+                _sendButton.hidden=NO;
                 [self setGoogleMapData];
             }
         }
@@ -158,7 +170,6 @@
 #pragma mark - Set pin on google map
 - (void)setGoogleMapData {
 
-    _sendButton.hidden=NO;
         camera = [GMSCameraPosition cameraWithLatitude:currentLocation.latitude
                                              longitude:currentLocation.longitude
                                                   zoom:14.0];
@@ -173,7 +184,7 @@
 #pragma mark - View IBActions
 - (IBAction)cancel:(UIButton *)sender {
     
-    [self.navigationController popViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (IBAction)currentLocation:(UIButton *)sender {
@@ -184,7 +195,9 @@
 
 - (IBAction)send:(UIButton *)sender {
     
-    [_delegate sendLocationDelegateAction:[self pb_takeSnapshot] locationAddress:self.currentSelectedAddress.text latitude:[NSString stringWithFormat:@"%f",currentLocation.latitude] longitude:[NSString stringWithFormat:@"%f",currentLocation.longitude]];
+//    [_delegate sendLocationDelegateAction:[self pb_takeSnapshot] locationAddress:self.currentSelectedAddress.text latitude:[NSString stringWithFormat:@"%f",currentLocation.latitude] longitude:[NSString stringWithFormat:@"%f",currentLocation.longitude]];
+    [_delegate sendLocationDelegateAction:[NSString stringWithFormat:@"%@, %@",self.currentSelectedPlaceName.text, self.currentSelectedAddress.text ] latitude:[NSString stringWithFormat:@"%f",currentLocation.latitude] longitude:[NSString stringWithFormat:@"%f",currentLocation.longitude]];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (NSString *)pb_takeSnapshot {
@@ -234,6 +247,7 @@
                     
                     currentLocation=place.coordinate;
                 }
+                _sendButton.hidden=NO;
                 [self setGoogleMapData];
             }
             else {
@@ -271,7 +285,9 @@
                                    }];
     [alertController addAction:cancelAction];
     [alertController addAction:okAction];
-    [[[UIApplication sharedApplication] keyWindow].rootViewController presentViewController:alertController animated:YES completion:nil];
+    [self presentViewController:alertController animated:YES completion:nil];
+    
+    
 }
 /*
 #pragma mark - Navigation

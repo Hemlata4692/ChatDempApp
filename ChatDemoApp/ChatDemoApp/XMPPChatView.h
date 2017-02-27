@@ -32,4 +32,6 @@
 - (void)sendFileSuccessDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId;
 - (void)sendFileFailDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId;
 - (void)sendFileProgressDelegate:(NSXMLElement *)message;
+
+- (void)sendLocationXmppMessage:(NSString *)friendJid friendName:(NSString *)friendName messageString:(NSString *)messageString latitude:(NSString *)latitude longitude:(NSString *)longitude;
 @end

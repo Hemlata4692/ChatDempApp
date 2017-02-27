@@ -140,4 +140,5 @@ XMPPIncomingFileTransferDelegate>
 - (void)saveFileInLocalDocumentDirectory:(NSString *)fileName file:(NSData *)fileData;
 
 - (NSString *)setMapImageInLocalDB:(UIImage*)image;
+- (NSData *)listionSendAttachedLocationImageCacheDirectoryFileName:(NSString *)fileName;
 @end

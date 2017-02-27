@@ -98,7 +98,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     appProfilePhotofolderName=[NSString stringWithFormat:@"%@/%@_ProfilePhotos",appMediafolderName,folderName];
     appSentReceivePhotofolderName=[NSString stringWithFormat:@"%@/%@_Photos/%@_SentReceived",appMediafolderName,folderName,folderName];
     appDocumentfolderName=[NSString stringWithFormat:@"%@/%@_Documents",folderName,folderName];
-    [self createCacheDirectory];
     appMapPhotofolderName=[NSString stringWithFormat:@"%@/%@_Map",folderName,folderName];
     [self createCacheDirectory];
     
@@ -1091,6 +1090,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [self createCacheDirectory:appProfilePhotofolderName];
     [self createCacheDirectory:appSentReceivePhotofolderName];
     [self createCacheDirectory:appDocumentfolderName];
+    [self createCacheDirectory:appMapPhotofolderName];
 }
 
 - (void)createCacheDirectory:(NSString *)FolderName {
@@ -1198,6 +1198,14 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     return pngData;
 }
 #pragma mark - end
+
+- (NSData *)listionSendAttachedLocationImageCacheDirectoryFileName:(NSString *)fileName {
+    
+    NSString *filePath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appMapPhotofolderName];
+    NSString *fileAtPath = [filePath stringByAppendingPathComponent:fileName];
+    NSError* error = nil;
+    return [NSData dataWithContentsOfFile:fileAtPath options:0 error:&error];
+}
 
 - (NSData*)reducedLocationImageSize:(UIImage *)selectedImage {
     

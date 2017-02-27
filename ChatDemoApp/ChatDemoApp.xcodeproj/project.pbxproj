@@ -56,6 +56,7 @@
 		B79CA25E1E30BCFC007CDB23 /* XMPPUserDefaultManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B79CA25D1E30BCFC007CDB23 /* XMPPUserDefaultManager.m */; };
 		B7A7A9A01E2F64060027D2B6 /* RegisterXMPP.m in Sources */ = {isa = PBXBuildFile; fileRef = B7A7A99F1E2F64060027D2B6 /* RegisterXMPP.m */; };
 		B7B9A5661E23B17A00DB4429 /* MMMaterialDesignSpinner.m in Sources */ = {isa = PBXBuildFile; fileRef = B7B9A5651E23B17A00DB4429 /* MMMaterialDesignSpinner.m */; };
+		B7C25C881E63F61100CD7270 /* locationPlaceholder.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B7C25C871E63F61100CD7270 /* locationPlaceholder.jpg */; };
 		B7E0D99D1E4048C500397393 /* RegistrationProcess.rtf in Resources */ = {isa = PBXBuildFile; fileRef = B7E0D99C1E4048C500397393 /* RegistrationProcess.rtf */; };
 /* End PBXBuildFile section */
 
@@ -149,6 +150,7 @@
 		B7B9A5631E23A07E00DB4429 /* PrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
 		B7B9A5641E23B17A00DB4429 /* MMMaterialDesignSpinner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMMaterialDesignSpinner.h; sourceTree = "<group>"; };
 		B7B9A5651E23B17A00DB4429 /* MMMaterialDesignSpinner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMMaterialDesignSpinner.m; sourceTree = "<group>"; };
+		B7C25C871E63F61100CD7270 /* locationPlaceholder.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = locationPlaceholder.jpg; sourceTree = "<group>"; };
 		B7CC6C511E27B0A000F471B6 /* XMPPFramework.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMPPFramework.h; sourceTree = "<group>"; };
 		B7E0D99C1E4048C500397393 /* RegistrationProcess.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = RegistrationProcess.rtf; sourceTree = "<group>"; };
 		BE07D7CB35D225B6FB24E1D2 /* libPods-ChatDemoApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ChatDemoApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -304,6 +306,7 @@
 		B745F8271E234D54001119BD /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				B7C25C871E63F61100CD7270 /* locationPlaceholder.jpg */,
 				B715A0C71E5EF47E00B36D16 /* pdf_placeholder.png */,
 				B7E0D99C1E4048C500397393 /* RegistrationProcess.rtf */,
 				B77DFFF61E4C433C00921126 /* arrow_down@3x.png */,
@@ -579,6 +582,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B7C25C881E63F61100CD7270 /* locationPlaceholder.jpg in Resources */,
 				B77DFFF91E4C72D200921126 /* a.pdf in Resources */,
 				B745F8341E234D55001119BD /* Assets.xcassets in Resources */,
 				B715A0C81E5EF47E00B36D16 /* pdf_placeholder.png in Resources */,

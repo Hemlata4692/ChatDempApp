@@ -34,10 +34,7 @@
 #define messageTextViewFont [UIFont systemFontOfSize:17]
 #define DEFAULT_FONT(size)   [UIFont systemFontOfSize:size]
 
-@import GoogleMaps;
-@import GooglePlacePicker;
-
-@interface ChatScreenViewController ()<CustomFilterDelegate,/*BSKeyboardControlsDelegate,*/UIGestureRecognizerDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate, SendImageDelegate, SendDocumentDelegate,UIDocumentInteractionControllerDelegate,GMSMapViewDelegate>{
+@interface ChatScreenViewController ()<CustomFilterDelegate,/*BSKeyboardControlsDelegate,*/UIGestureRecognizerDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate, SendImageDelegate, SendDocumentDelegate,UIDocumentInteractionControllerDelegate,SendLocationDelegate>{
     CGFloat messageHeight, messageYValue;
     NSMutableArray *userData;
     NSString *otherUserId;
@@ -100,10 +97,11 @@
 
 - (void)viewWillAppear:(BOOL)animated {
 
-    self.navigationController.navigationBarHidden=NO;
-    [self addNavigationtitle];  //Customized navigation bar
+//    self.navigationController.navigationBarHidden=NO;
+      //Customized navigation bar
     if (!isAttachmentOpen) {
         [super viewWillAppear:YES];
+        [self addNavigationtitle];
         [self viewInitialized]; //Initialised view
         [self registerForKeyboardNotifications];
         
@@ -464,6 +462,17 @@
             imagePreviewView.frame = CGRectMake(0,0,self.view.bounds.size.width,self.view.bounds.size.height);
         }];
     }
+    else if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"Location"]) {
+    
+         NSXMLElement *innerLocationData=[[userData objectAtIndex:(int)gesture.view.tag] elementForName:@"location"];
+        isAttachmentOpen=true;
+        UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+        LocationViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"LocationViewController"];
+        popupView.address=[[[userData objectAtIndex:(int)gesture.view.tag] elementForName:@"body"] stringValue];
+        popupView.latitude=[NSNumber numberWithDouble:[[innerLocationData attributeStringValueForName:@"latitude"] doubleValue]];
+        popupView.longitude=[NSNumber numberWithDouble:[[innerLocationData attributeStringValueForName:@"longitude"] doubleValue]];
+        [self presentViewController:popupView animated:YES completion:NULL];
+    }
 }
 
 - (IBAction)closeAction:(id)sender {
@@ -536,48 +545,12 @@
     return userData.count;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-    ChatScreenTableViewCell *cell;
-    
-    cell=[chatTableView dequeueReusableCellWithIdentifier:@"chatCell"];
-    if (cell == nil)
-    {
-        cell=[[ChatScreenTableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"chatCell"];
-    }
-    
-    cell.attachedImageView.tag=indexPath.row;
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tappedOnImageView:)];
-    [cell.attachedImageView addGestureRecognizer:tap];
-    [cell.attachedImageView setUserInteractionEnabled:YES];
-    
-    NSXMLElement* message = [userData objectAtIndex:indexPath.row];
-    NSXMLElement *innerData=[message elementForName:@"data"];
-    if (userData.count==1) {
-        
-        [cell displaySingleMessageData:message profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto chatType:[innerData attributeStringValueForName:@"chatType"]];
-    }
-    else if (userData.count>(indexPath.row+1)) {
-        
-        if ((int)indexPath.row==0) {
-            
-            [cell displayFirstMessage:message nextmessage:[userData objectAtIndex:indexPath.row+1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto chatType:[innerData attributeStringValueForName:@"chatType"]];
-        }
-        else {
-            [cell displayMultipleMessage:message nextmessage:[userData objectAtIndex:indexPath.row+1] previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto  chatType:[innerData attributeStringValueForName:@"chatType"]];
-        }
-    }
-    else {
-        [cell displayLastMessage:message previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto  chatType:[innerData attributeStringValueForName:@"chatType"]];
-    }
-    return cell;
-}
-
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     
     NSXMLElement* message = [userData objectAtIndex:indexPath.row];
     NSXMLElement *innerData=[message elementForName:@"data"];
-    if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"ImageAttachment"]||[[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"FileAttachment"]) {
+    
+    if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"ImageAttachment"]||[[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"FileAttachment"]||[[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"Location"]) {
         
         float mainCellHeight=5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+10+[[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]+10+20+5; //here mainCellHeight = NameLabel_topSpace + NameHeight + space_Between_NameLabel_And_MessageLabel + MessageHeight + space_Between_MessageLabel_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
         float innerCellHeight=5+[[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]+10+20+5; //here innerCellHeight = MessageLabel_topSpace + MessageHeight + space_Between_MessageLabel_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
@@ -644,6 +617,43 @@
             }
         }
     }
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    ChatScreenTableViewCell *cell;
+    
+    cell=[chatTableView dequeueReusableCellWithIdentifier:@"chatCell"];
+    if (cell == nil)
+    {
+        cell=[[ChatScreenTableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"chatCell"];
+    }
+    
+    cell.attachedImageView.tag=indexPath.row;
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tappedOnImageView:)];
+    [cell.attachedImageView addGestureRecognizer:tap];
+    [cell.attachedImageView setUserInteractionEnabled:YES];
+    
+    NSXMLElement* message = [userData objectAtIndex:indexPath.row];
+    NSXMLElement *innerData=[message elementForName:@"data"];
+    if (userData.count==1) {
+        
+        [cell displaySingleMessageData:message profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto chatType:[innerData attributeStringValueForName:@"chatType"]];
+    }
+    else if (userData.count>(indexPath.row+1)) {
+        
+        if ((int)indexPath.row==0) {
+            
+            [cell displayFirstMessage:message nextmessage:[userData objectAtIndex:indexPath.row+1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto chatType:[innerData attributeStringValueForName:@"chatType"]];
+        }
+        else {
+            [cell displayMultipleMessage:message nextmessage:[userData objectAtIndex:indexPath.row+1] previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto  chatType:[innerData attributeStringValueForName:@"chatType"]];
+        }
+    }
+    else {
+        [cell displayLastMessage:message previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto  chatType:[innerData attributeStringValueForName:@"chatType"]];
+    }
+    return cell;
 }
 
 //- (BOOL)tableView:(UITableView *)tableView canPerformAction:(SEL)action forRowAtIndexPath:(NSIndexPath *)indexPath withSender:(id)sender {
@@ -721,9 +731,10 @@
             isAttachmentOpen=true;
             UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
             LocationViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"LocationViewController"];
-            [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
-//            popupView.delegate=self;
-            [self.navigationController pushViewController:popupView animated:YES];
+//            [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+            popupView.delegate=self;
+            
+            [self presentViewController:popupView animated:YES completion:NULL];
         }
     });
 }
@@ -981,6 +992,13 @@
 //    [self sendImageAttachment:imageName imageCaption:imageCaption friendName:self.friendUserName]
     [self sendDocumentAttachment:documentName friendName:self.friendUserName];
 }
+
+- (void)sendLocationDelegateAction:(NSString *)locationAddress latitude:(NSString *)latitude longitude:(NSString *)longitude {
+
+    [self sendLocationXmppMessage:friendUserJid friendName:self.friendUserName  messageString:locationAddress latitude:latitude longitude:longitude];
+}
+
+
 #pragma mark - end
 
 /*file transfer

@@ -38,4 +38,8 @@
 
 //Fetch chat history
 - (void)fetchAllHistoryChat:(void(^)(NSMutableArray *tempHistoryData))completion;
+
+//Group chat
+- (void)getListOfGroups;
+//end
 @end

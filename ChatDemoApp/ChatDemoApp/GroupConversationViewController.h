@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-
-@interface GroupConversationViewController : UIViewController
+#import "GroupChatXMPP.h"
+@interface GroupConversationViewController : GroupChatXMPP
 
 @end

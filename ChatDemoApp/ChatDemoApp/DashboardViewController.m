@@ -393,18 +393,16 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         if (status==1) {
             NSLog(@"1");
-//            UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-//            UIViewController *objStatusView = [storyboard instantiateViewControllerWithIdentifier:@"EditUserStatusViewController"];
-//            [self.navigationController pushViewController:objStatusView animated:YES];
-            [myDelegate onOffNotificationSound:YES];
+            UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+            UIViewController *objStatusView = [storyboard instantiateViewControllerWithIdentifier:@"EditUserStatusViewController"];
+            [self.navigationController pushViewController:objStatusView animated:YES];
         }
         else if (status==2) {
             NSLog(@"2");
             
-             [myDelegate onOffNotificationSound:NO];
-//            UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-//            UIViewController *objGroupView = [storyboard instantiateViewControllerWithIdentifier:@"GroupConversationViewController"];
-//            [self.navigationController pushViewController:objGroupView animated:YES];
+            UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+            UIViewController *objGroupView = [storyboard instantiateViewControllerWithIdentifier:@"GroupConversationViewController"];
+            [self.navigationController pushViewController:objGroupView animated:YES];
         }
         else if (status==3) {
             NSLog(@"3");
@@ -455,20 +453,22 @@
 #pragma mark - end
 
 - (void)xmppUserListResponse:(NSMutableDictionary *)xmppUserDetails xmppUserListIds:(NSMutableArray *)xmppUserListIds {
-
+    
     [self addBarButton];
     userDetailedList=[xmppUserDetails mutableCopy];
     userListArray=[xmppUserListIds mutableCopy];
     
-//    profileLocalDictData=[self getProfileUsersData];
-                [self getProfileData1:^(NSDictionary *tempProfileData) {
-                    // do something with your BOOL
-                    profileLocalDictData=[tempProfileData mutableCopy];
-                    [self.dasboardTableListing reloadData];
-                }];
-            
-    [myDelegate stopIndicator];
+    //    profileLocalDictData=[self getProfileUsersData];
+    [self getProfileData1:^(NSDictionary *tempProfileData) {
+        // do something with your BOOL
+        profileLocalDictData=[tempProfileData mutableCopy];
+//        [self getListOfGroups];
+        [myDelegate stopIndicator];
+        [self.dasboardTableListing reloadData];
+    }];
 }
+
+
 /*
 #pragma mark - Navigation
 

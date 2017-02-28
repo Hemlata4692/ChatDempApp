@@ -137,6 +137,11 @@
 
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller {
     
+    NSArray *sections1 = controller.fetchedObjects;
+    NSSortDescriptor *descriptor1 = [NSSortDescriptor sortDescriptorWithKey:@"displayName" ascending:YES];
+    NSArray *results1 = [sections1
+                        sortedArrayUsingDescriptors:[NSArray arrayWithObject:descriptor1]];
+    
     if ([controller.fetchedObjects count]>0 && isrefresh) {
         
         NSMutableDictionary *xmppUserDetailedListTemp=[NSMutableDictionary new];
@@ -331,8 +336,37 @@
         completion(historyArray);
     }
 }
-
 #pragma mark - end
+
+#pragma mark - Group chat
+- (void)getListOfGroups {
+
+//    XMPPJID *servrJID = [XMPPJID jidWithString:myDelegate.conferenceServerJid];
+//    XMPPIQ *iq = [XMPPIQ iqWithType:@"get" to:servrJID];
+//    [iq addAttributeWithName:@"from" stringValue:[[self xmppStream] myJID].full];
+//    NSXMLElement *query = [NSXMLElement elementWithName:@"query"];
+//    [query addAttributeWithName:@"xmlns" stringValue:@"http://jabber.org/protocol/disco#items"];
+//    [iq addChild:query];
+//    [[self xmppStream] sendElement:iq];
+    
+//    XMPPIQ *iq = [[XMPPIQ alloc]init];
+//    [iq addAttributeWithName:@"type" stringValue:@"get"];
+//    NSString *from = [NSString stringWithFormat:@"%@/ResouseName",[self xmppStream].myJID.bare];
+//    [iq addAttributeWithName:@"from" stringValue:from];
+//    NSXMLElement *query =[NSXMLElement elementWithName:@"query" xmlns:@"jabber:iq:private"];
+//    NSXMLElement *storage =   [NSXMLElement elementWithName:@"storage" xmlns:@"storage:bookmarks"];
+//    [query addChild:storage];
+//    [iq addChild:query];
+//    [[self xmppStream] sendElement:iq];
+    
+    
+    
+}
+#pragma mark - end
+
+- (void)xmppRoom:(XMPPRoom *)sender didFetchConfigurationForm:(NSXMLElement *)configForm{
+    NSLog(@" %@", sender.roomJID.user);
+}
 /*
 #pragma mark - Navigation
 

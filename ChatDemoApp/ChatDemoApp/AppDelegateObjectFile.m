@@ -66,7 +66,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 @synthesize xmppUserEntries;
 @synthesize presencexmpp;
 
-@synthesize portNumber, hostName, serverName, defaultPassword, xmppUniqueId;
+@synthesize portNumber, hostName, serverName, defaultPassword, xmppUniqueId, conferenceServerJid;
 @synthesize isUpdatePofile, selectedFriendUserId;
 
 //Coredata
@@ -113,6 +113,15 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         hostName = @"";
     }
     
+//    @property(strong, nonatomic)NSString *conferenceServerJid;//ConferenceServerJid
+    
+    if (nil!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"ConferenceServerJid"] && NULL!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"ConferenceServerJid"]) {
+        conferenceServerJid = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"ConferenceServerJid"];
+    }
+    else {
+        conferenceServerJid = @"";
+    }
+
     if (nil!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"ServerName"] && NULL!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"ServerName"]) {
         serverName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"ServerName"];
     }
@@ -560,47 +569,52 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 - (BOOL)xmppStream:(XMPPStream *)sender didReceiveIQ:(XMPPIQ *)iq
 {
     NSXMLElement *queryElement = [NSXMLElement elementWithName:@"query" xmlns:@"jabber:iq:roster"];
-    
     NSXMLElement *vcardInfo = [iq elementForName:@"vCard"];
+    NSString *groupChat = [[iq attributeForName:@"from"] stringValue];
     
-    //Insert/Update users data in local storage
-    if (vcardInfo!=nil) {
-        NSXMLElement *registerUserInfo = [vcardInfo elementForName:@"RegisterUserId"];
-        if (registerUserInfo!=nil) {
-            NSLog(@"%@",[registerUserInfo stringValue]);
-            [[XmppCoreDataHandler sharedManager] insertEntryInXmppUserModel:[registerUserInfo stringValue] xmppName:[[vcardInfo elementForName:@"NICKNAME"] stringValue] xmppPhoneNumber:[[vcardInfo elementForName:@"TEL"] stringValue] xmppUserStatus:[[vcardInfo elementForName:@"USERSTATUS"] stringValue] xmppDescription:[[vcardInfo elementForName:@"DESC"] stringValue] xmppAddress:[[vcardInfo elementForName:@"ADDRESS"] stringValue] xmppEmailAddress:[[vcardInfo elementForName:@"EMAILADDRESS"] stringValue] xmppUserBirthDay:[[vcardInfo elementForName:@"BDAY"] stringValue] xmppGender:[[vcardInfo elementForName:@"GENDER"] stringValue]];
-            if (isContactListIsLoaded && xmppUserListArray!=nil) {
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPProfileUpdation" object:nil];
+    if (nil!=groupChat&&NULL!=groupChat&&[groupChat isEqualToString:conferenceServerJid]) {
+       
+        [self getGroupChatInformation:iq];
+    }
+    else {
+        //Insert/Update users data in local storage
+        if (vcardInfo!=nil) {
+            NSXMLElement *registerUserInfo = [vcardInfo elementForName:@"RegisterUserId"];
+            if (registerUserInfo!=nil) {
+                NSLog(@"%@",[registerUserInfo stringValue]);
+                [[XmppCoreDataHandler sharedManager] insertEntryInXmppUserModel:[registerUserInfo stringValue] xmppName:[[vcardInfo elementForName:@"NICKNAME"] stringValue] xmppPhoneNumber:[[vcardInfo elementForName:@"TEL"] stringValue] xmppUserStatus:[[vcardInfo elementForName:@"USERSTATUS"] stringValue] xmppDescription:[[vcardInfo elementForName:@"DESC"] stringValue] xmppAddress:[[vcardInfo elementForName:@"ADDRESS"] stringValue] xmppEmailAddress:[[vcardInfo elementForName:@"EMAILADDRESS"] stringValue] xmppUserBirthDay:[[vcardInfo elementForName:@"BDAY"] stringValue] xmppGender:[[vcardInfo elementForName:@"GENDER"] stringValue]];
+                if (isContactListIsLoaded && xmppUserListArray!=nil) {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPProfileUpdation" object:nil];
+                }
             }
         }
-    }
-    
-    //New user entry in local storage
-    NSXMLElement *addQueryElement = [iq elementForName:@"query"];
-    if (addQueryElement!=nil) {
-        NSXMLElement *removeitemElement = [addQueryElement elementForName:@"item"];
-        if (removeitemElement!=nil) {
-            NSString *addSubscriptionElement = [[removeitemElement attributeForName:@"subscription"] stringValue];
-            NSString *addSetAttribut = [[iq attributeForName:@"type"] stringValue];
-            if ((addSubscriptionElement!=nil)&&[addSubscriptionElement isEqualToString:@"both"]&&[addSetAttribut isEqualToString:@"set"]) {
-                [[XmppCoreDataHandler sharedManager] insertNewUserEntryInXmppUserModel:[[removeitemElement attributeForName:@"jid"] stringValue] xmppName:[[removeitemElement attributeForName:@"name"] stringValue] xmppPhoneNumber:@"" xmppUserStatus:@"" xmppDescription:@"" xmppAddress:@"" xmppEmailAddress:@"" xmppUserBirthDay:@"" xmppGender:@""];
+        
+        //New user entry in local storage
+        NSXMLElement *addQueryElement = [iq elementForName:@"query"];
+        if (addQueryElement!=nil) {
+            NSXMLElement *removeitemElement = [addQueryElement elementForName:@"item"];
+            if (removeitemElement!=nil) {
+                NSString *addSubscriptionElement = [[removeitemElement attributeForName:@"subscription"] stringValue];
+                NSString *addSetAttribut = [[iq attributeForName:@"type"] stringValue];
+                if ((addSubscriptionElement!=nil)&&[addSubscriptionElement isEqualToString:@"both"]&&[addSetAttribut isEqualToString:@"set"]) {
+                    [[XmppCoreDataHandler sharedManager] insertNewUserEntryInXmppUserModel:[[removeitemElement attributeForName:@"jid"] stringValue] xmppName:[[removeitemElement attributeForName:@"name"] stringValue] xmppPhoneNumber:@"" xmppUserStatus:@"" xmppDescription:@"" xmppAddress:@"" xmppEmailAddress:@"" xmppUserBirthDay:@"" xmppGender:@""];
+                }
             }
         }
-    }
-    
-    //Remove user entry if it is deleted
-    NSXMLElement *removeQueryElement = [iq elementForName:@"query"];
-    if (removeQueryElement!=nil) {
-         NSXMLElement *removeitemElement = [removeQueryElement elementForName:@"item"];
-        if (removeitemElement!=nil) {
-            NSString *removeSubscriptionElement = [[removeitemElement attributeForName:@"subscription"] stringValue];
-            if ((removeSubscriptionElement!=nil)&&[removeSubscriptionElement isEqualToString:@"remove"]) {
-                [[XmppCoreDataHandler sharedManager] deleteDataModelEntry:[[removeitemElement attributeForName:@"jid"] stringValue]];
+        
+        //Remove user entry if it is deleted
+        NSXMLElement *removeQueryElement = [iq elementForName:@"query"];
+        if (removeQueryElement!=nil) {
+            NSXMLElement *removeitemElement = [removeQueryElement elementForName:@"item"];
+            if (removeitemElement!=nil) {
+                NSString *removeSubscriptionElement = [[removeitemElement attributeForName:@"subscription"] stringValue];
+                if ((removeSubscriptionElement!=nil)&&[removeSubscriptionElement isEqualToString:@"remove"]) {
+                    [[XmppCoreDataHandler sharedManager] deleteDataModelEntry:[[removeitemElement attributeForName:@"jid"] stringValue]];
+                }
             }
         }
+        //end
     }
-    //end
-    
     if (queryElement) {
         NSArray *itemElements = [queryElement elementsForName: @"item"];
         NSMutableArray *mArray = [[NSMutableArray alloc] init];
@@ -1526,4 +1540,22 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
                        });
                    });
 }
+
+#pragma mark - Group chat
+- (void)getGroupChatInformation:(XMPPIQ *)iq {
+
+    NSXMLElement *queryElement = [iq elementForName:@"query"];
+    if (queryElement!=nil) {
+        NSArray *itemElements = [queryElement elementsForName: @"item"];
+        NSMutableArray *mArray = [[NSMutableArray alloc] init];
+        for (int i=0; i<[itemElements count]; i++) {
+            
+            NSString *jid=[[[itemElements objectAtIndex:i] attributeForName:@"jid"] stringValue];
+            [mArray addObject:jid];
+        }
+
+    }
+    
+}
+#pragma mark - end
 @end

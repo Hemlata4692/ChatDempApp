@@ -66,6 +66,7 @@ XMPPIncomingFileTransferDelegate>
 @property(strong, nonatomic)NSString *serverName;
 @property(strong, nonatomic)NSString *defaultPassword;
 @property(strong, nonatomic)NSString *xmppUniqueId;
+@property(strong, nonatomic)NSString *conferenceServerJid;//ConferenceServerJid
 @property(assign, nonatomic)int portNumber;
 //end
 
@@ -145,4 +146,8 @@ XMPPIncomingFileTransferDelegate>
 
 - (NSString *)setMapImageInLocalDB:(UIImage*)image;
 - (NSData *)listionSendAttachedLocationImageCacheDirectoryFileName:(NSString *)fileName;
+
+//Group chat
+
+//end
 @end

@@ -457,18 +457,48 @@
                         <rect key="frame" x="0.0" y="64" width="320" height="504"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="eft-8i-ihP">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="504"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            </tableView>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Oxb-Wf-cnl">
+                                <rect key="frame" x="17" y="30" width="44" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="create"/>
+                                <connections>
+                                    <action selector="create:" destination="fSg-QW-UOE" eventType="touchUpInside" id="hMQ-S0-7T1"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3en-8W-3vN">
+                                <rect key="frame" x="76" y="30" width="30" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="list"/>
+                                <connections>
+                                    <action selector="list:" destination="fSg-QW-UOE" eventType="touchUpInside" id="gdl-qR-jGa"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Qa6-Mv-gAP">
+                                <rect key="frame" x="130" y="30" width="30" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="join"/>
+                                <connections>
+                                    <action selector="join:" destination="fSg-QW-UOE" eventType="touchUpInside" id="kfu-U0-cRE"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0Mr-UT-U8G">
+                                <rect key="frame" x="199" y="30" width="37" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="invite"/>
+                                <connections>
+                                    <action selector="invite:" destination="fSg-QW-UOE" eventType="touchUpInside" id="mCD-AF-DtA"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="W89-mE-8Cd">
+                                <rect key="frame" x="261" y="30" width="43" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="delete"/>
+                                <connections>
+                                    <action selector="delete:" destination="fSg-QW-UOE" eventType="touchUpInside" id="SKp-7O-KkT"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <constraints>
-                            <constraint firstAttribute="trailing" secondItem="eft-8i-ihP" secondAttribute="trailing" id="YNB-JX-DRs"/>
-                            <constraint firstItem="eft-8i-ihP" firstAttribute="top" secondItem="z57-nd-deN" secondAttribute="bottom" id="diZ-Nb-RIS"/>
-                            <constraint firstItem="Y8O-UH-er6" firstAttribute="top" secondItem="eft-8i-ihP" secondAttribute="bottom" id="mLF-3q-YGt"/>
-                            <constraint firstItem="eft-8i-ihP" firstAttribute="leading" secondItem="wDw-oi-Yti" secondAttribute="leading" id="xBO-gS-xoh"/>
-                        </constraints>
                     </view>
                     <extendedEdge key="edgesForExtendedLayout"/>
                     <navigationItem key="navigationItem" id="gaw-DJ-RWd"/>
@@ -476,7 +506,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9On-vX-56U" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3921" y="832"/>
+            <point key="canvasLocation" x="3868" y="830"/>
         </scene>
         <!--User Profile View Controller-->
         <scene sceneID="EeS-Wf-6XB">

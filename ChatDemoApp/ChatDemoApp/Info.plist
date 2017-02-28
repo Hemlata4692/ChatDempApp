@@ -18,6 +18,8 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>ConferenceServerJid</key>
+	<string>conference.192.168.18.171</string>
 	<key>HostName</key>
 	<string>192.168.18.171</string>
 	<key>LSRequiresIPhoneOS</key>

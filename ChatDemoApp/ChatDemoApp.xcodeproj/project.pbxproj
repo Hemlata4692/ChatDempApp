@@ -57,6 +57,7 @@
 		B7A7A9A01E2F64060027D2B6 /* RegisterXMPP.m in Sources */ = {isa = PBXBuildFile; fileRef = B7A7A99F1E2F64060027D2B6 /* RegisterXMPP.m */; };
 		B7B9A5661E23B17A00DB4429 /* MMMaterialDesignSpinner.m in Sources */ = {isa = PBXBuildFile; fileRef = B7B9A5651E23B17A00DB4429 /* MMMaterialDesignSpinner.m */; };
 		B7C25C881E63F61100CD7270 /* locationPlaceholder.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B7C25C871E63F61100CD7270 /* locationPlaceholder.jpg */; };
+		B7C37BF51E656CC200411EC8 /* GroupChatXMPP.m in Sources */ = {isa = PBXBuildFile; fileRef = B7C37BF41E656CC200411EC8 /* GroupChatXMPP.m */; };
 		B7E0D99D1E4048C500397393 /* RegistrationProcess.rtf in Resources */ = {isa = PBXBuildFile; fileRef = B7E0D99C1E4048C500397393 /* RegistrationProcess.rtf */; };
 /* End PBXBuildFile section */
 
@@ -151,6 +152,8 @@
 		B7B9A5641E23B17A00DB4429 /* MMMaterialDesignSpinner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMMaterialDesignSpinner.h; sourceTree = "<group>"; };
 		B7B9A5651E23B17A00DB4429 /* MMMaterialDesignSpinner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMMaterialDesignSpinner.m; sourceTree = "<group>"; };
 		B7C25C871E63F61100CD7270 /* locationPlaceholder.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = locationPlaceholder.jpg; sourceTree = "<group>"; };
+		B7C37BF31E656CC200411EC8 /* GroupChatXMPP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GroupChatXMPP.h; sourceTree = "<group>"; };
+		B7C37BF41E656CC200411EC8 /* GroupChatXMPP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GroupChatXMPP.m; sourceTree = "<group>"; };
 		B7CC6C511E27B0A000F471B6 /* XMPPFramework.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMPPFramework.h; sourceTree = "<group>"; };
 		B7E0D99C1E4048C500397393 /* RegistrationProcess.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = RegistrationProcess.rtf; sourceTree = "<group>"; };
 		BE07D7CB35D225B6FB24E1D2 /* libPods-ChatDemoApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ChatDemoApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -389,6 +392,8 @@
 			children = (
 				B745F84A1E235210001119BD /* GroupConversationViewController.h */,
 				B745F84B1E235210001119BD /* GroupConversationViewController.m */,
+				B7C37BF31E656CC200411EC8 /* GroupChatXMPP.h */,
+				B7C37BF41E656CC200411EC8 /* GroupChatXMPP.m */,
 			);
 			name = GroupConversationView;
 			sourceTree = "<group>";
@@ -651,6 +656,7 @@
 			files = (
 				B76F75E91E40ABD8001FE579 /* DashboardXMPP.m in Sources */,
 				B745F85E1E2354B8001119BD /* UITextField+Validations.m in Sources */,
+				B7C37BF51E656CC200411EC8 /* GroupChatXMPP.m in Sources */,
 				B757925E1E43289300AC48D0 /* EditProfileViewController.m in Sources */,
 				B780E9F71E2F6E1A00437B4E /* ErrorCode.m in Sources */,
 				B70AE66A1E2F1EC600554038 /* AppDelegateObjectFile.m in Sources */,

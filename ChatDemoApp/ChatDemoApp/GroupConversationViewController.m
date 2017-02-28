@@ -8,7 +8,10 @@
 
 #import "GroupConversationViewController.h"
 
-@interface GroupConversationViewController ()
+@interface GroupConversationViewController () {
+
+    AppDelegateObjectFile *appDelegate;
+}
 
 @end
 
@@ -33,6 +36,25 @@
     // Dispose of any resources that can be recreated.
 }
 #pragma mark - end
+
+- (IBAction)create:(UIButton *)sender {
+    
+    [self createChatRoom];
+}
+
+- (IBAction)list:(UIButton *)sender {
+    
+    [self fetchList];
+}
+
+- (IBAction)join:(UIButton *)sender {
+}
+
+- (IBAction)invite:(UIButton *)sender {
+}
+
+- (IBAction)delete:(UIButton *)sender {
+}
 
 #pragma mark - Custom accessors
 - (void)addLeftBarButtonWithImage:(UIImage *)backImage addChat:(UIImage *)addChatImage {

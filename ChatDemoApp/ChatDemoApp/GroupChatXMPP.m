@@ -15,8 +15,9 @@
     
     AppDelegateObjectFile *appDelegate;
     NSString *nickName;
-    XMPPRoom *sendXmppObj;
+    XMPPRoom *sendXmppRoomObj;
     NSString *roomName, *roomDecs;
+    BOOL isFirstFetchBookmark;
 }
 
 @end
@@ -34,7 +35,7 @@
     [super viewWillAppear:YES];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPBookMarkUpdated) name:@"XMPPBookMarkUpdated" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPFetchBookmarktList) name:@"XMPPFetchBookmarktList" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPFetchBookmarktList:) name:@"XMPPFetchBookmarktList" object:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -65,6 +66,7 @@
 
 - (void)createChatRoom {
 
+    isFirstFetchBookmark=true;
     XMPPRoomMemoryStorage * _roomMemory = [[XMPPRoomMemoryStorage alloc]init];
     NSString* roomID = [NSString stringWithFormat:@"%@@%@",[self getUniqueRoomName],appDelegate.conferenceServerJid];
     XMPPJID * roomJID = [XMPPJID jidWithString:roomID];
@@ -82,7 +84,7 @@
 - (void)xmppRoomDidCreate:(XMPPRoom *)sender{
     NSLog(@"a");
     
-    sendXmppObj=sender;
+    sendXmppRoomObj=sender;
     [sender fetchConfigurationForm];
 }
 
@@ -127,7 +129,9 @@
 - (void)xmppRoom:(XMPPRoom *)sender didConfigure:(XMPPIQ *)iqResult {
 
      NSLog(@"a");
-    [self addBookMark:[sender roomJID]];
+    
+//    [self addBookMark:[sender roomJID]];
+    [self fetchJoinedGroupList];
 }
 
 - (void)xmppRoom:(XMPPRoom *)sender didNotConfigure:(XMPPIQ *)iqResult {
@@ -135,7 +139,7 @@
     NSLog(@"a");
 }
 
-- (void)addBookMark:(XMPPJID *)roomId {
+- (void)addBookMark:(XMPPJID *)roomId conferenceList:(NSMutableArray *)conferenceList{
 
 //    NSString* server = @"test@pc"; //or whatever the server address for muc is
 //    XMPPJID *servrJID = [XMPPJID jidWithString:server];
@@ -148,6 +152,11 @@
     NSXMLElement *storage_q = [NSXMLElement elementWithName:@"storage"];
     [storage_q addAttributeWithName:@"xmlns" stringValue:@"storage:bookmarks"];
     
+    for (int i=0; i<conferenceList.count; i++) {
+        
+        NSXMLElement *lastConferences=[conferenceList objectAtIndex:i];
+        [storage_q addChild:lastConferences];
+    }
     NSXMLElement *conference_s = [NSXMLElement elementWithName:@"conference"];
     [conference_s addAttributeWithName:@"name" stringValue:roomName];
     [conference_s addAttributeWithName:@"autojoin" stringValue:@"true"];
@@ -205,6 +214,27 @@
 
 }
 
+
+
+//[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPBookMarkUpdated) name:@"XMPPBookMarkUpdated" object:nil];
+//[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPFetchBookmarktList) name:@"XMPPFetchBookmarktList" object:nil];
+
+- (void)XMPPBookMarkUpdated {
+
+}
+
+- (void)XMPPFetchBookmarktList:(NSNotification *)notification {
+    
+    NSLog(@"%@",notification.object);
+    if (isFirstFetchBookmark) {
+        isFirstFetchBookmark=false;
+        [self addBookMark:[sendXmppRoomObj roomJID] conferenceList:[notification.object mutableCopy]];
+    }
+    else {
+    
+        
+    }
+}
 /*
 #pragma mark - Navigation
 

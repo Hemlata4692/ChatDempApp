@@ -54,6 +54,8 @@
 }
 
 - (IBAction)delete:(UIButton *)sender {
+    
+    [self deleteBookmark];
 }
 
 #pragma mark - Custom accessors

@@ -570,11 +570,20 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 {
     NSXMLElement *queryElement = [NSXMLElement elementWithName:@"query" xmlns:@"jabber:iq:roster"];
     NSXMLElement *vcardInfo = [iq elementForName:@"vCard"];
-    NSString *groupChat = [[iq attributeForName:@"from"] stringValue];
     
-    if (nil!=groupChat&&NULL!=groupChat&&[groupChat isEqualToString:conferenceServerJid]) {
-       
-        [self getGroupChatInformation:iq];
+    NSString *groupChat = [[iq attributeForName:@"id"] stringValue];
+    NSXMLElement *storageElement=[iq elementForName:@"storage"];
+    if (nil!=groupChat&&NULL!=groupChat&&[groupChat containsString:@"BookMarkManager"]) {
+        
+            NSLog(@"Bookmarks with id %@ succesfully uploaded", [iq attributeStringValueForName:@"id"]);
+        
+        
+//        [[[groupChat componentsSeparatedByString:@"@"] objectAtIndex:1] isEqualToString:conferenceServerJid]
+//        <iq xmlns="jabber:client" type="result" id="47ACF5E7-F088-4053-BE0D-4F96469A6557" from="010317094630@conference.192.168.18.171" to="1111111111@192.168.18.171//Smack"></iq>
+//        [self getGroupChatInformation:iq];
+    }
+    else if (nil!=storageElement&&NULL!=storageElement&&[[[storageElement attributeForName:@"xmlns"] stringValue] isEqualToString:@"storage:bookmarks"]) {
+    
     }
     else {
         //Insert/Update users data in local storage

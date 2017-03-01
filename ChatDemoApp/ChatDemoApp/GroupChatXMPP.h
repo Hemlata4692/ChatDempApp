@@ -14,4 +14,5 @@
 
 - (void)createChatRoom;
 - (void)fetchList;
+- (void)deleteBookmark;
 @end

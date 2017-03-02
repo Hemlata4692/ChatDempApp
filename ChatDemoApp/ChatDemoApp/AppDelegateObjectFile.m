@@ -572,20 +572,22 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     NSXMLElement *vcardInfo = [iq elementForName:@"vCard"];
     
     NSString *groupChat = [[iq attributeForName:@"id"] stringValue];
-    NSXMLElement *storageElement=[NSXMLElement elementWithName:@"query" xmlns:@"storage:bookmarks"];
+    
+    NSXMLElement *storageElementa=[iq elementForName:@"query"];
+    NSXMLElement *storageElement=[storageElementa elementForName:@"storage"];
     if (nil!=storageElement) {
-        NSLog(@"%@",[storageElement attributeStringValueForName:@"xmlns"]);
+         NSLog(@"%@",[storageElement namespaceForPrefix:nil].stringValue);
     }
     if (nil!=groupChat&&NULL!=groupChat&&[groupChat containsString:@"BookMarkManager"]) {
         
             NSLog(@"Bookmarks with id %@ succesfully uploaded", [iq attributeStringValueForName:@"id"]);
         
-        
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPBookMarkUpdated" object:nil];
 //        [[[groupChat componentsSeparatedByString:@"@"] objectAtIndex:1] isEqualToString:conferenceServerJid]
 //        <iq xmlns="jabber:client" type="result" id="47ACF5E7-F088-4053-BE0D-4F96469A6557" from="010317094630@conference.192.168.18.171" to="1111111111@192.168.18.171//Smack"></iq>
 //        [self getGroupChatInformation:iq];
     }
-    else if (nil!=storageElement&&NULL!=storageElement) {
+    else if (nil!=storageElement&&NULL!=storageElement&&([[storageElement namespaceForPrefix:nil].stringValue isEqualToString:@"storage:bookmarks"])) {
     
         NSMutableArray *itemElements=[[[[iq elementForName:@"query"] elementForName:@"storage"] elementsForName:@"conference"] mutableCopy];
         if (itemElements) {

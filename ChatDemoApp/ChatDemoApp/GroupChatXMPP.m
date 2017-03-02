@@ -18,8 +18,8 @@
     NSString *nickName;
     XMPPRoom *sendXmppRoomObj;
     NSString *roomName, *roomDecs;
-    BOOL isFirstFetchBookmark;
-    UIImage *groupProfileImage;
+    BOOL isFirstFetchBookmark, isUpdate;
+    UIImage *groupProfileImage, *lastgroupProfileImage;
 }
 
 @end
@@ -82,6 +82,14 @@
     [xmppRoom joinRoomUsingNickname:nickName
                             history:nil
                            password:nil];
+}
+
+- (void)updateChatRoom:(UIImage *)image {
+    
+    groupProfileImage=image;
+    isUpdate=true;
+    
+    [self fetchJoinedGroupList];
 }
 
 - (void)xmppRoomDidCreate:(XMPPRoom *)sender{
@@ -155,21 +163,65 @@
     NSXMLElement *storage_q = [NSXMLElement elementWithName:@"storage"];
     [storage_q addAttributeWithName:@"xmlns" stringValue:@"storage:bookmarks"];
     
+    for (NSXMLElement *list in conferenceList) {
+        
+        [storage_q addChild:[list copy]];
+    }
+//    NSXMLElement *conference_s = [NSXMLElement elementWithName:@"conference"];
+//    [conference_s addAttributeWithName:@"name" stringValue:roomName];
+//    [conference_s addAttributeWithName:@"autojoin" stringValue:@"true"];
+//    [conference_s addAttributeWithName:@"jid" stringValue:[NSString stringWithFormat:@"%@",roomId]];
+//    [conference_s addAttributeWithName:@"nick" stringValue:nickName];
+//    [conference_s addAttributeWithName:@"Desc" stringValue:roomDecs];
+//    
+//    if (groupProfileImage) {
+//        [self setPhoto:[myDelegate reducedImageSize:groupProfileImage] xmlElement:conference_s];
+//    }
+//    [storage_q addChild:conference_s];
+    [query addChild:storage_q];
+    [iq addChild:query];
+    [self.xmppStream sendElement:iq];
+}
+
+- (void)updateBookMark:(NSMutableArray *)conferenceList{
+    
+    //    NSString* server = @"test@pc"; //or whatever the server address for muc is
+    //    XMPPJID *servrJID = [XMPPJID jidWithString:server];
+//    020317101010@conference.192.168.18.171
+    XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:[XMPPJID jidWithString:myDelegate.hostName]];
+    [iq addAttributeWithName:@"from" stringValue:[self.xmppStream myJID].full];
+    //    [iq addAttributeWithName:@"id" stringValue:[NSString stringWithFormat:@"BookMarkManager2.%@",[self getUniqueRoomName]]];
+    [iq addAttributeWithName:@"id" stringValue:@"BookMarkManager"];
+    NSXMLElement *query = [NSXMLElement elementWithName:@"query"];
+    [query addAttributeWithName:@"xmlns" stringValue:@"jabber:iq:private"];
+    NSXMLElement *storage_q = [NSXMLElement elementWithName:@"storage"];
+    [storage_q addAttributeWithName:@"xmlns" stringValue:@"storage:bookmarks"];
+    
     for (int i=0; i<conferenceList.count; i++) {
         
-        NSXMLElement *lastConferences=[conferenceList objectAtIndex:i];
-        [storage_q addChild:[lastConferences copy]];
+        //        attributeStringValueForName
+        NSXMLElement *list=[[conferenceList objectAtIndex:i] copy];
+        if ([[list attributeStringValueForName:@"jid"] isEqualToString:@"020317101010@conference.192.168.18.171"]) {
+        
+            NSXMLElement *conference_s = [NSXMLElement elementWithName:@"conference"];
+            [conference_s addAttributeWithName:@"name" stringValue:@"New rohit modi"];
+            [conference_s addAttributeWithName:@"autojoin" stringValue:@"true"];
+            [conference_s addAttributeWithName:@"jid" stringValue:[list attributeStringValueForName:@"jid"]];
+            [conference_s addAttributeWithName:@"nick" stringValue:[list attributeStringValueForName:@"nick"]];
+            [conference_s addAttributeWithName:@"Desc" stringValue:[list attributeStringValueForName:@"Desc"]];
+            
+            if (groupProfileImage) {
+                [self setPhoto:[myDelegate reducedImageSize:groupProfileImage] xmlElement:conference_s];
+            }
+            
+            [conferenceList replaceObjectAtIndex:i withObject:conference_s];
+            [storage_q addChild:conference_s];
+        }
+        else {
+        
+            [storage_q addChild:[list copy]];
+        }
     }
-    NSXMLElement *conference_s = [NSXMLElement elementWithName:@"conference"];
-    [conference_s addAttributeWithName:@"name" stringValue:roomName];
-    [conference_s addAttributeWithName:@"autojoin" stringValue:@"true"];
-    [conference_s addAttributeWithName:@"jid" stringValue:[NSString stringWithFormat:@"%@",roomId]];
-    [conference_s addAttributeWithName:@"nick" stringValue:nickName];
-    [conference_s addAttributeWithName:@"Desc" stringValue:roomDecs];
-    
-    [self setPhoto:[myDelegate reducedImageSize:groupProfileImage] xmlElement:conference_s];
-    
-    [storage_q addChild:conference_s];
     [query addChild:storage_q];
     [iq addChild:query];
     [self.xmppStream sendElement:iq];
@@ -242,16 +294,6 @@
 
 - (void)fetchJoinedGroupList {
     
-//    DDXMLElement *pubsub = [DDXMLElement elementWithName:@"pubsub" xmlns:@"http://jabber.org/protocol/pubsub"];
-//    
-//    DDXMLElement *items = [DDXMLElement elementWithName:@"items"];
-//    [items addAttributeWithName:@"storage" stringValue:@"storage:bookmarks"];
-//    
-//    [pubsub addChild:items];
-//    
-//    XMPPIQ *iqBookmark = [XMPPIQ iqWithType:@"get" elementID:@"pip1" child:pubsub];
-//    [self.xmppStream sendElement:iqBookmark];
-    
     XMPPIQ *iq = [[XMPPIQ alloc]init];
     [iq addAttributeWithName:@"type" stringValue:@"get"];
 //    NSString *from = [NSString stringWithFormat:@"%@/%@",appDelegate.xmppLogedInUserId,[[myDelegate.xmppStream myJID] resource]];
@@ -264,23 +306,39 @@
     [self.xmppStream sendElement:iq];
 }
 
-- (void)deleteBookmark {
-
+- (void)deleteBookmark:(NSString*)jid conferenceList:(NSMutableArray *)conferenceList {
+    
+    XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:[XMPPJID jidWithString:myDelegate.hostName]];
+    [iq addAttributeWithName:@"from" stringValue:[self.xmppStream myJID].full];
+    //    [iq addAttributeWithName:@"id" stringValue:[NSString stringWithFormat:@"BookMarkManager2.%@",[self getUniqueRoomName]]];
+    [iq addAttributeWithName:@"id" stringValue:@"BookMarkManager"];
+    NSXMLElement *query = [NSXMLElement elementWithName:@"query"];
+    [query addAttributeWithName:@"xmlns" stringValue:@"jabber:iq:private"];
+    NSXMLElement *storage_q = [NSXMLElement elementWithName:@"storage"];
+    [storage_q addAttributeWithName:@"xmlns" stringValue:@"storage:bookmarks"];
+    
+    for (NSXMLElement *list in conferenceList) {
+        
+        if (![[list attributeStringValueForName:@"jid"] isEqualToString:jid]) {
+            
+            [storage_q addChild:[list copy]];
+        }
+    }
+    [query addChild:storage_q];
+    [iq addChild:query];
+    [self.xmppStream sendElement:iq];
 }
-
-
-
-//[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPBookMarkUpdated) name:@"XMPPBookMarkUpdated" object:nil];
-//[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPFetchBookmarktList) name:@"XMPPFetchBookmarktList" object:nil];
 
 - (void)XMPPBookMarkUpdated {
 
+    NSLog(@"a");
 }
 
 - (void)XMPPFetchBookmarktList:(NSNotification *)notification {
     
     NSLog(@"%@",notification.object);
     if (isFirstFetchBookmark) {
+        
         isFirstFetchBookmark=false;
         [self addBookMark:[sendXmppRoomObj roomJID] conferenceList:[notification.object mutableCopy]];
     }
@@ -291,12 +349,106 @@
             NSXMLElement *lastConferences=[notification.object objectAtIndex:i];
             NSLog(@"%@",[lastConferences elementForName:@"PHOTO"]);
             if (nil!=[lastConferences elementForName:@"PHOTO"]&&NULL!=[lastConferences elementForName:@"PHOTO"]) {
-                groupProfileImage=[UIImage imageWithData:[self photo:lastConferences]];
+                UIImage *i=[UIImage imageWithData:[self photo:lastConferences]];
+                lastgroupProfileImage=[UIImage imageWithData:[self photo:lastConferences]];
             }
-
-            NSLog(@"a");
         }
+        if (isUpdate) {
+            isUpdate=false;
+            [self updateBookMark:[notification.object mutableCopy]];
+        }
+        NSLog(@"a");
     }
+}
+
+- (void)destroyRoom :(NSString *)roomJidString {
+
+    XMPPRoomMemoryStorage *xmppRoomStorage = [[XMPPRoomMemoryStorage alloc] init];
+    
+    XMPPJID *roomJid = [XMPPJID jidWithString:roomJidString];
+    
+    XMPPRoom *xmppRoom = [[XMPPRoom alloc] initWithRoomStorage:xmppRoomStorage jid:roomJid];
+    xmppRoom=sendXmppRoomObj;
+//    [xmppRoom addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    
+    [xmppRoom removeDelegate:self delegateQueue:dispatch_get_main_queue()];
+    
+//    [xmppRoom deactivate];
+//    
+//    [xmppRoom leaveRoom];
+    [xmppRoom destroyRoom];
+    
+    
+//    NSXMLElement *destroy = [NSXMLElement elementWithName:@"destroy"];
+//    if (destroy) {
+//        NSXMLElement *reason = [destroy elementForName:@"reason"];
+//        if (!reason) {
+//            reason = [NSXMLElement elementWithName:@"reason" stringValue:@"Macbeth doth"];
+//            [destroy addChild:reason];
+//        }
+//    }
+//    
+//    NSXMLElement *query = [NSXMLElement elementWithName:@"query" xmlns:XMPPMUCOwnerNamespace];
+//    [query addChild:destroy];
+//    
+//    NSString *iqID = [self.xmppStream generateUUID];
+//    
+//    XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:[XMPPJID jidWithString:roomJidString] elementID:iqID child:query];
+////    [iq addAttributeWithName:@"from" stringValue:[NSString stringWithFormat:@"%@/%@",appDelegate.xmppLogedInUserId,[[myDelegate.xmppStream myJID] resource]]];
+//    [self.xmppStream sendElement:iq];
+    
+    
+    
+//    <iq from='crone1@shakespeare.lit/desktop'
+//    id='begone'
+//    to='heath@chat.shakespeare.lit'
+//    type='set'>
+//    <query xmlns='http://jabber.org/protocol/muc#owner'>
+//    <destroy jid='coven@chat.shakespeare.lit'>
+//    <reason>Macbeth doth come.</reason>
+//    </destroy>
+//    </query>
+//    </iq>
+    
+//    NSXMLElement *destroy = [NSXMLElement elementWithName:@"destroy"];
+//    
+//    NSXMLElement *query = [NSXMLElement elementWithName:@"query" xmlns:XMPPMUCOwnerNamespace];
+//    [query addChild:destroy];
+//    
+//    NSString *iqID = [xmppStream generateUUID];
+//    
+//    XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:roomJID elementID:iqID child:query];
+//    
+//    [xmppStream sendElement:iq];
+//    
+//    [responseTracker addID:iqID
+    
+//    [xmppRoom leaveRoom];
+    
+//    NSXMLElement *destroy = [NSXMLElement elementWithName:@"iq"];
+//    [destroy addAttributeWithName:@"type" stringValue:@"set"];
+//    [destroy addAttributeWithName:@"from" stringValue:roomJidString];//stadium nam
+////    [destroy addAttributeWithName:@"to" stringValue:[NSString stringWithFormat:@"%@@%@",@"+923425623868",kXMPPHost]]; // user number.
+//    
+//    NSXMLElement *reason = [NSXMLElement elementWithName:@"reason" stringValue:@"leave"];
+//    
+//    NSXMLElement *item = [NSXMLElement elementWithName:@"item"];
+////    [item addAttributeWithName:@"role" stringValue:@"none"];
+////    [item addAttributeWithName:@"nick" stringValue:@"nawazish2"]; // usernickname
+//    
+//    [item addChild:reason];
+//    
+//    NSXMLElement *query = [NSXMLElement elementWithName:@"query"];
+//    [query addAttributeWithName:@"xmlns" stringValue:@"http://jabber.org/protocol/muc#admin"];
+//    
+//    
+//    [query addChild:item];
+//    
+//    [destroy addChild:query];
+//    
+//    
+//    [self.xmppStream sendElement:destroy];
+//    [self.xmppStream addDelegate:self delegateQueue:dispatch_get_main_queue()];
 }
 /*
 #pragma mark - Navigation

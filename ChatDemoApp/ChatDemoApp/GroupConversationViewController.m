@@ -50,6 +50,11 @@
 
 - (IBAction)join:(UIButton *)sender {
     
+    
+}
+
+- (IBAction)uploadImage:(UIButton *)sender {
+    
     UIImagePickerController *picker = [[UIImagePickerController alloc] init];
     picker.delegate = self;
     picker.allowsEditing = YES;
@@ -57,6 +62,11 @@
     picker.navigationBar.tintColor = [UIColor whiteColor];
     
     [self presentViewController:picker animated:YES completion:NULL];
+}
+
+- (IBAction)update:(UIButton *)sender {
+    
+    [self updateChatRoom:tempImage];
 }
 
 #pragma mark - ImagePicker delegate
@@ -78,7 +88,7 @@
 
 - (IBAction)delete:(UIButton *)sender {
     
-    [self deleteBookmark];
+    [self destroyRoom:@"020317041616@conference.192.168.18.171"];
 }
 
 #pragma mark - Custom accessors

@@ -13,6 +13,8 @@
 @interface GroupChatXMPP : UIViewController
 
 - (void)createChatRoom:(UIImage *)image;
+- (void)updateChatRoom:(UIImage *)image;
 - (void)fetchList;
 - (void)deleteBookmark;
+- (void)destroyRoom :(NSString *)roomJidString;
 @end

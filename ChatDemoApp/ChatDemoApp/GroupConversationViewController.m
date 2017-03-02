@@ -88,7 +88,8 @@
 
 - (IBAction)delete:(UIButton *)sender {
     
-    [self destroyRoom:@"020317041616@conference.192.168.18.171"];
+//    [self destroyRoom:];
+    [self joinChatRoom:@"020317041616@conference.192.168.18.171"];
 }
 
 #pragma mark - Custom accessors

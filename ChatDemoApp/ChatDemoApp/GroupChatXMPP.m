@@ -20,6 +20,7 @@
     NSString *roomName, *roomDecs;
     BOOL isFirstFetchBookmark, isUpdate;
     UIImage *groupProfileImage, *lastgroupProfileImage;
+    NSString *currentjid;
 }
 
 @end
@@ -101,7 +102,7 @@
 
 - (void)xmppRoomDidJoin:(XMPPRoom *)sender{
     NSLog(@"a");
-    
+    [self destroyRoom:currentjid room:sender];
 //    [sender inviteUser:[XMPPJID jidWithString:@"Test1"] withMessage:@"Greetings!"];
 //    [sender inviteUser:[XMPPJID jidWithString:@"Test2"] withMessage:@"Greetings!"];
 }
@@ -167,17 +168,17 @@
         
         [storage_q addChild:[list copy]];
     }
-//    NSXMLElement *conference_s = [NSXMLElement elementWithName:@"conference"];
-//    [conference_s addAttributeWithName:@"name" stringValue:roomName];
-//    [conference_s addAttributeWithName:@"autojoin" stringValue:@"true"];
-//    [conference_s addAttributeWithName:@"jid" stringValue:[NSString stringWithFormat:@"%@",roomId]];
-//    [conference_s addAttributeWithName:@"nick" stringValue:nickName];
-//    [conference_s addAttributeWithName:@"Desc" stringValue:roomDecs];
-//    
-//    if (groupProfileImage) {
-//        [self setPhoto:[myDelegate reducedImageSize:groupProfileImage] xmlElement:conference_s];
-//    }
-//    [storage_q addChild:conference_s];
+    NSXMLElement *conference_s = [NSXMLElement elementWithName:@"conference"];
+    [conference_s addAttributeWithName:@"name" stringValue:roomName];
+    [conference_s addAttributeWithName:@"autojoin" stringValue:@"true"];
+    [conference_s addAttributeWithName:@"jid" stringValue:[NSString stringWithFormat:@"%@",roomId]];
+    [conference_s addAttributeWithName:@"nick" stringValue:nickName];
+    [conference_s addAttributeWithName:@"Desc" stringValue:roomDecs];
+    
+    if (groupProfileImage) {
+        [self setPhoto:[myDelegate reducedImageSize:groupProfileImage] xmlElement:conference_s];
+    }
+    [storage_q addChild:conference_s];
     [query addChild:storage_q];
     [iq addChild:query];
     [self.xmppStream sendElement:iq];
@@ -361,22 +362,45 @@
     }
 }
 
-- (void)destroyRoom :(NSString *)roomJidString {
+- (void)joinChatRoom:(NSString *)roomJidString {
+    
+    currentjid=roomJidString;
+    XMPPRoomMemoryStorage * _roomMemory = [[XMPPRoomMemoryStorage alloc]init];
+//    NSString* roomID = [NSString stringWithFormat:@"%@@%@",[self getUniqueRoomName],appDelegate.conferenceServerJid];
+    XMPPJID * roomJID = [XMPPJID jidWithString:roomJidString];
+    XMPPRoom* xmppRoom = [[XMPPRoom alloc] initWithRoomStorage:_roomMemory
+                                                           jid:roomJID
+                                                 dispatchQueue:dispatch_get_main_queue()];
+    [xmppRoom activate:self.xmppStream];
+    [xmppRoom addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    nickName=@"myNickname";
+    [xmppRoom joinRoomUsingNickname:nickName
+                            history:nil
+                           password:nil];
+}
+
+
+- (void)destroyRoom :(NSString *)roomJidString room:(XMPPRoom *)room{
 
     XMPPRoomMemoryStorage *xmppRoomStorage = [[XMPPRoomMemoryStorage alloc] init];
     
     XMPPJID *roomJid = [XMPPJID jidWithString:roomJidString];
     
-    XMPPRoom *xmppRoom = [[XMPPRoom alloc] initWithRoomStorage:xmppRoomStorage jid:roomJid];
-    xmppRoom=sendXmppRoomObj;
+//    XMPPRoom *xmppRoom = [[XMPPRoom alloc] initWithRoomStorage:xmppRoomStorage jid:roomJid];
+//    xmppRoom=sendXmppRoomObj;
+//    XMPPRoom* xmppRoom = [[XMPPRoom alloc] initWithRoomStorage:xmppRoomStorage
+//                                                           jid:roomJid
+//                                                 dispatchQueue:dispatch_get_main_queue()];
+    [room activate:self.xmppStream];
+    [room addDelegate:self delegateQueue:dispatch_get_main_queue()];
 //    [xmppRoom addDelegate:self delegateQueue:dispatch_get_main_queue()];
     
-    [xmppRoom removeDelegate:self delegateQueue:dispatch_get_main_queue()];
+//    [xmppRoom removeDelegate:self delegateQueue:dispatch_get_main_queue()];
     
 //    [xmppRoom deactivate];
 //    
 //    [xmppRoom leaveRoom];
-    [xmppRoom destroyRoom];
+    [room destroyRoom];
     
     
 //    NSXMLElement *destroy = [NSXMLElement elementWithName:@"destroy"];

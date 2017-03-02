@@ -799,6 +799,8 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 }
 
 
+
+
 - (NSData*)reducedImageSize:(UIImage *)selectedImage {
     
     NSData *imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(selectedImage, 1)];
@@ -813,8 +815,11 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 //    imageSize = imageData.length;
 //    NSLog(@"SIZE OF IMAGE: %.2f Mb", (float)imageSize/1024/1024);
     CGSize mySize;
-    mySize.height = 512;
-    mySize.width = 512;
+//    mySize.height = 512;
+//    mySize.width = 512;
+
+    mySize.height = 256;
+    mySize.width = 256;
     
     CGFloat oldWidth = selectedImage.size.width;
     CGFloat oldHeight = selectedImage.size.height;

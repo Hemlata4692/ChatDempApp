@@ -10,6 +10,7 @@
 #import "XmppCoreDataHandler.h"
 #import <XMPPRoomMemoryStorage.h>
 #import <XMPPIDTracker.h>
+#import "NSData+XMPP.h"
 
 @interface GroupChatXMPP (){
     
@@ -18,6 +19,7 @@
     XMPPRoom *sendXmppRoomObj;
     NSString *roomName, *roomDecs;
     BOOL isFirstFetchBookmark;
+    UIImage *groupProfileImage;
 }
 
 @end
@@ -38,11 +40,11 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPFetchBookmarktList:) name:@"XMPPFetchBookmarktList" object:nil];
 }
 
-- (void)viewWillDisappear:(BOOL)animated {
-    [self viewWillDisappear:YES];
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
+//- (void)viewWillDisappear:(BOOL)animated {
+//    [self viewWillDisappear:YES];
+//    
+//    [[NSNotificationCenter defaultCenter] removeObserver:self];
+//}
 
 - (XMPPStream *)xmppStream
 {
@@ -64,8 +66,9 @@
     return [dateFormatter stringFromDate:[NSDate date]];
 }
 
-- (void)createChatRoom {
+- (void)createChatRoom:(UIImage *)image {
 
+    groupProfileImage=image;
     isFirstFetchBookmark=true;
     XMPPRoomMemoryStorage * _roomMemory = [[XMPPRoomMemoryStorage alloc]init];
     NSString* roomID = [NSString stringWithFormat:@"%@@%@",[self getUniqueRoomName],appDelegate.conferenceServerJid];
@@ -155,7 +158,7 @@
     for (int i=0; i<conferenceList.count; i++) {
         
         NSXMLElement *lastConferences=[conferenceList objectAtIndex:i];
-        [storage_q addChild:lastConferences];
+        [storage_q addChild:[lastConferences copy]];
     }
     NSXMLElement *conference_s = [NSXMLElement elementWithName:@"conference"];
     [conference_s addAttributeWithName:@"name" stringValue:roomName];
@@ -163,10 +166,61 @@
     [conference_s addAttributeWithName:@"jid" stringValue:[NSString stringWithFormat:@"%@",roomId]];
     [conference_s addAttributeWithName:@"nick" stringValue:nickName];
     [conference_s addAttributeWithName:@"Desc" stringValue:roomDecs];
+    
+    [self setPhoto:[myDelegate reducedImageSize:groupProfileImage] xmlElement:conference_s];
+    
     [storage_q addChild:conference_s];
     [query addChild:storage_q];
     [iq addChild:query];
     [self.xmppStream sendElement:iq];
+}
+
+- (void)setPhoto:(NSData *)data xmlElement:(NSXMLElement *)xmlElement {
+    
+    NSXMLElement *photo = [xmlElement elementForName:@"PHOTO"];
+    
+    if(photo)
+    {
+        [xmlElement removeChildAtIndex:[[xmlElement children] indexOfObject:photo]];
+    }
+    
+    if([data length])
+    {
+        NSXMLElement *photo = [NSXMLElement elementWithName:@"PHOTO"];
+        [xmlElement addChild:photo];
+        
+        NSString *imageType = [data xmpp_imageType];
+        
+        if([imageType length])
+        {
+            NSXMLElement *type = [NSXMLElement elementWithName:@"TYPE"];
+            [photo addChild:type];
+            [type setStringValue:imageType];
+        }
+        
+        NSXMLElement *binval = [NSXMLElement elementWithName:@"BINVAL"];
+        [photo addChild:binval];
+        [binval setStringValue:[data xmpp_base64Encoded]];
+    }
+    
+}
+
+- (NSData *)photo:(NSXMLElement *)xmlElement {
+    NSData *decodedData = nil;
+    NSXMLElement *photo = [xmlElement elementForName:@"PHOTO"];
+    
+    if (photo != nil) {
+        // There is a PHOTO element. It should have a TYPE and a BINVAL
+        //NSXMLElement *fileType = [photo elementForName:@"TYPE"];
+        NSXMLElement *binval = [photo elementForName:@"BINVAL"];
+        
+        if (binval) {
+            NSData *base64Data = [[binval stringValue] dataUsingEncoding:NSASCIIStringEncoding];
+            decodedData = [base64Data xmpp_base64Decoded];
+        }
+    }
+    
+    return decodedData;
 }
 
 - (void)fetchList {
@@ -232,7 +286,16 @@
     }
     else {
     
-        
+        for (int i=0; i<[notification.object count]; i++) {
+            
+            NSXMLElement *lastConferences=[notification.object objectAtIndex:i];
+            NSLog(@"%@",[lastConferences elementForName:@"PHOTO"]);
+            if (nil!=[lastConferences elementForName:@"PHOTO"]&&NULL!=[lastConferences elementForName:@"PHOTO"]) {
+                groupProfileImage=[UIImage imageWithData:[self photo:lastConferences]];
+            }
+
+            NSLog(@"a");
+        }
     }
 }
 /*

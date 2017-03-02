@@ -148,6 +148,6 @@ XMPPIncomingFileTransferDelegate>
 - (NSData *)listionSendAttachedLocationImageCacheDirectoryFileName:(NSString *)fileName;
 
 //Group chat
-
+- (NSData*)reducedImageSize:(UIImage *)selectedImage;
 //end
 @end

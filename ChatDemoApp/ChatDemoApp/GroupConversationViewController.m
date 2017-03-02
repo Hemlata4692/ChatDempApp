@@ -8,9 +8,10 @@
 
 #import "GroupConversationViewController.h"
 
-@interface GroupConversationViewController () {
+@interface GroupConversationViewController ()<UIImagePickerControllerDelegate,UINavigationControllerDelegate> {
 
     AppDelegateObjectFile *appDelegate;
+    UIImage *tempImage;
 }
 
 @end
@@ -39,7 +40,7 @@
 
 - (IBAction)create:(UIButton *)sender {
     
-    [self createChatRoom];
+    [self createChatRoom:tempImage];
 }
 
 - (IBAction)list:(UIButton *)sender {
@@ -48,7 +49,29 @@
 }
 
 - (IBAction)join:(UIButton *)sender {
+    
+    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+    picker.delegate = self;
+    picker.allowsEditing = YES;
+    picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+    picker.navigationBar.tintColor = [UIColor whiteColor];
+    
+    [self presentViewController:picker animated:YES completion:NULL];
 }
+
+#pragma mark - ImagePicker delegate
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingImage:(UIImage *)image editingInfo:(NSDictionary *)info {
+    
+    [picker dismissViewControllerAnimated:NO completion:NULL];
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    tempImage=image;
+}
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+    
+    [picker dismissViewControllerAnimated:YES completion:NULL];
+}
+#pragma mark - end
 
 - (IBAction)invite:(UIButton *)sender {
 }

@@ -11,8 +11,9 @@
 #import <XMPPRoomMemoryStorage.h>
 #import <XMPPIDTracker.h>
 #import "NSData+XMPP.h"
+#import <XMPPRoomHybridStorage.h>
 
-@interface GroupChatXMPP (){
+@interface GroupChatXMPP ()<XMPPRoomDelegate>{
     
     AppDelegateObjectFile *appDelegate;
     NSString *nickName;
@@ -21,6 +22,10 @@
     BOOL isFirstFetchBookmark, isUpdate;
     UIImage *groupProfileImage, *lastgroupProfileImage;
     NSString *currentjid;
+    BOOL isDestroy, isInvite;
+    
+    __strong id <XMPPRoomStorage> xmppRoomStorage;
+
 }
 
 @end
@@ -39,6 +44,9 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPBookMarkUpdated) name:@"XMPPBookMarkUpdated" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPFetchBookmarktList:) name:@"XMPPFetchBookmarktList" object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppRoomDidDestroySuccess) name:@"XMPPDeleteGroupSuccess" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppRoomDidDestroyFail) name:@"XMPPDeleteGroupFail" object:nil];
 }
 
 //- (void)viewWillDisappear:(BOOL)animated {
@@ -70,6 +78,8 @@
 - (void)createChatRoom:(UIImage *)image {
 
     groupProfileImage=image;
+    isInvite=false;
+    isDestroy=false;
     isFirstFetchBookmark=true;
     XMPPRoomMemoryStorage * _roomMemory = [[XMPPRoomMemoryStorage alloc]init];
     NSString* roomID = [NSString stringWithFormat:@"%@@%@",[self getUniqueRoomName],appDelegate.conferenceServerJid];
@@ -96,15 +106,46 @@
 - (void)xmppRoomDidCreate:(XMPPRoom *)sender{
     NSLog(@"a");
     
+    isDestroy=false;
     sendXmppRoomObj=sender;
     [sender fetchConfigurationForm];
 }
 
 - (void)xmppRoomDidJoin:(XMPPRoom *)sender{
     NSLog(@"a");
-    [self destroyRoom:currentjid room:sender];
+    
+    sendXmppRoomObj=sender;
+    if (isDestroy) {
+        [sender removeDelegate:self delegateQueue:dispatch_get_main_queue()];
+        [self destroyRoom:currentjid room:sender];
+    }
+    else
+        if (isInvite){
+    
+        [self sendInvition:sender];
+    }
+    
 //    [sender inviteUser:[XMPPJID jidWithString:@"Test1"] withMessage:@"Greetings!"];
 //    [sender inviteUser:[XMPPJID jidWithString:@"Test2"] withMessage:@"Greetings!"];
+}
+
+
+
+- (BOOL)isRoomOwner:(XMPPRoom *)sender
+{
+    
+    
+    return YES;
+}
+
+- (BOOL)isRoomOwner {
+
+    return YES;
+}
+
+- (void)sendInvition:(XMPPRoom *)sender {
+
+    [sender inviteUser:[XMPPJID jidWithString:@"Test1"] withMessage:@"Greetings!"];
 }
 
 - (void)xmppRoom:(XMPPRoom *)sender didFetchConfigurationForm:(NSXMLElement *)configForm{
@@ -362,11 +403,23 @@
     }
 }
 
-- (void)joinChatRoom:(NSString *)roomJidString {
+- (void)joinDeleteChatRoom:(NSString *)roomJidString {
+    
+    isDestroy=YES;
+    [self reuseJoinMethod:roomJidString];
+}
+
+- (void)inviteChatRoom:(NSString *)roomJidString {
+    
+    isInvite=YES;
+    [self reuseJoinMethod:roomJidString];
+}
+
+- (void)reuseJoinMethod:(NSString *)roomJidString {
     
     currentjid=roomJidString;
     XMPPRoomMemoryStorage * _roomMemory = [[XMPPRoomMemoryStorage alloc]init];
-//    NSString* roomID = [NSString stringWithFormat:@"%@@%@",[self getUniqueRoomName],appDelegate.conferenceServerJid];
+    //    NSString* roomID = [NSString stringWithFormat:@"%@@%@",[self getUniqueRoomName],appDelegate.conferenceServerJid];
     XMPPJID * roomJID = [XMPPJID jidWithString:roomJidString];
     XMPPRoom* xmppRoom = [[XMPPRoom alloc] initWithRoomStorage:_roomMemory
                                                            jid:roomJID
@@ -379,101 +432,74 @@
                            password:nil];
 }
 
+- (void)xmppRoomDidDestroy:(XMPPRoom *)sender {
+
+    isDestroy=false;
+    
+}
+
+- (void)xmppRoom:(XMPPRoom *)sender didFailToDestroy:(XMPPIQ *)iqError {
+    isDestroy=false;
+}
+
 
 - (void)destroyRoom :(NSString *)roomJidString room:(XMPPRoom *)room{
 
-    XMPPRoomMemoryStorage *xmppRoomStorage = [[XMPPRoomMemoryStorage alloc] init];
-    
-    XMPPJID *roomJid = [XMPPJID jidWithString:roomJidString];
-    
-//    XMPPRoom *xmppRoom = [[XMPPRoom alloc] initWithRoomStorage:xmppRoomStorage jid:roomJid];
-//    xmppRoom=sendXmppRoomObj;
-//    XMPPRoom* xmppRoom = [[XMPPRoom alloc] initWithRoomStorage:xmppRoomStorage
-//                                                           jid:roomJid
-//                                                 dispatchQueue:dispatch_get_main_queue()];
-    [room activate:self.xmppStream];
-    [room addDelegate:self delegateQueue:dispatch_get_main_queue()];
-//    [xmppRoom addDelegate:self delegateQueue:dispatch_get_main_queue()];
-    
-//    [xmppRoom removeDelegate:self delegateQueue:dispatch_get_main_queue()];
-    
-//    [xmppRoom deactivate];
+//    XMPPRoomMemoryStorage *xmppRoomStorage1 = [[XMPPRoomMemoryStorage alloc] init];
 //    
-//    [xmppRoom leaveRoom];
-    [room destroyRoom];
-    
-    
-//    NSXMLElement *destroy = [NSXMLElement elementWithName:@"destroy"];
-//    if (destroy) {
-//        NSXMLElement *reason = [destroy elementForName:@"reason"];
-//        if (!reason) {
-//            reason = [NSXMLElement elementWithName:@"reason" stringValue:@"Macbeth doth"];
-//            [destroy addChild:reason];
-//        }
-//    }
+//    XMPPJID *roomJid = [XMPPJID jidWithString:roomJidString];
 //    
-//    NSXMLElement *query = [NSXMLElement elementWithName:@"query" xmlns:XMPPMUCOwnerNamespace];
-//    [query addChild:destroy];
+//    XMPPRoom *xmppRoom = [[XMPPRoom alloc] initWithRoomStorage:xmppRoomStorage1 jid:roomJid];
+//    xmppRoom=room;
+////    XMPPRoom* xmppRoom = [[XMPPRoom alloc] initWithRoomStorage:xmppRoomStorage
+////                                                           jid:roomJid
+////                                                 dispatchQueue:dispatch_get_main_queue()];
+////    [room activate:self.xmppStream];
+////    [room addDelegate:self delegateQueue:dispatch_get_main_queue()];
+////    [xmppRoom addDelegate:self delegateQueue:dispatch_get_main_queue()];
 //    
-//    NSString *iqID = [self.xmppStream generateUUID];
+////    [xmppRoom removeDelegate:self delegateQueue:dispatch_get_main_queue()];
 //    
-//    XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:[XMPPJID jidWithString:roomJidString] elementID:iqID child:query];
-////    [iq addAttributeWithName:@"from" stringValue:[NSString stringWithFormat:@"%@/%@",appDelegate.xmppLogedInUserId,[[myDelegate.xmppStream myJID] resource]]];
-//    [self.xmppStream sendElement:iq];
+////    [room deactivate];
+////
+////    [xmppRoom leaveRoom];
+//    [room destroyRoom];
     
     
+    NSXMLElement *destroy = [NSXMLElement elementWithName:@"destroy"];
+    if (destroy) {
+        NSXMLElement *reason = [destroy elementForName:@"reason"];
+        if (!reason) {
+            reason = [NSXMLElement elementWithName:@"reason" stringValue:@"Macbeth doth"];
+            [destroy addChild:reason];
+        }
+    }
     
-//    <iq from='crone1@shakespeare.lit/desktop'
-//    id='begone'
-//    to='heath@chat.shakespeare.lit'
-//    type='set'>
-//    <query xmlns='http://jabber.org/protocol/muc#owner'>
-//    <destroy jid='coven@chat.shakespeare.lit'>
-//    <reason>Macbeth doth come.</reason>
-//    </destroy>
-//    </query>
-//    </iq>
+    NSXMLElement *query = [NSXMLElement elementWithName:@"query" xmlns:XMPPMUCOwnerNamespace];
+    [query addChild:destroy];
     
-//    NSXMLElement *destroy = [NSXMLElement elementWithName:@"destroy"];
-//    
-//    NSXMLElement *query = [NSXMLElement elementWithName:@"query" xmlns:XMPPMUCOwnerNamespace];
-//    [query addChild:destroy];
-//    
-//    NSString *iqID = [xmppStream generateUUID];
-//    
-//    XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:roomJID elementID:iqID child:query];
-//    
-//    [xmppStream sendElement:iq];
-//    
-//    [responseTracker addID:iqID
-    
-//    [xmppRoom leaveRoom];
-    
-//    NSXMLElement *destroy = [NSXMLElement elementWithName:@"iq"];
-//    [destroy addAttributeWithName:@"type" stringValue:@"set"];
-//    [destroy addAttributeWithName:@"from" stringValue:roomJidString];//stadium nam
-////    [destroy addAttributeWithName:@"to" stringValue:[NSString stringWithFormat:@"%@@%@",@"+923425623868",kXMPPHost]]; // user number.
-//    
-//    NSXMLElement *reason = [NSXMLElement elementWithName:@"reason" stringValue:@"leave"];
-//    
-//    NSXMLElement *item = [NSXMLElement elementWithName:@"item"];
-////    [item addAttributeWithName:@"role" stringValue:@"none"];
-////    [item addAttributeWithName:@"nick" stringValue:@"nawazish2"]; // usernickname
-//    
-//    [item addChild:reason];
-//    
-//    NSXMLElement *query = [NSXMLElement elementWithName:@"query"];
-//    [query addAttributeWithName:@"xmlns" stringValue:@"http://jabber.org/protocol/muc#admin"];
-//    
-//    
-//    [query addChild:item];
-//    
-//    [destroy addChild:query];
-//    
-//    
-//    [self.xmppStream sendElement:destroy];
-//    [self.xmppStream addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    NSString *iqID = [self.xmppStream generateUUID];
+    myDelegate.groupDeleteid=iqID;
+    XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:[XMPPJID jidWithString:roomJidString] elementID:iqID child:query];
+//    [iq addAttributeWithName:@"from" stringValue:[NSString stringWithFormat:@"%@/%@",appDelegate.xmppLogedInUserId,[[myDelegate.xmppStream myJID] resource]]];
+    [self.xmppStream sendElement:iq];
 }
+
+//[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPDeleteGroupSuccess) name:@"XMPPDeleteGroupSuccess" object:nil];
+//[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPDeleteGroupFail) name:@"XMPPDeleteGroupFail" object:nil];
+#pragma mark - Delete group notify
+- (void)xmppRoomDidDestroySuccess {
+
+    myDelegate.groupDeleteid=nil;
+    NSLog(@"successfully destroy");
+}
+
+- (void)xmppRoomDidDestroyFail {
+    myDelegate.groupDeleteid=nil;
+    NSLog(@"fail destroy");
+}
+#pragma mark - end
+
 /*
 #pragma mark - Navigation
 

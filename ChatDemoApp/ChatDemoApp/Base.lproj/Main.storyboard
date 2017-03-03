@@ -473,6 +473,14 @@
                                     <action selector="update:" destination="fSg-QW-UOE" eventType="touchUpInside" id="Hms-h4-fdT"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eEG-9f-qsD">
+                                <rect key="frame" x="72" y="61" width="57" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="isOwner"/>
+                                <connections>
+                                    <action selector="isOwner:" destination="fSg-QW-UOE" eventType="touchUpInside" id="9Wm-32-WKL"/>
+                                </connections>
+                            </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3en-8W-3vN">
                                 <rect key="frame" x="76" y="30" width="30" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -1402,7 +1410,7 @@
                 <navigationController storyboardIdentifier="loginNavigation" automaticallyAdjustsScrollViewInsets="NO" id="g5s-l7-tBw" sceneMemberID="viewController">
                     <toolbarItems/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" translucent="NO" id="Hp1-z3-vWC">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="Hp1-z3-vWC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -1421,7 +1429,7 @@
                 <navigationController storyboardIdentifier="DashboardNavigation" automaticallyAdjustsScrollViewInsets="NO" id="Vep-JT-HHx" sceneMemberID="viewController">
                     <toolbarItems/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" translucent="NO" id="pVC-3M-Vd2">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="pVC-3M-Vd2">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>

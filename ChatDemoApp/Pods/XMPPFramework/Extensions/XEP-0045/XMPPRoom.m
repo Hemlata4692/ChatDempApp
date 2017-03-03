@@ -800,7 +800,7 @@ enum XMPPRoomState
 		
 		NSString *iqID = [xmppStream generateUUID];
 		
-		XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:roomJID elementID:iqID child:query];
+		XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:roomJID elementID:@"user delete" child:query];
 		
 		[xmppStream sendElement:iq];
 		

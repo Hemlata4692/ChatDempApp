@@ -16,5 +16,7 @@
 - (void)updateChatRoom:(UIImage *)image;
 - (void)fetchList;
 - (void)deleteBookmark;
-- (void)joinChatRoom:(NSString *)roomJidString;
+- (void)joinDeleteChatRoom:(NSString *)roomJidString;
+- (BOOL)isRoomOwner;
+- (void)reuseJoinMethod:(NSString *)roomJidString;
 @end

@@ -50,7 +50,17 @@
 
 - (IBAction)join:(UIButton *)sender {
     
+    [self reuseJoinMethod:@"030317033924@conference.117.240.110.83"];
+}
+
+
+- (IBAction)delete:(UIButton *)sender {
     
+    //    [self destroyRoom:];
+    [self joinDeleteChatRoom:@"030317033924@conference.117.240.110.83"];
+}
+
+- (IBAction)isOwner:(UIButton *)sender {
 }
 
 - (IBAction)uploadImage:(UIButton *)sender {
@@ -84,12 +94,8 @@
 #pragma mark - end
 
 - (IBAction)invite:(UIButton *)sender {
-}
-
-- (IBAction)delete:(UIButton *)sender {
     
-//    [self destroyRoom:];
-    [self joinChatRoom:@"020317041616@conference.192.168.18.171"];
+    
 }
 
 #pragma mark - Custom accessors

@@ -86,6 +86,10 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 @synthesize appMapPhotofolderName;
 //end
 
+//Group chat
+@synthesize groupDeleteid;
+//end
+
 @synthesize afterAutentication,afterAutenticationRegistration;
 
 #pragma mark - Intialze XMPP connection
@@ -116,7 +120,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 //    @property(strong, nonatomic)NSString *conferenceServerJid;//ConferenceServerJid
     
     if (nil!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"ConferenceServerJid"] && NULL!=[[NSBundle mainBundle] objectForInfoDictionaryKey:@"ConferenceServerJid"]) {
-        conferenceServerJid = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"ConferenceServerJid"];
+        conferenceServerJid = [NSString stringWithFormat:@"%@.%@",[[NSBundle mainBundle] objectForInfoDictionaryKey:@"ConferenceServerJid"],hostName];
     }
     else {
         conferenceServerJid = @"";
@@ -578,7 +582,18 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     if (nil!=storageElement) {
          NSLog(@"%@",[storageElement namespaceForPrefix:nil].stringValue);
     }
-    if (nil!=groupChat&&NULL!=groupChat&&[groupChat containsString:@"BookMarkManager"]) {
+    
+    NSLog(@"%@",[iq attributeStringValueForName:@"id"]);
+    if ((nil!=groupDeleteid)&&[[iq attributeStringValueForName:@"id"] isEqualToString:groupDeleteid]){
+        
+        if ([[iq attributeStringValueForName:@"type"] isEqualToString:@"result"]) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPDeleteGroupSuccess" object:nil];
+        }
+        else {
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPDeleteGroupFail" object:nil];
+        }
+    }
+    else if (nil!=groupChat&&NULL!=groupChat&&[groupChat containsString:@"BookMarkManager"]) {
         
             NSLog(@"Bookmarks with id %@ succesfully uploaded", [iq attributeStringValueForName:@"id"]);
         

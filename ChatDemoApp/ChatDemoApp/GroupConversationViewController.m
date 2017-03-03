@@ -97,7 +97,7 @@
 
 - (IBAction)invite:(UIButton *)sender {
     
-    
+    [self inviteChatRoom:@"030317033924@conference.117.240.110.83"];
 }
 
 #pragma mark - Custom accessors

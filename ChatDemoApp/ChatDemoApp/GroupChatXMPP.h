@@ -19,4 +19,5 @@
 - (void)joinDeleteChatRoom:(NSString *)roomJidString;
 - (void)isRoomOwner:(NSString *)jid ;
 - (void)reuseJoinMethod:(NSString *)roomJidString;
+- (void)inviteChatRoom:(NSString *)roomJidString;
 @end

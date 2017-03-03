@@ -140,7 +140,7 @@
 
 - (void)sendInvition:(XMPPRoom *)sender {
 
-    [sender inviteUser:[XMPPJID jidWithString:@"Test1"] withMessage:@"Greetings!"];
+    [sender inviteUser:[XMPPJID jidWithString:[NSString stringWithFormat:@"0000000000@117.240.110.83/%@",[[myDelegate.xmppStream myJID] resource]]] withMessage:@"Greetings!"];
 }
 
 - (void)xmppRoom:(XMPPRoom *)sender didFetchConfigurationForm:(NSXMLElement *)configForm{

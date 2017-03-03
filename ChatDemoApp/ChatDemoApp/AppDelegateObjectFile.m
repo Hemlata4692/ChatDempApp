@@ -661,10 +661,33 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     return NO;
 }
 
+
+
+
+//- (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message
+//{
+//    NSXMLElement * x = [message elementForName:@"x" xmlns:XMPPMUCUserNamespace];
+//    NSXMLElement * invite  = [x elementForName:@"invite"];
+//    NSXMLElement * decline = [x elementForName:@"decline"];
+//    NSXMLElement * directInvite = [message elementForName:@"x" xmlns:@"jabber:x:conference"];
+//    NSString *msg = [[message elementForName:@"body"]stringValue];
+//    NSString *from = [[[message attributeForName:@"from"]stringValue];
+//                      if (invite || directInvite)
+//                      {
+//                          [self createAndEnterRoom:from Message:msg];
+//                          return;
+//                      }
+//                      [self.delegate newMessageRecieved:msg];
+//}
+
 - (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message
 {
     DDLogVerbose(@"%@: %@", THIS_FILE, THIS_METHOD);
-    
+//    http://stackoverflow.com/questions/14665654/accepting-chatroom-invitation
+//    http://stackoverflow.com/questions/38246337/how-to-handle-decline-action-on-xmpp-framework-objective-c?noredirect=1&lq=1
+//    http://stackoverflow.com/questions/27566652/didreceiveinvitation-does-not-work-ios-xmpp-after-sending-invitation-to-users
+//    http://stackoverflow.com/questions/25967692/xmpp-ios-multiuser-chat-i-didnot-find-a-way-to-accept-the-invitation-from-grou
+//    <message xmlns="jabber:client" from="1488536738080@conference.117.240.110.83" to="0000000000@117.240.110.83//Smack"><x xmlns="http://jabber.org/protocol/muc#user"><invite from="7777777777@117.240.110.83"><reason>test</reason></invite></x><x xmlns="jabber:x:conference" jid="1488536738080@conference.117.240.110.83"/></message>
     if ([message isChatMessageWithBody])
     {
         XMPPUserCoreDataStorageObject *user = [xmppRosterStorage userForJID:[message from]

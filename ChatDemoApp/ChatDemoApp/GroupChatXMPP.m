@@ -22,7 +22,7 @@
     BOOL isFirstFetchBookmark, isUpdate;
     UIImage *groupProfileImage, *lastgroupProfileImage;
     NSString *currentjid;
-    BOOL isDestroy, isInvite;
+    BOOL isDestroy, isInvite, isOwner;
     
     __strong id <XMPPRoomStorage> xmppRoomStorage;
 
@@ -119,28 +119,23 @@
         [sender removeDelegate:self delegateQueue:dispatch_get_main_queue()];
         [self destroyRoom:currentjid room:sender];
     }
-    else
-        if (isInvite){
+    else if (isInvite){
     
         [self sendInvition:sender];
+    }
+    else if (isOwner){
+        
+        [sender fetchConfigurationForm];
     }
     
 //    [sender inviteUser:[XMPPJID jidWithString:@"Test1"] withMessage:@"Greetings!"];
 //    [sender inviteUser:[XMPPJID jidWithString:@"Test2"] withMessage:@"Greetings!"];
 }
 
+- (void)isRoomOwner:(NSString *)jid {
 
-
-- (BOOL)isRoomOwner:(XMPPRoom *)sender
-{
-    
-    
-    return YES;
-}
-
-- (BOOL)isRoomOwner {
-
-    return YES;
+    isOwner=true;
+    [self reuseJoinMethod:jid];
 }
 
 - (void)sendInvition:(XMPPRoom *)sender {
@@ -153,6 +148,25 @@
     NSXMLElement *newConfig = [configForm copy];
     
     NSArray* fields = [newConfig elementsForName:@"field"];
+    if (isOwner) {
+        isOwner=false;
+        bool flag=NO;
+        for (NSXMLElement *field in fields) {
+            NSString *var = [field attributeStringValueForName:@"var"];
+            if ([var isEqualToString:@"muc#roomconfig_roomowners"]&&[[[field elementForName:@"value"] stringValue] isEqualToString:myDelegate.xmppLogedInUserId]) {
+                flag=true;
+                break;
+            }
+        }
+        
+        if (flag) {
+            NSLog(@"owner");
+        }
+        else {
+            NSLog(@"member");
+        }
+    }
+    else {
     for (NSXMLElement *field in fields) {
         NSString *var = [field attributeStringValueForName:@"var"];
         if ([var isEqualToString:@"muc#roomconfig_persistentroom"]) {
@@ -175,6 +189,7 @@
         }
     }
     [sender configureRoomUsingOptions:newConfig];
+    }
     
 //    [self addBookMark:[sender roomJID] name:roomName roomDecs:roomDecs];
 }

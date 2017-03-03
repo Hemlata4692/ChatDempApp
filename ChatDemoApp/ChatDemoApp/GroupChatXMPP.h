@@ -17,6 +17,6 @@
 - (void)fetchList;
 - (void)deleteBookmark;
 - (void)joinDeleteChatRoom:(NSString *)roomJidString;
-- (BOOL)isRoomOwner;
+- (void)isRoomOwner:(NSString *)jid ;
 - (void)reuseJoinMethod:(NSString *)roomJidString;
 @end

@@ -61,6 +61,8 @@
 }
 
 - (IBAction)isOwner:(UIButton *)sender {
+    
+    [self isRoomOwner:@"030317033924@conference.117.240.110.83"];
 }
 
 - (IBAction)uploadImage:(UIButton *)sender {

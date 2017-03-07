@@ -33,4 +33,8 @@
 - (NSDictionary *)getProfileDicData:(NSString *)jid;
 - (NSMutableDictionary *)getProfileUsersData;
 //end
+
+//Group chat
+- (void)insertGroupEntryInXmppUserModelXmppGroupJid:(NSString *)xmppGroupJid xmppGroupName:(NSString *)xmppGroupName xmppGroupNickName:(NSString *)xmppGroupNickName xmppGroupDescription:(NSString *)xmppGroupDescription xmppGroupOnwerId:(NSString *)xmppGroupOnwerId;
+//end
 @end

@@ -8,6 +8,10 @@
 
 #import "XmppCoreDataHandler.h"
 
+#define UserEntry @"UserEntry"
+#define ChatMessageHistory @"MessageHistory"
+#define GroupChatRoomEntry @"GroupRoomEntry"
+
 @implementation XmppCoreDataHandler
 @synthesize xmppAppDelegateObj;
 
@@ -38,7 +42,7 @@
     NSMutableArray *results = [[NSMutableArray alloc]init];
     NSPredicate *pred = [NSPredicate predicateWithFormat:@"xmppRegisterId == %@", registredUserId];
     
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"UserEntry"];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:UserEntry];
     [fetchRequest setPredicate:pred];
     results = [[context executeFetchRequest:fetchRequest error:nil] mutableCopy];
     
@@ -67,12 +71,12 @@
     
     pred = [NSPredicate predicateWithFormat:@"xmppRegisterId == %@", registredUserId];
     NSLog(@"predicate: %@",pred);
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"UserEntry"];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:UserEntry];
     [fetchRequest setPredicate:pred];
     results = [[context executeFetchRequest:fetchRequest error:nil] mutableCopy];
     
     if (results.count == 0) {
-        NSManagedObject *xmppDataEntry = [NSEntityDescription insertNewObjectForEntityForName:@"UserEntry" inManagedObjectContext:context];
+        NSManagedObject *xmppDataEntry = [NSEntityDescription insertNewObjectForEntityForName:UserEntry inManagedObjectContext:context];
         [xmppDataEntry setValue:registredUserId forKey:@"xmppRegisterId"];
         [xmppDataEntry setValue:xmppName forKey:@"xmppName"];
         [xmppDataEntry setValue:xmppPhoneNumber forKey:@"xmppPhoneNumber"];
@@ -103,7 +107,7 @@
     
     pred = [NSPredicate predicateWithFormat:@"xmppRegisterId == %@", registredUserId];
     NSLog(@"predicate: %@",pred);
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"UserEntry"];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:UserEntry];
     [fetchRequest setPredicate:pred];
     results = [[context executeFetchRequest:fetchRequest error:nil] mutableCopy];
     
@@ -120,7 +124,7 @@
         [xmppDataEntry setValue:xmppGender forKey:@"xmppGender"];
         [context save:nil];
     } else {
-        NSManagedObject *xmppDataEntry = [NSEntityDescription insertNewObjectForEntityForName:@"UserEntry" inManagedObjectContext:context];
+        NSManagedObject *xmppDataEntry = [NSEntityDescription insertNewObjectForEntityForName:UserEntry inManagedObjectContext:context];
         [xmppDataEntry setValue:registredUserId forKey:@"xmppRegisterId"];
         [xmppDataEntry setValue:xmppName forKey:@"xmppName"];
         [xmppDataEntry setValue:xmppPhoneNumber forKey:@"xmppPhoneNumber"];
@@ -151,7 +155,7 @@
     NSLog(@"predicate: %@",pred);
     
     //    [request setPredicate:predicate];
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"MessageHistory"];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:ChatMessageHistory];
     [fetchRequest setPredicate:pred];
     NSArray *results = [context executeFetchRequest:fetchRequest error:nil];
     
@@ -183,7 +187,7 @@
     
     NSManagedObjectContext *context = [self managedObjectContext];
     
-    NSManagedObject *xmppDataEntry = [NSEntityDescription insertNewObjectForEntityForName:@"MessageHistory" inManagedObjectContext:context];
+    NSManagedObject *xmppDataEntry = [NSEntityDescription insertNewObjectForEntityForName:ChatMessageHistory inManagedObjectContext:context];
     [xmppDataEntry setValue:bareJidStr forKey:@"bareJidStr"];
     [xmppDataEntry setValue:message forKey:@"messageString"];
     [xmppDataEntry setValue:uniquiId forKey:@"uniqueId"];
@@ -198,7 +202,7 @@
 - (BOOL)isFileMessageExist:(NSString *)message {
     
     NSManagedObjectContext *context = [self managedObjectContext];
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"MessageHistory"];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:ChatMessageHistory];
     
         NSPredicate *pred;
         pred = [NSPredicate predicateWithFormat:@"messageString == %@", message];
@@ -223,7 +227,7 @@
 - (NSArray *)readLocalChat:(NSString *)bareJidStr {
     
     NSManagedObjectContext *context = [self managedObjectContext];
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"MessageHistory"];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:ChatMessageHistory];
     if (![bareJidStr isEqualToString:@""]) {
         NSPredicate *pred;
         pred = [NSPredicate predicateWithFormat:@"bareJidStr == %@", bareJidStr];
@@ -236,7 +240,7 @@
 - (void)updateLocalMessageStorageDatabaseBareJidStr:(NSString *)bareJidStr message:(NSXMLElement *)message uniquiId:(NSString *)uniquiId {
     
     NSManagedObjectContext *context = [self managedObjectContext];
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"MessageHistory"];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:ChatMessageHistory];
     if (![bareJidStr isEqualToString:@""]) {
         NSPredicate *pred;
         pred = [NSPredicate predicateWithFormat:@"uniqueId == %@", uniquiId];
@@ -266,7 +270,7 @@
     NSMutableArray *results = [[NSMutableArray alloc]init];
     pred = [NSPredicate predicateWithFormat:@"xmppRegisterId == %@",jid];
     NSLog(@"predicate: %@",pred);
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:@"UserEntry"];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:UserEntry];
     [fetchRequest setPredicate:pred];
     
     results = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
@@ -294,7 +298,7 @@
     NSMutableDictionary *tempDict=[NSMutableDictionary new];
     NSMutableArray *tempArray=[NSMutableArray new];
     NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"UserEntry"];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:UserEntry];
     tempArray = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
     for (NSManagedObject *tempDevice in tempArray) {
         if (![[tempDevice valueForKey:@"xmppRegisterId"] isEqualToString:xmppAppDelegateObj.xmppLogedInUserId]) {
@@ -318,6 +322,44 @@
     }
     
     return tempDict;
+}
+//end
+
+//Group chat
+- (void)insertGroupEntryInXmppUserModelXmppGroupJid:(NSString *)xmppGroupJid xmppGroupName:(NSString *)xmppGroupName xmppGroupNickName:(NSString *)xmppGroupNickName xmppGroupDescription:(NSString *)xmppGroupDescription xmppGroupOnwerId:(NSString *)xmppGroupOnwerId {
+    
+    NSManagedObjectContext *context = [self managedObjectContext];
+    NSMutableArray *results = [[NSMutableArray alloc]init];
+    NSPredicate *pred;
+    
+    pred = [NSPredicate predicateWithFormat:@"groupChatRoomId == %@", xmppGroupJid];
+    NSLog(@"predicate: %@",pred);
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:GroupChatRoomEntry];
+    [fetchRequest setPredicate:pred];
+    results = [[context executeFetchRequest:fetchRequest error:nil] mutableCopy];
+    
+    if (results.count > 0) {
+        NSManagedObject* xmppDataEntry = [results objectAtIndex:0];
+        [xmppDataEntry setValue:xmppGroupJid forKey:@"groupChatRoomId"];
+        [xmppDataEntry setValue:xmppGroupNickName forKey:@"groupChatRoomNickName"];
+        [xmppDataEntry setValue:xmppGroupName forKey:@"groupChatRoomName"];
+        [xmppDataEntry setValue:xmppGroupOnwerId forKey:@"groupChatOwnerId"];
+        [xmppDataEntry setValue:xmppGroupDescription forKey:@"groupChatDescription"];
+        
+        [context save:nil];
+    } else {
+        NSManagedObject *xmppDataEntry = [NSEntityDescription insertNewObjectForEntityForName:GroupChatRoomEntry inManagedObjectContext:context];
+        [xmppDataEntry setValue:xmppGroupJid forKey:@"groupChatRoomId"];
+        [xmppDataEntry setValue:xmppGroupNickName forKey:@"groupChatRoomNickName"];
+        [xmppDataEntry setValue:xmppGroupName forKey:@"groupChatRoomName"];
+        [xmppDataEntry setValue:xmppGroupOnwerId forKey:@"groupChatOwnerId"];
+        [xmppDataEntry setValue:xmppGroupDescription forKey:@"groupChatDescription"];
+        NSError *error = nil;
+        // Save the object to persistent store
+        if (![context save:&error]) {
+            NSLog(@"Can't Save! %@ %@", error, [error localizedDescription]);
+        }
+    }
 }
 //end
 

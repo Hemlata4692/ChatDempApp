@@ -230,6 +230,12 @@
     [conference_s addAttributeWithName:@"jid" stringValue:[NSString stringWithFormat:@"%@",roomId]];
     [conference_s addAttributeWithName:@"nick" stringValue:nickName];
     [conference_s addAttributeWithName:@"Desc" stringValue:roomDecs];
+    if ([[NSString stringWithFormat:@"%@",[self.xmppStream myJID]] containsString:@"/"]) {
+        [conference_s addAttributeWithName:@"OwnerJid" stringValue:[[[NSString stringWithFormat:@"%@",[self.xmppStream myJID]] componentsSeparatedByString:@"/"] objectAtIndex:0]];
+    }
+    else {
+        [conference_s addAttributeWithName:@"OwnerJid" stringValue:[NSString stringWithFormat:@"%@",[self.xmppStream myJID]]];
+    }
     
     if (groupProfileImage) {
         [self setPhoto:[myDelegate reducedImageSize:groupProfileImage] xmlElement:conference_s];

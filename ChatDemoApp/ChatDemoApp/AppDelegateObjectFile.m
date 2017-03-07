@@ -86,8 +86,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 @synthesize appMapPhotofolderName;
 //end
 
+@synthesize singleChatUserListArray;
 //Group chat
-@synthesize groupDeleteid;
+@synthesize groupDeleteid,groupChatRoomInfoList;
 //end
 
 @synthesize afterAutentication,afterAutenticationRegistration;
@@ -146,6 +147,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     
     userHistoryArr = [NSMutableArray new];
     userProfileImage = [NSMutableDictionary new];
+    groupChatRoomInfoList = [NSMutableArray new];
     
     xmppMessageArchivingCoreDataStorage = [XMPPMessageArchivingCoreDataStorage sharedInstance];
     xmppMessageArchivingModule = [[XMPPMessageArchiving alloc]initWithMessageArchivingStorage:xmppMessageArchivingCoreDataStorage];

@@ -70,8 +70,7 @@ XMPPIncomingFileTransferDelegate>
 @property(assign, nonatomic)int portNumber;
 //end
 
-@property(strong, nonatomic)NSMutableArray *UserListArray;
-@property(strong, nonatomic)NSMutableArray *groupListArray;
+@property(strong, nonatomic)NSMutableArray *singleChatUserListArray;
 @property(strong, nonatomic)NSString *chatUser;
 @property(strong, nonatomic)NSMutableArray *userHistoryArr;
 @property(strong, nonatomic)NSMutableDictionary *userProfileImage;
@@ -148,6 +147,7 @@ XMPPIncomingFileTransferDelegate>
 - (NSData *)listionSendAttachedLocationImageCacheDirectoryFileName:(NSString *)fileName;
 
 //Group chat
+@property(nonatomic,strong) NSMutableArray *groupChatRoomInfoList;
 @property(nonatomic,strong) NSString *groupDeleteid;
 - (NSData*)reducedImageSize:(UIImage *)selectedImage;
 //end

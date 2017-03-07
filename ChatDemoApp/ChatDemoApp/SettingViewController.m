@@ -25,7 +25,6 @@
     
     self.navigationItem.title=@"Settings";
     tableViewArray=@[@"Account"];
-    tableViewIconArray=@[@"accountIcon"];
     [self addBackBarButton];
     // Do any additional setup after loading the view.
 }
@@ -137,7 +136,6 @@
     }
     
     cell.settingTitle.text=[tableViewArray objectAtIndex:indexPath.row];
-    cell.settingIcon.image=[UIImage imageNamed:[tableViewIconArray objectAtIndex:indexPath.row]];
     return cell;
 }
 #pragma mark - end

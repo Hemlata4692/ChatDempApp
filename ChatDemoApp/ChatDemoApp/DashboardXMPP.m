@@ -9,6 +9,10 @@
 #import "DashboardXMPP.h"
 #import "XmppCoreDataHandler.h"
 
+//Group chat
+#import "XmppCoreDataHandler.h"
+#import "NSData+XMPP.h"
+//end
 @interface DashboardXMPP (){
     
     AppDelegateObjectFile *appDelegate;
@@ -42,6 +46,11 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppNewUserAddedNotify) name:@"XmppUserPresenceUpdate" object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(historUpdated:) name:@"UserHistory" object:nil];
+    
+    //Group chat
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPFetchBookmarktList:) name:@"XMPPFetchBookmarktList" object:nil];
+    //end
+    
     appDelegate.selectedFriendUserId=@"";
     appDelegate.xmppLogedInUserId=[XMPPUserDefaultManager getValue:@"LoginCred"];
     
@@ -168,6 +177,8 @@
         [XMPPUserDefaultManager setValue:tempDict key:@"xmppUserDetailedList"];
         isrefresh=false;
         appDelegate.isContactListIsLoaded=YES;
+        
+        
         [self xmppUserListResponse:appDelegate.xmppUserDetailedList xmppUserListIds:appDelegate.xmppUserListArray];
     }
 }
@@ -340,33 +351,100 @@
 
 #pragma mark - Group chat
 - (void)getListOfGroups {
+    
+    XMPPIQ *iq = [[XMPPIQ alloc]init];
+    [iq addAttributeWithName:@"type" stringValue:@"get"];
+    //    NSString *from = [NSString stringWithFormat:@"%@/%@",appDelegate.xmppLogedInUserId,[[myDelegate.xmppStream myJID] resource]];
+    NSString *from = appDelegate.conferenceServerJid;
+    [iq addAttributeWithName:@"from" stringValue:from];
+    NSXMLElement *query =[NSXMLElement elementWithName:@"query" xmlns:@"jabber:iq:private"];
+    NSXMLElement *storage =   [NSXMLElement elementWithName:@"storage" xmlns:@"storage:bookmarks"];
+    [query addChild:storage];
+    [iq addChild:query];
+    [self.xmppStream sendElement:iq];
+}
 
-//    XMPPJID *servrJID = [XMPPJID jidWithString:myDelegate.conferenceServerJid];
-//    XMPPIQ *iq = [XMPPIQ iqWithType:@"get" to:servrJID];
-//    [iq addAttributeWithName:@"from" stringValue:[[self xmppStream] myJID].full];
-//    NSXMLElement *query = [NSXMLElement elementWithName:@"query"];
-//    [query addAttributeWithName:@"xmlns" stringValue:@"http://jabber.org/protocol/disco#items"];
-//    [iq addChild:query];
-//    [[self xmppStream] sendElement:iq];
+- (void)XMPPFetchBookmarktList:(NSNotification *)notification {
     
-//    XMPPIQ *iq = [[XMPPIQ alloc]init];
-//    [iq addAttributeWithName:@"type" stringValue:@"get"];
-//    NSString *from = [NSString stringWithFormat:@"%@/ResouseName",[self xmppStream].myJID.bare];
-//    [iq addAttributeWithName:@"from" stringValue:from];
-//    NSXMLElement *query =[NSXMLElement elementWithName:@"query" xmlns:@"jabber:iq:private"];
-//    NSXMLElement *storage =   [NSXMLElement elementWithName:@"storage" xmlns:@"storage:bookmarks"];
-//    [query addChild:storage];
-//    [iq addChild:query];
-//    [[self xmppStream] sendElement:iq];
+    NSLog(@"%@",notification.object);
+    appDelegate.groupChatRoomInfoList=[NSMutableArray new];
     
+    NSMutableArray *tempArray=[NSMutableArray new];
+    for (int i=0; i<[notification.object count]; i++) {
+        
+        NSMutableDictionary *tempDict=[NSMutableDictionary new];
+        NSXMLElement *lastConferences=[notification.object objectAtIndex:i];
+        
+        NSLog(@"%@",[lastConferences elementForName:@"PHOTO"]);
+        NSLog(@"%@",[lastConferences attributeStringValueForName:@"name"]);
+        [[XmppCoreDataHandler sharedManager] insertGroupEntryInXmppUserModelXmppGroupJid:[lastConferences attributeStringValueForName:@"jid"] xmppGroupName:[lastConferences attributeStringValueForName:@"name"] xmppGroupNickName:[lastConferences attributeStringValueForName:@"nick"] xmppGroupDescription:[lastConferences attributeStringValueForName:@"Desc"] xmppGroupOnwerId:[lastConferences attributeStringValueForName:@"OwnerJid"]];
+        
+        [tempDict setObject:[lastConferences attributeStringValueForName:@"jid"] forKey:@"roomJid"];
+        [tempDict setObject:[lastConferences attributeStringValueForName:@"name"] forKey:@"roomName"];
+        [tempDict setObject:[lastConferences attributeStringValueForName:@"nick"] forKey:@"roomNickName"];
+        [tempDict setObject:[lastConferences attributeStringValueForName:@"Desc"] forKey:@"roomDescription"];
+        [tempDict setObject:[lastConferences attributeStringValueForName:@"OwnerJid"] forKey:@"roomOwnerJid"];
+        [tempDict setObject:[NSNumber numberWithBool:false] forKey:@"isPhoto"];
+        
+        if (nil!=[lastConferences elementForName:@"PHOTO"]&&NULL!=[lastConferences elementForName:@"PHOTO"]) {
+            
+            [tempDict setObject:[NSNumber numberWithBool:true] forKey:@"isPhoto"];
+            [appDelegate saveDataInCacheDirectory:(UIImage *)[UIImage imageWithData:[self photo:lastConferences]] folderName:appDelegate.appProfilePhotofolderName jid:[lastConferences attributeStringValueForName:@"jid"]];
+        }
+        
+        [tempArray addObject:tempDict];
+    }
     
+//    NSSortDescriptor *descriptor = [NSSortDescriptor sortDescriptorWithKey:@"roomJid" ascending:YES];
+//    NSArray *results = [tempArray
+//                                sortedArrayUsingDescriptors:[NSArray arrayWithObject:descriptor]];
     
+//    [self deleteBookmark];
+    appDelegate.groupChatRoomInfoList=[tempArray mutableCopy];
+    [self getListOfGroupsNotify:[appDelegate.groupChatRoomInfoList mutableCopy]];
+}
+
+- (NSData *)photo:(NSXMLElement *)xmlElement {
+    NSData *decodedData = nil;
+    NSXMLElement *photo = [xmlElement elementForName:@"PHOTO"];
+    
+    if (photo != nil) {
+        // There is a PHOTO element. It should have a TYPE and a BINVAL
+        //NSXMLElement *fileType = [photo elementForName:@"TYPE"];
+        NSXMLElement *binval = [photo elementForName:@"BINVAL"];
+        
+        if (binval) {
+            NSData *base64Data = [[binval stringValue] dataUsingEncoding:NSASCIIStringEncoding];
+            decodedData = [base64Data xmpp_base64Decoded];
+        }
+    }
+    
+    return decodedData;
+}
+
+
+- (void)deleteBookmark {
+    
+    XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:[XMPPJID jidWithString:myDelegate.hostName]];
+    [iq addAttributeWithName:@"from" stringValue:[self.xmppStream myJID].full];
+    //    [iq addAttributeWithName:@"id" stringValue:[NSString stringWithFormat:@"BookMarkManager2.%@",[self getUniqueRoomName]]];
+    [iq addAttributeWithName:@"id" stringValue:@"BookMarkManager"];
+    NSXMLElement *query = [NSXMLElement elementWithName:@"query"];
+    [query addAttributeWithName:@"xmlns" stringValue:@"jabber:iq:private"];
+    NSXMLElement *storage_q = [NSXMLElement elementWithName:@"storage"];
+    [storage_q addAttributeWithName:@"xmlns" stringValue:@"storage:bookmarks"];
+    
+    [query addChild:storage_q];
+    [iq addChild:query];
+    [self.xmppStream sendElement:iq];
+}
+
+- (void)getGroupPhotoJid:(NSString *)jid profileImageView:(UIImageView *)profileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(UIImage *tempImage)) completion {
+    
+    NSData *tempImageData=[appDelegate listionDataFromCacheDirectoryFolderName:appDelegate.appProfilePhotofolderName jid:jid];
+    completion([UIImage imageWithData:tempImageData]);
 }
 #pragma mark - end
-
-- (void)xmppRoom:(XMPPRoom *)sender didFetchConfigurationForm:(NSXMLElement *)configForm{
-    NSLog(@" %@", sender.roomJID.user);
-}
 /*
 #pragma mark - Navigation
 

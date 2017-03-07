@@ -10,6 +10,11 @@
 		90DC0D66A2ED385893C02E29 /* libPods-ChatDemoApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE07D7CB35D225B6FB24E1D2 /* libPods-ChatDemoApp.a */; };
 		B7005C1F1E5FE62F003A56D3 /* LocationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B7005C1E1E5FE62E003A56D3 /* LocationViewController.m */; };
 		B70AE66A1E2F1EC600554038 /* AppDelegateObjectFile.m in Sources */ = {isa = PBXBuildFile; fileRef = B70AE6691E2F1EC600554038 /* AppDelegateObjectFile.m */; };
+		B70FC3001E6EB6C100292950 /* groupPlaceholderImage.png in Resources */ = {isa = PBXBuildFile; fileRef = B70FC2FF1E6EB6C100292950 /* groupPlaceholderImage.png */; };
+		B70FC3031E6EB8BE00292950 /* XMPPGroupChatRoom.m in Sources */ = {isa = PBXBuildFile; fileRef = B70FC3021E6EB8BE00292950 /* XMPPGroupChatRoom.m */; };
+		B70FC3061E6EB8DD00292950 /* GroupChatViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B70FC3051E6EB8DD00292950 /* GroupChatViewController.m */; };
+		B70FC3091E6EB8EB00292950 /* GroupInvitationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B70FC3081E6EB8EB00292950 /* GroupInvitationViewController.m */; };
+		B70FC30D1E6EB8FF00292950 /* GroupChatFormViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B70FC30C1E6EB8FF00292950 /* GroupChatFormViewController.m */; };
 		B7131E5D1E52DA3A00A435A3 /* ChatScreenTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B7131E5C1E52DA3A00A435A3 /* ChatScreenTableViewCell.m */; };
 		B715A0B91E5E9BE100B36D16 /* SettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B715A0B81E5E9BE000B36D16 /* SettingViewController.m */; };
 		B715A0BE1E5E9F7700B36D16 /* SettingTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B715A0BD1E5E9F7700B36D16 /* SettingTableViewCell.m */; };
@@ -68,6 +73,15 @@
 		B70AE6691E2F1EC600554038 /* AppDelegateObjectFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegateObjectFile.m; sourceTree = "<group>"; };
 		B70F93281E4DB51C0064EF29 /* AddressBookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBookUI.framework; path = System/Library/Frameworks/AddressBookUI.framework; sourceTree = SDKROOT; };
 		B70F932A1E4DB5290064EF29 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
+		B70FC2FF1E6EB6C100292950 /* groupPlaceholderImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = groupPlaceholderImage.png; sourceTree = "<group>"; };
+		B70FC3011E6EB8BE00292950 /* XMPPGroupChatRoom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMPPGroupChatRoom.h; sourceTree = "<group>"; };
+		B70FC3021E6EB8BE00292950 /* XMPPGroupChatRoom.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMPPGroupChatRoom.m; sourceTree = "<group>"; };
+		B70FC3041E6EB8DD00292950 /* GroupChatViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GroupChatViewController.h; sourceTree = "<group>"; };
+		B70FC3051E6EB8DD00292950 /* GroupChatViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GroupChatViewController.m; sourceTree = "<group>"; };
+		B70FC3071E6EB8EB00292950 /* GroupInvitationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GroupInvitationViewController.h; sourceTree = "<group>"; };
+		B70FC3081E6EB8EB00292950 /* GroupInvitationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GroupInvitationViewController.m; sourceTree = "<group>"; };
+		B70FC30B1E6EB8FF00292950 /* GroupChatFormViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GroupChatFormViewController.h; sourceTree = "<group>"; };
+		B70FC30C1E6EB8FF00292950 /* GroupChatFormViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GroupChatFormViewController.m; sourceTree = "<group>"; };
 		B7131E5B1E52DA3A00A435A3 /* ChatScreenTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatScreenTableViewCell.h; sourceTree = "<group>"; };
 		B7131E5C1E52DA3A00A435A3 /* ChatScreenTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatScreenTableViewCell.m; sourceTree = "<group>"; };
 		B715A0B71E5E9BE000B36D16 /* SettingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingViewController.h; sourceTree = "<group>"; };
@@ -210,6 +224,44 @@
 			name = LocationAttachment;
 			sourceTree = "<group>";
 		};
+		B70FC2D51E6E6ADF00292950 /* SampleCode */ = {
+			isa = PBXGroup;
+			children = (
+				B745F84A1E235210001119BD /* GroupConversationViewController.h */,
+				B745F84B1E235210001119BD /* GroupConversationViewController.m */,
+				B7C37BF31E656CC200411EC8 /* GroupChatXMPP.h */,
+				B7C37BF41E656CC200411EC8 /* GroupChatXMPP.m */,
+			);
+			name = SampleCode;
+			sourceTree = "<group>";
+		};
+		B70FC2D61E6E6AEE00292950 /* GroupChatFormView */ = {
+			isa = PBXGroup;
+			children = (
+				B70FC30B1E6EB8FF00292950 /* GroupChatFormViewController.h */,
+				B70FC30C1E6EB8FF00292950 /* GroupChatFormViewController.m */,
+			);
+			name = GroupChatFormView;
+			sourceTree = "<group>";
+		};
+		B70FC2D71E6E6B0E00292950 /* GroupInvitionView */ = {
+			isa = PBXGroup;
+			children = (
+				B70FC3071E6EB8EB00292950 /* GroupInvitationViewController.h */,
+				B70FC3081E6EB8EB00292950 /* GroupInvitationViewController.m */,
+			);
+			name = GroupInvitionView;
+			sourceTree = "<group>";
+		};
+		B70FC2D81E6E6BB200292950 /* GroupChatView */ = {
+			isa = PBXGroup;
+			children = (
+				B70FC3041E6EB8DD00292950 /* GroupChatViewController.h */,
+				B70FC3051E6EB8DD00292950 /* GroupChatViewController.m */,
+			);
+			name = GroupChatView;
+			sourceTree = "<group>";
+		};
 		B715A0B51E5E9BA700B36D16 /* SettingView */ = {
 			isa = PBXGroup;
 			children = (
@@ -309,6 +361,7 @@
 		B745F8271E234D54001119BD /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				B70FC2FF1E6EB6C100292950 /* groupPlaceholderImage.png */,
 				B7C25C871E63F61100CD7270 /* locationPlaceholder.jpg */,
 				B715A0C71E5EF47E00B36D16 /* pdf_placeholder.png */,
 				B7E0D99C1E4048C500397393 /* RegistrationProcess.rtf */,
@@ -390,10 +443,12 @@
 		B745F8431E2351C3001119BD /* GroupConversationView */ = {
 			isa = PBXGroup;
 			children = (
-				B745F84A1E235210001119BD /* GroupConversationViewController.h */,
-				B745F84B1E235210001119BD /* GroupConversationViewController.m */,
-				B7C37BF31E656CC200411EC8 /* GroupChatXMPP.h */,
-				B7C37BF41E656CC200411EC8 /* GroupChatXMPP.m */,
+				B70FC2D81E6E6BB200292950 /* GroupChatView */,
+				B70FC2D71E6E6B0E00292950 /* GroupInvitionView */,
+				B70FC2D61E6E6AEE00292950 /* GroupChatFormView */,
+				B70FC2D51E6E6ADF00292950 /* SampleCode */,
+				B70FC3011E6EB8BE00292950 /* XMPPGroupChatRoom.h */,
+				B70FC3021E6EB8BE00292950 /* XMPPGroupChatRoom.m */,
 			);
 			name = GroupConversationView;
 			sourceTree = "<group>";
@@ -594,6 +649,7 @@
 				B77DFFF71E4C433C00921126 /* arrow_down@3x.png in Resources */,
 				B780E9F91E2F9FC200437B4E /* ReadMe.rtf in Resources */,
 				B7E0D99D1E4048C500397393 /* RegistrationProcess.rtf in Resources */,
+				B70FC3001E6EB6C100292950 /* groupPlaceholderImage.png in Resources */,
 				B745F8321E234D55001119BD /* Main.storyboard in Resources */,
 				B79CA2581E30B91A007CDB23 /* images.png in Resources */,
 			);
@@ -670,10 +726,12 @@
 				B77EE6391E4DE73200A38ADD /* CustomFilterViewController.m in Sources */,
 				B75792581E42E22300AC48D0 /* UserProfileViewController.m in Sources */,
 				B75126E01E30745000495348 /* LoginXMPP.m in Sources */,
+				B70FC3061E6EB8DD00292950 /* GroupChatViewController.m in Sources */,
 				B77DFFF51E4C32C500921126 /* XMPPOutgoingFileTransfer.m in Sources */,
 				B745F82C1E234D55001119BD /* AppDelegate.m in Sources */,
 				B77DFFDF1E4C2E2100921126 /* ChatScreenViewController.m in Sources */,
 				B75BC5761E3F60A500E5F780 /* XmppStorageModel.xcdatamodeld in Sources */,
+				B70FC3031E6EB8BE00292950 /* XMPPGroupChatRoom.m in Sources */,
 				B715A0B91E5E9BE100B36D16 /* SettingViewController.m in Sources */,
 				B715A0BE1E5E9F7700B36D16 /* SettingTableViewCell.m in Sources */,
 				B77DFFF41E4C32C500921126 /* XMPPNamespaces.m in Sources */,
@@ -683,8 +741,10 @@
 				B77DFFE81E4C2F3200921126 /* UIPlaceHolderTextView.m in Sources */,
 				B75E7EF61E5BF1E600634A68 /* XmppCoreDataHandler.m in Sources */,
 				B745F85A1E235435001119BD /* BSKeyboardControls.m in Sources */,
+				B70FC3091E6EB8EB00292950 /* GroupInvitationViewController.m in Sources */,
 				B745F8691E23596D001119BD /* HMSegmentedControl.m in Sources */,
 				B77DFFF31E4C32C500921126 /* XMPPIncomingFileTransfer.m in Sources */,
+				B70FC30D1E6EB8FF00292950 /* GroupChatFormViewController.m in Sources */,
 				B7B9A5661E23B17A00DB4429 /* MMMaterialDesignSpinner.m in Sources */,
 				B745F8291E234D55001119BD /* main.m in Sources */,
 				B757925B1E42E23800AC48D0 /* XmppProfileView.m in Sources */,

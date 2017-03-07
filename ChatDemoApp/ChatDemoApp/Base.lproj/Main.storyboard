@@ -445,6 +445,92 @@
             </objects>
             <point key="canvasLocation" x="3264.375" y="122.53521126760563"/>
         </scene>
+        <!--Group Chat Form View Controller-->
+        <scene sceneID="qGw-UA-1LV">
+            <objects>
+                <viewController storyboardIdentifier="GroupChatFormViewController" id="Oyr-ry-49z" customClass="GroupChatFormViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="e1y-Uc-X2B"/>
+                        <viewControllerLayoutGuide type="bottom" id="1jZ-Ea-LQD"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="LYK-r3-Ngp">
+                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="line" placeholder="Add subject" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="EGE-7x-inw">
+                                <rect key="frame" x="94" y="40" width="210" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="EiU-Aj-w6M"/>
+                                </constraints>
+                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                                <connections>
+                                    <outlet property="delegate" destination="Oyr-ry-49z" id="ZkO-ry-vli"/>
+                                </connections>
+                            </textField>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="jHW-yK-CCi" customClass="UIPlaceHolderTextView">
+                                <rect key="frame" x="16" y="98" width="288" height="81"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="81" id="qMt-UC-fMI"/>
+                                </constraints>
+                                <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                <connections>
+                                    <outlet property="delegate" destination="Oyr-ry-49z" id="oZL-nq-Rit"/>
+                                </connections>
+                            </textView>
+                            <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YVa-g4-2bz">
+                                <rect key="frame" x="135" y="202" width="50" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="50" id="7ea-qc-P6F"/>
+                                    <constraint firstAttribute="height" constant="50" id="LcO-F5-xJl"/>
+                                </constraints>
+                                <state key="normal" image="addGroupIcon"/>
+                                <connections>
+                                    <action selector="addGroup:" destination="Oyr-ry-49z" eventType="touchUpInside" id="EkV-m0-LcI"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="M93-Fm-rkK">
+                                <rect key="frame" x="16" y="20" width="70" height="70"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="70" id="IoC-JR-E35"/>
+                                    <constraint firstAttribute="width" constant="70" id="PrX-hh-Azz"/>
+                                </constraints>
+                                <state key="normal" image="groupPlaceholderImage.png"/>
+                                <connections>
+                                    <action selector="selectImage:" destination="Oyr-ry-49z" eventType="touchUpInside" id="1cC-U8-XzM"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="M93-Fm-rkK" firstAttribute="leading" secondItem="LYK-r3-Ngp" secondAttribute="leading" constant="16" id="HJI-nM-5gw"/>
+                            <constraint firstAttribute="trailing" secondItem="EGE-7x-inw" secondAttribute="trailing" constant="16" id="HtQ-se-TIc"/>
+                            <constraint firstItem="EGE-7x-inw" firstAttribute="leading" secondItem="M93-Fm-rkK" secondAttribute="trailing" constant="8" id="P3a-q9-CqS"/>
+                            <constraint firstItem="jHW-yK-CCi" firstAttribute="top" secondItem="M93-Fm-rkK" secondAttribute="bottom" constant="8" id="UT1-4z-sHA"/>
+                            <constraint firstItem="EGE-7x-inw" firstAttribute="centerY" secondItem="M93-Fm-rkK" secondAttribute="centerY" id="Yts-xo-aeV"/>
+                            <constraint firstItem="jHW-yK-CCi" firstAttribute="leading" secondItem="LYK-r3-Ngp" secondAttribute="leading" constant="16" id="ZI5-82-XJc"/>
+                            <constraint firstItem="YVa-g4-2bz" firstAttribute="top" secondItem="jHW-yK-CCi" secondAttribute="bottom" constant="23" id="fFK-C1-5pM"/>
+                            <constraint firstItem="M93-Fm-rkK" firstAttribute="top" secondItem="e1y-Uc-X2B" secondAttribute="bottom" constant="20" id="nUP-gy-wzD"/>
+                            <constraint firstItem="YVa-g4-2bz" firstAttribute="centerX" secondItem="LYK-r3-Ngp" secondAttribute="centerX" id="oyn-sb-sHd"/>
+                            <constraint firstAttribute="trailing" secondItem="jHW-yK-CCi" secondAttribute="trailing" constant="16" id="xMw-44-IQo"/>
+                        </constraints>
+                    </view>
+                    <extendedEdge key="edgesForExtendedLayout"/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
+                    <connections>
+                        <outlet property="addRoomName" destination="EGE-7x-inw" id="Bcw-SE-e6F"/>
+                        <outlet property="groupDescription" destination="jHW-yK-CCi" id="Gop-XI-kHQ"/>
+                        <outlet property="groupImage" destination="M93-Fm-rkK" id="fkS-q5-enN"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="z5p-rX-ocz" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4642.5" y="1595.0704225352113"/>
+        </scene>
         <!--Group Conversation View Controller-->
         <scene sceneID="eXQ-ts-mjx">
             <objects>
@@ -530,7 +616,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9On-vX-56U" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3868" y="830"/>
+            <point key="canvasLocation" x="5453" y="1597"/>
         </scene>
         <!--User Profile View Controller-->
         <scene sceneID="EeS-Wf-6XB">
@@ -678,15 +764,8 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="sqN-rC-SZc">
-                                                    <rect key="frame" x="8" y="11" width="21" height="21"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="width" constant="21" id="3XU-mJ-6sM"/>
-                                                        <constraint firstAttribute="height" constant="21" id="p4I-fj-aRJ"/>
-                                                    </constraints>
-                                                </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vw7-RB-mrH">
-                                                    <rect key="frame" x="37" y="11" width="275" height="22"/>
+                                                    <rect key="frame" x="16" y="11" width="296" height="22"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -706,18 +785,13 @@
                                                 <constraint firstAttribute="trailing" secondItem="XU6-Gl-uNX" secondAttribute="trailing" id="4u8-hm-Mmg"/>
                                                 <constraint firstItem="vw7-RB-mrH" firstAttribute="top" secondItem="SzJ-0N-Qhp" secondAttribute="top" constant="11" id="AWI-iX-zaJ"/>
                                                 <constraint firstAttribute="trailing" secondItem="vw7-RB-mrH" secondAttribute="trailing" constant="8" id="FWj-CF-Z5g"/>
-                                                <constraint firstItem="vw7-RB-mrH" firstAttribute="leading" secondItem="sqN-rC-SZc" secondAttribute="trailing" constant="8" id="WqX-BN-fbn"/>
                                                 <constraint firstItem="XU6-Gl-uNX" firstAttribute="leading" secondItem="SzJ-0N-Qhp" secondAttribute="leading" constant="37" id="b2B-4l-yZj"/>
-                                                <constraint firstItem="sqN-rC-SZc" firstAttribute="leading" secondItem="SzJ-0N-Qhp" secondAttribute="leading" constant="8" id="bnx-9N-bXL"/>
+                                                <constraint firstItem="vw7-RB-mrH" firstAttribute="leading" secondItem="SzJ-0N-Qhp" secondAttribute="leading" constant="16" id="cI6-Se-bn1"/>
                                                 <constraint firstAttribute="bottom" secondItem="vw7-RB-mrH" secondAttribute="bottom" constant="11" id="lXX-kz-zhk"/>
                                                 <constraint firstAttribute="bottom" secondItem="XU6-Gl-uNX" secondAttribute="bottom" id="qee-0P-LCF"/>
                                             </constraints>
                                         </tableViewCellContentView>
-                                        <constraints>
-                                            <constraint firstItem="sqN-rC-SZc" firstAttribute="centerY" secondItem="uqD-We-gyA" secondAttribute="centerY" id="JqY-pG-yrj"/>
-                                        </constraints>
                                         <connections>
-                                            <outlet property="settingIcon" destination="sqN-rC-SZc" id="mI6-Aj-0MD"/>
                                             <outlet property="settingTitle" destination="vw7-RB-mrH" id="sgw-jq-oby"/>
                                         </connections>
                                     </tableViewCell>
@@ -1410,7 +1484,7 @@
                 <navigationController storyboardIdentifier="loginNavigation" automaticallyAdjustsScrollViewInsets="NO" id="g5s-l7-tBw" sceneMemberID="viewController">
                     <toolbarItems/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="Hp1-z3-vWC">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" translucent="NO" id="Hp1-z3-vWC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -1429,7 +1503,7 @@
                 <navigationController storyboardIdentifier="DashboardNavigation" automaticallyAdjustsScrollViewInsets="NO" id="Vep-JT-HHx" sceneMemberID="viewController">
                     <toolbarItems/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="pVC-3M-Vd2">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" translucent="NO" id="pVC-3M-Vd2">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -1807,8 +1881,10 @@
         </scene>
     </scenes>
     <resources>
+        <image name="addGroupIcon" width="50" height="50"/>
         <image name="currentLocationIcon" width="40" height="40"/>
         <image name="editProfile" width="40" height="40"/>
+        <image name="groupPlaceholderImage.png" width="300" height="300"/>
         <image name="profile_camera" width="96" height="96"/>
         <image name="sendIcon" width="30" height="30"/>
         <image name="upArrow" width="20" height="10"/>

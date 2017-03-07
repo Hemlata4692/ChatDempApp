@@ -26,6 +26,10 @@
     
     NSMutableArray *historyChatData;
     NSMutableDictionary *profileLocalDictData;
+    
+    //Group chat
+    NSMutableArray *groupChatListArray;
+    //end
 }
 @property (strong, nonatomic) IBOutlet UITableView *dasboardTableListing;
 @end
@@ -44,6 +48,7 @@
     [self addSegmentBar];
     
     userListArray=[NSMutableArray new];
+    groupChatListArray=[NSMutableArray new];
     userDetailedList=[NSMutableDictionary new];
     historyChatData=[NSMutableArray new];
     
@@ -88,7 +93,7 @@
         return historyChatData.count;
     }
     else {
-        return 0;
+        return groupChatListArray.count;
     }
 }
 
@@ -121,6 +126,7 @@
     UILabel* badgeLabel = (UILabel*)[cell viewWithTag:6];
     
     badgeLabel.hidden=YES;
+    profileBtn.hidden=NO;
     if (customSegmentedControl.selectedSegmentIndex==2) {
 
         NSLog(@"%@",[userListArray objectAtIndex:indexPath.row]);
@@ -178,8 +184,17 @@
         //        NSLog(@" userStatus:%@ \n phoneNumber:%@ Desc:%@ \n address:%@ \n emailid:%@ \n birthDay:%@ \n gender:%@",[profileDic objectForKey:@"UserStatus"],[profileDic objectForKey:@"PhoneNumber"],[profileDic objectForKey:@"Description"],[profileDic objectForKey:@"Address"],[profileDic objectForKey:@"EmailAddress"],[profileDic objectForKey:@"UserBirthDay"],[profileDic objectForKey:@"Gender"]);
     }
     else {
+        //Group content
+        NSMutableDictionary *groupDataDic=[[groupChatListArray objectAtIndex:indexPath.row] mutableCopy];
         
-        //Group contents
+        dateLabel.hidden=YES;
+        profileBtn.hidden=YES;
+        userImage.layer.cornerRadius=20;
+        userImage.layer.masksToBounds=YES;
+        
+        nameLabel.text = [groupDataDic objectForKey:@"roomName"];
+        statusLabel.text=[groupDataDic objectForKey:@"roomDescription"];
+        [self configureGroupPhotoForCell:cell jid:[groupDataDic objectForKey:@"roomJid"]];
     }
     return cell;
 }
@@ -401,7 +416,7 @@
             NSLog(@"2");
             
             UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-            UIViewController *objGroupView = [storyboard instantiateViewControllerWithIdentifier:@"GroupConversationViewController"];
+            UIViewController *objGroupView = [storyboard instantiateViewControllerWithIdentifier:@"GroupChatFormViewController"];
             [self.navigationController pushViewController:objGroupView animated:YES];
         }
         else if (status==3) {
@@ -462,13 +477,35 @@
     [self getProfileData1:^(NSDictionary *tempProfileData) {
         // do something with your BOOL
         profileLocalDictData=[tempProfileData mutableCopy];
-//        [self getListOfGroups];
-        [myDelegate stopIndicator];
-        [self.dasboardTableListing reloadData];
+        [self getListOfGroups];
     }];
 }
 
+#pragma mark - Group chat
+- (void)configureGroupPhotoForCell:(UITableViewCell *)cell jid:(NSString *)jid {
+    
+    // Our xmppRosterStorage will cache photos as they arrive from the xmppvCardAvatarModule.
+    // We only need to ask the avatar module for a photo, if the roster doesn't have it.
+    UIImageView *userImage = (UIImageView*)[cell viewWithTag:2];
+    [self getGroupPhotoJid:jid profileImageView:userImage placeholderImage:@"groupPlaceholderImage.png" result:^(UIImage *tempImage) {
+        // do something with your BOOL
+        if (tempImage!=nil) {
+            userImage.image=tempImage;
+        }
+        else {
+            
+            userImage.image=[UIImage imageNamed:@"groupPlaceholderImage.png"];
+        }
+    }];
+}
 
+- (void)getListOfGroupsNotify:(NSMutableArray *)groupInfo {
+
+    [myDelegate stopIndicator];
+    groupChatListArray=[groupInfo mutableCopy];
+    [self.dasboardTableListing reloadData];
+}
+#pragma mark - end
 /*
 #pragma mark - Navigation
 

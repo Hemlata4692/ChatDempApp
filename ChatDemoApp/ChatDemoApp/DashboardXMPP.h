@@ -41,5 +41,7 @@
 
 //Group chat
 - (void)getListOfGroups;
+- (void)getListOfGroupsNotify:(NSMutableArray *)groupInfo;
+- (void)getGroupPhotoJid:(NSString *)jid profileImageView:(UIImageView *)profileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(UIImage *tempImage)) completion;
 //end
 @end

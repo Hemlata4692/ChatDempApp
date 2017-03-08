@@ -7,8 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "XMPPGroupChatRoom.h"
 
-@interface GroupChatFormViewController : XMPPGroupChatRoom
+@interface GroupChatFormViewController : UIViewController
 
 @end

@@ -9,6 +9,8 @@
 #import "GroupChatFormViewController.h"
 #import "UIPlaceHolderTextView.h"
 #import "BSKeyboardControls.h"
+#import "UserDefaultManager.h"
+#import "GroupInvitationViewController.h"
 
 @interface GroupChatFormViewController ()<BSKeyboardControlsDelegate,UIActionSheetDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate> {
 
@@ -55,7 +57,8 @@
     self.groupImage.layer.cornerRadius=35;
     self.groupImage.layer.masksToBounds=YES;
     
-    self.groupDescription.placeholder=@"Optional Room Desccription (100 chars)";
+    self.groupDescription.contentInset = UIEdgeInsetsMake(-5, 5, 0, 0);
+    self.groupDescription.placeholder=@"Room Desccription (Optional)";
     self.groupDescription.layer.borderColor=[UIColor colorWithRed:215.0/255.0 green:215.0/255.0 blue:215.0/255.0 alpha:0.5].CGColor;
     self.groupDescription.layer.borderWidth=1;
     self.groupDescription.placeholderTextColor=[UIColor colorWithRed:215.0/255.0 green:215.0/255.0 blue:215.0/255.0 alpha:0.5];
@@ -155,7 +158,27 @@
 
 - (void)nextAction :(id)sender {
     
+    [self.view endEditing:YES];
+    if (([self.addRoomName.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].length == 0)) {
+        
+        [UserDefaultManager showAlertMessage:@"Alert" message:@"Subject field is required."];
+    }
+    else {
     
+        GroupInvitationViewController *invitationViewObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"GroupInvitationViewController"];
+        invitationViewObj.roomSubject=self.addRoomName.text;
+        invitationViewObj.roomNickname=@"";
+        invitationViewObj.roomDescription=self.groupDescription.text;
+        if (![self image:self.groupImage.imageView.image isEqualTo:[UIImage imageNamed:@"groupPlaceholderImage.png"]]) {
+            invitationViewObj.friendImage=self.groupImage.imageView.image;
+        }
+        else {
+        
+            invitationViewObj.friendImage=nil;
+        }
+        
+        [self.navigationController pushViewController:invitationViewObj animated:YES];
+    }
 }
 
 - (BOOL)image:(UIImage *)image1 isEqualTo:(UIImage *)image2

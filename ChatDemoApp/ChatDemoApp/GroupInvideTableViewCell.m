@@ -21,4 +21,16 @@
     // Configure the view for the selected state
 }
 
+- (void)displayContactInformation:(NSMutableDictionary *)contactInfo isSelected:(bool)isSelected {
+
+    if(isSelected) {
+    
+        self.selectedIcon.hidden=NO;
+    }
+    else {
+        
+        self.selectedIcon.hidden=YES;
+    }
+    self.friendName.text=[contactInfo objectForKey:@"Name"];
+}
 @end

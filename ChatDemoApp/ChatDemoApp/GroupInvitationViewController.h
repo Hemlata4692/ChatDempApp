@@ -7,7 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "XMPPGroupChatRoom.h"
 
-@interface GroupInvitationViewController : UIViewController
+@interface GroupInvitationViewController : XMPPGroupChatRoom
 
+@property(nonatomic, retain)NSString *roomSubject;
+@property(nonatomic, retain)NSString *roomDescription;
+@property(nonatomic, retain)NSString *roomNickname;
+@property(nonatomic, retain)UIImage *friendImage;
 @end

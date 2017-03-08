@@ -143,7 +143,7 @@
         self.messageLabel.translatesAutoresizingMaskIntoConstraints=YES;
         self.attachedImageView.translatesAutoresizingMaskIntoConstraints=YES;
         self.messageLabel.numberOfLines=0;
-        self.messageLabel.text=[[[currentMessage elementForName:@"body"] stringValue] capitalizedString];
+        self.messageLabel.text=[[currentMessage elementForName:@"body"] stringValue];
         
         if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]) {
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 128); //Here frame = (AttachedImage_x_Space, attachedImageView_TopSpace, AttachedImage_width, AttachedImage_height
@@ -177,7 +177,7 @@
         self.messageLabel.translatesAutoresizingMaskIntoConstraints=YES;
         self.attachedImageView.translatesAutoresizingMaskIntoConstraints=YES;
         self.messageLabel.numberOfLines=0;
-        self.messageLabel.text=[[[currentMessage elementForName:@"body"] stringValue] capitalizedString];
+        self.messageLabel.text=[[currentMessage elementForName:@"body"] stringValue];
         
         if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]) {
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 128); //Here frame = (AttachedImage_x_Space, attachedImageView_TopSpace, AttachedImage_width, AttachedImage_height
@@ -267,7 +267,7 @@
         }
         
         self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
-        self.messageLabel.text=[[[currentMessage elementForName:@"body"] stringValue] capitalizedString];
+        self.messageLabel.text=[[currentMessage elementForName:@"body"] stringValue];
     }
     else {
         

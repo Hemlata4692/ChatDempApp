@@ -8,6 +8,14 @@
 
 #import <UIKit/UIKit.h>
 
+typedef NS_ENUM (NSInteger, GroupChatType){
+    XMPP_GroupCreate
+};
+
 @interface XMPPGroupChatRoom : UIViewController
 
+
+- (NSArray *)fetchFriendJids;
+- (NSMutableDictionary *)fetchFriendDetials;
+- (void)getProfilePhotosJid:(NSString *)jid profileImageView:(UIImageView *)profileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(UIImage *tempImage)) completion;
 @end

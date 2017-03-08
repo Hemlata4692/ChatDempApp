@@ -22,6 +22,7 @@
 		B715A0C81E5EF47E00B36D16 /* pdf_placeholder.png in Resources */ = {isa = PBXBuildFile; fileRef = B715A0C71E5EF47E00B36D16 /* pdf_placeholder.png */; };
 		B71B73CD1E542BC600D57E7D /* SendImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B71B73CC1E542BC600D57E7D /* SendImageViewController.m */; };
 		B72DD0781E5DAC0A0017C488 /* EditUserStatusViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B72DD0771E5DAC0A0017C488 /* EditUserStatusViewController.m */; };
+		B738ED431E6FFF99001AC7F5 /* GroupInvideTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B738ED421E6FFF99001AC7F5 /* GroupInvideTableViewCell.m */; };
 		B745F8291E234D55001119BD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F8281E234D55001119BD /* main.m */; };
 		B745F82C1E234D55001119BD /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F82B1E234D55001119BD /* AppDelegate.m */; };
 		B745F82F1E234D55001119BD /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F82E1E234D55001119BD /* ViewController.m */; };
@@ -95,6 +96,8 @@
 		B71B73CC1E542BC600D57E7D /* SendImageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SendImageViewController.m; sourceTree = "<group>"; };
 		B72DD0761E5DAC0A0017C488 /* EditUserStatusViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditUserStatusViewController.h; sourceTree = "<group>"; };
 		B72DD0771E5DAC0A0017C488 /* EditUserStatusViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditUserStatusViewController.m; sourceTree = "<group>"; };
+		B738ED411E6FFF99001AC7F5 /* GroupInvideTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GroupInvideTableViewCell.h; sourceTree = "<group>"; };
+		B738ED421E6FFF99001AC7F5 /* GroupInvideTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GroupInvideTableViewCell.m; sourceTree = "<group>"; };
 		B745F8241E234D54001119BD /* ChatDemoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChatDemoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B745F8281E234D55001119BD /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		B745F82A1E234D55001119BD /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -249,6 +252,8 @@
 			children = (
 				B70FC3071E6EB8EB00292950 /* GroupInvitationViewController.h */,
 				B70FC3081E6EB8EB00292950 /* GroupInvitationViewController.m */,
+				B738ED411E6FFF99001AC7F5 /* GroupInvideTableViewCell.h */,
+				B738ED421E6FFF99001AC7F5 /* GroupInvideTableViewCell.m */,
 			);
 			name = GroupInvitionView;
 			sourceTree = "<group>";
@@ -443,9 +448,9 @@
 		B745F8431E2351C3001119BD /* GroupConversationView */ = {
 			isa = PBXGroup;
 			children = (
-				B70FC2D81E6E6BB200292950 /* GroupChatView */,
-				B70FC2D71E6E6B0E00292950 /* GroupInvitionView */,
 				B70FC2D61E6E6AEE00292950 /* GroupChatFormView */,
+				B70FC2D71E6E6B0E00292950 /* GroupInvitionView */,
+				B70FC2D81E6E6BB200292950 /* GroupChatView */,
 				B70FC2D51E6E6ADF00292950 /* SampleCode */,
 				B70FC3011E6EB8BE00292950 /* XMPPGroupChatRoom.h */,
 				B70FC3021E6EB8BE00292950 /* XMPPGroupChatRoom.m */,
@@ -727,6 +732,7 @@
 				B75792581E42E22300AC48D0 /* UserProfileViewController.m in Sources */,
 				B75126E01E30745000495348 /* LoginXMPP.m in Sources */,
 				B70FC3061E6EB8DD00292950 /* GroupChatViewController.m in Sources */,
+				B738ED431E6FFF99001AC7F5 /* GroupInvideTableViewCell.m in Sources */,
 				B77DFFF51E4C32C500921126 /* XMPPOutgoingFileTransfer.m in Sources */,
 				B745F82C1E234D55001119BD /* AppDelegate.m in Sources */,
 				B77DFFDF1E4C2E2100921126 /* ChatScreenViewController.m in Sources */,

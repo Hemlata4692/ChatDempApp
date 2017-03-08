@@ -177,8 +177,7 @@
         [XMPPUserDefaultManager setValue:tempDict key:@"xmppUserDetailedList"];
         isrefresh=false;
         appDelegate.isContactListIsLoaded=YES;
-        
-        
+
         [self xmppUserListResponse:appDelegate.xmppUserDetailedList xmppUserListIds:appDelegate.xmppUserListArray];
     }
 }

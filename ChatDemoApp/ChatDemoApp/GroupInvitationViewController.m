@@ -10,6 +10,8 @@
 
 @interface GroupInvitationViewController ()
 
+@property (strong, nonatomic) IBOutlet UIImageView *groupIcon;
+@property (strong, nonatomic) IBOutlet UITextView *groupDescription;
 @end
 
 @implementation GroupInvitationViewController
@@ -22,6 +24,8 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+- (IBAction)createGroup:(UIButton *)sender {
 }
 
 /*

@@ -149,6 +149,7 @@ XMPPIncomingFileTransferDelegate>
 //Group chat
 @property(nonatomic,strong) NSMutableArray *groupChatRoomInfoList;
 @property(nonatomic,strong) NSString *groupDeleteid;
+@property(strong, nonatomic)XMPPRoom *xmppRoomDelegate;
 - (NSData*)reducedImageSize:(UIImage *)selectedImage;
 //end
 @end

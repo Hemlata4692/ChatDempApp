@@ -38,10 +38,16 @@ typedef NS_ENUM (NSInteger, GroupChatType){
 
 @property(nonatomic, readonly)NSMutableDictionary *xmppCurrentRoomDetail;
 
+- (void)deallocObservers;
 - (NSArray *)fetchFriendJids;
 - (NSMutableDictionary *)fetchFriendDetials;
 - (void)getProfilePhotosJid:(NSString *)jid profileImageView:(UIImageView *)profileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(UIImage *tempImage)) completion;
 - (void)createChatRoom:(UIImage *)groupImage groupNickName:(NSString *)groupNickName groupDescription:(NSString *)groupDescription groupSubject:(NSString *)groupSubject;
+- (void)joinChatRoomJid:(NSString *)groupRoomJid groupNickName:(NSString *)groupNickName;
+- (void)sendGroupInvitation:(NSArray *)inviteFriend;
 
 - (void)newChatGroupCreated:(NSMutableDictionary *)groupInfo;
+- (void)groupJoined;
+- (void)invitationSended;
+- (void)getGroupPhotoJid:(NSString *)jid result:(void(^)(UIImage *tempImage)) completion;
 @end

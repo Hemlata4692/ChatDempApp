@@ -20,7 +20,6 @@
     AppDelegateObjectFile *appDelegate;
     GroupChatType type;
 }
-
 @end
 
 @implementation XMPPGroupChatRoom
@@ -29,30 +28,38 @@
     [super viewDidLoad];
     
     appDelegate = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPBookMarkUpdated) name:@"XMPPBookMarkUpdated" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPFetchBookmarktList:) name:@"XMPPFetchBookmarktList" object:nil];
     // Do any additional setup after loading the view.
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:YES];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPBookMarkUpdated) name:@"XMPPBookMarkUpdated" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPFetchBookmarktList:) name:@"XMPPFetchBookmarktList" object:nil];
+   
 //
 //    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppRoomDidDestroySuccess) name:@"XMPPDeleteGroupSuccess" object:nil];
 //    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppRoomDidDestroyFail) name:@"XMPPDeleteGroupFail" object:nil];
 }
 
+- (void)deallocObservers {
+
+//    [self setXmppRoomVar:nil];
+    appDelegate.xmppRoomDelegate=nil;
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:YES];
 
-    [self setXmppRoomVar:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
 
 #pragma mark - Set/Get methods
 //Set methods
@@ -280,15 +287,28 @@
 - (void)xmppRoomDidCreate:(XMPPRoom *)sender{
     NSLog(@"a");
     
-    [self setXmppRoomVar:sender];
+//    [self setXmppRoomVar:sender];
+    appDelegate.xmppRoomDelegate=sender;
     [sender fetchConfigurationForm];
 }
 
 - (void)xmppRoomDidJoin:(XMPPRoom *)sender{
     NSLog(@"a");
     
-    [self setXmppRoomVar:sender];
+//    [self setXmppRoomVar:sender];
+    appDelegate.xmppRoomDelegate=sender;
+    
+    switch (type) {
+        case XMPP_GroupJoin:
+            type=XMPP_GroupNull;
+            [self groupJoined];
+            break;
+        default:
+            break;
+    }
 }
+
+- (void)groupJoined{}
 
 - (void)newChatGroupCreated:(NSMutableDictionary *)groupInfo{}
 #pragma mark - end
@@ -360,7 +380,7 @@
     NSXMLElement *conference_s = [NSXMLElement elementWithName:@"conference"];
     [conference_s addAttributeWithName:@"name" stringValue:[self chatRoomName]];
     [conference_s addAttributeWithName:@"autojoin" stringValue:@"true"];
-    [conference_s addAttributeWithName:@"jid" stringValue:[NSString stringWithFormat:@"%@",[[self xmppRoomVar] roomJID]]];
+    [conference_s addAttributeWithName:@"jid" stringValue:[NSString stringWithFormat:@"%@",[appDelegate.xmppRoomDelegate roomJID]]];
     [conference_s addAttributeWithName:@"nick" stringValue:[self chatRoomNickName]];
     [conference_s addAttributeWithName:@"Desc" stringValue:[self chatRoomDescription]];
     if ([[NSString stringWithFormat:@"%@",[self.xmppStream myJID]] containsString:@"/"]) {
@@ -487,9 +507,9 @@
         {
             type=XMPP_GroupNull;
             NSMutableDictionary *tempDict=[NSMutableDictionary new];
-            [[XmppCoreDataHandler sharedManager] insertGroupEntryInXmppUserModelXmppGroupJid:[NSString stringWithFormat:@"%@",[[self xmppRoomVar] roomJID]] xmppGroupName:[self chatRoomName] xmppGroupNickName:[self chatRoomNickName] xmppGroupDescription:[self chatRoomDescription] xmppGroupOnwerId:[self chatRoomOwnerId]];
+            [[XmppCoreDataHandler sharedManager] insertGroupEntryInXmppUserModelXmppGroupJid:[NSString stringWithFormat:@"%@",[appDelegate.xmppRoomDelegate roomJID]] xmppGroupName:[self chatRoomName] xmppGroupNickName:[self chatRoomNickName] xmppGroupDescription:[self chatRoomDescription] xmppGroupOnwerId:[self chatRoomOwnerId]];
             
-            [tempDict setObject:[NSString stringWithFormat:@"%@",[[self xmppRoomVar] roomJID]] forKey:@"roomJid"];
+            [tempDict setObject:[NSString stringWithFormat:@"%@",[appDelegate.xmppRoomDelegate roomJID]] forKey:@"roomJid"];
             [tempDict setObject:[self chatRoomName] forKey:@"roomName"];
             [tempDict setObject:[self chatRoomNickName] forKey:@"roomNickName"];
             [tempDict setObject:[self chatRoomDescription] forKey:@"roomDescription"];
@@ -499,7 +519,7 @@
             if ((nil!=[self chatRoomImage])&&(NULL!=[self chatRoomImage])) {
                 
                 [tempDict setObject:[NSNumber numberWithBool:true] forKey:@"isPhoto"];
-                [appDelegate saveDataInCacheDirectory:[self chatRoomImage] folderName:appDelegate.appProfilePhotofolderName jid:[NSString stringWithFormat:@"%@",[[self xmppRoomVar] roomJID]]];
+                [appDelegate saveDataInCacheDirectory:[self chatRoomImage] folderName:appDelegate.appProfilePhotofolderName jid:[NSString stringWithFormat:@"%@",[appDelegate.xmppRoomDelegate roomJID]]];
             }
             [appDelegate.groupChatRoomInfoList addObject:[tempDict mutableCopy]];
             [self newChatGroupCreated:[tempDict mutableCopy]];
@@ -521,11 +541,21 @@
 #pragma mark - Send invitation
 - (void)sendGroupInvitation:(NSArray *)inviteFriend {
 
-//    [[self xmppRoomVar] inviteUser:[XMPPJID jidWithString:@"Test1"] withMessage:@"Greetings!"];
+    for (NSString *invitationJid in inviteFriend) {
+        [appDelegate.xmppRoomDelegate inviteUser:[XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",invitationJid,[[self.xmppStream myJID] resource]]] withMessage:@"Greetings!"];
+    }
+    
 }
+- (void)invitationSended{}
 #pragma mark - end
 
-
+#pragma mark - Fetch group image
+- (void)getGroupPhotoJid:(NSString *)jid result:(void(^)(UIImage *tempImage)) completion {
+    
+    NSData *tempImageData=[appDelegate listionDataFromCacheDirectoryFolderName:appDelegate.appProfilePhotofolderName jid:jid];
+    completion([UIImage imageWithData:tempImageData]);
+}
+#pragma mark - end
 /*
 #pragma mark - Navigation
 

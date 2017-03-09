@@ -23,6 +23,7 @@
 
 @implementation GroupInvitationViewController
 @synthesize roomDescription, roomNickname, roomSubject, friendImage;
+@synthesize isCreate;
 
 #pragma mark - View life cycle
 - (void)viewDidLoad {
@@ -173,8 +174,15 @@
 
 - (IBAction)createGroup:(UIButton *)sender {
 
-    [myDelegate showIndicator];
-    [self performSelector:@selector(creteGroupService) withObject:nil afterDelay:0.1];
+    if (isCreate) {
+        
+        [myDelegate showIndicator];
+        [self performSelector:@selector(creteGroupService) withObject:nil afterDelay:0.1];
+    }
+    else {
+       
+        [self sendFriendInvitation];
+    }
 }
 
 - (void)creteGroupService {
@@ -200,7 +208,29 @@
 #pragma mark - XMPPGroupChatRoom result methods
 - (void)newChatGroupCreated:(NSMutableDictionary *)groupInfo {
 
-    [myDelegate stopIndicator];
+    if (selectedJids.count>0) {
+        [self sendFriendInvitation];
+    }
+    else {
+        [myDelegate stopIndicator];
+    }
+}
+
+- (void)sendFriendInvitation {
+
+    [self sendGroupInvitation:[selectedJids copy]];
+}
+
+- (void)invitationSended {
+
+    if (isCreate) {
+        
+        [myDelegate stopIndicator];
+    }
+    else {
+        
+        [self.navigationController popViewControllerAnimated:YES];
+    }
 }
 #pragma mark - end
 /*

@@ -17,6 +17,7 @@
 #import "ChatScreenViewController.h"
 
 #import "CustomFilterViewController.h"
+#import "GroupChatViewController.h"
 
 @class XMPPvCardTempModuleStorage;
 @interface DashboardViewController () {
@@ -243,6 +244,10 @@
     else {
     
         //Group content click
+        
+        GroupChatViewController *groupChatObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"GroupChatViewController"];
+        groupChatObj.roomDetail=[[groupChatListArray objectAtIndex:indexPath.row] mutableCopy];
+        [self.navigationController pushViewController:groupChatObj animated:YES];
     }
 }
 

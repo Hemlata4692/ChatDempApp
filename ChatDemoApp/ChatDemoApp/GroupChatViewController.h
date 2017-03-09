@@ -7,7 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "XMPPGroupChatRoom.h"
 
-@interface GroupChatViewController : UIViewController
+@interface GroupChatViewController : XMPPGroupChatRoom
 
+@property(nonatomic, retain)NSMutableDictionary *roomDetail;
 @end

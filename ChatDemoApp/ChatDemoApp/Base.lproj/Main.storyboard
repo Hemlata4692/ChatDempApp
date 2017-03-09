@@ -663,6 +663,25 @@
             </objects>
             <point key="canvasLocation" x="5300.625" y="1594.0140845070423"/>
         </scene>
+        <!--Group Chat View Controller-->
+        <scene sceneID="uH8-Gu-bAL">
+            <objects>
+                <viewController storyboardIdentifier="GroupChatViewController" id="jiX-RT-CrJ" customClass="GroupChatViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="acN-9O-Vbq"/>
+                        <viewControllerLayoutGuide type="bottom" id="ony-p1-iEJ"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="bal-Q5-7k3">
+                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="PCb-03-Apr" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="5976" y="1595"/>
+        </scene>
         <!--Group Conversation View Controller-->
         <scene sceneID="eXQ-ts-mjx">
             <objects>
@@ -748,7 +767,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9On-vX-56U" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="6024" y="1595"/>
+            <point key="canvasLocation" x="6669" y="1594"/>
         </scene>
         <!--User Profile View Controller-->
         <scene sceneID="EeS-Wf-6XB">
@@ -1616,7 +1635,7 @@
                 <navigationController storyboardIdentifier="loginNavigation" automaticallyAdjustsScrollViewInsets="NO" id="g5s-l7-tBw" sceneMemberID="viewController">
                     <toolbarItems/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" translucent="NO" id="Hp1-z3-vWC">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="Hp1-z3-vWC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -1635,7 +1654,7 @@
                 <navigationController storyboardIdentifier="DashboardNavigation" automaticallyAdjustsScrollViewInsets="NO" id="Vep-JT-HHx" sceneMemberID="viewController">
                     <toolbarItems/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" translucent="NO" id="pVC-3M-Vd2">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="pVC-3M-Vd2">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>

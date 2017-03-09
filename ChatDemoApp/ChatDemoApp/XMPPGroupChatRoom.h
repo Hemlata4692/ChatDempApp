@@ -9,13 +9,39 @@
 #import <UIKit/UIKit.h>
 
 typedef NS_ENUM (NSInteger, GroupChatType){
-    XMPP_GroupCreate
+    XMPP_GroupNull,
+    XMPP_GroupCreate,
+    XMPP_GroupJoin,
+    XMPP_GroupDetail,
 };
 
-@interface XMPPGroupChatRoom : UIViewController
+@interface XMPPGroupChatRoom : UIViewController {
 
+    NSString *chatRoomName;
+    NSString *chatRoomDescription;
+    NSString *chatRoomNickName;
+    UIImage *chatRoomImage;
+    XMPPRoom *xmppRoomVar;
+    NSString *chatRoomOwnerId;
+    
+    NSMutableDictionary *xmppCurrentRoomDetail;
+}
+//NSString *roomName, *roomDescription, *roomNickName;
+//UIImage *roomImage;
+
+@property(nonatomic, readonly)NSString *chatRoomName;
+@property(nonatomic, readonly)NSString *chatRoomDescription;
+@property(nonatomic, readonly)NSString *chatRoomNickName;
+@property(nonatomic, readonly)UIImage *chatRoomImage;
+@property(nonatomic, readonly)XMPPRoom *xmppRoomVar;
+@property(nonatomic, readonly)NSString *chatRoomOwnerId;
+
+@property(nonatomic, readonly)NSMutableDictionary *xmppCurrentRoomDetail;
 
 - (NSArray *)fetchFriendJids;
 - (NSMutableDictionary *)fetchFriendDetials;
 - (void)getProfilePhotosJid:(NSString *)jid profileImageView:(UIImageView *)profileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(UIImage *tempImage)) completion;
+- (void)createChatRoom:(UIImage *)groupImage groupNickName:(NSString *)groupNickName groupDescription:(NSString *)groupDescription groupSubject:(NSString *)groupSubject;
+
+- (void)newChatGroupCreated:(NSMutableDictionary *)groupInfo;
 @end

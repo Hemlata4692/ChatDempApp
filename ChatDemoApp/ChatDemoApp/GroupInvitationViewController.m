@@ -172,8 +172,20 @@
 }
 
 - (IBAction)createGroup:(UIButton *)sender {
-    
-    
+
+    [myDelegate showIndicator];
+    [self performSelector:@selector(creteGroupService) withObject:nil afterDelay:0.1];
+}
+
+- (void)creteGroupService {
+
+    if ([self image:self.groupIcon.image isEqualTo:[UIImage imageNamed:@"groupPlaceholderImage.png"]]) {
+        
+        [self createChatRoom:nil groupNickName:roomNickname groupDescription:roomDescription groupSubject:roomSubject];
+    }
+    else {
+        [self createChatRoom:self.groupIcon.image groupNickName:roomNickname groupDescription:roomDescription groupSubject:roomSubject];
+    }
 }
 #pragma mark - end
 
@@ -184,6 +196,13 @@
     
     return [data1 isEqual:data2];
 }
+
+#pragma mark - XMPPGroupChatRoom result methods
+- (void)newChatGroupCreated:(NSMutableDictionary *)groupInfo {
+
+    [myDelegate stopIndicator];
+}
+#pragma mark - end
 /*
 #pragma mark - Navigation
 

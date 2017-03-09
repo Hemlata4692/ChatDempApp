@@ -33,6 +33,10 @@
     
     textLimit=100;
     self.navigationItem.title=@"New Group";
+    [self setKeyboardControls:[[BSKeyboardControls alloc] initWithFields:@[self.addRoomName, self.groupDescription]]];
+    [self.keyboardControls setDelegate:self];
+    [self addLeftBarButtonWithImage:[UIImage imageNamed:@"back_white"]];
+    [self viewInitialized];
     // Do any additional setup after loading the view.
 }
 
@@ -40,10 +44,7 @@
     [super viewWillAppear:YES];
     
     //Adding textfield to keyboard controls array
-    [self setKeyboardControls:[[BSKeyboardControls alloc] initWithFields:@[self.addRoomName, self.groupDescription]]];
-    [self.keyboardControls setDelegate:self];
-    [self addLeftBarButtonWithImage:[UIImage imageNamed:@"back_white"]];
-    [self viewInitialized];
+   
 }
 
 - (void)didReceiveMemoryWarning {

@@ -46,7 +46,7 @@
 #pragma mark - Login User
 - (void)loginConnectWithoutPassword:(NSString *)username {
     
-    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%@@%@",username,appDelegate.hostName] key:@"LoginCred"];
+    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%@@%@",username,appDelegate.serverName] key:@"LoginCred"];
     [XMPPUserDefaultManager setValue:appDelegate.defaultPassword key:@"PassCred"];
     [XMPPUserDefaultManager setValue:@"1" key:@"CountValue"];
     [appDelegate disconnect];
@@ -55,7 +55,7 @@
 
 - (void)loginConnectPassword:(NSString *)password username:(NSString *)username {
     
-    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%@@%@",username,appDelegate.hostName] key:@"LoginCred"];
+    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%@@%@",username,appDelegate.serverName] key:@"LoginCred"];
     [XMPPUserDefaultManager setValue:password key:@"PassCred"];
     [XMPPUserDefaultManager setValue:@"1" key:@"CountValue"];
     [appDelegate disconnect];
@@ -67,7 +67,7 @@
 #pragma mark - Post notification called method
 - (void)UserDidAuthenticated {
 
-//    if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName]]) {
+//    if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"zebra@%@",appDelegate.serverName]]) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
             [self loginUserDidAuthenticatedResult];
         });
@@ -76,7 +76,7 @@
 
 - (void)UserNotAuthenticated {
     
-//    if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName]]) {
+//    if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"zebra@%@",appDelegate.serverName]]) {
 //        [XMPPUserDefaultManager removeValue:@"LoginCred"];
 //        [XMPPUserDefaultManager removeValue:@"PassCred"];
         [appDelegate disconnect];

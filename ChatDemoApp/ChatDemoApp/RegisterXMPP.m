@@ -97,7 +97,7 @@
     
         xmppNameCredential=[[profileData objectForKey:self.xmppName] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     }
-    NSString *xmppUsername = [NSString stringWithFormat:@"%@@%@",userName,appDelegate.hostName];
+    NSString *xmppUsername = [NSString stringWithFormat:@"%@@%@",userName,appDelegate.serverName];
     NSString *password = userPassword;
 
     xmppUserNameCredential=xmppUsername;
@@ -126,7 +126,7 @@
         xmppNameCredential=[[profileData objectForKey:self.xmppName] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     }
 
-    NSString *xmppUsername = [NSString stringWithFormat:@"%@@%@",userName,appDelegate.hostName];
+    NSString *xmppUsername = [NSString stringWithFormat:@"%@@%@",userName,appDelegate.serverName];
     NSString *password = appDelegate.defaultPassword;
     
     xmppUserNameCredential=xmppUsername;
@@ -138,7 +138,7 @@
 - (void)createConnection {
 
     myDelegate.afterAutentication=1;
-    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%@@%@",appDelegate.xmppUniqueId,appDelegate.hostName] key:@"LoginCred"];
+    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%@@%@",appDelegate.xmppUniqueId,appDelegate.serverName] key:@"LoginCred"];
     [XMPPUserDefaultManager setValue:appDelegate.defaultPassword key:@"PassCred"];
     [appDelegate connect];
 }
@@ -232,7 +232,7 @@
     [appDelegate disconnect];
     //    NSString *username = xmppUserNameCredential; // OR
     NSString *password = passwordValue;
-    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%@@%@",userName,appDelegate.hostName] key:@"LoginCred"];
+    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%@@%@",userName,appDelegate.serverName] key:@"LoginCred"];
     [XMPPUserDefaultManager setValue:password key:@"PassCred"];
     [XMPPUserDefaultManager setValue:@"1" key:@"CountValue"];
     myDelegate.afterAutentication=1;
@@ -254,7 +254,7 @@
     [appDelegate disconnect];
     //    NSString *username = xmppUserNameCredential; // OR
     NSString *password = appDelegate.defaultPassword;
-    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%@@%@",userName,appDelegate.hostName] key:@"LoginCred"];
+    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%@@%@",userName,appDelegate.serverName] key:@"LoginCred"];
     [XMPPUserDefaultManager setValue:password key:@"PassCred"];
     [XMPPUserDefaultManager setValue:@"1" key:@"CountValue"];
     [appDelegate connect];
@@ -287,7 +287,7 @@
 - (void)tempUserDidNotRegister:(ErrorType)errorType {
     
     [XMPPUserDefaultManager removeValue:@"LoginCred"];
-    //    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",myDelegate.hostName] key:@"LoginCred"];
+    //    [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",myDelegate.serverName] key:@"LoginCred"];
     [XMPPUserDefaultManager removeValue:@"PassCred"];
     
     [appDelegate disconnect];
@@ -302,7 +302,7 @@
 
 - (void)RegisterUserDidAuthenticated {
 
-    if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"%@@%@",appDelegate.xmppUniqueId,appDelegate.hostName]]) {
+    if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"%@@%@",appDelegate.xmppUniqueId,appDelegate.serverName]]) {
         
         if (isRegisterAuthenticate) {
             if (methodCallingCount==0) {
@@ -327,7 +327,7 @@
 
 - (void)RegisterUserNotAuthenticated {
     
-    if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"%@@%@",appDelegate.xmppUniqueId,appDelegate.hostName]]) {
+    if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"%@@%@",appDelegate.xmppUniqueId,appDelegate.serverName]]) {
         
         [XMPPUserDefaultManager removeValue:@"LoginCred"];
         [XMPPUserDefaultManager removeValue:@"PassCred"];
@@ -350,10 +350,10 @@
     
     NSLog(@"success ");
 //    [appDelegate disconnect];
-//    if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName]]) {
+//    if (nil!=[XMPPUserDefaultManager getValue:@"LoginCred"] && ![[XMPPUserDefaultManager getValue:@"LoginCred"] isEqualToString:[NSString stringWithFormat:@"zebra@%@",appDelegate.serverName]]) {
     [appDelegate disconnect];
     [self UserDidRegister];
-//        [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",appDelegate.hostName] key:@"LoginCred"];
+//        [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"zebra@%@",appDelegate.serverName] key:@"LoginCred"];
 //        [XMPPUserDefaultManager setValue:@"password" key:@"PassCred"];
 //        
 //        [appDelegate connect];

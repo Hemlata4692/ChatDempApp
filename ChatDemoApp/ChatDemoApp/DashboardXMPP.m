@@ -403,6 +403,11 @@
     [self getListOfGroupsNotify:[appDelegate.groupChatRoomInfoList mutableCopy]];
 }
 
+- (NSMutableArray *)fetchGroupChatRommInfoList {
+
+    return appDelegate.groupChatRoomInfoList;
+}
+
 - (NSData *)photo:(NSXMLElement *)xmlElement {
     NSData *decodedData = nil;
     NSXMLElement *photo = [xmlElement elementForName:@"PHOTO"];

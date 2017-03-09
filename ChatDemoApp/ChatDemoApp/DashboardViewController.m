@@ -61,6 +61,7 @@
     [super viewWillAppear:YES];
     
     profileLocalDictData=[NSMutableDictionary new];
+    groupChatListArray=[[self fetchGroupChatRommInfoList] mutableCopy];
     if (userListArray.count>0) {
         profileLocalDictData=[self getProfileUsersData];
     }

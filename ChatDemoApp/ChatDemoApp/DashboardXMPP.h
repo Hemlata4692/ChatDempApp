@@ -40,6 +40,7 @@
 - (void)fetchAllHistoryChat:(void(^)(NSMutableArray *tempHistoryData))completion;
 
 //Group chat
+- (NSMutableArray *)fetchGroupChatRommInfoList;
 - (void)getListOfGroups;
 - (void)getListOfGroupsNotify:(NSMutableArray *)groupInfo;
 - (void)getGroupPhotoJid:(NSString *)jid profileImageView:(UIImageView *)profileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(UIImage *tempImage)) completion;

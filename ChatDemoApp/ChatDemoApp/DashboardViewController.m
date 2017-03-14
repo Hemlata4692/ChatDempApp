@@ -61,6 +61,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:YES];
     
+    [self deallocGroupChatVariables];
     profileLocalDictData=[NSMutableDictionary new];
     groupChatListArray=[[self fetchGroupChatRommInfoList] mutableCopy];
     if (userListArray.count>0) {

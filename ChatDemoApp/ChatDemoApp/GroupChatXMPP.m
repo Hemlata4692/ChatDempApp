@@ -412,7 +412,7 @@
             NSXMLElement *lastConferences=[notification.object objectAtIndex:i];
             NSLog(@"%@",[lastConferences elementForName:@"PHOTO"]);
             if (nil!=[lastConferences elementForName:@"PHOTO"]&&NULL!=[lastConferences elementForName:@"PHOTO"]) {
-                UIImage *i=[UIImage imageWithData:[self photo:lastConferences]];
+                //UIImage *i=[UIImage imageWithData:[self photo:lastConferences]];
                 lastgroupProfileImage=[UIImage imageWithData:[self photo:lastConferences]];
             }
         }

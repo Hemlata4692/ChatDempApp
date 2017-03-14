@@ -146,10 +146,10 @@
 
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller {
     
-    NSArray *sections1 = controller.fetchedObjects;
-    NSSortDescriptor *descriptor1 = [NSSortDescriptor sortDescriptorWithKey:@"displayName" ascending:YES];
-    NSArray *results1 = [sections1
-                        sortedArrayUsingDescriptors:[NSArray arrayWithObject:descriptor1]];
+//    NSArray *sections1 = controller.fetchedObjects;
+//    NSSortDescriptor *descriptor1 = [NSSortDescriptor sortDescriptorWithKey:@"displayName" ascending:YES];
+//    NSArray *results1 = [sections1
+//                        sortedArrayUsingDescriptors:[NSArray arrayWithObject:descriptor1]];
     
     if ([controller.fetchedObjects count]>0 && isrefresh) {
         
@@ -426,7 +426,6 @@
     return decodedData;
 }
 
-
 - (void)deleteBookmark {
     
     XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:[XMPPJID jidWithString:myDelegate.hostName]];
@@ -447,6 +446,17 @@
     
     NSData *tempImageData=[appDelegate listionDataFromCacheDirectoryFolderName:appDelegate.appProfilePhotofolderName jid:jid];
     completion([UIImage imageWithData:tempImageData]);
+}
+
+- (void)deallocGroupChatVariables {
+
+    appDelegate.xmppRoomAppDelegateObje=nil;
+    appDelegate.chatRoomAppDelegateImage=nil;
+    appDelegate.chatRoomAppDelegateDescription=@"";
+    appDelegate.chatRoomAppDelegateNickName=@"";
+    appDelegate.chatRoomAppDelegateName=@"";
+    appDelegate.chatRoomAppDelegateRoomJid=@"";
+    appDelegate.chatRoomAppDelegateSelectedRoomOwnerJid=@"";
 }
 #pragma mark - end
 /*

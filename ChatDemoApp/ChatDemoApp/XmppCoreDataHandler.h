@@ -36,5 +36,6 @@
 
 //Group chat
 - (void)insertGroupEntryInXmppUserModelXmppGroupJid:(NSString *)xmppGroupJid xmppGroupName:(NSString *)xmppGroupName xmppGroupNickName:(NSString *)xmppGroupNickName xmppGroupDescription:(NSString *)xmppGroupDescription xmppGroupOnwerId:(NSString *)xmppGroupOnwerId;
+- (void)deleteGroupEntry:(NSString *)roomJid;
 //end
 @end

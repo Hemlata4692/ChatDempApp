@@ -9,9 +9,13 @@
 #import "GroupChatViewController.h"
 #import "GroupInvitationViewController.h"
 #import "DashboardViewController.h"
+#import "CustomFilterViewController.h"
+#import "UserDefaultManager.h"
 
-@interface GroupChatViewController ()
+@interface GroupChatViewController ()<CustomFilterDelegate> {
 
+    UIImage *groupImageIcon;
+}
 @end
 
 @implementation GroupChatViewController
@@ -23,13 +27,27 @@
     
     self.navigationItem.title=[roomDetail objectForKey:@"roomName"];
     [self addBarButtons];
+    [self appDelegateVariableInitializedGroupSubject:[roomDetail objectForKey:@"roomName"] groupNickName:[roomDetail objectForKey:@"roomNickName"] groupDescription:[roomDetail objectForKey:@"roomDescription"] groupJid:[roomDetail objectForKey:@"roomJid"] ownerJid:[roomDetail objectForKey:@"roomOwnerJid"]];
+    [self joinChatRoomJid:[roomDetail objectForKey:@"roomJid"] groupNickName:[roomDetail objectForKey:@"roomNickName"]];
     // Do any additional setup after loading the view.
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:YES];
     
-    [self joinChatRoomJid:[roomDetail objectForKey:@"roomJid"] groupNickName:[roomDetail objectForKey:@"roomNickName"]];
+    [self getGroupPhotoJid:[roomDetail objectForKey:@"roomJid"] result:^(UIImage *tempImage) {
+        // do something with your BOOL
+        
+        if (tempImage) {
+            
+            groupImageIcon=tempImage;
+        }
+        else {
+        
+            groupImageIcon=[UIImage imageNamed:@"groupPlaceholderImage.png"];
+        }
+        [self appDelegateImageVariableInitialized:groupImageIcon];
+    }];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -39,7 +57,7 @@
 
 - (void)addBarButtons {
     
-    UIBarButtonItem *backBarButton,*inviteBarButton;
+    UIBarButtonItem *backBarButton,*menuBarButton;
     CGRect framing = CGRectMake(0, 0, 25, 25);
     
     UIButton *back = [[UIButton alloc] initWithFrame:framing];
@@ -47,13 +65,12 @@
     backBarButton =[[UIBarButtonItem alloc] initWithCustomView:back];
     [back addTarget:self action:@selector(backAction) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem=backBarButton;
-    
-    UIButton *invite = [[UIButton alloc] initWithFrame:framing];
-    [invite setImage:[UIImage imageNamed:@"addMemberIcon"] forState:UIControlStateNormal];
-    inviteBarButton =[[UIBarButtonItem alloc] initWithCustomView:invite];
-    [invite addTarget:self action:@selector(inviteAction) forControlEvents:UIControlEventTouchUpInside];
-    
-    self.navigationItem.rightBarButtonItem=inviteBarButton;
+
+    UIButton *menu = [[UIButton alloc] initWithFrame:framing];
+    [menu setImage:[UIImage imageNamed:@"menuIcon"] forState:UIControlStateNormal];
+    menuBarButton =[[UIBarButtonItem alloc] initWithCustomView:menu];
+    [menu addTarget:self action:@selector(menuAction:) forControlEvents:UIControlEventTouchUpInside];
+    self.navigationItem.rightBarButtonItem=menuBarButton;
 }
 #pragma mark - end
 
@@ -73,28 +90,97 @@
     }
 }
 
+- (void)menuAction:(id)sender {
+    
+    UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    CustomFilterViewController *filterViewObj =[storyboard instantiateViewControllerWithIdentifier:@"CustomFilterViewController"];
+    filterViewObj.delegate=self;
+    filterViewObj.tableCellheightValue=70;
+    NSMutableDictionary *tempAttachment=[NSMutableDictionary new];
+    NSMutableArray *tempAttachmentArra=[NSMutableArray new];
+    NSMutableArray *tempAttachmentImageArra=[NSMutableArray new];
+    
+    if ([self isOwner]) {
+        
+        [tempAttachment setObject:[NSNumber numberWithInt:1] forKey:@"Add Member"];
+        [tempAttachmentArra addObject:@"Add Member"];
+        [tempAttachmentImageArra addObject:@"inviteNewMember"];
+        [tempAttachment setObject:[NSNumber numberWithInt:2] forKey:@"Delete Group"];
+        [tempAttachmentArra addObject:@"Delete Group"];
+        [tempAttachmentImageArra addObject:@"deleteGroup"];
+        filterViewObj.filterDict=[tempAttachment mutableCopy];
+        filterViewObj.filterArray=[tempAttachmentArra mutableCopy];
+        filterViewObj.filterImageArray=[tempAttachmentImageArra mutableCopy];
+    }
+    else {
+    
+        [tempAttachment setObject:[NSNumber numberWithInt:1] forKey:@"AddNewMember"];
+        [tempAttachmentArra addObject:@"Add Member"];
+        [tempAttachmentImageArra addObject:@"inviteNewMember"];
+        filterViewObj.filterDict=[tempAttachment mutableCopy];
+        filterViewObj.filterArray=[tempAttachmentArra mutableCopy];
+        filterViewObj.filterImageArray=[tempAttachmentImageArra mutableCopy];
+    }
+    
+    [filterViewObj setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+    [self presentViewController:filterViewObj animated:NO completion:nil];
+}
+
 - (void)inviteAction {
     
+    GroupInvitationViewController *invitationViewObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"GroupInvitationViewController"];
+    invitationViewObj.roomSubject=[roomDetail objectForKey:@"roomName"];
+    invitationViewObj.roomNickname=[roomDetail objectForKey:@"roomNickName"];
+    invitationViewObj.roomDescription=[roomDetail objectForKey:@"roomDescription"];
+    if (![self image:groupImageIcon isEqualTo:[UIImage imageNamed:@"groupPlaceholderImage.png"]]) {
+        invitationViewObj.friendImage=groupImageIcon;
+    }
+    else {
+        
+        invitationViewObj.friendImage=nil;
+    }
+    [self.navigationController pushViewController:invitationViewObj animated:YES];
+}
+
+- (BOOL)image:(UIImage *)image1 isEqualTo:(UIImage *)image2
+{
+    NSData *data1 = UIImagePNGRepresentation(image1);
+    NSData *data2 = UIImagePNGRepresentation(image2);
     
-//    if (![self image:self.groupImage.imageView.image isEqualTo:[UIImage imageNamed:@"groupPlaceholderImage.png"]]) {
-//        invitationViewObj.friendImage=self.groupImage.imageView.image;
-//    }
-//    else {
-//        
-//        invitationViewObj.friendImage=nil;
-//    }
+    return [data1 isEqual:data2];
+}
+#pragma mark - end
+
+#pragma mark - Group delete
+- (void)deleteGroupService {
+
+    [self destroyRoom];
+}
+#pragma mark - end
+
+#pragma mark - Custom filter delegate
+- (void)customFilterDelegateAction:(int)status{
     
-    [self getGroupPhotoJid:[roomDetail objectForKey:@"roomJid"] result:^(UIImage *tempImage) {
-        // do something with your BOOL
-        GroupInvitationViewController *invitationViewObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"GroupInvitationViewController"];
-        invitationViewObj.roomSubject=[roomDetail objectForKey:@"roomName"];
-        invitationViewObj.roomNickname=[roomDetail objectForKey:@"roomNickName"];
-        invitationViewObj.roomDescription=[roomDetail objectForKey:@"roomDescription"];
-        [self.navigationController pushViewController:invitationViewObj animated:YES];
-    }];
-    
-    
-//    [self sendGroupInvitation:@[[NSString stringWithFormat:@"0000000000@%@//Smack",myDelegate.serverName,[[myDelegate.xmppStream myJID] resource]]]];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (status==1) {
+            NSLog(@"1");
+            [self inviteAction];            
+        }
+        else if (status==2) {
+            NSLog(@"2");
+            
+            [myDelegate showIndicator];
+            [self performSelector:@selector(deleteGroupService) withObject:nil afterDelay:0.1];
+        }
+        else if (status==3) {
+            NSLog(@"3");
+            
+        }
+        else if (status==4) {
+            NSLog(@"3");
+            
+        }
+    });
 }
 #pragma mark - end
 
@@ -102,7 +188,49 @@
 - (void)groupJoined {
 
     //Group joined
+    
 }
+
+//Delete group notify
+- (void)xmppRoomDeleteSuccess {
+
+    [myDelegate stopIndicator];
+    UIAlertController *alertController = [UIAlertController
+                                          alertControllerWithTitle:@"Success"
+                                          message:@"Group successfully deleted."
+                                          preferredStyle:UIAlertControllerStyleAlert];
+    
+    
+    
+    UIAlertAction *okAction = [UIAlertAction
+                               actionWithTitle:@"OK"
+                               style:UIAlertActionStyleDefault
+                               handler:^(UIAlertAction *action)
+                               {
+                                   [self deallocObservers];
+                                   for (UIViewController *controller in self.navigationController.viewControllers) {
+                                       
+                                       //Do not forget to import AnOldViewController.h
+                                       if ([controller isKindOfClass:[DashboardViewController class]]) {
+                                           
+                                           [self.navigationController popToViewController:controller
+                                                                                 animated:YES];
+                                           break;
+                                       }
+                                   }
+                                   [alertController dismissViewControllerAnimated:YES completion:nil];
+                               }];
+    
+    [alertController addAction:okAction];
+    [[[UIApplication sharedApplication] keyWindow].rootViewController presentViewController:alertController animated:YES completion:nil];
+}
+
+- (void)xmppRoomDeleteFail {
+
+    [myDelegate stopIndicator];
+    [UserDefaultManager showAlertMessage:@"Fail" message:@"Some thing went wrong, Please try again later."];
+}
+//end
 #pragma mark - end
 /*
 #pragma mark - Navigation

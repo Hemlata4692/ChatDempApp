@@ -8,12 +8,14 @@
 
 #import "GroupInvitationViewController.h"
 #import "GroupInvideTableViewCell.h"
+#import "GroupChatViewController.h"
 
 @interface GroupInvitationViewController () {
 
     NSArray *friendJids;
     NSMutableDictionary *friendDetails, *selectedUnselectedFriends;
     NSMutableArray *selectedJids;
+    NSMutableDictionary *groupInfoDic;
 }
 
 @property (strong, nonatomic) IBOutlet UIImageView *groupIcon;
@@ -123,22 +125,13 @@
                                       reuseIdentifier:CellIdentifier];
     }
     
-//    [cell displayContactInformation:[[friendDetails objectForKey:[friendJids objectAtIndex:indexPath.row]] mutableCopy] isSelected:[[selectedUnselectedFriends objectForKey:[friendJids objectAtIndex:indexPath.row]] boolValue]];
-     [cell displayContactInformation:[[friendDetails objectForKey:[friendJids objectAtIndex:indexPath.row]] mutableCopy] isSelected:[selectedJids containsObject:[friendJids objectAtIndex:indexPath.row]]];
+    [cell displayContactInformation:[[friendDetails objectForKey:[friendJids objectAtIndex:indexPath.row]] mutableCopy] isSelected:[selectedJids containsObject:[friendJids objectAtIndex:indexPath.row]]];
     [self configurePhotoForCell:cell jid:[friendJids objectAtIndex:indexPath.row]];
     return cell;
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
-//    if ([[selectedUnselectedFriends objectForKey:[friendJids objectAtIndex:indexPath.row]] boolValue]) {
-//        
-//        [selectedUnselectedFriends setObject:[NSNumber numberWithBool:false] forKey:[friendJids objectAtIndex:indexPath.row]];
-//    }
-//    else {
-//        
-//        [selectedUnselectedFriends setObject:[NSNumber numberWithBool:true] forKey:[friendJids objectAtIndex:indexPath.row]];
-//    }
     if ([selectedJids containsObject:[friendJids objectAtIndex:indexPath.row]]) {
         [selectedJids removeObject:[friendJids objectAtIndex:indexPath.row]];
     }
@@ -181,7 +174,9 @@
     }
     else {
        
-        [self sendFriendInvitation];
+        if (selectedJids.count>0) {
+            [self sendFriendInvitation];
+        }
     }
 }
 
@@ -208,11 +203,15 @@
 #pragma mark - XMPPGroupChatRoom result methods
 - (void)newChatGroupCreated:(NSMutableDictionary *)groupInfo {
 
+    groupInfoDic=[groupInfo mutableCopy];
     if (selectedJids.count>0) {
         [self sendFriendInvitation];
     }
     else {
         [myDelegate stopIndicator];
+        GroupChatViewController *groupChatObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"GroupChatViewController"];
+        groupChatObj.roomDetail=[groupInfo mutableCopy];
+        [self.navigationController pushViewController:groupChatObj animated:YES];
     }
 }
 
@@ -226,6 +225,9 @@
     if (isCreate) {
         
         [myDelegate stopIndicator];
+        GroupChatViewController *groupChatObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"GroupChatViewController"];
+        groupChatObj.roomDetail=[groupInfoDic mutableCopy];
+        [self.navigationController pushViewController:groupChatObj animated:YES];
     }
     else {
         

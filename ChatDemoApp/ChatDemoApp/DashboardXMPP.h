@@ -40,6 +40,7 @@
 - (void)fetchAllHistoryChat:(void(^)(NSMutableArray *tempHistoryData))completion;
 
 //Group chat
+- (void)deallocGroupChatVariables;
 - (NSMutableArray *)fetchGroupChatRommInfoList;
 - (void)getListOfGroups;
 - (void)getListOfGroupsNotify:(NSMutableArray *)groupInfo;

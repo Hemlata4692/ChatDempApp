@@ -361,6 +361,29 @@
         }
     }
 }
+
+- (void)deleteGroupEntry:(NSString *)roomJid {
+    
+    NSManagedObjectContext *context = [self managedObjectContext];
+    NSMutableArray *results = [[NSMutableArray alloc]init];
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"groupChatRoomId == %@", roomJid];
+    
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:GroupChatRoomEntry];
+    [fetchRequest setPredicate:pred];
+    results = [[context executeFetchRequest:fetchRequest error:nil] mutableCopy];
+    
+    if (results.count > 0) {
+        
+        [context deleteObject:[results objectAtIndex:0]];
+        NSError *error = nil;
+        if (![context save:&error]) {
+            NSLog(@"Can't Delete! %@ %@", error, [error localizedDescription]);
+            return;
+        }
+        
+        [self removeLocalMessageStorageDataBase:roomJid];
+    }
+}
 //end
 
 - (NSManagedObjectContext *)managedObjectContext {

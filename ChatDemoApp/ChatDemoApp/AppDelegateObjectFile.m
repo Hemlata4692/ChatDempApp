@@ -88,7 +88,14 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 
 @synthesize singleChatUserListArray;
 //Group chat
-@synthesize groupDeleteid,groupChatRoomInfoList,xmppRoomDelegate;
+@synthesize groupDeleteid,groupChatRoomInfoList;
+@synthesize xmppRoomAppDelegateObje;
+@synthesize chatRoomAppDelegateName;
+@synthesize chatRoomAppDelegateNickName;
+@synthesize chatRoomAppDelegateDescription;
+@synthesize chatRoomAppDelegateRoomJid;
+@synthesize chatRoomAppDelegateImage;
+@synthesize chatRoomAppDelegateSelectedRoomOwnerJid;
 //end
 
 @synthesize afterAutentication,afterAutenticationRegistration;

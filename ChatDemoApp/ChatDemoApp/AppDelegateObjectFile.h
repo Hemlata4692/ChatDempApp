@@ -19,7 +19,7 @@
 #import "XMPPIncomingFileTransfer.h"
 
 @interface AppDelegateObjectFile : UIResponder<XMPPRosterDelegate,XMPPStreamDelegate,
-XMPPIncomingFileTransferDelegate>
+XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate>
 {
     XMPPStream *xmppStream;
     XMPPReconnect *xmppReconnect;
@@ -38,6 +38,8 @@ XMPPIncomingFileTransferDelegate>
     
     //File transfer
     XMPPIncomingFileTransfer *xmppIncomingFileTransfer;
+    
+    XMPPMUC *_xmppMUC;//Group chat
 }
 
 //Delcare XMPP variables
@@ -57,6 +59,8 @@ XMPPIncomingFileTransferDelegate>
 
 @property(strong, nonatomic)XMPPMessageArchivingCoreDataStorage* xmppMessageArchivingCoreDataStorage;
 @property(strong, nonatomic)XMPPMessageArchiving* xmppMessageArchivingModule;
+
+@property (nonatomic, strong, readonly) XMPPMUC *_xmppMUC;//Group chat
 
 //@property(strong, nonatomic)XMPPMessageDeliveryReceipts *xmppMessageDeliveryRecipts;
 //end

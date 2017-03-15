@@ -203,10 +203,10 @@
     }
 }
 
-- (void)appDelegateVariableInitializedGroupSubject:(NSString *)groupSubject groupNickName:(NSString *)groupNickName groupDescription:(NSString *)groupDescription groupJid:(NSString *)groupJid ownerJid:(NSString *)ownerJid {
+- (void)appDelegateVariableInitializedGroupSubject:(NSString *)groupSubject groupDescription:(NSString *)groupDescription groupJid:(NSString *)groupJid ownerJid:(NSString *)ownerJid {
 
     appDelegate.chatRoomAppDelegateName=groupSubject;
-    appDelegate.chatRoomAppDelegateNickName=groupNickName;
+    appDelegate.chatRoomAppDelegateNickName=[[groupJid componentsSeparatedByString:@"@"] objectAtIndex:0];
     appDelegate.chatRoomAppDelegateDescription=groupDescription;
 //    appDelegate.chatRoomAppDelegateImage=groupImage;
     appDelegate.chatRoomAppDelegateRoomJid=groupJid;
@@ -263,11 +263,11 @@
     return [dateFormatter stringFromDate:[NSDate date]];
 }
 
-- (void)createChatRoom:(UIImage *)groupImage groupNickName:(NSString *)groupNickName groupDescription:(NSString *)groupDescription groupSubject:(NSString *)groupSubject {
+- (void)createChatRoom:(UIImage *)groupImage groupDescription:(NSString *)groupDescription groupSubject:(NSString *)groupSubject {
     
     type=XMPP_GroupCreate;    
     appDelegate.chatRoomAppDelegateName=groupSubject;
-    appDelegate.chatRoomAppDelegateNickName=groupNickName;
+//    appDelegate.chatRoomAppDelegateNickName=groupNickName;
     appDelegate.chatRoomAppDelegateDescription=groupDescription;
     appDelegate.chatRoomAppDelegateImage=groupImage;
     
@@ -281,10 +281,10 @@
     [xmppRoom activate:self.xmppStream];
     [xmppRoom addDelegate:self delegateQueue:dispatch_get_main_queue()];
 
-    if (appDelegate.chatRoomAppDelegateNickName||[appDelegate.chatRoomAppDelegateNickName isEqualToString:@""]) {
-        
+//    if (appDelegate.chatRoomAppDelegateNickName||[appDelegate.chatRoomAppDelegateNickName isEqualToString:@""]) {
+    
         appDelegate.chatRoomAppDelegateNickName=uniqueName;
-    }
+//    }
     
     //This method is used to create group if not exist and if this group is exist then join it
     [xmppRoom joinRoomUsingNickname:appDelegate.chatRoomAppDelegateNickName
@@ -293,10 +293,10 @@
 }
 
 
-- (void)joinChatRoomJid:(NSString *)groupRoomJid groupNickName:(NSString *)groupNickName {
+- (void)joinChatRoomJid:(NSString *)groupRoomJid {
     
     type=XMPP_GroupJoin;
-    appDelegate.chatRoomAppDelegateNickName=groupNickName;;
+    appDelegate.chatRoomAppDelegateNickName=[[groupRoomJid componentsSeparatedByString:@"@"] objectAtIndex:0];
     
     XMPPRoomMemoryStorage * _roomMemory = [[XMPPRoomMemoryStorage alloc]init];
     XMPPJID * roomJID = [XMPPJID jidWithString:groupRoomJid];
@@ -372,6 +372,57 @@
             [field removeChildAtIndex:0];
             [field addChild:[NSXMLElement elementWithName:@"value" stringValue:appDelegate.chatRoomAppDelegateDescription]];
             //                roomDecs=[[field elementForName:@"value"] stringValue];
+            
+            
+            //            if (type==XMPP_GroupCreate) {
+            //                [field removeChildAtIndex:0];
+            //
+            //                NSData *tempImageData=[myDelegate reducedImageSize:appDelegate.chatRoomAppDelegateImage];
+            //                //            NSXMLElement *binval = [NSXMLElement elementWithName:@"BINVAL"];
+            //                //
+            //                //            [binval setStringValue:[tempImageData xmpp_base64Encoded]];
+            //
+            //                NSString *imageType = [tempImageData xmpp_imageType];
+            //
+            //                if([imageType length])
+            //                {
+            //                    [field addAttributeWithName:@"TYPE" stringValue:imageType];
+            //                }
+            //
+            //                [field addChild:[NSXMLElement elementWithName:@"value" stringValue:[tempImageData xmpp_base64Encoded]]];
+            //
+            //                //                roomDecs=[[field elementForName:@"value"] stringValue];
+            //            }
+            //            else {
+            //
+            //                UIImage *tem=[UIImage imageWithData:[[[[field elementForName:@"value"] stringValue] dataUsingEncoding:NSASCIIStringEncoding] xmpp_base64Decoded] ];
+            //                NSLog(@"a");
+            //                //                if (nil!=[lastConferences elementForName:@"PHOTO"]&&NULL!=[lastConferences elementForName:@"PHOTO"]) {
+            //                //
+            //                //                    [tempDict setObject:[NSNumber numberWithBool:true] forKey:@"isPhoto"];
+            //                //                    [appDelegate saveDataInCacheDirectory:(UIImage *)[UIImage imageWithData:[self photo:lastConferences]] folderName:appDelegate.appProfilePhotofolderName jid:[lastConferences attributeStringValueForName:@"jid"]];
+            //                //                }
+            //
+            //                //                - (NSData *)photo:(NSXMLElement *)xmlElement {
+            //                //                    NSData *decodedData = nil;
+            //                //                    NSXMLElement *photo = [xmlElement elementForName:@"PHOTO"];
+            //                //
+            //                //                    if (photo != nil) {
+            //                //                        // There is a PHOTO element. It should have a TYPE and a BINVAL
+            //                //                        //NSXMLElement *fileType = [photo elementForName:@"TYPE"];
+            //                //                        NSXMLElement *binval = [photo elementForName:@"BINVAL"];
+            //                //
+            //                //                        if (binval) {
+            //                //                            NSData *base64Data = [[binval stringValue] dataUsingEncoding:NSASCIIStringEncoding];
+            //                //                            decodedData = [base64Data xmpp_base64Decoded];
+            //                //                        }
+            //                //                    }
+            //                //                    
+            //                //                    return decodedData;
+            //                //                }
+            //                
+            //            }
+
         }
     }
     [sender configureRoomUsingOptions:newConfig];
@@ -613,6 +664,7 @@
 - (void)sendGroupInvitation:(NSArray *)inviteFriend {
 
     for (NSString *invitationJid in inviteFriend) {
+        [appDelegate.xmppRoomAppDelegateObje editRoomPrivileges:@[[XMPPRoom itemWithAffiliation:@"admin" jid:[XMPPJID jidWithString:invitationJid]]]];
         [appDelegate.xmppRoomAppDelegateObje inviteUser:[XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",invitationJid,[[self.xmppStream myJID] resource]]] withMessage:@"Greetings!"];
     }
     [self invitationSended];

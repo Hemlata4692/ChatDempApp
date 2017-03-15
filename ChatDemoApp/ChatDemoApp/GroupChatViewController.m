@@ -27,8 +27,8 @@
     
     self.navigationItem.title=[roomDetail objectForKey:@"roomName"];
     [self addBarButtons];
-    [self appDelegateVariableInitializedGroupSubject:[roomDetail objectForKey:@"roomName"] groupNickName:[roomDetail objectForKey:@"roomNickName"] groupDescription:[roomDetail objectForKey:@"roomDescription"] groupJid:[roomDetail objectForKey:@"roomJid"] ownerJid:[roomDetail objectForKey:@"roomOwnerJid"]];
-    [self joinChatRoomJid:[roomDetail objectForKey:@"roomJid"] groupNickName:[roomDetail objectForKey:@"roomNickName"]];
+    [self appDelegateVariableInitializedGroupSubject:[roomDetail objectForKey:@"roomName"] groupDescription:[roomDetail objectForKey:@"roomDescription"] groupJid:[roomDetail objectForKey:@"roomJid"] ownerJid:[roomDetail objectForKey:@"roomOwnerJid"]];
+    [self joinChatRoomJid:[roomDetail objectForKey:@"roomJid"]];
     // Do any additional setup after loading the view.
 }
 
@@ -130,7 +130,6 @@
     
     GroupInvitationViewController *invitationViewObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"GroupInvitationViewController"];
     invitationViewObj.roomSubject=[roomDetail objectForKey:@"roomName"];
-    invitationViewObj.roomNickname=[roomDetail objectForKey:@"roomNickName"];
     invitationViewObj.roomDescription=[roomDetail objectForKey:@"roomDescription"];
     if (![self image:groupImageIcon isEqualTo:[UIImage imageNamed:@"groupPlaceholderImage.png"]]) {
         invitationViewObj.friendImage=groupImageIcon;
@@ -199,8 +198,6 @@
                                           alertControllerWithTitle:@"Success"
                                           message:@"Group successfully deleted."
                                           preferredStyle:UIAlertControllerStyleAlert];
-    
-    
     
     UIAlertAction *okAction = [UIAlertAction
                                actionWithTitle:@"OK"

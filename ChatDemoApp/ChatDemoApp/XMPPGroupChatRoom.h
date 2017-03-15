@@ -43,15 +43,15 @@ typedef NS_ENUM (NSInteger, GroupChatType){
 - (NSArray *)fetchFriendJids;
 - (NSMutableDictionary *)fetchFriendDetials;
 - (void)getProfilePhotosJid:(NSString *)jid profileImageView:(UIImageView *)profileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(UIImage *tempImage)) completion;
-- (void)createChatRoom:(UIImage *)groupImage groupNickName:(NSString *)groupNickName groupDescription:(NSString *)groupDescription groupSubject:(NSString *)groupSubject;
-- (void)joinChatRoomJid:(NSString *)groupRoomJid groupNickName:(NSString *)groupNickName;
+- (void)createChatRoom:(UIImage *)groupImage groupDescription:(NSString *)groupDescription groupSubject:(NSString *)groupSubject;
+- (void)joinChatRoomJid:(NSString *)groupRoomJid;
 - (void)sendGroupInvitation:(NSArray *)inviteFriend;
 
 - (void)newChatGroupCreated:(NSMutableDictionary *)groupInfo;
 - (void)groupJoined;
 - (void)invitationSended;
 - (void)getGroupPhotoJid:(NSString *)jid result:(void(^)(UIImage *tempImage)) completion;
-- (void)appDelegateVariableInitializedGroupSubject:(NSString *)groupSubject groupNickName:(NSString *)groupNickName groupDescription:(NSString *)groupDescription groupJid:(NSString *)groupJid ownerJid:(NSString *)ownerJid;
+- (void)appDelegateVariableInitializedGroupSubject:(NSString *)groupSubject groupDescription:(NSString *)groupDescription groupJid:(NSString *)groupJid ownerJid:(NSString *)ownerJid;
 - (void)appDelegateImageVariableInitialized:(UIImage *)groupPhoto;
 - (bool)isOwner;
 - (void)destroyRoom;

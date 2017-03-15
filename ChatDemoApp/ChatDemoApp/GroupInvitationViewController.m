@@ -184,10 +184,10 @@
 
     if ([self image:self.groupIcon.image isEqualTo:[UIImage imageNamed:@"groupPlaceholderImage.png"]]) {
         
-        [self createChatRoom:nil groupNickName:roomNickname groupDescription:roomDescription groupSubject:roomSubject];
+        [self createChatRoom:nil groupDescription:roomDescription groupSubject:roomSubject];
     }
     else {
-        [self createChatRoom:self.groupIcon.image groupNickName:roomNickname groupDescription:roomDescription groupSubject:roomSubject];
+        [self createChatRoom:self.groupIcon.image groupDescription:roomDescription groupSubject:roomSubject];
     }
 }
 #pragma mark - end

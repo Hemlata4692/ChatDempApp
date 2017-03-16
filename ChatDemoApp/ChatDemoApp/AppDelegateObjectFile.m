@@ -29,9 +29,6 @@
 #import "XMPPUserDefaultManager.h"
 #import "XmppCoreDataHandler.h"
 
-//Group chat
-#import <XMPPRoomMemoryStorage.h>
-//end
 
 #if DEBUG
 static const int ddLogLevel = LOG_LEVEL_VERBOSE;
@@ -328,7 +325,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     
     xmppRosterStorage = [[XMPPRosterCoreDataStorage alloc] initWithInMemoryStore];
     
-    xmppReconnect = [[XMPPReconnect alloc] init];
+//    xmppReconnect = [[XMPPReconnect alloc] init];
     
     xmppRosterStorage = [[XMPPRosterCoreDataStorage alloc] init];
     xmppRoster = [[XMPPRoster alloc] initWithRosterStorage:xmppRosterStorage];
@@ -353,7 +350,16 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     
     // Activate xmpp modules
     
-    [xmppReconnect         activate:xmppStream];
+    xmppReconnect = [[XMPPReconnect alloc] initWithDispatchQueue:dispatch_get_main_queue()];
+    [xmppReconnect addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    [xmppReconnect activate:self.xmppStream];
+    xmppAutoPing = [[XMPPAutoPing alloc] initWithDispatchQueue:dispatch_get_main_queue()];
+    xmppAutoPing.pingInterval = 25.f; // default is 60
+    xmppAutoPing.pingTimeout = 10.f; // default is 10
+    [xmppAutoPing addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    [xmppAutoPing activate:self.xmppStream];
+    
+//    [xmppReconnect         activate:xmppStream];
     [xmppRoster            activate:xmppStream];
     [xmppvCardTempModule   activate:xmppStream];
     [xmppvCardAvatarModule activate:xmppStream];
@@ -1664,8 +1670,8 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     
     NSLog(@"%@", message);  //This is being Called
    
-//    appDelegate.chatRoomAppDelegateNickName=[[groupRoomJid componentsSeparatedByString:@"@"] objectAtIndex:0];
-    
+////    appDelegate.chatRoomAppDelegateNickName=[[groupRoomJid componentsSeparatedByString:@"@"] objectAtIndex:0];
+//    
     XMPPRoomMemoryStorage * _roomMemory = [[XMPPRoomMemoryStorage alloc]init];
 //    XMPPJID * roomJID = [XMPPJID jidWithString:[[message attributeForName:@"from"]stringValue]];
     XMPPRoom* xmppRoom = [[XMPPRoom alloc] initWithRoomStorage:_roomMemory
@@ -1678,7 +1684,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [xmppRoom joinRoomUsingNickname:[[[NSString stringWithFormat:@"%@",roomJID] componentsSeparatedByString:@"@"] objectAtIndex:0]
                             history:nil
                            password:nil];
-//    [self joinMultiUserChatRoom:[[message attributeForName:@"from"]stringValue]];
+////    [self joinMultiUserChatRoom:[[message attributeForName:@"from"]stringValue]];
 }
 
 - (void) joinMultiUserChatRoom:(NSString *) newRoomName

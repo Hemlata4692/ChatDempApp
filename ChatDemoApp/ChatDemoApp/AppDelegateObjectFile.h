@@ -18,6 +18,11 @@
 //File transfer
 #import "XMPPIncomingFileTransfer.h"
 
+//Group chat
+#import <XMPPRoomMemoryStorage.h>
+#import <XMPPAutoPing.h>
+//end
+
 @interface AppDelegateObjectFile : UIResponder<XMPPRosterDelegate,XMPPStreamDelegate,
 XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate>
 {
@@ -30,6 +35,7 @@ XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate>
     XMPPvCardAvatarModule *xmppvCardAvatarModule;
     XMPPCapabilities *xmppCapabilities;
     XMPPCapabilitiesCoreDataStorage *xmppCapabilitiesStorage;
+    
 //    XMPPMessageDeliveryReceipts *xmppMessageDeliveryRecipts;
     NSString *xmppPassword;
     BOOL customCertEvaluation;
@@ -40,6 +46,7 @@ XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate>
     XMPPIncomingFileTransfer *xmppIncomingFileTransfer;
     
     XMPPMUC *_xmppMUC;//Group chat
+    XMPPAutoPing *xmppAutoPing;
 }
 
 //Delcare XMPP variables
@@ -50,6 +57,7 @@ XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate>
 @property (nonatomic, strong, readonly) XMPPRoster *xmppRoster;
 
 @property (nonatomic, strong, readonly) XMPPIncomingFileTransfer *xmppIncomingFileTransfer;//File transfer
+@property (nonatomic, strong, readonly) XMPPAutoPing *xmppAutoPing;
 
 @property (nonatomic, strong, readonly) XMPPRosterCoreDataStorage *xmppRosterStorage;
 @property (nonatomic, strong, readonly) XMPPvCardTempModule *xmppvCardTempModule;

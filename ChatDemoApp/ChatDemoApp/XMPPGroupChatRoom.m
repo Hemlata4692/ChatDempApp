@@ -665,10 +665,16 @@
 
     for (NSString *invitationJid in inviteFriend) {
         [appDelegate.xmppRoomAppDelegateObje editRoomPrivileges:@[[XMPPRoom itemWithAffiliation:@"admin" jid:[XMPPJID jidWithString:invitationJid]]]];
-        [appDelegate.xmppRoomAppDelegateObje inviteUser:[XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",invitationJid,[[self.xmppStream myJID] resource]]] withMessage:@"Greetings!"];
+        [appDelegate.xmppRoomAppDelegateObje inviteUser:[XMPPJID jidWithString:[NSString stringWithFormat:@"%@",invitationJid]] withMessage:@"Greetings!"];
     }
     [self invitationSended];
 }
+
+//- (void)xmppRoom:(XMPPRoom *)sender didEditPrivileges:(XMPPIQ *)iqResult {
+//
+//    [appDelegate.xmppRoomAppDelegateObje inviteUser:[XMPPJID jidWithString:[[iqResult attributeForName:@"to"] stringValue]] withMessage:@"Greetings!"];
+//    [self invitationSended];
+//}
 
 - (void)invitationSended{}
 #pragma mark - end

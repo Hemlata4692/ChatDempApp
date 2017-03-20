@@ -34,6 +34,8 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppRoomDidDestroySuccess) name:@"XMPPDeleteGroupSuccess" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppRoomDidDestroyFail) name:@"XMPPDeleteGroupFail" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPGroupMembersList:) name:@"GroupAdminList" object:nil];
+    
     // Do any additional setup after loading the view.
 }
 
@@ -312,14 +314,34 @@
     switch (type) {
         case XMPP_GroupJoin:
             type=XMPP_GroupNull;
-            [self groupJoined];
+//            [sender fetchMembersList];
+        {
+            NSString *fetchID = @"GroupAdminList";
+            
+            NSXMLElement *item = [NSXMLElement elementWithName:@"item"];
+            [item addAttributeWithName:@"affiliation" stringValue:@"admin"];
+            
+            NSXMLElement *query = [NSXMLElement elementWithName:@"query" xmlns:XMPPMUCAdminNamespace];
+            [query addChild:item];
+            
+            XMPPIQ *iq = [XMPPIQ iqWithType:@"get" to:[sender roomJID] elementID:fetchID child:query];
+            
+            [self.xmppStream sendElement:iq];
+    }
+//            [self groupJoined];
             break;
         default:
             break;
     }
 }
 
-- (void)groupJoined{}
+- (void)XMPPGroupMembersList:(NSNotification *)notification {
+    
+    NSLog(@"%@",notification.object);
+    [self groupJoined:[notification.object mutableCopy]];
+}
+
+- (void)groupJoined:(NSMutableArray *)memberList{}
 
 - (void)newChatGroupCreated:(NSMutableDictionary *)groupInfo{}
 #pragma mark - end
@@ -751,6 +773,13 @@
 - (void)xmppRoomDeleteFail {}
 //end
 #pragma mark - end
+
+#pragma mark - Fetch list of members of group 
+- (void)membersList {
+
+    
+}
+
 /*
 #pragma mark - Navigation
 

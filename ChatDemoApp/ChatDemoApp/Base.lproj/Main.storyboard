@@ -588,7 +588,7 @@
                                         <rect key="frame" x="0.0" y="1" width="320" height="60"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="A68-3j-llb" id="cgp-kD-LU6">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="60"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="59"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="IUM-fR-Ed6">
@@ -605,6 +605,13 @@
                                                         <constraint firstAttribute="height" constant="35" id="kDU-6M-WV0"/>
                                                     </constraints>
                                                 </imageView>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="alreadyAdded.png" translatesAutoresizingMaskIntoConstraints="NO" id="OZW-hn-YHv">
+                                                    <rect key="frame" x="277" y="12" width="35" height="35"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="35" id="bSh-6P-Smb"/>
+                                                        <constraint firstAttribute="width" constant="35" id="tTN-vr-ncP"/>
+                                                    </constraints>
+                                                </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QvH-qP-hzm">
                                                     <rect key="frame" x="56" y="0.0" width="213" height="59"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -616,6 +623,8 @@
                                                 <constraint firstAttribute="bottom" secondItem="QvH-qP-hzm" secondAttribute="bottom" id="7rq-i9-Cxv"/>
                                                 <constraint firstAttribute="trailing" secondItem="UoF-WV-vts" secondAttribute="trailing" constant="8" id="NXS-TV-ayq"/>
                                                 <constraint firstItem="UoF-WV-vts" firstAttribute="centerY" secondItem="cgp-kD-LU6" secondAttribute="centerY" id="PBC-kO-QSr"/>
+                                                <constraint firstAttribute="trailing" secondItem="OZW-hn-YHv" secondAttribute="trailing" constant="8" id="Pfa-Lt-65R"/>
+                                                <constraint firstItem="OZW-hn-YHv" firstAttribute="centerY" secondItem="cgp-kD-LU6" secondAttribute="centerY" id="QbP-ai-jdS"/>
                                                 <constraint firstItem="IUM-fR-Ed6" firstAttribute="leading" secondItem="cgp-kD-LU6" secondAttribute="leading" constant="8" id="WcK-4q-Cvj"/>
                                                 <constraint firstItem="IUM-fR-Ed6" firstAttribute="centerY" secondItem="cgp-kD-LU6" secondAttribute="centerY" id="XeC-ae-yfn"/>
                                                 <constraint firstItem="QvH-qP-hzm" firstAttribute="top" secondItem="cgp-kD-LU6" secondAttribute="top" id="mvU-bt-Ltc"/>
@@ -624,6 +633,7 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
+                                            <outlet property="alreadyAddedIcon" destination="OZW-hn-YHv" id="fsD-C2-OgX"/>
                                             <outlet property="friendName" destination="QvH-qP-hzm" id="sba-dK-Jee"/>
                                             <outlet property="friendProfilePhoto" destination="IUM-fR-Ed6" id="RZe-tO-fOh"/>
                                             <outlet property="selectedIcon" destination="UoF-WV-vts" id="Yk6-Nt-yaM"/>
@@ -1635,7 +1645,7 @@
                 <navigationController storyboardIdentifier="loginNavigation" automaticallyAdjustsScrollViewInsets="NO" id="g5s-l7-tBw" sceneMemberID="viewController">
                     <toolbarItems/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="Hp1-z3-vWC">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" translucent="NO" id="Hp1-z3-vWC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -1654,7 +1664,7 @@
                 <navigationController storyboardIdentifier="DashboardNavigation" automaticallyAdjustsScrollViewInsets="NO" id="Vep-JT-HHx" sceneMemberID="viewController">
                     <toolbarItems/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="pVC-3M-Vd2">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" translucent="NO" id="pVC-3M-Vd2">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -2033,6 +2043,7 @@
     </scenes>
     <resources>
         <image name="addGroupIcon" width="50" height="50"/>
+        <image name="alreadyAdded.png" width="512" height="512"/>
         <image name="checkedIcon" width="35" height="34"/>
         <image name="currentLocationIcon" width="40" height="40"/>
         <image name="editProfile" width="40" height="40"/>

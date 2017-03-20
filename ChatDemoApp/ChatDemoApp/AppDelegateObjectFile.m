@@ -657,6 +657,25 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
             [self setRoomInfo:iq];
         }
     }
+    else if ([[iq attributeStringValueForName:@"id"] isEqualToString:@"InvitationInfoId"]){
+        
+        if ([[iq attributeStringValueForName:@"type"] isEqualToString:@"result"]) {
+            
+            [self setRoomInfo:iq];
+        }
+    }
+    else if ([[iq attributeStringValueForName:@"id"] isEqualToString:@"GroupAdminList"]){
+        
+        NSArray* members = [[iq elementForName:@"query"] elementsForName:@"item"];//[newConfig elementsForName:@"field"];
+        
+        NSMutableArray *membersJid=[NSMutableArray new];
+        for (NSXMLElement *member in members) {
+        
+            [membersJid addObject:[[member attributeForName:@"jid"] stringValue]];
+        }
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"GroupAdminList" object:membersJid];
+    }
     else {
         //Insert/Update users data in local storage
         if (vcardInfo!=nil) {

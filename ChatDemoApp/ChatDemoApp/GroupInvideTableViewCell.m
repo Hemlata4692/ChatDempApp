@@ -21,7 +21,7 @@
     // Configure the view for the selected state
 }
 
-- (void)displayContactInformation:(NSMutableDictionary *)contactInfo isSelected:(bool)isSelected {
+- (void)displayContactInformation:(NSMutableDictionary *)contactInfo isSelected:(bool)isSelected isAlreadyAdded:(bool)isAlreadyAdded {
 
     if(isSelected) {
     
@@ -30,6 +30,13 @@
     else {
         
         self.selectedIcon.hidden=YES;
+    }
+    
+    if (isAlreadyAdded) {
+        self.alreadyAddedIcon.hidden=NO;
+    }
+    else {
+        self.alreadyAddedIcon.hidden=YES;
     }
     self.friendName.text=[contactInfo objectForKey:@"Name"];
 }

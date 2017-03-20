@@ -15,6 +15,7 @@
 @interface GroupChatViewController ()<CustomFilterDelegate> {
 
     UIImage *groupImageIcon;
+    NSMutableArray *groupMemberList;
 }
 @end
 
@@ -29,7 +30,6 @@
     [self addBarButtons];
     [self appDelegateVariableInitializedGroupSubject:[roomDetail objectForKey:@"roomName"] groupDescription:[roomDetail objectForKey:@"roomDescription"] groupJid:[roomDetail objectForKey:@"roomJid"] ownerJid:[roomDetail objectForKey:@"roomOwnerJid"]];
     [self joinChatRoomJid:[roomDetail objectForKey:@"roomJid"]];
-//    [self joinChatRoomJid:@"160317060813@conference.117.240.110.83"];
     // Do any additional setup after loading the view.
 }
 
@@ -140,6 +140,7 @@
         invitationViewObj.friendImage=nil;
     }
     invitationViewObj.roomJid=[roomDetail objectForKey:@"roomJid"];
+    invitationViewObj.alreadyAddJids=[groupMemberList mutableCopy];
     [self.navigationController pushViewController:invitationViewObj animated:YES];
 }
 
@@ -186,10 +187,10 @@
 #pragma mark - end
 
 #pragma mark - XMPPGroupChat method
-- (void)groupJoined {
+- (void)groupJoined:(NSMutableArray *)memberList {
 
     //Group joined
-    
+    groupMemberList=[memberList mutableCopy];
 }
 
 //Delete group notify

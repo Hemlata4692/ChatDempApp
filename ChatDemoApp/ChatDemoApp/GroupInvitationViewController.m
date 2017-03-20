@@ -24,7 +24,7 @@
 @end
 
 @implementation GroupInvitationViewController
-@synthesize roomDescription, roomSubject, friendImage, roomJid;
+@synthesize roomDescription, roomSubject, friendImage, roomJid, alreadyAddJids;
 @synthesize isCreate;
 
 #pragma mark - View life cycle
@@ -40,6 +40,10 @@
     
     [self addLeftBarButtonWithImage:[UIImage imageNamed:@"back_white"]];
     [self initializedView];
+    
+    if (!alreadyAddJids) {
+        alreadyAddJids=[NSMutableArray new];
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -125,20 +129,22 @@
                                       reuseIdentifier:CellIdentifier];
     }
     
-    [cell displayContactInformation:[[friendDetails objectForKey:[friendJids objectAtIndex:indexPath.row]] mutableCopy] isSelected:[selectedJids containsObject:[friendJids objectAtIndex:indexPath.row]]];
+    [cell displayContactInformation:[[friendDetails objectForKey:[friendJids objectAtIndex:indexPath.row]] mutableCopy] isSelected:[selectedJids containsObject:[friendJids objectAtIndex:indexPath.row]] isAlreadyAdded:[alreadyAddJids containsObject:[friendJids objectAtIndex:indexPath.row]]];
     [self configurePhotoForCell:cell jid:[friendJids objectAtIndex:indexPath.row]];
     return cell;
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    if ([selectedJids containsObject:[friendJids objectAtIndex:indexPath.row]]) {
-        [selectedJids removeObject:[friendJids objectAtIndex:indexPath.row]];
+    if (![alreadyAddJids containsObject:[friendJids objectAtIndex:indexPath.row]]) {
+        if ([selectedJids containsObject:[friendJids objectAtIndex:indexPath.row]]) {
+            [selectedJids removeObject:[friendJids objectAtIndex:indexPath.row]];
+        }
+        else {
+            [selectedJids addObject:[friendJids objectAtIndex:indexPath.row]];
+        }
+        [self.invitaionTableView reloadData];
     }
-    else {
-        [selectedJids addObject:[friendJids objectAtIndex:indexPath.row]];
-    }
-    [self.invitaionTableView reloadData];
 }
 
 - (void)configurePhotoForCell:(GroupInvideTableViewCell *)cell jid:(NSString *)jid {

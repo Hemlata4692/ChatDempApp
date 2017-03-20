@@ -13,6 +13,7 @@
 @property (strong, nonatomic) IBOutlet UIImageView *friendProfilePhoto;
 @property (strong, nonatomic) IBOutlet UIImageView *selectedIcon;
 @property (strong, nonatomic) IBOutlet UILabel *friendName;
+@property (strong, nonatomic) IBOutlet UIImageView *alreadyAddedIcon;
 
-- (void)displayContactInformation:(NSMutableDictionary *)contactInfo isSelected:(bool)isSelected;
+- (void)displayContactInformation:(NSMutableDictionary *)contactInfo isSelected:(bool)isSelected isAlreadyAdded:(bool)isAlreadyAdded;
 @end

@@ -47,7 +47,7 @@ typedef NS_ENUM (NSInteger, GroupChatType){
 - (void)sendGroupInvitation:(NSArray *)inviteFriend;
 
 - (void)newChatGroupCreated:(NSMutableDictionary *)groupInfo;
-- (void)groupJoined;
+- (void)groupJoined:(NSMutableArray *)memberList;
 - (void)invitationSended;
 - (void)getGroupPhotoJid:(NSString *)jid result:(void(^)(UIImage *tempImage)) completion;
 - (void)appDelegateVariableInitializedGroupSubject:(NSString *)groupSubject groupDescription:(NSString *)groupDescription groupJid:(NSString *)groupJid ownerJid:(NSString *)ownerJid;

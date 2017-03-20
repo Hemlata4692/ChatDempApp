@@ -326,7 +326,7 @@
 //end
 
 //Group chat
-- (void)insertGroupEntryInXmppUserModelXmppGroupJid:(NSString *)xmppGroupJid xmppGroupName:(NSString *)xmppGroupName xmppGroupNickName:(NSString *)xmppGroupNickName xmppGroupDescription:(NSString *)xmppGroupDescription xmppGroupOnwerId:(NSString *)xmppGroupOnwerId {
+- (void)insertGroupEntryInXmppUserModelXmppGroupJid:(NSString *)xmppGroupJid xmppGroupName:(NSString *)xmppGroupName xmppGroupDescription:(NSString *)xmppGroupDescription xmppGroupOnwerId:(NSString *)xmppGroupOnwerId {
     
     NSManagedObjectContext *context = [self managedObjectContext];
     NSMutableArray *results = [[NSMutableArray alloc]init];
@@ -341,7 +341,6 @@
     if (results.count > 0) {
         NSManagedObject* xmppDataEntry = [results objectAtIndex:0];
         [xmppDataEntry setValue:xmppGroupJid forKey:@"groupChatRoomId"];
-        [xmppDataEntry setValue:xmppGroupNickName forKey:@"groupChatRoomNickName"];
         [xmppDataEntry setValue:xmppGroupName forKey:@"groupChatRoomName"];
         [xmppDataEntry setValue:xmppGroupOnwerId forKey:@"groupChatOwnerId"];
         [xmppDataEntry setValue:xmppGroupDescription forKey:@"groupChatDescription"];
@@ -350,7 +349,6 @@
     } else {
         NSManagedObject *xmppDataEntry = [NSEntityDescription insertNewObjectForEntityForName:GroupChatRoomEntry inManagedObjectContext:context];
         [xmppDataEntry setValue:xmppGroupJid forKey:@"groupChatRoomId"];
-        [xmppDataEntry setValue:xmppGroupNickName forKey:@"groupChatRoomNickName"];
         [xmppDataEntry setValue:xmppGroupName forKey:@"groupChatRoomName"];
         [xmppDataEntry setValue:xmppGroupOnwerId forKey:@"groupChatOwnerId"];
         [xmppDataEntry setValue:xmppGroupDescription forKey:@"groupChatDescription"];

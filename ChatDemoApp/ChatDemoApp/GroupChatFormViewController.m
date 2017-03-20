@@ -169,7 +169,6 @@
         GroupInvitationViewController *invitationViewObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"GroupInvitationViewController"];
         invitationViewObj.isCreate=true;
         invitationViewObj.roomSubject=self.addRoomName.text;
-        invitationViewObj.roomNickname=@"";
         invitationViewObj.roomDescription=self.groupDescription.text;
         if (![self image:self.groupImage.imageView.image isEqualTo:[UIImage imageNamed:@"groupPlaceholderImage.png"]]) {
             invitationViewObj.friendImage=self.groupImage.imageView.image;

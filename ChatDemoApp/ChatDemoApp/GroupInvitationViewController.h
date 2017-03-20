@@ -13,7 +13,7 @@
 
 @property(nonatomic, retain)NSString *roomSubject;
 @property(nonatomic, retain)NSString *roomDescription;
-@property(nonatomic, retain)NSString *roomNickname;
+@property(nonatomic, retain)NSString *roomJid;
 @property(nonatomic, retain)UIImage *friendImage;
 
 @property(nonatomic, assign)BOOL isCreate;

@@ -13,26 +13,25 @@ typedef NS_ENUM (NSInteger, GroupChatType){
     XMPP_GroupCreate,
     XMPP_GroupJoin,
     XMPP_GroupDetail,
-    XMPP_GroupDelete
+    XMPP_GroupDelete,
+    XMPP_GroupInvite
 };
 
 @interface XMPPGroupChatRoom : UIViewController {
 
     NSString *chatRoomName;
     NSString *chatRoomDescription;
-    NSString *chatRoomNickName;
     UIImage *chatRoomImage;
     XMPPRoom *xmppRoomVar;
     NSString *chatRoomOwnerId;
     
     NSMutableDictionary *xmppCurrentRoomDetail;
 }
-//NSString *roomName, *roomDescription, *roomNickName;
+//NSString *roomName, *roomDescription;
 //UIImage *roomImage;
 
 @property(nonatomic, readonly)NSString *chatRoomName;
 @property(nonatomic, readonly)NSString *chatRoomDescription;
-@property(nonatomic, readonly)NSString *chatRoomNickName;
 @property(nonatomic, readonly)UIImage *chatRoomImage;
 @property(nonatomic, readonly)XMPPRoom *xmppRoomVar;
 @property(nonatomic, readonly)NSString *chatRoomOwnerId;

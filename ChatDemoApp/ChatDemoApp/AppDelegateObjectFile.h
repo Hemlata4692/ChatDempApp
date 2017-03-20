@@ -21,6 +21,7 @@
 //Group chat
 #import <XMPPRoomMemoryStorage.h>
 #import <XMPPAutoPing.h>
+#import <XMPPIDTracker.h>
 //end
 
 @interface AppDelegateObjectFile : UIResponder<XMPPRosterDelegate,XMPPStreamDelegate,
@@ -164,7 +165,6 @@ XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate>
 @property(strong, nonatomic)XMPPRoom *xmppRoomAppDelegateObje;
 @property(nonatomic,strong) NSString *chatRoomAppDelegateSelectedRoomOwnerJid;
 @property(nonatomic,strong) NSString *chatRoomAppDelegateName;
-@property(nonatomic,strong) NSString *chatRoomAppDelegateNickName;
 @property(nonatomic,strong) NSString *chatRoomAppDelegateDescription;
 @property(nonatomic,strong) NSString *chatRoomAppDelegateRoomJid;
 @property(nonatomic,strong) UIImage *chatRoomAppDelegateImage;

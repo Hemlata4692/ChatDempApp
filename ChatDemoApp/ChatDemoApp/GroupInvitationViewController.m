@@ -24,7 +24,7 @@
 @end
 
 @implementation GroupInvitationViewController
-@synthesize roomDescription, roomNickname, roomSubject, friendImage;
+@synthesize roomDescription, roomSubject, friendImage, roomJid;
 @synthesize isCreate;
 
 #pragma mark - View life cycle

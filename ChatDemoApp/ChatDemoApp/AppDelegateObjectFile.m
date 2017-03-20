@@ -45,6 +45,8 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     
     //GroupChat
     NSMutableDictionary *inviteUserInfo;
+    XMPPRoom *inviteRoom;
+    XMPPIDTracker *responseTracker;
     //end
 }
 
@@ -96,7 +98,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 @synthesize groupDeleteid,groupChatRoomInfoList;
 @synthesize xmppRoomAppDelegateObje;
 @synthesize chatRoomAppDelegateName;
-@synthesize chatRoomAppDelegateNickName;
 @synthesize chatRoomAppDelegateDescription;
 @synthesize chatRoomAppDelegateRoomJid;
 @synthesize chatRoomAppDelegateImage;
@@ -624,14 +625,13 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     else if (nil!=groupChat&&NULL!=groupChat&&[groupChat containsString:@"BookMarkManager"]) {
         
             NSLog(@"Bookmarks with id %@ succesfully uploaded", [iq attributeStringValueForName:@"id"]);
-
-        NSString *inviteText=[[[iq elementForName:@"query"] attributeForName:@"isInvite"] stringValue];
-        if (!inviteText) {
+        [responseTracker invokeForID:[iq elementID] withObject:iq];
+        if ([groupChat isEqualToString:@"BookMarkManager"]) {
             [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPBookMarkUpdated" object:nil];
         }
-        else if (inviteText&&[[inviteUserInfo allKeys] containsObject:inviteText]) {
+        else {
             
-            [self updateBookmarkOfJid:inviteText];
+            [self updateBookmarkOfJid:[[groupChat componentsSeparatedByString:@"BookMarkManager"] objectAtIndex:1]];
         }
         
 //        [[[groupChat componentsSeparatedByString:@"@"] objectAtIndex:1] isEqualToString:conferenceServerJid]
@@ -649,7 +649,13 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         else if (itemElements&&inviteText&&[[inviteUserInfo allKeys] containsObject:inviteText]) {
             [self addBookMarkConferenceList:itemElements jid:inviteText];
         }
+    }
+    else if ([[iq attributeStringValueForName:@"id"] isEqualToString:@"InvitationInfoId"]){
         
+        if ([[iq attributeStringValueForName:@"type"] isEqualToString:@"result"]) {
+            
+            [self setRoomInfo:iq];
+        }
     }
     else {
         //Insert/Update users data in local storage
@@ -1664,40 +1670,26 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     NSLog(@"%@", message);  //This is being Called
 }
 
-
-- (void)xmppMUC:(XMPPMUC *)sender roomJID:(XMPPJID *) roomJID didReceiveInvitation:(XMPPMessage *)message
-{
+- (void)xmppMUC:(XMPPMUC *)sender roomJID:(XMPPJID *) roomJID didReceiveInvitation:(XMPPMessage *)message {
     
     NSLog(@"%@", message);  //This is being Called
-   
-////    appDelegate.chatRoomAppDelegateNickName=[[groupRoomJid componentsSeparatedByString:@"@"] objectAtIndex:0];
-//    
     XMPPRoomMemoryStorage * _roomMemory = [[XMPPRoomMemoryStorage alloc]init];
-//    XMPPJID * roomJID = [XMPPJID jidWithString:[[message attributeForName:@"from"]stringValue]];
     XMPPRoom* xmppRoom = [[XMPPRoom alloc] initWithRoomStorage:_roomMemory
                                                            jid:roomJID
                                                  dispatchQueue:dispatch_get_main_queue()];
     [xmppRoom activate:self.xmppStream];
     [xmppRoom addDelegate:self delegateQueue:dispatch_get_main_queue()];
     
+    NSMutableDictionary *temDict=[NSMutableDictionary new];
+    [temDict setObject:[[message attributeForName:@"from"]stringValue] forKey:@"roomJid"];
+    NSLog(@"%@",[message elementForName:@"invite"]);
+    NSLog(@"%@",[[[message elementForName:@"x"] elementForName:@"invite"] attributeForName:@"from"]);
+    [temDict setObject:[[[[message elementForName:@"x"] elementForName:@"invite"] attributeForName:@"from"] stringValue] forKey:@"roomOwnerid"];
+    [inviteUserInfo setObject:temDict forKey:[NSString stringWithFormat:@"%@",roomJID]];
     //This method is used to create group if not exist and if this group is exist then join it
-    [xmppRoom joinRoomUsingNickname:[[[NSString stringWithFormat:@"%@",roomJID] componentsSeparatedByString:@"@"] objectAtIndex:0]
+    [xmppRoom joinRoomUsingNickname:[[xmppLogedInUserId componentsSeparatedByString:@"@"] objectAtIndex:0]
                             history:nil
                            password:nil];
-////    [self joinMultiUserChatRoom:[[message attributeForName:@"from"]stringValue]];
-}
-
-- (void) joinMultiUserChatRoom:(NSString *) newRoomName
-{
-    XMPPJID *roomJID = [XMPPJID jidWithString:newRoomName];
-    XMPPRoomMemoryStorage *roomMemoryStorage = [[XMPPRoomMemoryStorage alloc] init];
-    XMPPRoom* xmppRoom = [[XMPPRoom alloc]
-                initWithRoomStorage:roomMemoryStorage
-                jid:roomJID
-                dispatchQueue:dispatch_get_main_queue()];
-    [xmppRoom activate:[self xmppStream]];
-    [xmppRoom addDelegate:self delegateQueue:dispatch_get_main_queue()];
-    [xmppRoom joinRoomUsingNickname:[[[NSString stringWithFormat:@"%@",roomJID] componentsSeparatedByString:@"@"] objectAtIndex:0] history:nil];
 }
 
 - (void)xmppRoomDidCreate:(XMPPRoom *)sender{
@@ -1707,45 +1699,33 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 - (void)xmppRoomDidJoin:(XMPPRoom *)sender{
     NSLog(@"a");
     
-    [inviteUserInfo setObject:[NSMutableDictionary new] forKey:[NSString stringWithFormat:@"%@",[sender roomJID]]];
-    [sender fetchConfigurationForm];
-//    //    [self setXmppRoomVar:sender];
-//    appDelegate.xmppRoomAppDelegateObje=sender;
-//    
-//    switch (type) {
-//        case XMPP_GroupJoin:
-//            type=XMPP_GroupNull;
-//            [self groupJoined];
-//            break;
-//        default:
-//            break;
-//    }
+    dispatch_queue_t queue = dispatch_queue_create("InvitationInfoQueue", DISPATCH_QUEUE_PRIORITY_DEFAULT);
+    dispatch_async(queue, ^
+                   {
+                       XMPPJID * roomJID = [sender roomJID];
+                       NSString *fetchID = @"InvitationInfoId";
+                       
+                       NSXMLElement *query = [NSXMLElement elementWithName:@"query" xmlns:@"http://jabber.org/protocol/disco#info"];
+                       XMPPIQ *iq = [XMPPIQ iqWithType:@"get" to:roomJID elementID:fetchID child:query];
+                       [xmppStream sendElement:iq];
+                   });
 }
 
-#pragma mark - Fetch room configurations and update it using configureRoomUsingOptions
-- (void)xmppRoom:(XMPPRoom *)sender didFetchConfigurationForm:(NSXMLElement *)configForm{
-    
-    NSMutableDictionary *tempDict=[NSMutableDictionary new];
-    [tempDict setObject:[NSString stringWithFormat:@"%@",[sender roomJID]] forKey:@"roomJid"];
-    [tempDict setObject:[[[NSString stringWithFormat:@"%@",[sender roomJID]] componentsSeparatedByString:@"@"] objectAtIndex:0] forKey:@"roomNickName"];
-    
-    NSXMLElement *newConfig = [configForm copy];
-    NSArray* fields = [newConfig elementsForName:@"field"];
+- (void)setRoomInfo:(XMPPIQ *)iq {
+
+    NSMutableDictionary *temDict=[[inviteUserInfo objectForKey:[iq attributeStringValueForName:@"from"]] mutableCopy];
+    [temDict setObject:[[[iq elementForName:@"query"] elementForName:@"identity"] attributeStringValueForName:@"name"] forKey:@"name"];
+    NSArray* fields = [[[iq elementForName:@"query"] elementForName:@"x"] elementsForName:@"field"];
     
     for (NSXMLElement *field in fields) {
         NSString *var = [field attributeStringValueForName:@"var"];
-        if ([var isEqualToString:@"muc#roomconfig_roomname"]) {
-            [tempDict setObject:[[field elementForName:@"value"] stringValue] forKey:@"roomName"];
-        }
-        else if ([var isEqualToString:@"muc#roomconfig_roomdesc"]) {
-            [tempDict setObject:[[field elementForName:@"value"] stringValue] forKey:@"roomDesc"];
-        }
-        else if ([var isEqualToString:@"muc#roomconfig_roomowners"]) {
-            [tempDict setObject:[[field elementForName:@"value"] stringValue] forKey:@"roomOwnerid"];
+        if ([var isEqualToString:@"muc#roominfo_description"]) {
+            [temDict setObject:[[field elementForName:@"value"] stringValue] forKey:@"Desc"];
+            break;
         }
     }
-    [inviteUserInfo setObject:[tempDict mutableCopy] forKey:[NSString stringWithFormat:@"%@",[sender roomJID]]];
-   [self fetchJoinedGroupList:[NSString stringWithFormat:@"%@",[sender roomJID]]];
+    [inviteUserInfo setObject:temDict forKey:[iq attributeStringValueForName:@"from"]];
+    [self fetchJoinedGroupList:[iq attributeStringValueForName:@"from"]];
 }
 
 - (void)fetchJoinedGroupList:(NSString*)jid {
@@ -1764,30 +1744,28 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 
 - (void)addBookMarkConferenceList:(NSMutableArray *)conferenceList jid:(NSString *)jid{
     
-    //    NSString* server = @"test@pc"; //or whatever the server address for muc is
-    //    XMPPJID *servrJID = [XMPPJID jidWithString:server];
     XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:[XMPPJID jidWithString:myDelegate.serverName]];
     [iq addAttributeWithName:@"from" stringValue:[self.xmppStream myJID].full];
-    //    [iq addAttributeWithName:@"id" stringValue:[NSString stringWithFormat:@"BookMarkManager2.%@",[self getUniqueRoomName]]];
-    [iq addAttributeWithName:@"id" stringValue:@"BookMarkManager"];
+    [iq addAttributeWithName:@"id" stringValue:[NSString stringWithFormat:@"BookMarkManager%@",jid]];
     NSXMLElement *query = [NSXMLElement elementWithName:@"query"];
-    [query addAttributeWithName:@"isInvite" stringValue:jid];
+    
     [query addAttributeWithName:@"xmlns" stringValue:@"jabber:iq:private"];
     NSXMLElement *storage_q = [NSXMLElement elementWithName:@"storage"];
     [storage_q addAttributeWithName:@"xmlns" stringValue:@"storage:bookmarks"];
     
     for (NSXMLElement *list in conferenceList) {
         
-        [storage_q addChild:[list copy]];
+        if (![[list attributeStringValueForName:@"jid"] isEqualToString:[[inviteUserInfo objectForKey:jid] objectForKey:@"roomJid"]]) {
+            
+            [storage_q addChild:[list copy]];
+        }
     }
-    
     NSXMLElement *conference_s = [NSXMLElement elementWithName:@"conference"];
-    [conference_s addAttributeWithName:@"name" stringValue:[[inviteUserInfo objectForKey:jid] objectForKey:@""]];
+    [conference_s addAttributeWithName:@"name" stringValue:[[inviteUserInfo objectForKey:jid] objectForKey:@"name"]];
     [conference_s addAttributeWithName:@"autojoin" stringValue:@"true"];
     [conference_s addAttributeWithName:@"jid" stringValue:[[inviteUserInfo objectForKey:jid] objectForKey:@"roomJid"]];
-    [conference_s addAttributeWithName:@"nick" stringValue:[[inviteUserInfo objectForKey:jid] objectForKey:@"roomNickName"]];
-    [conference_s addAttributeWithName:@"Desc" stringValue:[[inviteUserInfo objectForKey:jid] objectForKey:@"roomDesc"]];
-        [conference_s addAttributeWithName:@"OwnerJid" stringValue:[[inviteUserInfo objectForKey:jid] objectForKey:@"roomOwnerid"]];
+    [conference_s addAttributeWithName:@"Desc" stringValue:[[inviteUserInfo objectForKey:jid] objectForKey:@"Desc"]];
+    [conference_s addAttributeWithName:@"OwnerJid" stringValue:[[inviteUserInfo objectForKey:jid] objectForKey:@"roomOwnerid"]];
     
     [storage_q addChild:conference_s];
     [query addChild:storage_q];
@@ -1796,8 +1774,35 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 }
 
 - (void)updateBookmarkOfJid:(NSString *)jid {
-
+    
+    NSMutableDictionary *tempDict=[NSMutableDictionary new];
+    [[XmppCoreDataHandler sharedManager] insertGroupEntryInXmppUserModelXmppGroupJid:[[inviteUserInfo objectForKey:jid] objectForKey:@"roomJid"] xmppGroupName:[[inviteUserInfo objectForKey:jid] objectForKey:@"name"] xmppGroupDescription:[[inviteUserInfo objectForKey:jid] objectForKey:@"Desc"] xmppGroupOnwerId:[[inviteUserInfo objectForKey:jid] objectForKey:@"roomOwnerid"]];
+    
+    [tempDict setObject:[[inviteUserInfo objectForKey:jid] objectForKey:@"roomJid"] forKey:@"roomJid"];
+    [tempDict setObject:[[inviteUserInfo objectForKey:jid] objectForKey:@"name"] forKey:@"roomName"];
+    [tempDict setObject:@"" forKey:@"roomDescription"];
+    if (nil!=[[inviteUserInfo objectForKey:jid] objectForKey:@"Desc"]) {
+        [tempDict setObject:[[inviteUserInfo objectForKey:jid] objectForKey:@"Desc"] forKey:@"roomDescription"];
+    }
+    [tempDict setObject:[[inviteUserInfo objectForKey:jid] objectForKey:@"roomOwnerid"] forKey:@"roomOwnerJid"];
+    [tempDict setObject:[NSNumber numberWithBool:false] forKey:@"isPhoto"];
+    
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"roomJid == %@", [[inviteUserInfo objectForKey:jid] objectForKey:@"roomJid"]];
+    NSArray *filteredarray = [groupChatRoomInfoList filteredArrayUsingPredicate:predicate];
+    
+    if (filteredarray.count>0) {
+        
+        NSUInteger index = [groupChatRoomInfoList indexOfObjectPassingTest:^(id obj, NSUInteger idx, BOOL *stop) {
+            return [predicate evaluateWithObject:obj];
+        }];
+        [groupChatRoomInfoList replaceObjectAtIndex:index withObject:[tempDict mutableCopy]];
+    }
+    else {
+        [groupChatRoomInfoList addObject:[tempDict mutableCopy]];
+    }
     [inviteUserInfo removeObjectForKey:jid];
+    NSLog(@"a");
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPAddedNewGroup" object:nil];
 }
 
 #pragma mark - end

@@ -19,6 +19,7 @@
     
     AppDelegateObjectFile *appDelegate;
     GroupChatType type;
+    NSMutableArray *invitedFriendArray;
 }
 @end
 
@@ -69,11 +70,6 @@
     chatRoomName=chatRoomNameString;
 }
 
-- (void)setChatRoomNickName:(NSString *)chatRoomNickNameString {
-    
-    chatRoomNickName=chatRoomNickNameString;
-}
-
 - (void)setChatRoomDescription:(NSString *)chatRoomDescriptionString {
     
     chatRoomDescription=chatRoomDescriptionString;
@@ -104,11 +100,6 @@
 - (NSString *)chatRoomName {
     
     return chatRoomName;
-}
-
-- (NSString *)chatRoomNickName {
-    
-    return chatRoomNickName;
 }
 
 - (NSString *)chatRoomDescription {
@@ -206,7 +197,6 @@
 - (void)appDelegateVariableInitializedGroupSubject:(NSString *)groupSubject groupDescription:(NSString *)groupDescription groupJid:(NSString *)groupJid ownerJid:(NSString *)ownerJid {
 
     appDelegate.chatRoomAppDelegateName=groupSubject;
-    appDelegate.chatRoomAppDelegateNickName=[[groupJid componentsSeparatedByString:@"@"] objectAtIndex:0];
     appDelegate.chatRoomAppDelegateDescription=groupDescription;
 //    appDelegate.chatRoomAppDelegateImage=groupImage;
     appDelegate.chatRoomAppDelegateRoomJid=groupJid;
@@ -267,7 +257,6 @@
     
     type=XMPP_GroupCreate;    
     appDelegate.chatRoomAppDelegateName=groupSubject;
-//    appDelegate.chatRoomAppDelegateNickName=groupNickName;
     appDelegate.chatRoomAppDelegateDescription=groupDescription;
     appDelegate.chatRoomAppDelegateImage=groupImage;
     
@@ -281,13 +270,8 @@
     [xmppRoom activate:self.xmppStream];
     [xmppRoom addDelegate:self delegateQueue:dispatch_get_main_queue()];
 
-//    if (appDelegate.chatRoomAppDelegateNickName||[appDelegate.chatRoomAppDelegateNickName isEqualToString:@""]) {
-    
-        appDelegate.chatRoomAppDelegateNickName=uniqueName;
-//    }
-    
     //This method is used to create group if not exist and if this group is exist then join it
-    [xmppRoom joinRoomUsingNickname:appDelegate.chatRoomAppDelegateNickName
+    [xmppRoom joinRoomUsingNickname:[[appDelegate.xmppLogedInUserId componentsSeparatedByString:@"@"] objectAtIndex:0]
                             history:nil
                            password:nil];
 }
@@ -296,7 +280,6 @@
 - (void)joinChatRoomJid:(NSString *)groupRoomJid {
     
     type=XMPP_GroupJoin;
-    appDelegate.chatRoomAppDelegateNickName=[[groupRoomJid componentsSeparatedByString:@"@"] objectAtIndex:0];
     
     XMPPRoomMemoryStorage * _roomMemory = [[XMPPRoomMemoryStorage alloc]init];
     XMPPJID * roomJID = [XMPPJID jidWithString:groupRoomJid];
@@ -307,7 +290,7 @@
     [xmppRoom addDelegate:self delegateQueue:dispatch_get_main_queue()];
 
     //This method is used to create group if not exist and if this group is exist then join it
-    [xmppRoom joinRoomUsingNickname:appDelegate.chatRoomAppDelegateNickName
+    [xmppRoom joinRoomUsingNickname:[[appDelegate.xmppLogedInUserId componentsSeparatedByString:@"@"] objectAtIndex:0]
                             history:nil
                            password:nil];
 }
@@ -460,7 +443,6 @@
     [conference_s addAttributeWithName:@"name" stringValue:appDelegate.chatRoomAppDelegateName];
     [conference_s addAttributeWithName:@"autojoin" stringValue:@"true"];
     [conference_s addAttributeWithName:@"jid" stringValue:[NSString stringWithFormat:@"%@",[appDelegate.xmppRoomAppDelegateObje roomJID]]];
-    [conference_s addAttributeWithName:@"nick" stringValue:appDelegate.chatRoomAppDelegateNickName];
     [conference_s addAttributeWithName:@"Desc" stringValue:appDelegate.chatRoomAppDelegateDescription];
     if ([[NSString stringWithFormat:@"%@",[self.xmppStream myJID]] containsString:@"/"]) {
         [conference_s addAttributeWithName:@"OwnerJid" stringValue:[[[NSString stringWithFormat:@"%@",[self.xmppStream myJID]] componentsSeparatedByString:@"/"] objectAtIndex:0]];
@@ -551,11 +533,10 @@
                 
                 NSLog(@"%@",[lastConferences elementForName:@"PHOTO"]);
                 NSLog(@"%@",[lastConferences attributeStringValueForName:@"name"]);
-                [[XmppCoreDataHandler sharedManager] insertGroupEntryInXmppUserModelXmppGroupJid:[lastConferences attributeStringValueForName:@"jid"] xmppGroupName:[lastConferences attributeStringValueForName:@"name"] xmppGroupNickName:[lastConferences attributeStringValueForName:@"nick"] xmppGroupDescription:[lastConferences attributeStringValueForName:@"Desc"] xmppGroupOnwerId:[lastConferences attributeStringValueForName:@"OwnerJid"]];
+                [[XmppCoreDataHandler sharedManager] insertGroupEntryInXmppUserModelXmppGroupJid:[lastConferences attributeStringValueForName:@"jid"] xmppGroupName:[lastConferences attributeStringValueForName:@"name"] xmppGroupDescription:[lastConferences attributeStringValueForName:@"Desc"] xmppGroupOnwerId:[lastConferences attributeStringValueForName:@"OwnerJid"]];
                 
                 [tempDict setObject:[lastConferences attributeStringValueForName:@"jid"] forKey:@"roomJid"];
                 [tempDict setObject:[lastConferences attributeStringValueForName:@"name"] forKey:@"roomName"];
-                [tempDict setObject:[lastConferences attributeStringValueForName:@"nick"] forKey:@"roomNickName"];
                 [tempDict setObject:[lastConferences attributeStringValueForName:@"Desc"] forKey:@"roomDescription"];
                 [tempDict setObject:[lastConferences attributeStringValueForName:@"OwnerJid"] forKey:@"roomOwnerJid"];
                 [tempDict setObject:[NSNumber numberWithBool:false] forKey:@"isPhoto"];
@@ -587,11 +568,10 @@
                     
                     NSLog(@"%@",[lastConferences elementForName:@"PHOTO"]);
                     NSLog(@"%@",[lastConferences attributeStringValueForName:@"name"]);
-                    [[XmppCoreDataHandler sharedManager] insertGroupEntryInXmppUserModelXmppGroupJid:[lastConferences attributeStringValueForName:@"jid"] xmppGroupName:[lastConferences attributeStringValueForName:@"name"] xmppGroupNickName:[lastConferences attributeStringValueForName:@"nick"] xmppGroupDescription:[lastConferences attributeStringValueForName:@"Desc"] xmppGroupOnwerId:[lastConferences attributeStringValueForName:@"OwnerJid"]];
+                    [[XmppCoreDataHandler sharedManager] insertGroupEntryInXmppUserModelXmppGroupJid:[lastConferences attributeStringValueForName:@"jid"] xmppGroupName:[lastConferences attributeStringValueForName:@"name"] xmppGroupDescription:[lastConferences attributeStringValueForName:@"Desc"] xmppGroupOnwerId:[lastConferences attributeStringValueForName:@"OwnerJid"]];
                     
                     [tempDict setObject:[lastConferences attributeStringValueForName:@"jid"] forKey:@"roomJid"];
                     [tempDict setObject:[lastConferences attributeStringValueForName:@"name"] forKey:@"roomName"];
-                    [tempDict setObject:[lastConferences attributeStringValueForName:@"nick"] forKey:@"roomNickName"];
                     [tempDict setObject:[lastConferences attributeStringValueForName:@"Desc"] forKey:@"roomDescription"];
                     [tempDict setObject:[lastConferences attributeStringValueForName:@"OwnerJid"] forKey:@"roomOwnerJid"];
                     [tempDict setObject:[NSNumber numberWithBool:false] forKey:@"isPhoto"];
@@ -625,11 +605,10 @@
         {
             type=XMPP_GroupNull;
             NSMutableDictionary *tempDict=[NSMutableDictionary new];
-            [[XmppCoreDataHandler sharedManager] insertGroupEntryInXmppUserModelXmppGroupJid:[NSString stringWithFormat:@"%@",[appDelegate.xmppRoomAppDelegateObje roomJID]] xmppGroupName:appDelegate.chatRoomAppDelegateName xmppGroupNickName:appDelegate.chatRoomAppDelegateNickName xmppGroupDescription:appDelegate.chatRoomAppDelegateDescription xmppGroupOnwerId:appDelegate.chatRoomAppDelegateSelectedRoomOwnerJid];
+            [[XmppCoreDataHandler sharedManager] insertGroupEntryInXmppUserModelXmppGroupJid:[NSString stringWithFormat:@"%@",[appDelegate.xmppRoomAppDelegateObje roomJID]] xmppGroupName:appDelegate.chatRoomAppDelegateName xmppGroupDescription:appDelegate.chatRoomAppDelegateDescription xmppGroupOnwerId:appDelegate.chatRoomAppDelegateSelectedRoomOwnerJid];
             
             [tempDict setObject:[NSString stringWithFormat:@"%@",[appDelegate.xmppRoomAppDelegateObje roomJID]] forKey:@"roomJid"];
             [tempDict setObject:appDelegate.chatRoomAppDelegateName forKey:@"roomName"];
-            [tempDict setObject:appDelegate.chatRoomAppDelegateNickName forKey:@"roomNickName"];
             [tempDict setObject:appDelegate.chatRoomAppDelegateDescription forKey:@"roomDescription"];
             [tempDict setObject:appDelegate.chatRoomAppDelegateSelectedRoomOwnerJid forKey:@"roomOwnerJid"];
             [tempDict setObject:[NSNumber numberWithBool:false] forKey:@"isPhoto"];
@@ -662,7 +641,7 @@
 
 #pragma mark - Send invitation
 - (void)sendGroupInvitation:(NSArray *)inviteFriend {
-
+    
     for (NSString *invitationJid in inviteFriend) {
         [appDelegate.xmppRoomAppDelegateObje editRoomPrivileges:@[[XMPPRoom itemWithAffiliation:@"admin" jid:[XMPPJID jidWithString:invitationJid]]]];
         [appDelegate.xmppRoomAppDelegateObje inviteUser:[XMPPJID jidWithString:[NSString stringWithFormat:@"%@",invitationJid]] withMessage:@"Greetings!"];
@@ -670,11 +649,11 @@
     [self invitationSended];
 }
 
-//- (void)xmppRoom:(XMPPRoom *)sender didEditPrivileges:(XMPPIQ *)iqResult {
-//
+- (void)xmppRoom:(XMPPRoom *)sender didEditPrivileges:(XMPPIQ *)iqResult {
+
 //    [appDelegate.xmppRoomAppDelegateObje inviteUser:[XMPPJID jidWithString:[[iqResult attributeForName:@"to"] stringValue]] withMessage:@"Greetings!"];
 //    [self invitationSended];
-//}
+}
 
 - (void)invitationSended{}
 #pragma mark - end

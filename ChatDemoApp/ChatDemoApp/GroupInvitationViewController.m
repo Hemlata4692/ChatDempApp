@@ -71,12 +71,7 @@
     
     friendJids=[[self fetchFriendJids] copy];
     friendDetails=[[self fetchFriendDetials] mutableCopy];
-//    selectedUnselectedFriends=[NSMutableDictionary new];
     selectedJids=[NSMutableArray new];
-//    for (NSString *jid in friendJids) {
-//        
-//        [selectedUnselectedFriends setObject:[NSNumber numberWithBool:false] forKey:jid];
-//    }
     
     self.groupDescription.layer.borderColor=[UIColor colorWithRed:215.0/255.0 green:215.0/255.0 blue:215.0/255.0 alpha:0.5].CGColor;
     self.groupDescription.layer.borderWidth=1;

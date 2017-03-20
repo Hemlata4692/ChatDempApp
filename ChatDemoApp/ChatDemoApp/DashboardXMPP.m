@@ -368,7 +368,7 @@
     
     NSLog(@"%@",notification.object);
     appDelegate.groupChatRoomInfoList=[NSMutableArray new];
-    
+    appDelegate.groupChatMyBookMarkConferences=[NSMutableArray new];
     NSMutableArray *tempArray=[NSMutableArray new];
     for (int i=0; i<[notification.object count]; i++) {
         
@@ -395,6 +395,7 @@
         }
         
         [tempArray addObject:tempDict];
+        [appDelegate.groupChatMyBookMarkConferences addObject:lastConferences];
     }
     
 //    NSSortDescriptor *descriptor = [NSSortDescriptor sortDescriptorWithKey:@"roomJid" ascending:YES];

@@ -436,7 +436,86 @@
 - (void)xmppRoom:(XMPPRoom *)sender didConfigure:(XMPPIQ *)iqResult {
     
     NSLog(@"a");
-    [self fetchJoinedGroupList];
+//    [self fetchJoinedGroupList];
+    switch (type) {
+        case XMPP_GroupCreate:
+            [self addBookMarkConferenceList:[appDelegate.groupChatMyBookMarkConferences mutableCopy]];
+            break;
+            
+//        case XMPP_GroupDetail: {
+//            
+//            NSLog(@"%@",notification.object);
+//            appDelegate.groupChatRoomInfoList=[NSMutableArray new];
+//            
+//            NSMutableArray *tempArray=[NSMutableArray new];
+//            for (int i=0; i<[notification.object count]; i++) {
+//                
+//                NSMutableDictionary *tempDict=[NSMutableDictionary new];
+//                NSXMLElement *lastConferences=[notification.object objectAtIndex:i];
+//                
+//                NSLog(@"%@",[lastConferences elementForName:@"PHOTO"]);
+//                NSLog(@"%@",[lastConferences attributeStringValueForName:@"name"]);
+//                [[XmppCoreDataHandler sharedManager] insertGroupEntryInXmppUserModelXmppGroupJid:[lastConferences attributeStringValueForName:@"jid"] xmppGroupName:[lastConferences attributeStringValueForName:@"name"] xmppGroupDescription:[lastConferences attributeStringValueForName:@"Desc"] xmppGroupOnwerId:[lastConferences attributeStringValueForName:@"OwnerJid"]];
+//                
+//                [tempDict setObject:[lastConferences attributeStringValueForName:@"jid"] forKey:@"roomJid"];
+//                [tempDict setObject:[lastConferences attributeStringValueForName:@"name"] forKey:@"roomName"];
+//                [tempDict setObject:[lastConferences attributeStringValueForName:@"Desc"] forKey:@"roomDescription"];
+//                [tempDict setObject:[lastConferences attributeStringValueForName:@"OwnerJid"] forKey:@"roomOwnerJid"];
+//                [tempDict setObject:[NSNumber numberWithBool:false] forKey:@"isPhoto"];
+//                
+//                if (nil!=[lastConferences elementForName:@"PHOTO"]&&NULL!=[lastConferences elementForName:@"PHOTO"]) {
+//                    
+//                    [tempDict setObject:[NSNumber numberWithBool:true] forKey:@"isPhoto"];
+//                    [appDelegate saveDataInCacheDirectory:(UIImage *)[UIImage imageWithData:[self photo:lastConferences]] folderName:appDelegate.appProfilePhotofolderName jid:[lastConferences attributeStringValueForName:@"jid"]];
+//                }
+//                
+//                [tempArray addObject:tempDict];
+//            }
+//            appDelegate.groupChatRoomInfoList=[tempArray mutableCopy];
+//            //            [self getListOfGroupsNotify:[appDelegate.groupChatRoomInfoList mutableCopy]];
+//        }
+//        case XMPP_GroupDelete: {
+//            
+//            NSLog(@"%@",notification.object);
+//            
+//            [[XmppCoreDataHandler sharedManager] deleteGroupEntry:appDelegate.chatRoomAppDelegateRoomJid];
+//            appDelegate.groupChatRoomInfoList=[NSMutableArray new];
+//            NSMutableArray *tempArray=[NSMutableArray new];
+//            for (int i=0; i<[notification.object count]; i++) {
+//                
+//                NSXMLElement *lastConferences=[notification.object objectAtIndex:i];
+//                if (![[lastConferences attributeStringValueForName:@"jid"] isEqualToString:appDelegate.chatRoomAppDelegateRoomJid]) {
+//                    
+//                    NSMutableDictionary *tempDict=[NSMutableDictionary new];
+//                    
+//                    NSLog(@"%@",[lastConferences elementForName:@"PHOTO"]);
+//                    NSLog(@"%@",[lastConferences attributeStringValueForName:@"name"]);
+//                    [[XmppCoreDataHandler sharedManager] insertGroupEntryInXmppUserModelXmppGroupJid:[lastConferences attributeStringValueForName:@"jid"] xmppGroupName:[lastConferences attributeStringValueForName:@"name"] xmppGroupDescription:[lastConferences attributeStringValueForName:@"Desc"] xmppGroupOnwerId:[lastConferences attributeStringValueForName:@"OwnerJid"]];
+//                    
+//                    [tempDict setObject:[lastConferences attributeStringValueForName:@"jid"] forKey:@"roomJid"];
+//                    [tempDict setObject:[lastConferences attributeStringValueForName:@"name"] forKey:@"roomName"];
+//                    [tempDict setObject:[lastConferences attributeStringValueForName:@"Desc"] forKey:@"roomDescription"];
+//                    [tempDict setObject:[lastConferences attributeStringValueForName:@"OwnerJid"] forKey:@"roomOwnerJid"];
+//                    [tempDict setObject:[NSNumber numberWithBool:false] forKey:@"isPhoto"];
+//                    
+//                    if (nil!=[lastConferences elementForName:@"PHOTO"]&&NULL!=[lastConferences elementForName:@"PHOTO"]) {
+//                        
+//                        [tempDict setObject:[NSNumber numberWithBool:true] forKey:@"isPhoto"];
+//                        [appDelegate saveDataInCacheDirectory:(UIImage *)[UIImage imageWithData:[self photo:lastConferences]] folderName:appDelegate.appProfilePhotofolderName jid:[lastConferences attributeStringValueForName:@"jid"]];
+//                    }
+//                    
+//                    [tempArray addObject:tempDict];
+//                }
+//                
+//            }
+//            
+//            appDelegate.groupChatRoomInfoList=[tempArray mutableCopy];
+//            [self deleteBookmark:appDelegate.chatRoomAppDelegateRoomJid conferenceList:[notification.object mutableCopy]];
+//            //                        [self getListOfGroupsNotify:[appDelegate.groupChatRoomInfoList mutableCopy]];
+//        }
+        default:
+            break;
+    }
 }
 
 - (void)xmppRoom:(XMPPRoom *)sender didNotConfigure:(XMPPIQ *)iqResult {
@@ -480,6 +559,8 @@
         [self setPhoto:tempImageData xmlElement:conference_s];
         [self setChatRoomImage:[UIImage imageWithData:tempImageData]];
     }
+    
+    [appDelegate.groupChatMyBookMarkConferences addObject:conference_s];
     [storage_q addChild:conference_s];
     [query addChild:storage_q];
     [iq addChild:query];
@@ -657,7 +738,8 @@
 - (void)xmppJoindGroupList {
 
     type=XMPP_GroupDetail;
-    [self fetchJoinedGroupList];
+    
+//    [self fetchJoinedGroupList];
 }
 #pragma mark - end
 
@@ -757,7 +839,48 @@
 - (void)xmppRoomDidDestroySuccess {
     
     myDelegate.groupDeleteid=nil;
-    [self fetchJoinedGroupList];
+    
+    //    [self fetchJoinedGroupList];
+    
+    [[XmppCoreDataHandler sharedManager] deleteGroupEntry:appDelegate.chatRoomAppDelegateRoomJid];
+    appDelegate.groupChatRoomInfoList=[NSMutableArray new];
+    
+    NSMutableArray *tempArray=[NSMutableArray new];
+    NSMutableArray *tempDeletedConferenceArray=[NSMutableArray new];
+    for (int i=0; i<[appDelegate.groupChatMyBookMarkConferences count]; i++) {
+        
+        NSXMLElement *lastConferences=[appDelegate.groupChatMyBookMarkConferences objectAtIndex:i];
+        if (![[lastConferences attributeStringValueForName:@"jid"] isEqualToString:appDelegate.chatRoomAppDelegateRoomJid]) {
+            
+            NSMutableDictionary *tempDict=[NSMutableDictionary new];
+            
+            NSLog(@"%@",[lastConferences elementForName:@"PHOTO"]);
+            NSLog(@"%@",[lastConferences attributeStringValueForName:@"name"]);
+            [[XmppCoreDataHandler sharedManager] insertGroupEntryInXmppUserModelXmppGroupJid:[lastConferences attributeStringValueForName:@"jid"] xmppGroupName:[lastConferences attributeStringValueForName:@"name"] xmppGroupDescription:[lastConferences attributeStringValueForName:@"Desc"] xmppGroupOnwerId:[lastConferences attributeStringValueForName:@"OwnerJid"]];
+            
+            [tempDict setObject:[lastConferences attributeStringValueForName:@"jid"] forKey:@"roomJid"];
+            [tempDict setObject:[lastConferences attributeStringValueForName:@"name"] forKey:@"roomName"];
+            [tempDict setObject:[lastConferences attributeStringValueForName:@"Desc"] forKey:@"roomDescription"];
+            [tempDict setObject:[lastConferences attributeStringValueForName:@"OwnerJid"] forKey:@"roomOwnerJid"];
+            [tempDict setObject:[NSNumber numberWithBool:false] forKey:@"isPhoto"];
+            
+            if (nil!=[lastConferences elementForName:@"PHOTO"]&&NULL!=[lastConferences elementForName:@"PHOTO"]) {
+                
+                [tempDict setObject:[NSNumber numberWithBool:true] forKey:@"isPhoto"];
+                [appDelegate saveDataInCacheDirectory:(UIImage *)[UIImage imageWithData:[self photo:lastConferences]] folderName:appDelegate.appProfilePhotofolderName jid:[lastConferences attributeStringValueForName:@"jid"]];
+            }
+            
+            [tempDeletedConferenceArray addObject:lastConferences];
+            [tempArray addObject:tempDict];
+        }
+        
+    }
+    
+    appDelegate.groupChatMyBookMarkConferences=[tempDeletedConferenceArray mutableCopy];
+    appDelegate.groupChatRoomInfoList=[tempArray mutableCopy];
+    [self deleteBookmark:appDelegate.chatRoomAppDelegateRoomJid conferenceList:[appDelegate.groupChatMyBookMarkConferences mutableCopy]];
+    //                        [self getListOfGroupsNotify:[appDelegate.groupChatRoomInfoList mutableCopy]];
+    
     NSLog(@"successfully destroy");
 }
 
@@ -774,7 +897,7 @@
 //end
 #pragma mark - end
 
-#pragma mark - Fetch list of members of group 
+#pragma mark - Fetch list of members of group
 - (void)membersList {
 
     

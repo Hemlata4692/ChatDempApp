@@ -27,9 +27,10 @@
     [super viewDidLoad];
     
     self.navigationItem.title=[roomDetail objectForKey:@"roomName"];
-    [self addBarButtons];
+    
     [self appDelegateVariableInitializedGroupSubject:[roomDetail objectForKey:@"roomName"] groupDescription:[roomDetail objectForKey:@"roomDescription"] groupJid:[roomDetail objectForKey:@"roomJid"] ownerJid:[roomDetail objectForKey:@"roomOwnerJid"]];
     [self joinChatRoomJid:[roomDetail objectForKey:@"roomJid"]];
+    [self addBarButtons];
     // Do any additional setup after loading the view.
 }
 
@@ -67,11 +68,13 @@
     [back addTarget:self action:@selector(backAction) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem=backBarButton;
 
-    UIButton *menu = [[UIButton alloc] initWithFrame:framing];
-    [menu setImage:[UIImage imageNamed:@"menuIcon"] forState:UIControlStateNormal];
-    menuBarButton =[[UIBarButtonItem alloc] initWithCustomView:menu];
-    [menu addTarget:self action:@selector(menuAction:) forControlEvents:UIControlEventTouchUpInside];
-    self.navigationItem.rightBarButtonItem=menuBarButton;
+    if ([self isOwner]) {
+        UIButton *menu = [[UIButton alloc] initWithFrame:framing];
+        [menu setImage:[UIImage imageNamed:@"menuIcon"] forState:UIControlStateNormal];
+        menuBarButton =[[UIBarButtonItem alloc] initWithCustomView:menu];
+        [menu addTarget:self action:@selector(menuAction:) forControlEvents:UIControlEventTouchUpInside];
+        self.navigationItem.rightBarButtonItem=menuBarButton;
+    }
 }
 #pragma mark - end
 
@@ -101,8 +104,8 @@
     NSMutableArray *tempAttachmentArra=[NSMutableArray new];
     NSMutableArray *tempAttachmentImageArra=[NSMutableArray new];
     
-    if ([self isOwner]) {
-        
+//    if ([self isOwner]) {
+    
         [tempAttachment setObject:[NSNumber numberWithInt:1] forKey:@"Add Member"];
         [tempAttachmentArra addObject:@"Add Member"];
         [tempAttachmentImageArra addObject:@"inviteNewMember"];
@@ -112,16 +115,16 @@
         filterViewObj.filterDict=[tempAttachment mutableCopy];
         filterViewObj.filterArray=[tempAttachmentArra mutableCopy];
         filterViewObj.filterImageArray=[tempAttachmentImageArra mutableCopy];
-    }
-    else {
-    
-        [tempAttachment setObject:[NSNumber numberWithInt:1] forKey:@"AddNewMember"];
-        [tempAttachmentArra addObject:@"Add Member"];
-        [tempAttachmentImageArra addObject:@"inviteNewMember"];
-        filterViewObj.filterDict=[tempAttachment mutableCopy];
-        filterViewObj.filterArray=[tempAttachmentArra mutableCopy];
-        filterViewObj.filterImageArray=[tempAttachmentImageArra mutableCopy];
-    }
+//    }
+//    else {
+//    
+//        [tempAttachment setObject:[NSNumber numberWithInt:1] forKey:@"AddNewMember"];
+//        [tempAttachmentArra addObject:@"Add Member"];
+//        [tempAttachmentImageArra addObject:@"inviteNewMember"];
+//        filterViewObj.filterDict=[tempAttachment mutableCopy];
+//        filterViewObj.filterArray=[tempAttachmentArra mutableCopy];
+//        filterViewObj.filterImageArray=[tempAttachmentImageArra mutableCopy];
+//    }
     
     [filterViewObj setModalPresentationStyle:UIModalPresentationOverCurrentContext];
     [self presentViewController:filterViewObj animated:NO completion:nil];

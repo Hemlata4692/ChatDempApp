@@ -301,6 +301,7 @@
     NSLog(@"a");
     
 //    [self setXmppRoomVar:sender];
+    type=XMPP_GroupCreate;
     appDelegate.xmppRoomAppDelegateObje=sender;
     [sender fetchConfigurationForm];
 }
@@ -538,7 +539,11 @@
     
     for (NSXMLElement *list in conferenceList) {
         
-        [storage_q addChild:[list copy]];
+        if (![[list attributeStringValueForName:@"jid"] isEqualToString:[NSString stringWithFormat:@"%@",[appDelegate.xmppRoomAppDelegateObje roomJID]]]) {
+            
+            [storage_q addChild:[list copy]];
+        }
+
     }
     NSXMLElement *conference_s = [NSXMLElement elementWithName:@"conference"];
     [conference_s addAttributeWithName:@"name" stringValue:appDelegate.chatRoomAppDelegateName];
@@ -721,7 +726,22 @@
                 [tempDict setObject:[NSNumber numberWithBool:true] forKey:@"isPhoto"];
                 [appDelegate saveDataInCacheDirectory:appDelegate.chatRoomAppDelegateImage folderName:appDelegate.appProfilePhotofolderName jid:[NSString stringWithFormat:@"%@",[appDelegate.xmppRoomAppDelegateObje roomJID]]];
             }
-            [appDelegate.groupChatRoomInfoList addObject:[tempDict mutableCopy]];
+            
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"roomJid == %@", [NSString stringWithFormat:@"%@",[appDelegate.xmppRoomAppDelegateObje roomJID]]];
+            NSArray *filteredarray = [appDelegate.groupChatRoomInfoList filteredArrayUsingPredicate:predicate];
+            
+            if (filteredarray.count>0) {
+                
+                NSUInteger index = [appDelegate.groupChatRoomInfoList indexOfObjectPassingTest:^(id obj, NSUInteger idx, BOOL *stop) {
+                    return [predicate evaluateWithObject:obj];
+                }];
+                [appDelegate.groupChatRoomInfoList replaceObjectAtIndex:index withObject:[tempDict mutableCopy]];
+            }
+            else {
+                [appDelegate.groupChatRoomInfoList addObject:[tempDict mutableCopy]];
+            }
+            
+//            [appDelegate.groupChatRoomInfoList addObject:[tempDict mutableCopy]];
             [self newChatGroupCreated:[tempDict mutableCopy]];
         }
             break;

@@ -13,10 +13,11 @@
 #import "XmppCoreDataHandler.h"
 #import "NSData+XMPP.h"
 //end
-@interface DashboardXMPP (){
+@interface DashboardXMPP ()<XMPPRoomDelegate>{
     
     AppDelegateObjectFile *appDelegate;
     BOOL isrefresh;
+    NSMutableArray *joinAllGroups;
 }
 @end
 
@@ -370,6 +371,7 @@
     appDelegate.groupChatRoomInfoList=[NSMutableArray new];
     appDelegate.groupChatMyBookMarkConferences=[NSMutableArray new];
     NSMutableArray *tempArray=[NSMutableArray new];
+    joinAllGroups=[NSMutableArray new];
     for (int i=0; i<[notification.object count]; i++) {
         
         NSMutableDictionary *tempDict=[NSMutableDictionary new];
@@ -395,6 +397,7 @@
         }
         
         [tempArray addObject:tempDict];
+        [joinAllGroups addObject:[lastConferences attributeStringValueForName:@"jid"]];
         [appDelegate.groupChatMyBookMarkConferences addObject:lastConferences];
     }
     
@@ -402,12 +405,57 @@
 //    NSArray *results = [tempArray
 //                                sortedArrayUsingDescriptors:[NSArray arrayWithObject:descriptor]];
     
-//    [self deleteBookmark];
+   // [self deleteBookmark];
     appDelegate.groupChatRoomInfoList=[tempArray mutableCopy];
+    
+    if (joinAllGroups.count>0) {
+        
+        [self joinChatRoomJid:[joinAllGroups objectAtIndex:0]];
+    }
     [self getListOfGroupsNotify:[appDelegate.groupChatRoomInfoList mutableCopy]];
 }
 
+//Join all groups
+- (void)joinChatRoomJid:(NSString *)groupRoomJid {
+    
+    XMPPRoomMemoryStorage * _roomMemory = [[XMPPRoomMemoryStorage alloc]init];
+    XMPPJID * roomJID = [XMPPJID jidWithString:groupRoomJid];
+    XMPPRoom* xmppRoom = [[XMPPRoom alloc] initWithRoomStorage:_roomMemory
+                                                           jid:roomJID
+                                                 dispatchQueue:dispatch_get_main_queue()];
+    [xmppRoom activate:self.xmppStream];
+    [xmppRoom addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    
+    //This method is used to create group if not exist and if this group is exist then join it
+    [xmppRoom joinRoomUsingNickname:[[appDelegate.xmppLogedInUserId componentsSeparatedByString:@"@"] objectAtIndex:0]
+                            history:nil
+                           password:nil];
+}
 
+- (void)xmppRoomDidJoin:(XMPPRoom *)sender{
+    NSLog(@"a");
+    
+    if([joinAllGroups containsObject:[NSString stringWithFormat:@"%@",[sender roomJID]]]) {
+        [joinAllGroups removeObject:[NSString stringWithFormat:@"%@",[sender roomJID]]];
+    }
+    if (joinAllGroups.count>0) {
+        
+        [self joinChatRoomJid:[joinAllGroups objectAtIndex:0]];
+    }
+}
+
+- (void)xmppRoomDidCreate:(XMPPRoom *)sender{
+    NSLog(@"a");
+    
+    if([joinAllGroups containsObject:[NSString stringWithFormat:@"%@",[sender roomJID]]]) {
+        [joinAllGroups removeObject:[NSString stringWithFormat:@"%@",[sender roomJID]]];
+    }
+    if (joinAllGroups.count>0) {
+        
+        [self joinChatRoomJid:[joinAllGroups objectAtIndex:0]];
+    }
+}
+//end
 - (void)XMPPAddedNewGroup {
 
     [self getListOfGroupsNotify:[appDelegate.groupChatRoomInfoList mutableCopy]];

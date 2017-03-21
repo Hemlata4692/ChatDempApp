@@ -463,14 +463,32 @@
 
 - (void)xmppNewUserAddedNotify {
 
+    self.navigationItem.leftBarButtonItem=nil;
+    self.navigationItem.leftBarButtonItems=nil;
+    self.navigationItem.rightBarButtonItem=nil;
+    self.navigationItem.rightBarButtonItems=nil;
+    
+    UIBarButtonItem *profileBarButton;
     CGRect framing = CGRectMake(0, 0, 30, 30.0);
-    UIBarButtonItem *reloadBarButton;    
+    UIButton *profile = [[UIButton alloc] initWithFrame:framing];
+    //    [logout setTitle:@"Logout" forState:UIControlStateNormal];
+    [profile setImage:[UIImage imageNamed:@"profile"] forState:UIControlStateNormal];
+    profileBarButton =[[UIBarButtonItem alloc] initWithCustomView:profile];
+    [profile addTarget:self action:@selector(profileAction:) forControlEvents:UIControlEventTouchUpInside];
+    self.navigationItem.leftBarButtonItems=[NSArray arrayWithObjects:profileBarButton, nil];
+    
+    UIBarButtonItem *menuBarButton, *reloadBarButton;
+    UIButton *menu = [[UIButton alloc] initWithFrame:framing];
+    [menu setImage:[UIImage imageNamed:@"menuIcon"] forState:UIControlStateNormal];
+    menuBarButton =[[UIBarButtonItem alloc] initWithCustomView:menu];
+    [menu addTarget:self action:@selector(menuAction:) forControlEvents:UIControlEventTouchUpInside];
+    
     UIButton *reload = [[UIButton alloc] initWithFrame:framing];
     //    [group setTitle:@"Group" forState:UIControlStateNormal];
     [reload setImage:[UIImage imageNamed:@"reloadRed"] forState:UIControlStateNormal];
     reloadBarButton =[[UIBarButtonItem alloc] initWithCustomView:reload];
     [reload addTarget:self action:@selector(reloadAction:) forControlEvents:UIControlEventTouchUpInside];
-    self.navigationItem.rightBarButtonItems=[NSArray arrayWithObjects:reloadBarButton, nil];
+    self.navigationItem.rightBarButtonItems=[NSArray arrayWithObjects:menuBarButton,reloadBarButton, nil];
 }
 #pragma mark - end
 

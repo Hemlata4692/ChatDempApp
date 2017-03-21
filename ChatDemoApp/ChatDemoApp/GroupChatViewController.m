@@ -234,6 +234,11 @@
     [UserDefaultManager showAlertMessage:@"Fail" message:@"Some thing went wrong, Please try again later."];
 }
 //end
+
+- (void)newChatGroupCreated:(NSMutableDictionary *)groupInfo {
+    
+    [self addBarButtons];
+}
 #pragma mark - end
 /*
 #pragma mark - Navigation

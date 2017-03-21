@@ -771,10 +771,18 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
      NSLog(@"From user %@",presenceType);
     NSLog(@"From user %@",[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]);
 
+    NSString *groupDeleteInfo=[[presence elementForName:@"x"] namespaceForPrefix:nil].stringValue;
 //    int myCount = [[XMPPUserDefaultManager getValue:@"CountValue"] intValue];
     
     //Delete group
 //    <presence xmlns="jabber:client" type="unavailable" from="200317073628@conference.117.240.110.83/0000000000" to="0000000000@117.240.110.83//Smack"><x xmlns="http://jabber.org/protocol/muc#user"><item affiliation="none" role="none"></item></x></presence>
+    
+//    <presence xmlns="jabber:client" to="0000000000@117.240.110.83//Smack" from="200317020208@conference.117.240.110.83/0000000000"><x xmlns="vcard-temp:x:update"><photo>e1a6077e8c3061e8e79ce8314c209d5c72bea451</photo></x><c xmlns="http://jabber.org/protocol/caps" hash="sha-1" node="https://github.com/robbiehanson/XMPPFramework" ver="VyOFcFX6+YNmKssVXSBKGFP0BS4="></c><x xmlns="http://jabber.org/protocol/muc#user"><item jid="0000000000@117.240.110.83//Smack" affiliation="none" role="participant"></item><status code="110"></status></x></presence>
+    
+//    2017-03-21 10:37:21:604 ChatDemoApp[4043:9447] RECV1: <presence xmlns="jabber:client" type="unavailable" from="1111111112@117.240.110.83//Smack" to="0000000000@117.240.110.83"/>
+    
+//    <presence xmlns="jabber:client" to="0000000000@117.240.110.83//Smack" from="210317010706@conference.117.240.110.83/1111111112" type="unavailable"><x xmlns="vcard-temp:x:update"><photo>051287f5f4e4edd83c785952dd59137489c1577f</photo></x><c xmlns="http://jabber.org/protocol/caps" hash="sha-1" node="https://github.com/robbiehanson/XMPPFramework" ver="VyOFcFX6+YNmKssVXSBKGFP0BS4="></c><x xmlns="http://jabber.org/protocol/muc#user"><item jid="1111111112@117.240.110.83//Smack" affiliation="owner" role="none"></item></x></presence>
+    
     if (isContactListIsLoaded && xmppUserListArray!=nil && [NSString stringWithFormat:@"%@",[presence from]]!=nil && [xmppUserListArray containsObject:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]] && [selectedFriendUserId isEqualToString:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]]) {
         
 //        switch (section)
@@ -802,6 +810,17 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         }
         //Send presence status and set at particular jid in xmppUserDetailedList key
         [[NSNotificationCenter defaultCenter] postNotificationName:@"XmppUserPresenceUpdate" object:nil];
+    }
+    else if([presenceType isEqualToString:@"unavailable"] && nil!=groupDeleteInfo && [groupDeleteInfo containsString:@"muc#user"]) {
+    
+        NSArray* items = [[presence elementForName:@"x"] elementsForName:@"item"];//[newConfig elementsForName:@"field"];
+        for (NSXMLElement *item in items) {
+            
+            if ([[item attributeStringValueForName:@"affiliation"] isEqualToString:@"none"]) {
+                
+                NSLog(@"%@",[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]);
+            }
+        }
     }
 }
 

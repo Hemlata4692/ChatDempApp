@@ -19,6 +19,8 @@
 #import "CustomFilterViewController.h"
 #import "GroupChatViewController.h"
 
+#import "MyButton.h"
+
 @class XMPPvCardTempModuleStorage;
 @interface DashboardViewController () {
 
@@ -123,7 +125,7 @@
     
     UILabel* nameLabel = (UILabel*)[cell viewWithTag:1];
     UIImageView *userImage = (UIImageView*)[cell viewWithTag:2];
-    UIButton* profileBtn = (UIButton*)[cell viewWithTag:3];
+    MyButton* profileBtn = (MyButton*)[cell viewWithTag:3];
     UILabel* statusLabel = (UILabel*)[cell viewWithTag:4];
     UILabel* dateLabel = (UILabel*)[cell viewWithTag:5];
     UILabel* badgeLabel = (UILabel*)[cell viewWithTag:6];
@@ -136,7 +138,7 @@
         NSMutableDictionary *profileDic=[[profileLocalDictData objectForKey:[userListArray objectAtIndex:indexPath.row]] mutableCopy];
         
         dateLabel.hidden=YES;
-        profileBtn.tag=indexPath.row;
+        profileBtn.Tag=(int)indexPath.row;
         [profileBtn addTarget:self action:@selector(friendProfileAction:) forControlEvents:UIControlEventTouchUpInside];
         userImage.layer.cornerRadius=20;
         userImage.layer.masksToBounds=YES;
@@ -177,7 +179,7 @@
         }
         
         dateLabel.hidden=NO;
-        profileBtn.tag=indexPath.row;
+        profileBtn.Tag=(int)indexPath.row;
         [profileBtn addTarget:self action:@selector(friendProfileAction:) forControlEvents:UIControlEventTouchUpInside];
         userImage.layer.cornerRadius=20;
         userImage.layer.masksToBounds=YES;
@@ -331,9 +333,9 @@
 #pragma mark - end
 
 #pragma mark - IBActions
-- (IBAction)friendProfileAction:(UIButton *)sender {
+- (IBAction)friendProfileAction:(MyButton *)sender {
     
-    int tagValue=(int)[sender tag];
+    int tagValue=(int)[sender Tag];
     if (customSegmentedControl.selectedSegmentIndex==2) {
         
         UserProfileViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"UserProfileViewController"];

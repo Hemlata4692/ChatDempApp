@@ -10,6 +10,7 @@
 		90DC0D66A2ED385893C02E29 /* libPods-ChatDemoApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE07D7CB35D225B6FB24E1D2 /* libPods-ChatDemoApp.a */; };
 		B7005C1F1E5FE62F003A56D3 /* LocationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B7005C1E1E5FE62E003A56D3 /* LocationViewController.m */; };
 		B70AE66A1E2F1EC600554038 /* AppDelegateObjectFile.m in Sources */ = {isa = PBXBuildFile; fileRef = B70AE6691E2F1EC600554038 /* AppDelegateObjectFile.m */; };
+		B70BF22E1E81227D005C5B03 /* MyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = B70BF22D1E81227D005C5B03 /* MyButton.m */; };
 		B70FC3001E6EB6C100292950 /* groupPlaceholderImage.png in Resources */ = {isa = PBXBuildFile; fileRef = B70FC2FF1E6EB6C100292950 /* groupPlaceholderImage.png */; };
 		B70FC3031E6EB8BE00292950 /* XMPPGroupChatRoom.m in Sources */ = {isa = PBXBuildFile; fileRef = B70FC3021E6EB8BE00292950 /* XMPPGroupChatRoom.m */; };
 		B70FC3061E6EB8DD00292950 /* GroupChatViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B70FC3051E6EB8DD00292950 /* GroupChatViewController.m */; };
@@ -73,6 +74,8 @@
 		B7005C1E1E5FE62E003A56D3 /* LocationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationViewController.m; sourceTree = "<group>"; };
 		B70AE6681E2F1EC600554038 /* AppDelegateObjectFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegateObjectFile.h; sourceTree = "<group>"; };
 		B70AE6691E2F1EC600554038 /* AppDelegateObjectFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegateObjectFile.m; sourceTree = "<group>"; };
+		B70BF22C1E81227D005C5B03 /* MyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyButton.h; sourceTree = "<group>"; };
+		B70BF22D1E81227D005C5B03 /* MyButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyButton.m; sourceTree = "<group>"; };
 		B70F93281E4DB51C0064EF29 /* AddressBookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBookUI.framework; path = System/Library/Frameworks/AddressBookUI.framework; sourceTree = SDKROOT; };
 		B70F932A1E4DB5290064EF29 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		B70FC2FF1E6EB6C100292950 /* groupPlaceholderImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = groupPlaceholderImage.png; sourceTree = "<group>"; };
@@ -227,6 +230,15 @@
 				B7005C1E1E5FE62E003A56D3 /* LocationViewController.m */,
 			);
 			name = LocationAttachment;
+			sourceTree = "<group>";
+		};
+		B70BF22F1E812282005C5B03 /* ButtonClass */ = {
+			isa = PBXGroup;
+			children = (
+				B70BF22C1E81227D005C5B03 /* MyButton.h */,
+				B70BF22D1E81227D005C5B03 /* MyButton.m */,
+			);
+			name = ButtonClass;
 			sourceTree = "<group>";
 		};
 		B70FC2D51E6E6ADF00292950 /* SampleCode */ = {
@@ -464,6 +476,7 @@
 		B745F84D1E23535F001119BD /* HelperClasses */ = {
 			isa = PBXGroup;
 			children = (
+				B70BF22F1E812282005C5B03 /* ButtonClass */,
 				B77DFFE91E4C329E00921126 /* FileTransfer */,
 				B7CC6C511E27B0A000F471B6 /* XMPPFramework.h */,
 				B745F8661E23595F001119BD /* SegmentControl */,
@@ -758,6 +771,7 @@
 				B7B9A5661E23B17A00DB4429 /* MMMaterialDesignSpinner.m in Sources */,
 				B745F8291E234D55001119BD /* main.m in Sources */,
 				B757925B1E42E23800AC48D0 /* XmppProfileView.m in Sources */,
+				B70BF22E1E81227D005C5B03 /* MyButton.m in Sources */,
 				B715A0C31E5EB55300B36D16 /* DocumentAttachmentViewController.m in Sources */,
 				B7131E5D1E52DA3A00A435A3 /* ChatScreenTableViewCell.m in Sources */,
 				B745F8561E2353DD001119BD /* UserDefaultManager.m in Sources */,

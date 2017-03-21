@@ -771,7 +771,17 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
      NSLog(@"From user %@",presenceType);
     NSLog(@"From user %@",[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]);
 
-    NSString *groupDeleteInfo=[[presence elementForName:@"x"] namespaceForPrefix:nil].stringValue;
+    NSString *groupDeleteInfo;
+    NSArray* items =[presence elementsForName:@"x"];//[newConfig elementsForName:@"field"];
+    for (NSXMLElement *item in items) {
+        
+        if ([[item namespaceForPrefix:nil].stringValue containsString:@"muc#user"]) {
+            
+            groupDeleteInfo=[item namespaceForPrefix:nil].stringValue;
+            break;
+        }
+    }
+//    NSString *groupDeleteInfo=[[presence elementForName:@"x"] namespaceForPrefix:nil].stringValue;
 //    int myCount = [[XMPPUserDefaultManager getValue:@"CountValue"] intValue];
     
     //Delete group
@@ -811,14 +821,23 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         //Send presence status and set at particular jid in xmppUserDetailedList key
         [[NSNotificationCenter defaultCenter] postNotificationName:@"XmppUserPresenceUpdate" object:nil];
     }
-    else if([presenceType isEqualToString:@"unavailable"] && nil!=groupDeleteInfo && [groupDeleteInfo containsString:@"muc#user"]) {
+    else if(nil!=groupDeleteInfo && [groupDeleteInfo containsString:@"muc#user"]) {
     
-        NSArray* items = [[presence elementForName:@"x"] elementsForName:@"item"];//[newConfig elementsForName:@"field"];
-        for (NSXMLElement *item in items) {
+        NSArray* itemsX =[presence elementsForName:@"x"];//[newConfig elementsForName:@"field"];
+        for (NSXMLElement *itemX in itemsX) {
             
-            if ([[item attributeStringValueForName:@"affiliation"] isEqualToString:@"none"]) {
+            if ([[itemX namespaceForPrefix:nil].stringValue containsString:@"muc#user"]) {
                 
-                NSLog(@"%@",[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]);
+                NSArray* items = [itemX elementsForName:@"item"];//[newConfig elementsForName:@"field"];
+                for (NSXMLElement *item in items) {
+                    
+                    if ([[item attributeStringValueForName:@"affiliation"] isEqualToString:@"none"]) {
+                        
+                        NSLog(@"%@",[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]);
+                        break;
+                    }
+                }
+                break;
             }
         }
     }

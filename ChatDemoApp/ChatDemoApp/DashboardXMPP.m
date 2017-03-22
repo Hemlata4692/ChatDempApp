@@ -50,7 +50,7 @@
     
     //Group chat
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPFetchBookmarktList:) name:@"XMPPFetchBookmarktList" object:nil];
-     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPAddedNewGroup) name:@"XMPPAddedNewGroup" object:nil];
+     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPAddedNewGroup) name:@"XMPPUpdatedGroup" object:nil];
     //end
     
     appDelegate.selectedFriendUserId=@"";

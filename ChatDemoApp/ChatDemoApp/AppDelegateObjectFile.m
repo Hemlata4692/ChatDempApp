@@ -45,6 +45,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     
     //GroupChat
     NSMutableDictionary *inviteUserInfo;
+    NSMutableArray *deleteUserInfo;
     XMPPRoom *inviteRoom;
     XMPPIDTracker *responseTracker;
     //end
@@ -164,6 +165,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     userProfileImage = [NSMutableDictionary new];
     groupChatRoomInfoList = [NSMutableArray new];
     inviteUserInfo = [NSMutableDictionary new];
+    deleteUserInfo = [NSMutableArray new];
     xmppMessageArchivingCoreDataStorage = [XMPPMessageArchivingCoreDataStorage sharedInstance];
     xmppMessageArchivingModule = [[XMPPMessageArchiving alloc]initWithMessageArchivingStorage:xmppMessageArchivingCoreDataStorage];
     
@@ -601,8 +603,8 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [xmppStream sendElement:iq];
 }
 
-- (BOOL)xmppStream:(XMPPStream *)sender didReceiveIQ:(XMPPIQ *)iq
-{
+- (BOOL)xmppStream:(XMPPStream *)sender didReceiveIQ:(XMPPIQ *)iq {
+    
     NSXMLElement *queryElement = [NSXMLElement elementWithName:@"query" xmlns:@"jabber:iq:roster"];
     NSXMLElement *vcardInfo = [iq elementForName:@"vCard"];
     
@@ -630,6 +632,10 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         [responseTracker invokeForID:[iq elementID] withObject:iq];
         if ([groupChat isEqualToString:@"BookMarkManager"]) {
             [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPBookMarkUpdated" object:nil];
+        }
+        else if ([groupChat containsString:@"DeleteBookMarkManager"]) {
+        
+            [self updateDeletedBookmarkOfJid:[[groupChat componentsSeparatedByString:@"BookMarkManager"] objectAtIndex:1]];
         }
         else {
             
@@ -781,17 +787,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
             break;
         }
     }
-//    NSString *groupDeleteInfo=[[presence elementForName:@"x"] namespaceForPrefix:nil].stringValue;
-//    int myCount = [[XMPPUserDefaultManager getValue:@"CountValue"] intValue];
-    
-    //Delete group
-//    <presence xmlns="jabber:client" type="unavailable" from="200317073628@conference.117.240.110.83/0000000000" to="0000000000@117.240.110.83//Smack"><x xmlns="http://jabber.org/protocol/muc#user"><item affiliation="none" role="none"></item></x></presence>
-    
-//    <presence xmlns="jabber:client" to="0000000000@117.240.110.83//Smack" from="200317020208@conference.117.240.110.83/0000000000"><x xmlns="vcard-temp:x:update"><photo>e1a6077e8c3061e8e79ce8314c209d5c72bea451</photo></x><c xmlns="http://jabber.org/protocol/caps" hash="sha-1" node="https://github.com/robbiehanson/XMPPFramework" ver="VyOFcFX6+YNmKssVXSBKGFP0BS4="></c><x xmlns="http://jabber.org/protocol/muc#user"><item jid="0000000000@117.240.110.83//Smack" affiliation="none" role="participant"></item><status code="110"></status></x></presence>
-    
-//    2017-03-21 10:37:21:604 ChatDemoApp[4043:9447] RECV1: <presence xmlns="jabber:client" type="unavailable" from="1111111112@117.240.110.83//Smack" to="0000000000@117.240.110.83"/>
-    
-//    <presence xmlns="jabber:client" to="0000000000@117.240.110.83//Smack" from="210317010706@conference.117.240.110.83/1111111112" type="unavailable"><x xmlns="vcard-temp:x:update"><photo>051287f5f4e4edd83c785952dd59137489c1577f</photo></x><c xmlns="http://jabber.org/protocol/caps" hash="sha-1" node="https://github.com/robbiehanson/XMPPFramework" ver="VyOFcFX6+YNmKssVXSBKGFP0BS4="></c><x xmlns="http://jabber.org/protocol/muc#user"><item jid="1111111112@117.240.110.83//Smack" affiliation="owner" role="none"></item></x></presence>
     
     if (isContactListIsLoaded && xmppUserListArray!=nil && [NSString stringWithFormat:@"%@",[presence from]]!=nil && [xmppUserListArray containsObject:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]] && [selectedFriendUserId isEqualToString:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]]) {
         
@@ -833,7 +828,14 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
                     
                     if ([[item attributeStringValueForName:@"affiliation"] isEqualToString:@"none"]) {
                         
-                        NSLog(@"%@",[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]);
+                        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"roomJid == %@", [[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]];
+                        NSArray *filteredarray = [groupChatRoomInfoList filteredArrayUsingPredicate:predicate];
+                        
+                        if (filteredarray.count>0) {
+                            
+                            [self deleteBookMarkConferenceList:groupChatMyBookMarkConferences jid:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]];
+                            NSLog(@"%@",[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]);
+                        }
                         break;
                     }
                 }
@@ -853,9 +855,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         [registerSuccessDict setObject:@"1" forKey:@"Status"];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPDidRegisterResponse" object:registerSuccessDict];
     }
-    
 }
-
 
 - (void)xmppStream:(XMPPStream *)sender didNotRegister:(NSXMLElement *)error{
     
@@ -1844,7 +1844,54 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     }
     [inviteUserInfo removeObjectForKey:jid];
     NSLog(@"a");
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPAddedNewGroup" object:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPUpdatedGroup" object:nil];
+}
+
+- (void)deleteBookMarkConferenceList:(NSMutableArray *)conferenceList jid:(NSString *)jid{
+    
+    [deleteUserInfo addObject:jid];
+    XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:[XMPPJID jidWithString:myDelegate.serverName]];
+    [iq addAttributeWithName:@"from" stringValue:[self.xmppStream myJID].full];
+    [iq addAttributeWithName:@"id" stringValue:[NSString stringWithFormat:@"DeleteBookMarkManager%@",jid]];
+    NSXMLElement *query = [NSXMLElement elementWithName:@"query"];
+    
+    [query addAttributeWithName:@"xmlns" stringValue:@"jabber:iq:private"];
+    NSXMLElement *storage_q = [NSXMLElement elementWithName:@"storage"];
+    [storage_q addAttributeWithName:@"xmlns" stringValue:@"storage:bookmarks"];
+    
+    NSMutableArray *tempArray=[NSMutableArray new];
+    
+    for (NSXMLElement *list in conferenceList) {
+        
+        if (![[list attributeStringValueForName:@"jid"] isEqualToString:jid]) {
+            
+            [tempArray addObject:list];
+            [storage_q addChild:[list copy]];
+        }
+    }
+    groupChatMyBookMarkConferences=[tempArray mutableCopy];
+    [query addChild:storage_q];
+    [iq addChild:query];
+    [self.xmppStream sendElement:iq];
+    
+     [[XmppCoreDataHandler sharedManager] deleteGroupEntry:jid];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"roomJid == %@", jid];
+    NSArray *filteredarray = [groupChatRoomInfoList filteredArrayUsingPredicate:predicate];
+    
+    if (filteredarray.count>0) {
+        
+        NSUInteger index = [groupChatRoomInfoList indexOfObjectPassingTest:^(id obj, NSUInteger idx, BOOL *stop) {
+            return [predicate evaluateWithObject:obj];
+        }];
+        [groupChatRoomInfoList removeObjectAtIndex:index];
+        
+    }
+}
+
+- (void)updateDeletedBookmarkOfJid:(NSString *)jid {
+    
+    [deleteUserInfo removeObject:jid];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPUpdatedGroup" object:nil];
 }
 
 #pragma mark - end

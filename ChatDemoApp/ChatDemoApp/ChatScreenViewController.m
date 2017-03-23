@@ -32,7 +32,7 @@
 #define messageLabelFont [UIFont systemFontOfSize:15]
 #define dateLabelFont [UIFont systemFontOfSize:14]
 #define messageTextViewFont [UIFont systemFontOfSize:17]
-#define DEFAULT_FONT(size)   [UIFont systemFontOfSize:size]
+#define DEFAULT_FONT(size) [UIFont systemFontOfSize:size]
 
 @interface ChatScreenViewController ()<CustomFilterDelegate,/*BSKeyboardControlsDelegate,*/UIGestureRecognizerDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate, SendImageDelegate, SendDocumentDelegate,UIDocumentInteractionControllerDelegate,SendLocationDelegate>{
     CGFloat messageHeight, messageYValue;
@@ -764,7 +764,6 @@
         [self presentViewController:picker animated:YES completion:NULL];
     }
     else if(authStatus == AVAuthorizationStatusDenied){
-        
         
         [UserDefaultManager showAlertMessage:@"Camera Access" message:@"Without permission to use your camera, you won't be able to take photo.\nGo to your device settings and then Privacy to grant permission."];
     }

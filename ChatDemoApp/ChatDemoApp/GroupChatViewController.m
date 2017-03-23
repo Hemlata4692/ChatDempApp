@@ -41,7 +41,6 @@
     UIImage *groupImageIcon;
     NSMutableArray *groupMemberList;
     
-    
     CGFloat messageHeight, messageYValue;
     NSMutableArray *userData;
     int btnTag;
@@ -57,8 +56,8 @@
     
     BOOL isAttachmentOpen, isReceiptOffline;
     UIView *imagePreviewView;
-
 }
+
 @property (strong, nonatomic) IBOutlet UITableView *chatTableView;
 @property (strong, nonatomic) IBOutlet UIView *messageView;
 @property (strong, nonatomic) IBOutlet UIPlaceHolderTextView *messageTextView;
@@ -362,7 +361,6 @@
 #pragma mark - end
 
 #pragma mark - IBActions
-#pragma mark - UIActions
 - (IBAction)tapGestureOnView:(UITapGestureRecognizer *)sender {
     [messageTextView resignFirstResponder];
 }
@@ -533,6 +531,39 @@
             
         }
     });
+    
+    
+    
+    
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        if (status==1) {
+//            NSLog(@"1");
+//            
+//            UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+//            DocumentAttachmentViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"DocumentAttachmentViewController"];
+//            [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+//            popupView.delegate=self;
+//            [self presentViewController:popupView animated:YES completion:nil];
+//        }
+//        else if (status==2) {
+//            NSLog(@"2");
+//            [self openCamera];
+//        }
+//        else if (status==3) {
+//            NSLog(@"3");
+//            [self openGallery];
+//        }
+//        else if (status==4) {
+//            NSLog(@"3");
+//            isAttachmentOpen=true;
+//            UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+//            LocationViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"LocationViewController"];
+//            //            [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+//            popupView.delegate=self;
+//            
+//            [self presentViewController:popupView animated:YES completion:NULL];
+//        }
+//    });
 }
 #pragma mark - end
 
@@ -709,6 +740,292 @@
     }
     return cell;
 }
+
+-(NSIndexPath *)indexPathForLastMessage
+{
+    NSInteger lastSection = 0;
+    NSInteger numberOfMessages = userData.count;
+    return [NSIndexPath indexPathForRow:numberOfMessages-1 inSection:lastSection];
+}
+#pragma mark - end
+/*
+ #pragma mark - Navigation
+ 
+ // In a storyboard-based application, you will often want to do a little preparation before navigation
+ - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+ // Get the new view controller using [segue destinationViewController].
+ // Pass the selected object to the new view controller.
+ }
+ */
+
+#pragma mark - XMPP delegates
+- (XMPPStream *)xmppStream {
+    
+    return [myDelegate xmppStream];
+}
+#pragma mark - end
+
+#pragma mark - Custom filter delegate
+- (void)openGallery {
+    
+    isAttachmentOpen=true;
+    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+    picker.delegate = self;
+    picker.allowsEditing = YES;
+    picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+    picker.navigationBar.tintColor = [UIColor whiteColor];
+    
+    [self presentViewController:picker animated:YES completion:NULL];
+}
+
+- (void)openCamera {
+    
+    isAttachmentOpen=true;
+    AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    if(authStatus == AVAuthorizationStatusAuthorized) {
+        
+        UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+        picker.delegate = self;
+        picker.allowsEditing = YES;
+        picker.sourceType = UIImagePickerControllerSourceTypeCamera;
+        [self presentViewController:picker animated:YES completion:NULL];
+    }
+    else if(authStatus == AVAuthorizationStatusDenied){
+        
+        [UserDefaultManager showAlertMessage:@"Camera Access" message:@"Without permission to use your camera, you won't be able to take photo.\nGo to your device settings and then Privacy to grant permission."];
+    }
+    else if(authStatus == AVAuthorizationStatusRestricted){
+        
+        [UserDefaultManager showAlertMessage:@"Camera Access" message:@"Without permission to use your camera, you won't be able to take photo.\nGo to your device settings and then Privacy to grant permission."];
+    }
+    else if(authStatus == AVAuthorizationStatusNotDetermined){
+        
+        [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
+            if(granted){
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    
+                    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+                    picker.delegate = self;
+                    picker.allowsEditing = YES;
+                    picker.sourceType = UIImagePickerControllerSourceTypeCamera;
+                    [self presentViewController:picker animated:YES completion:NULL];
+                });
+            }
+            
+        }];
+    }
+}
+#pragma mark - end
+
+#pragma mark - ImagePicker delegate
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingImage:(UIImage *)image editingInfo:(NSDictionary *)info {
+    
+    [picker dismissViewControllerAnimated:NO completion:NULL];
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    
+    UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    SendImageViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"SendImageViewController"];
+    [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+    popupView.delegate=self;
+    popupView.attachImage=image;
+    [self presentViewController:popupView animated:YES completion:nil];
+}
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+    
+    [picker dismissViewControllerAnimated:YES completion:NULL];
+}
+#pragma mark - end
+
+#pragma mark - Fetch history data
+- (void)getHistoryChatData {
+    
+//    [self getHistoryChatData:friendUserJid];
+}
+#pragma mark - end
+
+#pragma mark - Send text message response
+- (void)XmppSendMessageResponse:(NSXMLElement *)xmpMessage {
+    
+    [self messagesData:xmpMessage];
+    messageTextView.text=@"";
+    messageHeight = messageTextviewInitialHeight;
+    messageTextView.frame = CGRectMake(messageTextView.frame.origin.x, messageTextView.frame.origin.y, messageTextView.frame.size.width, messageHeight-8);
+    messageView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height-(keyboardHeight+navigationBarHeight+messageHeight+10)  , self.view.bounds.size.width, messageHeight + 10);
+    chatTableView.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, messageView.frame.origin.y-2);
+    if (userData.count > 0) {
+        NSIndexPath* ip = [NSIndexPath indexPathForRow:userData.count-1 inSection:0];
+        [chatTableView scrollToRowAtIndexPath:ip atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+    }
+    if (messageTextView.text.length>=1) {
+        sendButtonOutlet.enabled=YES;
+    }
+    else if (messageTextView.text.length==0) {
+        sendButtonOutlet.enabled=NO;
+    }
+    [chatTableView reloadData];
+}
+
+- (void)messagesData:(NSXMLElement*)message{
+    
+    message=[self setHeightInMessage:message];
+    [userData addObject:message];
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:userData.count-1 inSection:0];
+    [chatTableView beginUpdates];
+    [chatTableView insertRowsAtIndexPaths:@[indexPath]
+                         withRowAnimation:UITableViewRowAnimationBottom];
+    [chatTableView endUpdates];
+    [chatTableView scrollToRowAtIndexPath:[self indexPathForLastMessage]
+                         atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    [chatTableView reloadData];
+}
+
+- (NSXMLElement *)setHeightInMessage:(NSXMLElement*)message {
+    
+    NSXMLElement *innerData=[message elementForName:@"data"];
+    //Set userName height
+    CGSize size = CGSizeMake([[UIScreen mainScreen] bounds].size.width - (76+8),200);//here (76+8) = (nameLabel.x + label trailing)
+    CGRect textRect=[[innerData attributeStringValueForName:@"senderName"]
+                     boundingRectWithSize:size
+                     options:NSStringDrawingUsesLineFragmentOrigin
+                     attributes:@{NSFontAttributeName:nameLabelFont}
+                     context:nil];
+    [innerData addAttributeWithName:@"nameHeight" numberValue:[NSNumber numberWithFloat:textRect.size.height]];
+    
+    if (![[[message elementForName:@"body"] stringValue] isEqualToString:@""]) {
+        //Set message height
+        size = CGSizeMake([[UIScreen mainScreen] bounds].size.width - (76+8),4000);//here (76+8) = (nameLabel.x + label trailing)
+        textRect=[[[message elementForName:@"body"] stringValue]
+                  boundingRectWithSize:size
+                  options:NSStringDrawingUsesLineFragmentOrigin
+                  attributes:@{NSFontAttributeName:messageLabelFont}
+                  context:nil];
+        [innerData addAttributeWithName:@"messageBodyHeight" numberValue:[NSNumber numberWithFloat:textRect.size.height]];
+    }
+    else {
+        
+        [innerData addAttributeWithName:@"messageBodyHeight" numberValue:[NSNumber numberWithFloat:0.0]];
+    }
+    
+    return message;
+}
+#pragma mark - end
+
+#pragma mark - XMPPChatView response method
+//History data response
+- (void)historyData:(NSMutableArray *)result{
+    
+    userData=[result mutableCopy];
+    for (int i=0; i<userData.count; i++) {
+        NSXMLElement *tempMessage=[userData objectAtIndex:i];
+        NSXMLElement *innertext=[tempMessage elementForName:@"data"];
+        if (nil==[innertext attributeStringValueForName:@"messageBodyHeight"]) {
+            tempMessage=[self setHeightInMessage:tempMessage];
+            [userData replaceObjectAtIndex:i withObject:tempMessage];
+        }
+    }
+    [self.chatTableView reloadData];
+    if (userData.count > 0) {
+        NSIndexPath* ip = [NSIndexPath indexPathForRow:userData.count-1 inSection:0];
+        [chatTableView scrollToRowAtIndexPath:ip atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+    }
+    [myDelegate stopIndicator];
+}
+
+- (void)XmppUserPresenceUpdateNotify {
+    
+//    switch ([self getPresenceStatus:friendUserJid]) {
+//        case 0:     // online/available
+//            [self userOnline];
+//            break;
+//        default:    //offline
+//            [self userOffline];
+//            break;
+//    }
+}
+
+- (void)historyUpdateNotify:(NSXMLElement *)message {
+    
+    [self messagesData:message];
+}
+
+#pragma mark - Send image delegates
+- (void)sendImageDelegateAction:(int)status imageName:(NSString *)imageName imageCaption:(NSString *)imageCaption {
+    
+    if (status==1) {
+        
+//        [self sendImageAttachment:imageName imageCaption:imageCaption friendName:self.friendUserName];//friendName:self.friendUserName
+    }
+}
+
+- (void)sendFileSuccessDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId {
+    
+    [self setAttachmentMessage:message uniquiId:uniqueId];
+}
+
+- (void)sendFileFailDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId {
+    
+    [self setAttachmentMessage:message uniquiId:uniqueId];
+}
+
+- (void)sendFileProgressDelegate:(NSXMLElement *)message {
+    
+    [self setAttachmentMessage:message uniquiId:@""];
+}
+
+- (void)setAttachmentMessage:(NSXMLElement *)message uniquiId:(NSString *)uniqueId {
+    
+    message=[self setHeightInMessage:message];
+    
+    if ([uniqueId isEqualToString:@""]) {
+        
+        [userData addObject:message];
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:userData.count-1 inSection:0];
+        [chatTableView beginUpdates];
+        [chatTableView insertRowsAtIndexPaths:@[indexPath]
+                             withRowAnimation:UITableViewRowAnimationBottom];
+        [chatTableView endUpdates];
+        [chatTableView scrollToRowAtIndexPath:[self indexPathForLastMessage]
+                             atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    }
+    else {
+        
+        for (int i=(int)userData.count-1; i>=0; i--) {
+            
+            NSXMLElement *innerElementData = [[userData objectAtIndex:i] elementForName:@"data"];
+            if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"ImageAttachment"]||[[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"FileAttachment"]) {
+                
+                if ([[[[innerElementData attributeStringValueForName:@"fileName"] componentsSeparatedByString:@"."] objectAtIndex:0] isEqualToString:uniqueId]) {
+                    
+                    [userData replaceObjectAtIndex:i withObject:message];
+                }
+            }
+        }
+    }
+    
+    if (userData.count > 0) {
+        NSIndexPath* ip = [NSIndexPath indexPathForRow:userData.count-1 inSection:0];
+        [chatTableView scrollToRowAtIndexPath:ip atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+    }
+    [chatTableView reloadData];
+}
+#pragma mark - end
+
+#pragma mark - Send file delegates
+- (void)sendDocumentDelegateAction:(NSString *)documentName {
+    
+    //    [self sendImageAttachment:imageName imageCaption:imageCaption friendName:self.friendUserName]
+//    [self sendDocumentAttachment:documentName friendName:self.friendUserName];
+}
+
+- (void)sendLocationDelegateAction:(NSString *)locationAddress latitude:(NSString *)latitude longitude:(NSString *)longitude {
+    
+//    [self sendLocationXmppMessage:friendUserJid friendName:self.friendUserName  messageString:locationAddress latitude:latitude longitude:longitude];
+}
+
+
+#pragma mark - end
 
 /*
 #pragma mark - Navigation

@@ -46,7 +46,7 @@
     int btnTag;
     
     //    NSString *loginUserId, *friendUserId;
-    UIImage *logedInUserPhoto, *friendUserPhoto;
+    UIImage *logedInUserPhoto;
     
     //Navigation views
     UIView *navBackView;
@@ -76,7 +76,7 @@
 @synthesize messageView;
 @synthesize chatTableView;
 @synthesize lastView,meeToProfile,userNameProfile;
-@synthesize userProfileImageView, friendProfileImageView;
+@synthesize userProfileImageView;
 
 @synthesize friendUserJid;
 @synthesize roomDetail;
@@ -97,19 +97,19 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:YES];
     
-    [self getGroupPhotoJid:[roomDetail objectForKey:@"roomJid"] result:^(UIImage *tempImage) {
-        // do something with your BOOL
-        
-        if (tempImage) {
-            
-            groupImageIcon=tempImage;
-        }
-        else {
-        
-            groupImageIcon=[UIImage imageNamed:@"groupPlaceholderImage.png"];
-        }
-        [self appDelegateImageVariableInitialized:groupImageIcon];
-    }];
+//    [self getGroupPhotoJid:[roomDetail objectForKey:@"roomJid"] result:^(UIImage *tempImage) {
+//        // do something with your BOOL
+//        
+//        if (tempImage) {
+//            
+//            groupImageIcon=tempImage;
+//        }
+//        else {
+//        
+//            groupImageIcon=[UIImage imageNamed:@"groupPlaceholderImage.png"];
+//        }
+//        [self appDelegateImageVariableInitialized:groupImageIcon];
+//    }];
     
     
     if (!isAttachmentOpen) {
@@ -121,7 +121,7 @@
         //    [[self navigationController] setNavigationBarHidden:NO];
         //    [[UIApplication sharedApplication] setStatusBarHidden:NO];
         [myDelegate showIndicator];
-        [self performSelector:@selector(getHistoryChatData) withObject:nil afterDelay:.1];
+        [self performSelector:@selector(getHistoryGoupChatData) withObject:nil afterDelay:.1];
     }
     else {
         isAttachmentOpen=false;
@@ -572,6 +572,7 @@
 
     //Group joined
     groupMemberList=[memberList mutableCopy];
+//    [self sendXmppMessage:[roomDetail objectForKey:@"roomJid"] subjectName:[roomDetail objectForKey:@"roomName"] messageString:messageTextView.text];
 }
 
 //Delete group notify
@@ -723,20 +724,20 @@
     NSXMLElement *innerData=[message elementForName:@"data"];
     if (userData.count==1) {
         
-        [cell displaySingleMessageData:message profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto chatType:[innerData attributeStringValueForName:@"groupType"]];
+        [cell displaySingleMessageData:message profileImageView:logedInUserPhoto chatType:[innerData attributeStringValueForName:@"groupType"]];
     }
     else if (userData.count>(indexPath.row+1)) {
         
         if ((int)indexPath.row==0) {
             
-            [cell displayFirstMessage:message nextmessage:[userData objectAtIndex:indexPath.row+1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto chatType:[innerData attributeStringValueForName:@"groupType"]];
+            [cell displayFirstMessage:message nextmessage:[userData objectAtIndex:indexPath.row+1] profileImageView:logedInUserPhoto chatType:[innerData attributeStringValueForName:@"groupType"]];
         }
         else {
-            [cell displayMultipleMessage:message nextmessage:[userData objectAtIndex:indexPath.row+1] previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto  chatType:[innerData attributeStringValueForName:@"groupType"]];
+            [cell displayMultipleMessage:message nextmessage:[userData objectAtIndex:indexPath.row+1] previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto chatType:[innerData attributeStringValueForName:@"groupType"]];
         }
     }
     else {
-        [cell displayLastMessage:message previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto  chatType:[innerData attributeStringValueForName:@"groupType"]];
+        [cell displayLastMessage:message previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto chatType:[innerData attributeStringValueForName:@"groupType"]];
     }
     return cell;
 }
@@ -913,6 +914,12 @@
 #pragma mark - end
 
 #pragma mark - XMPPChatView response method
+- (void)getHistoryGoupChatData {
+    
+    [self getHistoryGroupChatData:[roomDetail objectForKey:@"roomJid"]];
+}
+#pragma mark - end
+
 //History data response
 - (void)historyData:(NSMutableArray *)result{
     

@@ -219,6 +219,7 @@
 //    XMPPUserCoreDataStorageObject *user = [[self fetchedResultsController] objectAtIndexPath:indexPath];
     
     if (customSegmentedControl.selectedSegmentIndex==2) {
+        
     ChatScreenViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"ChatScreenViewController"];
     profileObj.friendUserJid=[userListArray objectAtIndex:indexPath.row];
     profileObj.friendUserName=[[profileLocalDictData objectForKey:[userListArray objectAtIndex:indexPath.row]] objectForKey:@"Name"];
@@ -229,25 +230,56 @@
     
         NSXMLElement *historyElement=[historyChatData objectAtIndex:indexPath.row];
          NSXMLElement *innerData=[historyElement elementForName:@"data"];
-         ChatScreenViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"ChatScreenViewController"];
         
-        
-        if (![[innerData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]) {
-          
-            profileObj.friendUserJid=[innerData attributeStringValueForName:@"from"];
-            profileObj.friendUserName=[[innerData attributeStringValueForName:@"senderName"] capitalizedString];
+        if ([self isChatTypeMessageElement:historyElement]) {
+            
+            ChatScreenViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"ChatScreenViewController"];
+            
+            if (![[innerData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]) {
+                
+                profileObj.friendUserJid=[innerData attributeStringValueForName:@"from"];
+                profileObj.friendUserName=[[innerData attributeStringValueForName:@"senderName"] capitalizedString];
+            }
+            else {
+                
+                profileObj.friendUserJid=[innerData attributeStringValueForName:@"to"];
+                profileObj.friendUserName=[[innerData attributeStringValueForName:@"receiverName"] capitalizedString];
+            }
+            [self.navigationController pushViewController:profileObj animated:YES];
         }
         else {
+        
+            //Group content click
+            GroupChatViewController *groupChatObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"GroupChatViewController"];
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"roomJid == %@", [NSString stringWithFormat:@"%@",[innerData attributeStringValueForName:@"to"]]];
+            NSArray *filteredarray = [groupChatListArray filteredArrayUsingPredicate:predicate];
             
-            profileObj.friendUserJid=[innerData attributeStringValueForName:@"to"];
-            profileObj.friendUserName=[[innerData attributeStringValueForName:@"receiverName"] capitalizedString];
+            if (filteredarray.count>0) {
+                
+                NSUInteger index = [groupChatListArray indexOfObjectPassingTest:^(id obj, NSUInteger idx, BOOL *stop) {
+                    return [predicate evaluateWithObject:obj];
+                }];
+                groupChatObj.roomDetail=[[groupChatListArray objectAtIndex:index] mutableCopy];
+            }
+            else {
+                
+                NSMutableDictionary *roomData=[NSMutableDictionary new];
+                [roomData setObject:[NSNumber numberWithBool:false] forKey:@"isPhoto"];
+                [roomData setObject:@"" forKey:@"roomDescription"];
+                [roomData setObject:[innerData attributeStringValueForName:@"to"] forKey:@"roomJid"];
+                [roomData setObject:[innerData attributeStringValueForName:@"receiverName"] forKey:@"roomName"];
+                [roomData setObject:@"" forKey:@"roomOwnerJid"];
+                groupChatObj.roomDetail=[roomData mutableCopy];
+            }
+            
+            
+            [self.navigationController pushViewController:groupChatObj animated:YES];
+
         }
-        [self.navigationController pushViewController:profileObj animated:YES];
     }
     else {
     
         //Group content click
-        
         GroupChatViewController *groupChatObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"GroupChatViewController"];
         groupChatObj.roomDetail=[[groupChatListArray objectAtIndex:indexPath.row] mutableCopy];
         [self.navigationController pushViewController:groupChatObj animated:YES];
@@ -346,16 +378,19 @@
         
         NSXMLElement *historyElement=[historyChatData objectAtIndex:tagValue];
         NSXMLElement *innerData=[historyElement elementForName:@"data"];
-        UserProfileViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"UserProfileViewController"];
-        if (![[innerData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]) {
-            
-            profileObj.friendId=[innerData attributeStringValueForName:@"from"];
+        
+        if ([self isChatTypeMessageElement:historyElement]) {
+            UserProfileViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"UserProfileViewController"];
+            if (![[innerData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]) {
+                
+                profileObj.friendId=[innerData attributeStringValueForName:@"from"];
+            }
+            else {
+                
+                profileObj.friendId=[innerData attributeStringValueForName:@"to"];
+            }
+            [self.navigationController pushViewController:profileObj animated:YES];
         }
-        else {
-            
-            profileObj.friendId=[innerData attributeStringValueForName:@"to"];
-        }
-        [self.navigationController pushViewController:profileObj animated:YES];
     }
     else {
         //Group content

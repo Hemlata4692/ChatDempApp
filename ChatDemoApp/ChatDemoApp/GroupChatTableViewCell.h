@@ -7,8 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "XMPPGroupChatRoom.h"
 
-@interface GroupChatTableViewCell : UITableViewCell
+@interface GroupChatTableViewCell : UITableViewCell {
+
+    XMPPGroupChatRoom *xmppGroupChatRoomObj;
+}
 
 @property (strong, nonatomic) IBOutlet UILabel *nameLabel;
 @property (strong, nonatomic) IBOutlet UILabel *messageLabel;
@@ -18,8 +22,8 @@
 @property (strong, nonatomic) IBOutlet UIImageView *userImage;
 @property (strong, nonatomic) IBOutlet UIImageView *attachedImageView;
 
-- (void)displaySingleMessageData:(NSXMLElement *)message profileImageView:(UIImage *)logedInUserPhoto friendProfileImageView:(UIImage *)friendUserPhoto chatType:(NSString *)chatType;
-- (void)displayMultipleMessage:(NSXMLElement *)currentMessage nextmessage:(NSXMLElement *)nextmessage previousMessage:(NSXMLElement *)previousMessage profileImageView:(UIImage *)logedInUserPhoto friendProfileImageView:(UIImage *)friendUserPhoto chatType:(NSString *)chatType;
-- (void)displayFirstMessage:(NSXMLElement *)currentMessage nextmessage:(NSXMLElement *)nextmessage profileImageView:(UIImage *)logedInUserPhoto friendProfileImageView:(UIImage *)friendUserPhoto chatType:(NSString *)chatType;
-- (void)displayLastMessage:(NSXMLElement *)currentMessage previousMessage:(NSXMLElement *)previousMessage profileImageView:(UIImage *)logedInUserPhoto friendProfileImageView:(UIImage *)friendUserPhoto chatType:(NSString *)chatType;
+- (void)displaySingleMessageData:(NSXMLElement *)message profileImageView:(UIImage *)logedInUserPhoto chatType:(NSString *)chatType;
+- (void)displayMultipleMessage:(NSXMLElement *)currentMessage nextmessage:(NSXMLElement *)nextmessage previousMessage:(NSXMLElement *)previousMessage profileImageView:(UIImage *)logedInUserPhoto chatType:(NSString *)chatType;
+- (void)displayFirstMessage:(NSXMLElement *)currentMessage nextmessage:(NSXMLElement *)nextmessage profileImageView:(UIImage *)logedInUserPhoto chatType:(NSString *)chatType;
+- (void)displayLastMessage:(NSXMLElement *)currentMessage previousMessage:(NSXMLElement *)previousMessage profileImageView:(UIImage *)logedInUserPhoto chatType:(NSString *)chatType;
 @end

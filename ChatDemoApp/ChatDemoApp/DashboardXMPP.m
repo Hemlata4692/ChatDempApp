@@ -516,6 +516,16 @@
     appDelegate.chatRoomAppDelegateSelectedRoomOwnerJid=@"";
 }
 #pragma mark - end
+
+- (BOOL)isChatTypeMessageElement:(NSXMLElement *)message {
+
+    return [[[message attributeForName:@"type"] stringValue] isEqualToString:@"chat"];
+}
+
+- (BOOL)isGroupChatTypeMessageElement:(NSXMLElement *)message {
+    
+    return [[[message attributeForName:@"type"] stringValue] isEqualToString:@"groupchat"];
+}
 /*
 #pragma mark - Navigation
 

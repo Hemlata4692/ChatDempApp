@@ -28,6 +28,7 @@
 #import "ErrorCode.h"
 #import "XMPPUserDefaultManager.h"
 #import "XmppCoreDataHandler.h"
+#import <XMPPMessage+XEP0045.h>
 
 
 #if DEBUG
@@ -738,7 +739,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 - (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message {
     
     DDLogVerbose(@"%@: %@", THIS_FILE, THIS_METHOD);
-    if ([message isChatMessageWithBody])
+    if ([message isChatMessageWithBody]||[message isGroupChatMessage])
     {
         XMPPUserCoreDataStorageObject *user = [xmppRosterStorage userForJID:[message from]
                                                                  xmppStream:xmppStream
@@ -746,19 +747,23 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         NSLog(@"%@",user);
         
         NSXMLElement *innerElementData = [message elementForName:@"data"];
-        [[XmppCoreDataHandler sharedManager] insertLocalMessageStorageDataBase:[innerElementData attributeStringValueForName:@"from"] message:message];
-        if (![selectedFriendUserId isEqualToString:[innerElementData attributeStringValueForName:@"from"]]){
-            
-            [self addLocalNotification:[innerElementData attributeStringValueForName:@"senderName"] message:[[message elementForName:@"body"] stringValue] userId:[innerElementData attributeStringValueForName:@"from"]];
-            [XMPPUserDefaultManager setXMPPBadgeIndicatorKey:[innerElementData attributeStringValueForName:@"from"]];
-        }
-        else if ([[UIApplication sharedApplication] applicationState]==UIApplicationStateBackground) {
-            [self addLocalNotification:[innerElementData attributeStringValueForName:@"senderName"] message:[[message elementForName:@"body"] stringValue] userId:[innerElementData attributeStringValueForName:@"from"]];
-        }
-//        else {
-         [[NSNotificationCenter defaultCenter] postNotificationName:@"UserHistory" object:message];
-//        }
         
+        if (![[innerElementData attributeStringValueForName:@"from"] isEqualToString:[NSString stringWithFormat:@"%@",xmppLogedInUserId]]) {
+            
+            [[XmppCoreDataHandler sharedManager] insertLocalMessageStorageDataBase:[innerElementData attributeStringValueForName:@"from"] message:message];
+            if (![selectedFriendUserId isEqualToString:[innerElementData attributeStringValueForName:@"from"]]){
+                
+                [self addLocalNotification:[innerElementData attributeStringValueForName:@"senderName"] message:[[message elementForName:@"body"] stringValue] userId:[innerElementData attributeStringValueForName:@"from"]];
+                [XMPPUserDefaultManager setXMPPBadgeIndicatorKey:[innerElementData attributeStringValueForName:@"from"]];
+            }
+            else if ([[UIApplication sharedApplication] applicationState]==UIApplicationStateBackground) {
+                [self addLocalNotification:[innerElementData attributeStringValueForName:@"senderName"] message:[[message elementForName:@"body"] stringValue] userId:[innerElementData attributeStringValueForName:@"from"]];
+            }
+            //        else {
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"UserHistory" object:message];
+            //        }
+
+        }
     }
 }
 

@@ -56,4 +56,10 @@ typedef NS_ENUM (NSInteger, GroupChatType){
 - (void)destroyRoom;
 - (void)xmppRoomDeleteSuccess;
 - (void)xmppRoomDeleteFail;
+
+//Send group message
+- (void)getHistoryGroupChatData:(NSString *)jid;
+- (void)sendXmppMessage:(NSString *)roomJid subjectName:(NSString *)subjectName messageString:(NSString *)messageString;
++ (void)getChatProfilePhotoJid:(NSString *)Jid profileImageView:(UIImage *)profileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(UIImage *image)) completion;
+- (void)historyData:(NSMutableArray *)result;
 @end

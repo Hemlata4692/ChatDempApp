@@ -46,4 +46,7 @@
 - (void)getListOfGroupsNotify:(NSMutableArray *)groupInfo;
 - (void)getGroupPhotoJid:(NSString *)jid profileImageView:(UIImageView *)profileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(UIImage *tempImage)) completion;
 //end
+
+- (BOOL)isChatTypeMessageElement:(NSXMLElement *)message;
+- (BOOL)isGroupChatTypeMessageElement:(NSXMLElement *)message;
 @end

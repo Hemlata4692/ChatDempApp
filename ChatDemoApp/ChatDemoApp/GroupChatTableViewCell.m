@@ -22,15 +22,15 @@
     // Configure the view for the selected state
 }
 
-- (void)displaySingleMessageData:(NSXMLElement *)message profileImageView:(UIImage *)logedInUserPhoto chatType:(NSString *)chatType {
+- (void)displaySingleMessageData:(NSXMLElement *)message profileImageView:(UIImage *)logedInUserPhoto chatType:(NSString *)chatType memberColor:(NSMutableDictionary *)memberColor {
     
-    [self displaySingleTypeMessageData:message profileImageView:logedInUserPhoto chatType:chatType];
+    [self displaySingleTypeMessageData:message profileImageView:logedInUserPhoto chatType:chatType memberColor:memberColor];
     self.separatorLabel.hidden=false;
 }
 
-- (void)displayFirstMessage:(NSXMLElement *)currentMessage nextmessage:(NSXMLElement *)nextmessage profileImageView:(UIImage *)logedInUserPhoto chatType:(NSString *)chatType {
+- (void)displayFirstMessage:(NSXMLElement *)currentMessage nextmessage:(NSXMLElement *)nextmessage profileImageView:(UIImage *)logedInUserPhoto chatType:(NSString *)chatType memberColor:(NSMutableDictionary *)memberColor {
     
-    [self displaySingleTypeMessageData:currentMessage profileImageView:logedInUserPhoto chatType:chatType];
+    [self displaySingleTypeMessageData:currentMessage profileImageView:logedInUserPhoto chatType:chatType memberColor:memberColor];
     NSXMLElement *innerData=[currentMessage elementForName:@"data"];
     NSXMLElement *innerData1=[nextmessage elementForName:@"data"];
     
@@ -44,7 +44,7 @@
     }
 }
 
-- (void)displaySingleTypeMessageData:(NSXMLElement *)message profileImageView:(UIImage *)logedInUserPhoto chatType:(NSString *)chatType {
+- (void)displaySingleTypeMessageData:(NSXMLElement *)message profileImageView:(UIImage *)logedInUserPhoto chatType:(NSString *)chatType memberColor:(NSMutableDictionary *)memberColor {
     
     //Unhide/hide all objects
     self.userImage.hidden=false;
@@ -69,13 +69,13 @@
     NSXMLElement *innerData=[message elementForName:@"data"];
     if ([[innerData attributeStringValueForName:@"from"] isEqualToString:myDelegate.xmppLogedInUserId]) {
 //        self.userImage.image=logedInUserPhoto;
-        [self getProfileImageUsingJid:[innerData attributeStringValueForName:@"from"] cellImage:self.userImage.image];
+        [self getProfileImageUsingJid:[innerData attributeStringValueForName:@"from"] cellImage:self.userImage];
         self.nameLabel.textColor=[UIColor colorWithRed:101.0/255.0 green:123.0/255.0 blue:227.0/255.0 alpha:1.0];
     }
     else {
 //        self.userImage.image=friendUserPhoto;
-        [self getProfileImageUsingJid:[innerData attributeStringValueForName:@"from"] cellImage:self.userImage.image];
-        self.nameLabel.textColor=[UIColor colorWithRed:227.0/255.0 green:77.0/255.0 blue:75.0/255.0 alpha:1.0];
+        [self getProfileImageUsingJid:[innerData attributeStringValueForName:@"from"] cellImage:self.userImage];
+        self.nameLabel.textColor=[memberColor objectForKey:[innerData attributeStringValueForName:@"from"]];
     }
     
     self.nameLabel.translatesAutoresizingMaskIntoConstraints=YES;
@@ -118,7 +118,7 @@
     self.dateLabel.text=[self changeTimeFormat:[innerData attributeStringValueForName:@"time"]];
 }
 
-- (void)displayMultipleMessage:(NSXMLElement *)currentMessage nextmessage:(NSXMLElement *)nextmessage previousMessage:(NSXMLElement *)previousMessage profileImageView:(UIImage *)logedInUserPhoto chatType:(NSString *)chatType {
+- (void)displayMultipleMessage:(NSXMLElement *)currentMessage nextmessage:(NSXMLElement *)nextmessage previousMessage:(NSXMLElement *)previousMessage profileImageView:(UIImage *)logedInUserPhoto chatType:(NSString *)chatType memberColor:(NSMutableDictionary *)memberColor {
     
     //Unhide/hide all objects
     self.userImage.hidden=true;
@@ -209,12 +209,12 @@
     }
     else /*if (![[currentMessage attributeStringValueForName:@"from"] isEqualToString:[previousMessage attributeStringValueForName:@"from"]] && [[currentMessage attributeStringValueForName:@"from"] isEqualToString:[nextmessage attributeStringValueForName:@"from"]])*/ {
         
-        [self displayFirstMessage:currentMessage nextmessage:nextmessage profileImageView:logedInUserPhoto chatType:chatType];
+        [self displayFirstMessage:currentMessage nextmessage:nextmessage profileImageView:logedInUserPhoto chatType:chatType memberColor:memberColor];
     }
     self.dateLabel.text=[self changeTimeFormat:[innerData attributeStringValueForName:@"time"]];
 }
 
-- (void)displayLastMessage:(NSXMLElement *)currentMessage previousMessage:(NSXMLElement *)previousMessage profileImageView:(UIImage *)logedInUserPhoto chatType:(NSString *)chatType {
+- (void)displayLastMessage:(NSXMLElement *)currentMessage previousMessage:(NSXMLElement *)previousMessage profileImageView:(UIImage *)logedInUserPhoto chatType:(NSString *)chatType memberColor:(NSMutableDictionary *)memberColor {
     
     //Unhide/hide all objects
     self.userImage.hidden=false;
@@ -274,7 +274,7 @@
     }
     else {
         
-        [self displaySingleTypeMessageData:currentMessage profileImageView:logedInUserPhoto chatType:chatType];
+        [self displaySingleTypeMessageData:currentMessage profileImageView:logedInUserPhoto chatType:chatType memberColor:memberColor];
     }
     self.dateLabel.text=[self changeTimeFormat:[innerData attributeStringValueForName:@"time"]];
     self.separatorLabel.hidden=false;
@@ -290,12 +290,12 @@
     return [dateFormatter stringFromDate:date];
 }
 
-- (void)getProfileImageUsingJid:(NSString *)jid cellImage:(UIImage *)cellImage {
+- (void)getProfileImageUsingJid:(NSString *)jid cellImage:(UIImageView *)cellImageView {
 
-    __block UIImage *weakRef = cellImage;
-    [XMPPGroupChatRoom getChatProfilePhotoJid:jid profileImageView:cellImage placeholderImage:@"images.png" result:^(UIImage *tempImage) {
+    __block UIImageView *weakRef = cellImageView;
+    [XMPPGroupChatRoom getChatProfilePhotoJid:jid profileImageView:cellImageView placeholderImage:@"images.png" result:^(UIImage *tempImage) {
         
-        weakRef=tempImage;
+        weakRef.image=tempImage;
     }];
 }
 

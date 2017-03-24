@@ -160,7 +160,13 @@
         if (![[innerData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]) {
             
             //            profileDic=[[profileLocalDictData objectForKey:[historyElement attributeStringValueForName:@"from"]] mutableCopy];
-            [self configurePhotoForCell:cell jid:[innerData attributeStringValueForName:@"from"]];
+            if ([self isChatTypeMessageElement:historyElement]) {
+                 [self configurePhotoForCell:cell jid:[innerData attributeStringValueForName:@"from"]];
+            }
+            else {
+                userImage.image=[UIImage imageNamed:@"groupPlaceholderImage.png"];
+            }
+           
             nameLabel.text = [[innerData attributeStringValueForName:@"senderName"] capitalizedString];
             if ([[XMPPUserDefaultManager getXMPPBadgeIndicatorValue:[innerData attributeStringValueForName:@"from"]] intValue]!=0) {
                 badgeLabel.hidden=NO;
@@ -170,7 +176,14 @@
         else {
             
             //            profileDic=[[profileLocalDictData objectForKey:[historyElement attributeStringValueForName:@"to"]] mutableCopy];
-            [self configurePhotoForCell:cell jid:[innerData attributeStringValueForName:@"to"]];
+            
+            if ([self isChatTypeMessageElement:historyElement]) {
+                [self configurePhotoForCell:cell jid:[innerData attributeStringValueForName:@"to"]];
+            }
+            else {
+                userImage.image=[UIImage imageNamed:@"groupPlaceholderImage.png"];
+            }
+            
             nameLabel.text = [[innerData attributeStringValueForName:@"receiverName"] capitalizedString];
             if ([[XMPPUserDefaultManager getXMPPBadgeIndicatorValue:[innerData attributeStringValueForName:@"to"]] intValue]!=0) {
                 badgeLabel.hidden=NO;

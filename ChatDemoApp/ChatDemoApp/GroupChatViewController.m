@@ -39,7 +39,7 @@
 @interface GroupChatViewController ()<CustomFilterDelegate,/*BSKeyboardControlsDelegate,*/UIGestureRecognizerDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate, SendImageDelegate, SendDocumentDelegate,UIDocumentInteractionControllerDelegate,SendLocationDelegate> {
 
     UIImage *groupImageIcon;
-    NSMutableArray *groupMemberList;
+    NSMutableDictionary *groupMemberList;
     
     CGFloat messageHeight, messageYValue;
     NSMutableArray *userData;
@@ -421,7 +421,7 @@
 
 -(IBAction)sendMessage:(id)sender {
     
-//    [self sendXmppMessage:friendUserJid friendName:self.friendUserName messageString:messageTextView.text];
+    [self sendXmppMessage:[roomDetail objectForKey:@"roomJid"] subjectName:[roomDetail objectForKey:@"roomName"] messageString:messageTextView.text];
 }
 
 - (void)backAction {
@@ -488,7 +488,7 @@
         invitationViewObj.friendImage=nil;
     }
     invitationViewObj.roomJid=[roomDetail objectForKey:@"roomJid"];
-    invitationViewObj.alreadyAddJids=[groupMemberList mutableCopy];
+    invitationViewObj.alreadyAddJids=[[groupMemberList allKeys] mutableCopy];
     [self.navigationController pushViewController:invitationViewObj animated:YES];
 }
 
@@ -571,8 +571,24 @@
 - (void)groupJoined:(NSMutableArray *)memberList {
 
     //Group joined
-    groupMemberList=[memberList mutableCopy];
+//    groupMemberList=[memberList mutableCopy];
+    for (NSString *listItem in memberList) {
+        
+        [groupMemberList setObject:[self randomColor] forKey:listItem];
+    }
 //    [self sendXmppMessage:[roomDetail objectForKey:@"roomJid"] subjectName:[roomDetail objectForKey:@"roomName"] messageString:messageTextView.text];
+}
+
+- (UIColor *) randomColor {
+    while (1) {
+        CGFloat red =  (CGFloat)arc4random()/(CGFloat)RAND_MAX;
+        CGFloat blue = (CGFloat)arc4random()/(CGFloat)RAND_MAX;
+        CGFloat green = (CGFloat)arc4random()/(CGFloat)RAND_MAX;
+        CGFloat gray = 0.299 * red + 0.587 * green + 0.114 * blue;
+        if (gray < 0.6) {
+            return [UIColor colorWithRed:red green:green blue:blue alpha:1.0];
+        }
+    }
 }
 
 //Delete group notify
@@ -724,20 +740,20 @@
     NSXMLElement *innerData=[message elementForName:@"data"];
     if (userData.count==1) {
         
-        [cell displaySingleMessageData:message profileImageView:logedInUserPhoto chatType:[innerData attributeStringValueForName:@"groupType"]];
+        [cell displaySingleMessageData:message profileImageView:logedInUserPhoto chatType:[innerData attributeStringValueForName:@"groupType"] memberColor:groupMemberList];
     }
     else if (userData.count>(indexPath.row+1)) {
         
         if ((int)indexPath.row==0) {
             
-            [cell displayFirstMessage:message nextmessage:[userData objectAtIndex:indexPath.row+1] profileImageView:logedInUserPhoto chatType:[innerData attributeStringValueForName:@"groupType"]];
+            [cell displayFirstMessage:message nextmessage:[userData objectAtIndex:indexPath.row+1] profileImageView:logedInUserPhoto chatType:[innerData attributeStringValueForName:@"groupType"] memberColor:groupMemberList];
         }
         else {
-            [cell displayMultipleMessage:message nextmessage:[userData objectAtIndex:indexPath.row+1] previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto chatType:[innerData attributeStringValueForName:@"groupType"]];
+            [cell displayMultipleMessage:message nextmessage:[userData objectAtIndex:indexPath.row+1] previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto chatType:[innerData attributeStringValueForName:@"groupType"] memberColor:groupMemberList];
         }
     }
     else {
-        [cell displayLastMessage:message previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto chatType:[innerData attributeStringValueForName:@"groupType"]];
+        [cell displayLastMessage:message previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto chatType:[innerData attributeStringValueForName:@"groupType"] memberColor:groupMemberList];
     }
     return cell;
 }
@@ -836,13 +852,6 @@
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     
     [picker dismissViewControllerAnimated:YES completion:NULL];
-}
-#pragma mark - end
-
-#pragma mark - Fetch history data
-- (void)getHistoryChatData {
-    
-//    [self getHistoryChatData:friendUserJid];
 }
 #pragma mark - end
 

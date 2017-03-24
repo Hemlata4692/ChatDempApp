@@ -845,7 +845,7 @@
 #pragma mark - end
 
 #pragma mark - Send message
-+ (void)getChatProfilePhotoJid:(NSString *)Jid profileImageView:(UIImage *)profileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(UIImage *image)) completion {
++ (void)getChatProfilePhotoJid:(NSString *)Jid profileImageView:(UIImageView *)profileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(UIImage *image)) completion {
     
      AppDelegateObjectFile *appDelegateVar = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
     //Fetch profile photos from local database if exist
@@ -853,10 +853,10 @@
     
     //Set temporary image
     if (nil==tempImageData) {
-        profileImageView=[UIImage imageNamed:placeholderImage];
+        profileImageView.image=[UIImage imageNamed:placeholderImage];
     }
     else {
-        profileImageView=[UIImage imageWithData:tempImageData];
+        profileImageView.image=[UIImage imageWithData:tempImageData];
     }
     
     //If one image is nil means anyone image is not exist then call background thread
@@ -889,7 +889,7 @@
         
         dispatch_async(dispatch_get_main_queue(), ^{
             
-            completion(profileImageView);
+            completion(profileImageView.image);
         });
     }
 }
@@ -977,8 +977,10 @@
     
     [[self xmppStream] sendElement:message];
     [[XmppCoreDataHandler sharedManager] insertLocalMessageStorageDataBase:roomJid message:message];
-//    [self XmppSendMessageResponse:[message copy]];
+    [self XmppSendMessageResponse:[message copy]];
 }
+
+- (void)XmppSendMessageResponse:(NSXMLElement *)xmpMessage {}
 #pragma mark - end
 /*
 #pragma mark - Navigation

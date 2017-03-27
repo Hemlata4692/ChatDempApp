@@ -246,7 +246,12 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
             notificationImage.image=[UIImage imageWithData:tempImageData];
         }
         else {
-            notificationImage.image=[UIImage imageNamed:@"images.png"];
+            if ([userId containsString:@"conference"]) {
+                notificationImage.image=[UIImage imageNamed:@"groupPlaceholderImage.png"];
+            }
+            else {
+                notificationImage.image=[UIImage imageNamed:@"images.png"];
+            }
         }
     
     [UIView animateWithDuration:0.2f animations:^{
@@ -739,7 +744,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 - (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message {
     
     DDLogVerbose(@"%@: %@", THIS_FILE, THIS_METHOD);
-    if ([message isChatMessageWithBody]||[message isGroupChatMessage])
+    if ([message isChatMessageWithBody])
     {
         XMPPUserCoreDataStorageObject *user = [xmppRosterStorage userForJID:[message from]
                                                                  xmppStream:xmppStream
@@ -751,7 +756,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         if (![[innerElementData attributeStringValueForName:@"from"] isEqualToString:[NSString stringWithFormat:@"%@",xmppLogedInUserId]]) {
             
             [[XmppCoreDataHandler sharedManager] insertLocalMessageStorageDataBase:[innerElementData attributeStringValueForName:@"from"] message:message];
-            if (![selectedFriendUserId isEqualToString:[innerElementData attributeStringValueForName:@"from"]]){
                 
                 [self addLocalNotification:[innerElementData attributeStringValueForName:@"senderName"] message:[[message elementForName:@"body"] stringValue] userId:[innerElementData attributeStringValueForName:@"from"]];
                 [XMPPUserDefaultManager setXMPPBadgeIndicatorKey:[innerElementData attributeStringValueForName:@"from"]];
@@ -763,8 +767,48 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
             [[NSNotificationCenter defaultCenter] postNotificationName:@"UserHistory" object:message];
             //        }
 
+    }
+    else if ([message isGroupChatMessage]) {
+        XMPPUserCoreDataStorageObject *user = [xmppRosterStorage userForJID:[message from]
+                                                                 xmppStream:xmppStream
+                                                       managedObjectContext:[self managedObjectContext_roster]];
+        NSLog(@"%@",user);
+        //Self send
+//        <message xmlns="jabber:client" type="groupchat" to="0000000000@117.240.110.83//Smack" from="240317025253@conference.117.240.110.83/0000000000"><data xmlns="main" chatType="Single" to="240317025253@conference.117.240.110.83" from="0000000000@117.240.110.83" time="17:52:26" date="24/03/17" senderName="modi" receiverName="Modi Group"></data><body>K</body></message>
+        
+        //Friend send
+//        <message xmlns="jabber:client" type="groupchat" to="0000000000@117.240.110.83//Smack" from="240317025253@conference.117.240.110.83/1111111112"><data xmlns="main" chatType="Single" to="240317025253@conference.117.240.110.83" from="1111111112@117.240.110.83" time="12:16:50" date="27/03/17" senderName="rohit" receiverName="Modi Group"></data><body>Hi</body></message>
+        
+        
+        
+        
+        NSXMLElement *innerElementData = [message elementForName:@"data"];
+        
+        if (![[innerElementData attributeStringValueForName:@"from"] isEqualToString:[NSString stringWithFormat:@"%@",xmppLogedInUserId]]&&![[XmppCoreDataHandler sharedManager] isFileMessageExist:[NSString stringWithFormat:@"%@",message]]&&![self isDelayExist:message]) {
+            
+            [[XmppCoreDataHandler sharedManager] insertLocalMessageStorageDataBase:[innerElementData attributeStringValueForName:@"to"] message:message];
+            if (![selectedFriendUserId isEqualToString:[innerElementData attributeStringValueForName:@"to"]]){
+                
+                [self addLocalNotification:[innerElementData attributeStringValueForName:@"senderName"] message:[[message elementForName:@"body"] stringValue] userId:[innerElementData attributeStringValueForName:@"to"]];
+                [XMPPUserDefaultManager setXMPPBadgeIndicatorKey:[innerElementData attributeStringValueForName:@"to"]];
+            }
+            else if ([[UIApplication sharedApplication] applicationState]==UIApplicationStateBackground) {
+                [self addLocalNotification:[innerElementData attributeStringValueForName:@"senderName"] message:[[message elementForName:@"body"] stringValue] userId:[innerElementData attributeStringValueForName:@"to"]];
+            }
+            //        else {
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"UserHistory" object:message];
+            //        }
+            
         }
     }
+}
+
+- (bool)isDelayExist:(NSXMLElement *)message {
+
+    if (nil!=[message elementForName:@"delay"]) {
+        return true;
+    }
+    return false;
 }
 
 - (void)xmppStream:(XMPPStream *)sender didReceivePresence:(XMPPPresence *)presence

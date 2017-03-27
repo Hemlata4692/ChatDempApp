@@ -571,11 +571,13 @@
 - (void)groupJoined:(NSMutableArray *)memberList {
 
     //Group joined
-//    groupMemberList=[memberList mutableCopy];
+    groupMemberList=[NSMutableDictionary new];
     for (NSString *listItem in memberList) {
         
         [groupMemberList setObject:[self randomColor] forKey:listItem];
     }
+    [self.chatTableView reloadData];
+    [myDelegate stopIndicator];
 //    [self sendXmppMessage:[roomDetail objectForKey:@"roomJid"] subjectName:[roomDetail objectForKey:@"roomName"] messageString:messageTextView.text];
 }
 
@@ -896,6 +898,17 @@
     NSXMLElement *innerData=[message elementForName:@"data"];
     //Set userName height
     CGSize size = CGSizeMake([[UIScreen mainScreen] bounds].size.width - (76+8),200);//here (76+8) = (nameLabel.x + label trailing)
+    NSXMLElement *innerElementData = [message elementForName:@"data"];
+    
+    NSString *nameString;
+    if (![[innerElementData attributeStringValueForName:@"from"] isEqualToString:[NSString stringWithFormat:@"%@",myDelegate.xmppLogedInUserId]]) {
+    
+        nameString=[innerData attributeStringValueForName:@"senderName"];
+    }
+    else {
+        
+        nameString=@"You";
+    }
     CGRect textRect=[[innerData attributeStringValueForName:@"senderName"]
                      boundingRectWithSize:size
                      options:NSStringDrawingUsesLineFragmentOrigin
@@ -946,7 +959,7 @@
         NSIndexPath* ip = [NSIndexPath indexPathForRow:userData.count-1 inSection:0];
         [chatTableView scrollToRowAtIndexPath:ip atScrollPosition:UITableViewScrollPositionBottom animated:NO];
     }
-    [myDelegate stopIndicator];
+
 }
 
 - (void)XmppUserPresenceUpdateNotify {

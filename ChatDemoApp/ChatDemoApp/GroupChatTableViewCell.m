@@ -70,7 +70,8 @@
     if ([[innerData attributeStringValueForName:@"from"] isEqualToString:myDelegate.xmppLogedInUserId]) {
 //        self.userImage.image=logedInUserPhoto;
         [self getProfileImageUsingJid:[innerData attributeStringValueForName:@"from"] cellImage:self.userImage];
-        self.nameLabel.textColor=[UIColor colorWithRed:101.0/255.0 green:123.0/255.0 blue:227.0/255.0 alpha:1.0];
+        self.nameLabel.textColor=[UIColor colorWithRed:50.0/255.0 green:50.0/255.0 blue:50.0/255.0 alpha:1.0];
+//        [UIColor colorWithRed:101.0/255.0 green:123.0/255.0 blue:227.0/255.0 alpha:1.0]
     }
     else {
 //        self.userImage.image=friendUserPhoto;
@@ -85,7 +86,16 @@
     self.nameLabel.numberOfLines=0;
     self.messageLabel.numberOfLines=0;
     
-    self.nameLabel.text=[[innerData attributeStringValueForName:@"senderName"] capitalizedString];
+    NSString *nameString;
+    if (![[innerData attributeStringValueForName:@"from"] isEqualToString:[NSString stringWithFormat:@"%@",myDelegate.xmppLogedInUserId]]) {
+        
+        nameString=[innerData attributeStringValueForName:@"senderName"];
+    }
+    else {
+        
+        nameString=@"You";
+    }
+    self.nameLabel.text=[nameString capitalizedString];
     self.messageLabel.text=[[message elementForName:@"body"] stringValue];
     
     self.nameLabel.frame=CGRectMake(76, 5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"nameHeight"] floatValue]); //Here frame = (Namelabel_x_Space, NameLabel_TopSpace, screenWidth - (Namelabel_x_Space + Namelabel_trailingSpace), NameHeight)

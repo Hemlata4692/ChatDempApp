@@ -36,6 +36,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppRoomDidDestroyFail) name:@"XMPPDeleteGroupFail" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPGroupMembersList:) name:@"GroupAdminList" object:nil];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(historUpdated:) name:@"UserHistory" object:nil];
     // Do any additional setup after loading the view.
 }
 
@@ -198,6 +199,8 @@
 
 - (void)appDelegateVariableInitializedGroupSubject:(NSString *)groupSubject groupDescription:(NSString *)groupDescription groupJid:(NSString *)groupJid ownerJid:(NSString *)ownerJid {
 
+    [XMPPUserDefaultManager removeXMPPBadgeIndicatorValue:groupJid];
+    appDelegate.selectedFriendUserId=groupJid;
     appDelegate.chatRoomAppDelegateName=groupSubject;
     appDelegate.chatRoomAppDelegateDescription=groupDescription;
 //    appDelegate.chatRoomAppDelegateImage=groupImage;
@@ -849,7 +852,7 @@
     
      AppDelegateObjectFile *appDelegateVar = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
     //Fetch profile photos from local database if exist
-    NSData *tempImageData=[appDelegateVar listionDataFromCacheDirectoryFolderName:appDelegateVar.appProfilePhotofolderName jid:appDelegateVar.xmppLogedInUserId];
+    NSData *tempImageData=[appDelegateVar listionDataFromCacheDirectoryFolderName:appDelegateVar.appProfilePhotofolderName jid:Jid];
     
     //Set temporary image
     if (nil==tempImageData) {
@@ -867,9 +870,9 @@
                            UIImage *tempPhoto;
                            
                            if (nil==tempImageData) {
-                               tempPhoto=[UIImage imageWithData:[[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:appDelegateVar.xmppLogedInUserId]]];
+                               tempPhoto=[UIImage imageWithData:[[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:Jid]]];
                                if (tempPhoto!=nil) {
-                                   [appDelegateVar saveDataInCacheDirectory:(UIImage *)tempPhoto folderName:appDelegateVar.appProfilePhotofolderName jid:appDelegateVar.xmppLogedInUserId];
+                                   [appDelegateVar saveDataInCacheDirectory:(UIImage *)tempPhoto folderName:appDelegateVar.appProfilePhotofolderName jid:Jid];
                                }
                                else {
                                    tempPhoto=[UIImage imageNamed:placeholderImage];
@@ -913,17 +916,17 @@
         NSMutableArray *tempHistoryData=[NSMutableArray new];
         for (NSManagedObject *message in messages_arc) {
             NSXMLElement *element = [[NSXMLElement alloc] initWithXMLString:[message valueForKey:@"messageString"] error:nil];
-            
-            NSXMLElement *innerElementData = [element elementForName:@"data"];
-            if (![[innerElementData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId] && [[innerElementData attributeStringValueForName:@"to"] isEqualToString:appDelegate.xmppLogedInUserId]) {
-                
-                [tempHistoryData addObject:element];
-            }
-            else {
-                if ([[innerElementData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]) {
-                    [tempHistoryData addObject:element];
-                }
-            }
+            [tempHistoryData addObject:element];
+//            NSXMLElement *innerElementData = [element elementForName:@"data"];
+//            if (![[innerElementData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]) {
+//                
+//                [tempHistoryData addObject:element];
+//            }
+//            else {
+//                if ([[innerElementData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]) {
+//                    [tempHistoryData addObject:element];
+//                }
+//            }
             
         }
         [self historyData:tempHistoryData];
@@ -982,6 +985,22 @@
 
 - (void)XmppSendMessageResponse:(NSXMLElement *)xmpMessage {}
 #pragma mark - end
+
+- (void)historUpdated:(NSNotification *)notification {
+    
+    //    NSString *keyName = myDelegate.chatUser;
+    //    if ([[UserDefaultManager getValue:@"CountData"] objectForKey:keyName] != nil) {
+    //        int tempCount = 0;
+    //        NSMutableDictionary *tempDict = [[UserDefaultManager getValue:@"CountData"] mutableCopy];
+    //        [tempDict setObject:[NSString stringWithFormat:@"%d",tempCount] forKey:keyName];
+    //        [UserDefaultManager setValue:tempDict key:@"CountData"];
+    //    }
+    NSXMLElement* message = [notification object];
+    [self historyUpdateNotify:message];
+}
+
+- (void)historyUpdateNotify:(NSXMLElement *)message {}
+
 /*
 #pragma mark - Navigation
 

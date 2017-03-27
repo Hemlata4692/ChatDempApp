@@ -372,13 +372,13 @@
     UITapGestureRecognizer *gesture = (UITapGestureRecognizer *) sender;
     NSXMLElement *innerData=[[userData objectAtIndex:(int)gesture.view.tag] elementForName:@"data"];
     
-    if ([[innerData attributeStringValueForName:@"groupType"] isEqualToString:@"FileAttachment"]) {
+    if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"FileAttachment"]) {
         NSURL *url = [NSURL fileURLWithPath:[myDelegate documentCacheDirectoryPathFileName:[innerData attributeStringValueForName:@"fileName"]]];
         self.docController = [UIDocumentInteractionController interactionControllerWithURL:url];
         self.docController.delegate = self;
         [self.docController presentOpenInMenuFromRect:CGRectZero inView:self.view animated:YES];
     }
-    else if ([[innerData attributeStringValueForName:@"groupType"] isEqualToString:@"ImageAttachment"]) {
+    else if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"ImageAttachment"]) {
         
         imagePreviewView=[[UIView alloc] initWithFrame:CGRectMake(0,self.view.bounds.size.height,self.view.bounds.size.width,self.view.bounds.size.height)];
         UIImageView *popImage=[[UIImageView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,self.view.frame.size.height)];
@@ -398,7 +398,7 @@
             imagePreviewView.frame = CGRectMake(0,0,self.view.bounds.size.width,self.view.bounds.size.height);
         }];
     }
-    else if ([[innerData attributeStringValueForName:@"groupType"] isEqualToString:@"Location"]) {
+    else if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"Location"]) {
         
         NSXMLElement *innerLocationData=[[userData objectAtIndex:(int)gesture.view.tag] elementForName:@"location"];
         isAttachmentOpen=true;
@@ -583,39 +583,6 @@
             [self performSelector:@selector(deleteGroupService) withObject:nil afterDelay:0.1];
         }
     });
-    
-    
-    
-    
-//    dispatch_async(dispatch_get_main_queue(), ^{
-//        if (status==1) {
-//            NSLog(@"1");
-//            
-//            UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-//            DocumentAttachmentViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"DocumentAttachmentViewController"];
-//            [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
-//            popupView.delegate=self;
-//            [self presentViewController:popupView animated:YES completion:nil];
-//        }
-//        else if (status==2) {
-//            NSLog(@"2");
-//            [self openCamera];
-//        }
-//        else if (status==3) {
-//            NSLog(@"3");
-//            [self openGallery];
-//        }
-//        else if (status==4) {
-//            NSLog(@"3");
-//            isAttachmentOpen=true;
-//            UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-//            LocationViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"LocationViewController"];
-//            //            [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
-//            popupView.delegate=self;
-//            
-//            [self presentViewController:popupView animated:YES completion:NULL];
-//        }
-//    });
 }
 #pragma mark - end
 
@@ -729,7 +696,7 @@
     NSXMLElement* message = [userData objectAtIndex:indexPath.row];
     NSXMLElement *innerData=[message elementForName:@"data"];
     
-    if ([[innerData attributeStringValueForName:@"groupType"] isEqualToString:@"ImageAttachment"]||[[innerData attributeStringValueForName:@"groupType"] isEqualToString:@"FileAttachment"]||[[innerData attributeStringValueForName:@"groupType"] isEqualToString:@"Location"]) {
+    if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"ImageAttachment"]||[[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"FileAttachment"]||[[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"Location"]) {
         
         float mainCellHeight=5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+10+[[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]+10+20+5; //here mainCellHeight = NameLabel_topSpace + NameHeight + space_Between_NameLabel_And_MessageLabel + MessageHeight + space_Between_MessageLabel_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
         float innerCellHeight=5+[[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]+10+20+5; //here innerCellHeight = MessageLabel_topSpace + MessageHeight + space_Between_MessageLabel_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
@@ -817,20 +784,20 @@
     NSXMLElement *innerData=[message elementForName:@"data"];
     if (userData.count==1) {
         
-        [cell displaySingleMessageData:message profileImageView:logedInUserPhoto chatType:[innerData attributeStringValueForName:@"groupType"] memberColor:groupMemberList];
+        [cell displaySingleMessageData:message profileImageView:logedInUserPhoto chatType:[innerData attributeStringValueForName:@"chatType"] memberColor:groupMemberList];
     }
     else if (userData.count>(indexPath.row+1)) {
         
         if ((int)indexPath.row==0) {
             
-            [cell displayFirstMessage:message nextmessage:[userData objectAtIndex:indexPath.row+1] profileImageView:logedInUserPhoto chatType:[innerData attributeStringValueForName:@"groupType"] memberColor:groupMemberList];
+            [cell displayFirstMessage:message nextmessage:[userData objectAtIndex:indexPath.row+1] profileImageView:logedInUserPhoto chatType:[innerData attributeStringValueForName:@"chatType"] memberColor:groupMemberList];
         }
         else {
-            [cell displayMultipleMessage:message nextmessage:[userData objectAtIndex:indexPath.row+1] previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto chatType:[innerData attributeStringValueForName:@"groupType"] memberColor:groupMemberList];
+            [cell displayMultipleMessage:message nextmessage:[userData objectAtIndex:indexPath.row+1] previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto chatType:[innerData attributeStringValueForName:@"chatType"] memberColor:groupMemberList];
         }
     }
     else {
-        [cell displayLastMessage:message previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto chatType:[innerData attributeStringValueForName:@"groupType"] memberColor:groupMemberList];
+        [cell displayLastMessage:message previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto chatType:[innerData attributeStringValueForName:@"chatType"] memberColor:groupMemberList];
     }
     return cell;
 }
@@ -1119,16 +1086,14 @@
 #pragma mark - Send file delegates
 - (void)sendDocumentDelegateAction:(NSString *)documentName {
     
-    //    [self sendImageAttachment:imageName imageCaption:imageCaption friendName:self.friendUserName]
-//    [self sendDocumentAttachment:documentName friendName:self.friendUserName];
+//        [self sendImageAttachment:imageName imageCaption:imageCaption friendName:self.friendUserName]
+    [self sendDocumentAttachment:documentName roomName:[roomDetail objectForKey:@"roomName"]];
 }
 
 - (void)sendLocationDelegateAction:(NSString *)locationAddress latitude:(NSString *)latitude longitude:(NSString *)longitude {
     
-//    [self sendLocationXmppMessage:friendUserJid friendName:self.friendUserName  messageString:locationAddress latitude:latitude longitude:longitude];
+    [self sendLocationXmppMessage:[roomDetail objectForKey:@"roomJid"] roomName:[roomDetail objectForKey:@"roomName"]  messageString:locationAddress latitude:latitude longitude:longitude];
 }
-
-
 #pragma mark - end
 
 /*

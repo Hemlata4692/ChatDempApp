@@ -15,12 +15,18 @@
 #import "NSData+XMPP.h"
 #import <XMPPRoomHybridStorage.h>
 
-@interface XMPPGroupChatRoom ()<XMPPRoomDelegate>{
+#import "XMPPOutgoingFileTransfer.h"//File transfer
+
+@interface XMPPGroupChatRoom ()<XMPPRoomDelegate,XMPPOutgoingFileTransferDelegate/*file transfer*/>{
     
     AppDelegateObjectFile *appDelegate;
     GroupChatType type;
     NSMutableArray *invitedFriendArray;
+    
+    NSXMLElement *fileAttachmentMessage;
+    NSString *uniqueId;
 }
+@property (nonatomic, strong) XMPPOutgoingFileTransfer *fileTransfer;//File transfer
 @end
 
 @implementation XMPPGroupChatRoom
@@ -1003,6 +1009,184 @@
 
 - (void)historyUpdateNotify:(NSXMLElement *)message {}
 - (void)XmppGroupUserPresenceUpdateNotify:(NSNotification *)notification {}
+
+
+#pragma mark - Send document
+- (void)sendDocumentAttachment:(NSString *)fileName roomName:(NSString *)roomName {
+    
+    fileAttachmentMessage=nil;
+    uniqueId=@"";
+    NSData *fileData=[appDelegate documentCacheDirectoryFileName:fileName];
+//    appDelegate.chatRoomAppDelegateRoomJid
+    XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",appDelegate.chatRoomAppDelegateRoomJid,[[myDelegate.xmppStream myJID] resource]]];
+    //    if (!_fileTransfer) {
+    _fileTransfer = [[XMPPOutgoingFileTransfer alloc]
+                     initWithDispatchQueue:dispatch_get_main_queue()];
+    _fileTransfer.disableIBB = NO;
+    _fileTransfer.disableSOCKS5 = YES;
+    [_fileTransfer activate:myDelegate.xmppStream];
+    [_fileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    //    }
+    
+    uniqueId=[[fileName componentsSeparatedByString:@"."] objectAtIndex:0];
+    fileAttachmentMessage=[self convertedMessage:appDelegate.chatRoomAppDelegateRoomJid roomName:roomName fileName:fileName messageString:fileName fileType:@"FileAttachment"];
+    NSError *err;
+    //    if (![_fileTransfer sendData:imageData
+    //                           named:fileName
+    //                     toRecipient:jid
+    //                     description:imageCaption
+    //                           error:&err]) {
+    //        NSLog(@"You messed something up: %@", err);
+    //    }
+    
+    
+    NSXMLElement *messageData=[fileAttachmentMessage elementForName:@"data"];
+    if ([_fileTransfer sendCustomizedData:fileData named:fileName toRecipient:jid description:fileName date:[messageData attributeStringValueForName:@"date"] time:[messageData attributeStringValueForName:@"time"] senderId:[messageData attributeStringValueForName:@"from"] chatType:@"FileAttachment" senderName:appDelegate.xmppLogedInUserName receiverName:roomName error:&err]) {
+        
+        [[XmppCoreDataHandler sharedManager] insertLocalImageMessageStorageDataBase:appDelegate.chatRoomAppDelegateRoomJid message:fileAttachmentMessage uniquiId:uniqueId];
+        [self sendFileProgressDelegate:[fileAttachmentMessage copy]];
+    }
+}
+
+- (NSXMLElement *)convertedMessage:(NSString *)to roomName:(NSString *)roomName fileName:(NSString *)fileName messageString:(NSString *)messageString fileType:(NSString *)fileType {
+    
+    NSString *messageStr = [messageString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"HH:mm:ss"];
+    NSDate *date = [NSDate date];
+    NSString *formattedTime = [dateFormatter stringFromDate:date];
+    [dateFormatter setDateFormat:@"dd/MM/yy"];
+    NSString *formattedDate = [dateFormatter stringFromDate:date];
+    NSXMLElement *body = [NSXMLElement elementWithName:@"body"];
+    
+    [body setStringValue:messageStr];
+    NSXMLElement *message = [NSXMLElement elementWithName:@"message"];
+    NSXMLElement *dataTag = [NSXMLElement elementWithName:@"data"];
+    
+    [message addAttributeWithName:@"type" stringValue:@"groupchat"];
+    [message addAttributeWithName:@"to" stringValue:to];
+    [message addAttributeWithName:@"from" stringValue:appDelegate.xmppLogedInUserId];
+    [message addAttributeWithName:@"progress" stringValue:@"2"];
+    
+    [dataTag addAttributeWithName:@"xmlns" stringValue:@"main"];
+    [dataTag addAttributeWithName:@"chatType" stringValue:fileType];
+    
+    [dataTag addAttributeWithName:@"to" stringValue:to];
+    [dataTag addAttributeWithName:@"fileName" stringValue:fileName];
+    
+    [dataTag addAttributeWithName:@"from" stringValue:appDelegate.xmppLogedInUserId];
+    [dataTag addAttributeWithName:@"time" stringValue:formattedTime];
+    //        [message addAttributeWithName:@"Name" stringValue:[UserDefaultManager getValue:@"userName"]];
+    [dataTag addAttributeWithName:@"date" stringValue:formattedDate];
+    //        [message addAttributeWithName:@"from-To" stringValue:[NSString stringWithFormat:@"%@-%@",myDelegate.xmppLogedInUserId,friendUserJid]];
+    [dataTag addAttributeWithName:@"senderName" stringValue:appDelegate.xmppLogedInUserName];
+    [dataTag addAttributeWithName:@"receiverName" stringValue:roomName];
+    //    }
+    [message addChild:dataTag];
+    [message addChild:body];
+    return message;
+}
+
+#pragma mark - XMPPOutgoingFileTransferDelegate Methods
+- (void)xmppOutgoingFileTransfer:(XMPPOutgoingFileTransfer *)sender
+                didFailWithError:(NSError *)error
+{
+    //    DDLogInfo(@"Outgoing file transfer failed with error: %@", error);
+    NSLog(@"%ld",(long)error.code);
+    if (error.code!=-1) {
+        
+        NSXMLElement *failMessage=[fileAttachmentMessage copy];
+        [failMessage addAttributeWithName:@"progress" stringValue:@"0"];
+        [[XmppCoreDataHandler sharedManager] updateLocalMessageStorageDatabaseBareJidStr:appDelegate.chatRoomAppDelegateRoomJid message:failMessage uniquiId:uniqueId];
+        [self sendFileFailDelegate:failMessage uniquiId:uniqueId];
+    }
+    //    NSLog(@"%@",error.localizedDescription);
+    //    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
+    //                                                    message:error.localizedDescription
+    //                                                   delegate:nil
+    //                                          cancelButtonTitle:@"OK"
+    //                                          otherButtonTitles:nil];
+    //    [alert show];
+}
+
+- (void)xmppOutgoingFileTransferDidSucceed:(XMPPOutgoingFileTransfer *)sender
+{
+    NSLog(@"File transfer successful.");
+    
+    //    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Success!"
+    //                                                    message:@"Your file was sent successfully."
+    //                                                   delegate:nil
+    //                                          cancelButtonTitle:@"OK"
+    //                                          otherButtonTitles:nil];
+    //    [alert show];
+}
+
+- (void)fileTransferSuccessFully {
+    
+    NSLog(@"File transfer successful.");
+    NSXMLElement *successMessage=[fileAttachmentMessage copy];
+    [successMessage addAttributeWithName:@"progress" stringValue:@"1"];
+    [[XmppCoreDataHandler sharedManager] updateLocalMessageStorageDatabaseBareJidStr:appDelegate.chatRoomAppDelegateRoomJid message:successMessage uniquiId:uniqueId];
+    [self sendFileSuccessDelegate:successMessage uniquiId:uniqueId];
+}
+
+- (void)sendFileSuccessDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId{}
+- (void)sendFileFailDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId{}
+- (void)sendFileProgressDelegate:(NSXMLElement *)message{}
+
+
+#pragma mark - Send location
+- (void)sendLocationXmppMessage:(NSString *)roomJid roomName:(NSString *)roomName messageString:(NSString *)messageString latitude:(NSString *)latitude longitude:(NSString *)longitude {
+    
+    [myDelegate.xmppMessageArchivingModule setClientSideMessageArchivingOnly:YES];
+    [myDelegate.xmppMessageArchivingModule activate:[self xmppStream]];    //By this line all your messages are stored in CoreData
+    [myDelegate.xmppMessageArchivingModule addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    NSString *messageStr = [messageString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"HH:mm:ss"];
+    NSDate *date = [NSDate date];
+    //    [dateFormatter setDateFormat:@"hh:mm a"];
+    //    [dateFormatter setAMSymbol:@"am"];
+    //    [dateFormatter setPMSymbol:@"pm"];
+    NSString *formattedTime = [dateFormatter stringFromDate:date];
+    [dateFormatter setDateFormat:@"dd/MM/yy"];
+    NSString *formattedDate = [dateFormatter stringFromDate:date];
+    NSXMLElement *body = [NSXMLElement elementWithName:@"body"];
+    
+    [body setStringValue:messageStr];
+    NSXMLElement *message = [NSXMLElement elementWithName:@"message"];
+    NSXMLElement *dataTag = [NSXMLElement elementWithName:@"data"];
+    NSXMLElement *locationTag = [NSXMLElement elementWithName:@"location"];
+    //    <message to='7777777777@192.168.18.171' id='eYbIo-34' type='chat'><body>yugigighiihhinoi</body><thread>444560f0-5904-4a06-aa87-0ec6e230bb33</thread><data xmlns='main' receiverName='test' senderName='Sender test' date='14/02/17' from='9999999999' to='7777777777' time='12:56:45'/></message>
+    
+    [message addAttributeWithName:@"type" stringValue:@"groupchat"];
+    [message addAttributeWithName:@"to" stringValue:roomJid];
+    [message addAttributeWithName:@"from" stringValue:myDelegate.xmppLogedInUserId];
+    
+    [dataTag addAttributeWithName:@"xmlns" stringValue:@"main"];
+    [dataTag addAttributeWithName:@"chatType" stringValue:@"Location"];
+    [message addAttributeWithName:@"to" stringValue:roomJid];
+    [message addAttributeWithName:@"from" stringValue:myDelegate.xmppLogedInUserId];
+    
+    [dataTag addAttributeWithName:@"to" stringValue:roomJid];
+    [dataTag addAttributeWithName:@"from" stringValue:myDelegate.xmppLogedInUserId];
+    [dataTag addAttributeWithName:@"time" stringValue:formattedTime];
+    [dataTag addAttributeWithName:@"date" stringValue:formattedDate];
+    [dataTag addAttributeWithName:@"senderName" stringValue:appDelegate.xmppLogedInUserName];
+    [dataTag addAttributeWithName:@"receiverName" stringValue:roomName];
+    
+    [locationTag addAttributeWithName:@"address" stringValue:messageStr];
+    [locationTag addAttributeWithName:@"latitude" stringValue:latitude];
+    [locationTag addAttributeWithName:@"longitude" stringValue:longitude];
+    
+    [message addChild:dataTag];
+    [message addChild:body];
+    [message addChild:locationTag];
+    
+    [[self xmppStream] sendElement:message];
+    [[XmppCoreDataHandler sharedManager] insertLocalMessageStorageDataBase:roomJid message:message];
+    [self XmppSendMessageResponse:[message copy]];
+}
 
 /*
 #pragma mark - Navigation

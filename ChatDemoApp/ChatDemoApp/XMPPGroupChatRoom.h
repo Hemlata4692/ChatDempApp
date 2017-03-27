@@ -63,4 +63,13 @@ typedef NS_ENUM (NSInteger, GroupChatType){
 + (void)getChatProfilePhotoJid:(NSString *)Jid profileImageView:(UIImageView *)profileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(UIImage *image)) completion;
 - (void)historyData:(NSMutableArray *)result;
 - (void)XmppSendMessageResponse:(NSXMLElement *)xmpMessage;
+
+//Send location
+- (void)sendLocationXmppMessage:(NSString *)roomJid roomName:(NSString *)roomName messageString:(NSString *)messageString latitude:(NSString *)latitude longitude:(NSString *)longitude;
+//end
+#pragma mark - Send document
+- (void)sendDocumentAttachment:(NSString *)fileName roomName:(NSString *)roomName;
+- (void)sendFileSuccessDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId;
+- (void)sendFileFailDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId;
+- (void)sendFileProgressDelegate:(NSXMLElement *)message;
 @end

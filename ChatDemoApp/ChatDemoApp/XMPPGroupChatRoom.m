@@ -37,6 +37,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPGroupMembersList:) name:@"GroupAdminList" object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(historUpdated:) name:@"UserHistory" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XmppGroupUserPresenceUpdateNotify:) name:@"XmppGroupUserPresenceUpdate" object:nil];
     // Do any additional setup after loading the view.
 }
 
@@ -342,6 +343,7 @@
 - (void)XMPPGroupMembersList:(NSNotification *)notification {
     
     NSLog(@"%@",notification.object);
+    myDelegate.selectedMemberUserIds=[notification.object mutableCopy];
     [self groupJoined:[notification.object mutableCopy]];
 }
 
@@ -1000,6 +1002,7 @@
 }
 
 - (void)historyUpdateNotify:(NSXMLElement *)message {}
+- (void)XmppGroupUserPresenceUpdateNotify:(NSNotification *)notification {}
 
 /*
 #pragma mark - Navigation

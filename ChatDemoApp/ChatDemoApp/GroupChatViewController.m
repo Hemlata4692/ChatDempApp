@@ -56,6 +56,7 @@
     
     BOOL isAttachmentOpen, isReceiptOffline;
     UIView *imagePreviewView;
+    NSMutableDictionary *membersPresentStatus;
 }
 
 @property (strong, nonatomic) IBOutlet UITableView *chatTableView;
@@ -86,7 +87,7 @@
     [super viewDidLoad];
     
     self.navigationItem.title=[roomDetail objectForKey:@"roomName"];
-    
+    membersPresentStatus=[NSMutableDictionary new];
     [self appDelegateVariableInitializedGroupSubject:[roomDetail objectForKey:@"roomName"] groupDescription:[roomDetail objectForKey:@"roomDescription"] groupJid:[roomDetail objectForKey:@"roomJid"] ownerJid:[roomDetail objectForKey:@"roomOwnerJid"]];
     [self joinChatRoomJid:[roomDetail objectForKey:@"roomJid"]];
     [self addBarButtons];
@@ -204,13 +205,13 @@
     [back addTarget:self action:@selector(backAction) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem=backBarButton;
 
-    if ([self isOwner]) {
+//    if ([self isOwner]) {
         UIButton *menu = [[UIButton alloc] initWithFrame:framing];
         [menu setImage:[UIImage imageNamed:@"menuIcon"] forState:UIControlStateNormal];
         menuBarButton =[[UIBarButtonItem alloc] initWithCustomView:menu];
         [menu addTarget:self action:@selector(menuAction:) forControlEvents:UIControlEventTouchUpInside];
         self.navigationItem.rightBarButtonItem=menuBarButton;
-    }
+//    }
 }
 #pragma mark - end
 
@@ -449,28 +450,32 @@
     NSMutableArray *tempAttachmentArra=[NSMutableArray new];
     NSMutableArray *tempAttachmentImageArra=[NSMutableArray new];
     
-//    if ([self isOwner]) {
+    [tempAttachment setObject:[NSNumber numberWithInt:1] forKey:@"Documents"];
+    [tempAttachmentArra addObject:@"Documents"];
+    [tempAttachmentImageArra addObject:@"documentsAttachment"];
+    [tempAttachment setObject:[NSNumber numberWithInt:2] forKey:@"Camera"];
+    [tempAttachmentArra addObject:@"Camera"];
+    [tempAttachmentImageArra addObject:@"cameraAttachment"];
+    [tempAttachment setObject:[NSNumber numberWithInt:3] forKey:@"Gallery"];
+    [tempAttachmentArra addObject:@"Gallery"];
+    [tempAttachmentImageArra addObject:@"galleryAttachment"];
+    [tempAttachment setObject:[NSNumber numberWithInt:4] forKey:@"Location"];
+    [tempAttachmentArra addObject:@"Location"];
+    [tempAttachmentImageArra addObject:@"locationIcon"];
     
-        [tempAttachment setObject:[NSNumber numberWithInt:1] forKey:@"Add Member"];
+    if ([self isOwner]) {
+    
+        [tempAttachment setObject:[NSNumber numberWithInt:5] forKey:@"Add Member"];
         [tempAttachmentArra addObject:@"Add Member"];
         [tempAttachmentImageArra addObject:@"inviteNewMember"];
-        [tempAttachment setObject:[NSNumber numberWithInt:2] forKey:@"Delete Group"];
+        [tempAttachment setObject:[NSNumber numberWithInt:6] forKey:@"Delete Group"];
         [tempAttachmentArra addObject:@"Delete Group"];
         [tempAttachmentImageArra addObject:@"deleteGroup"];
-        filterViewObj.filterDict=[tempAttachment mutableCopy];
-        filterViewObj.filterArray=[tempAttachmentArra mutableCopy];
-        filterViewObj.filterImageArray=[tempAttachmentImageArra mutableCopy];
-//    }
-//    else {
-//    
-//        [tempAttachment setObject:[NSNumber numberWithInt:1] forKey:@"AddNewMember"];
-//        [tempAttachmentArra addObject:@"Add Member"];
-//        [tempAttachmentImageArra addObject:@"inviteNewMember"];
-//        filterViewObj.filterDict=[tempAttachment mutableCopy];
-//        filterViewObj.filterArray=[tempAttachmentArra mutableCopy];
-//        filterViewObj.filterImageArray=[tempAttachmentImageArra mutableCopy];
-//    }
+    }
     
+    filterViewObj.filterDict=[tempAttachment mutableCopy];
+    filterViewObj.filterArray=[tempAttachmentArra mutableCopy];
+    filterViewObj.filterImageArray=[tempAttachmentImageArra mutableCopy];
     [filterViewObj setModalPresentationStyle:UIModalPresentationOverCurrentContext];
     [self presentViewController:filterViewObj animated:NO completion:nil];
 }
@@ -512,23 +517,70 @@
 - (void)customFilterDelegateAction:(int)status{
     
     dispatch_async(dispatch_get_main_queue(), ^{
+        
+        int flag=0;
+        NSArray *memberIds=[membersPresentStatus allKeys];
+        
+        for (NSString *memberTemp in memberIds) {
+            if ([[membersPresentStatus objectForKey:memberTemp] boolValue]) {
+                flag=1;
+                break;
+            }
+        }
         if (status==1) {
             NSLog(@"1");
-            [self inviteAction];            
+            
+            if (flag) {
+                UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+                DocumentAttachmentViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"DocumentAttachmentViewController"];
+                [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+                popupView.delegate=self;
+                [self presentViewController:popupView animated:YES completion:nil];
+            }
+            else {
+                [UserDefaultManager showAlertMessage:@"Alert" message:@"All Recipients may be offline so please try again later."];
+            }
         }
         else if (status==2) {
             NSLog(@"2");
-            
-            [myDelegate showIndicator];
-            [self performSelector:@selector(deleteGroupService) withObject:nil afterDelay:0.1];
+            if (flag) {
+                [self openCamera];
+            }
+            else {
+                [UserDefaultManager showAlertMessage:@"Alert" message:@"All Recipients may be offline so please try again later."];
+            }
         }
         else if (status==3) {
             NSLog(@"3");
-            
+            if (flag) {
+                [self openGallery];
+            }
+            else {
+                [UserDefaultManager showAlertMessage:@"Alert" message:@"All Recipients may be offline so please try again later."];
+            }
         }
         else if (status==4) {
             NSLog(@"3");
+            if (flag) {
+                isAttachmentOpen=true;
+                UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+                LocationViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"LocationViewController"];
+                popupView.delegate=self;
+                [self presentViewController:popupView animated:YES completion:NULL];
+            }
+            else {
+                [UserDefaultManager showAlertMessage:@"Alert" message:@"All Recipients may be offline so please try again later."];
+            }
+        }
+        else if (status==5) {
+            NSLog(@"5");
+            [self inviteAction];            
+        }
+        else if (status==6) {
+            NSLog(@"6");
             
+            [myDelegate showIndicator];
+            [self performSelector:@selector(deleteGroupService) withObject:nil afterDelay:0.1];
         }
     });
     
@@ -575,6 +627,14 @@
     for (NSString *listItem in memberList) {
         
         [groupMemberList setObject:[self randomColor] forKey:listItem];
+        switch ([self getPresenceStatus:listItem]) {
+            case 0:     // online/available
+                [membersPresentStatus setObject:[NSNumber numberWithBool:YES] forKey:listItem];
+                break;
+            default:    //offline
+                [membersPresentStatus setObject:[NSNumber numberWithBool:NO] forKey:listItem];
+                break;
+        }
     }
     [self.chatTableView reloadData];
     [myDelegate stopIndicator];
@@ -592,6 +652,21 @@
         }
     }
 }
+
+#pragma mark - Get user presence
+- (int)getPresenceStatus:(NSString *)jid {
+    
+    if (myDelegate.xmppUserDetailedList==nil || myDelegate.xmppUserDetailedList.count==0) {
+        
+        NSMutableDictionary *temp=[XMPPUserDefaultManager getValue:@"xmppUserDetailedList"];
+        return [[temp objectForKey:jid] intValue];
+    }
+    else {
+        XMPPUserCoreDataStorageObject *user=[myDelegate.xmppUserDetailedList objectForKey:jid];
+        return [user.sectionNum intValue];
+    }
+}
+#pragma mark - end
 
 //Delete group notify
 - (void)xmppRoomDeleteSuccess {
@@ -962,16 +1037,16 @@
 
 }
 
-- (void)XmppUserPresenceUpdateNotify {
-    
-//    switch ([self getPresenceStatus:friendUserJid]) {
-//        case 0:     // online/available
-//            [self userOnline];
-//            break;
-//        default:    //offline
-//            [self userOffline];
-//            break;
-//    }
+- (void)XmppGroupUserPresenceUpdateNotify:(NSNotification *)notification {
+
+    switch ([self getPresenceStatus:notification.object]) {
+        case 0:     // online/available
+            [membersPresentStatus setObject:[NSNumber numberWithBool:YES] forKey:notification.object];
+            break;
+        default:    //offline
+            [membersPresentStatus setObject:[NSNumber numberWithBool:NO] forKey:notification.object];
+            break;
+    }
 }
 
 - (void)historyUpdateNotify:(NSXMLElement *)message {

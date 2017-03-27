@@ -509,6 +509,7 @@
 - (void)deallocGroupChatVariables {
 
     appDelegate.selectedFriendUserId=@"";
+    appDelegate.selectedMemberUserIds=[NSMutableArray new];
     appDelegate.xmppRoomAppDelegateObje=nil;
     appDelegate.chatRoomAppDelegateImage=nil;
     appDelegate.chatRoomAppDelegateDescription=@"";

@@ -104,7 +104,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 @synthesize chatRoomAppDelegateDescription;
 @synthesize chatRoomAppDelegateRoomJid;
 @synthesize chatRoomAppDelegateImage;
-@synthesize chatRoomAppDelegateSelectedRoomOwnerJid;
+@synthesize chatRoomAppDelegateSelectedRoomOwnerJid, selectedMemberUserIds;
 //end
 
 @synthesize afterAutentication,afterAutenticationRegistration;
@@ -864,6 +864,34 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         }
         //Send presence status and set at particular jid in xmppUserDetailedList key
         [[NSNotificationCenter defaultCenter] postNotificationName:@"XmppUserPresenceUpdate" object:nil];
+    }
+    else if (isContactListIsLoaded && xmppUserListArray!=nil && [NSString stringWithFormat:@"%@",[presence from]]!=nil && [xmppUserListArray containsObject:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]] && [selectedMemberUserIds containsObject:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]]) {
+        
+        //        switch (section)
+        //        {
+        //            case 0  :
+        //                label.text = @"Available";
+        //                label.textColor=[UIColor colorWithRed:13.0/255.0 green:213.0/255.0 blue:178.0/255.0 alpha:1.0];
+        //                break;
+        //            case 1  :
+        //                label.text =  @"Away";
+        //                label.textColor=[UIColor yellowColor];
+        //                break;
+        //            default :
+        //                label.text =  @"Offline";
+        //                label.textColor=[UIColor redColor];
+        //                break;
+        //        }
+        
+        XMPPUserCoreDataStorageObject *user=[xmppUserDetailedList objectForKey:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]];
+        if ([presenceType isEqualToString:@"available"]) {
+            user.sectionNum=[NSNumber numberWithInt:0];
+        }
+        else {
+            user.sectionNum=[NSNumber numberWithInt:2];
+        }
+        //Send presence status and set at particular jid in xmppUserDetailedList key
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"XmppGroupUserPresenceUpdate" object:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]];
     }
     else if(nil!=groupDeleteInfo && [groupDeleteInfo containsString:@"muc#user"]) {
     

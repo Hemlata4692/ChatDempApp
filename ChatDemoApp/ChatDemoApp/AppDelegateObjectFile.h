@@ -160,6 +160,7 @@ XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate>
 - (NSData *)listionSendAttachedLocationImageCacheDirectoryFileName:(NSString *)fileName;
 
 //Group chat
+@property(strong, nonatomic)NSMutableArray *selectedMemberUserIds;
 @property(nonatomic,strong) NSMutableArray *groupChatMyBookMarkConferences;
 @property(nonatomic,strong) NSMutableArray *groupChatRoomInfoList;
 @property(nonatomic,strong) NSString *groupDeleteid;

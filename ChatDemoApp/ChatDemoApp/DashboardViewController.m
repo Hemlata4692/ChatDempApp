@@ -197,7 +197,19 @@
         userImage.layer.cornerRadius=20;
         userImage.layer.masksToBounds=YES;
         
-        statusLabel.text=[[historyElement elementForName:@"body"] stringValue];
+        if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"FileAttachment"]) {
+            statusLabel.text=@"File \U0001F4D1";
+        }
+        else if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"ImageAttachment"]) {
+            statusLabel.text=@"Photo \U0001F4F7";
+        }
+        else if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"Location"]) {
+            statusLabel.text=@"Location \U0001F4CC";
+        }
+        else {
+            statusLabel.text=[[historyElement elementForName:@"body"] stringValue];
+        }
+//        statusLabel.text=[[historyElement elementForName:@"body"] stringValue];
         dateLabel.text=[self changeTimeFormat:[innerData attributeStringValueForName:@"time"]];
         //        NSLog(@" userStatus:%@ \n phoneNumber:%@ Desc:%@ \n address:%@ \n emailid:%@ \n birthDay:%@ \n gender:%@",[profileDic objectForKey:@"UserStatus"],[profileDic objectForKey:@"PhoneNumber"],[profileDic objectForKey:@"Description"],[profileDic objectForKey:@"Address"],[profileDic objectForKey:@"EmailAddress"],[profileDic objectForKey:@"UserBirthDay"],[profileDic objectForKey:@"Gender"]);
     }
@@ -216,6 +228,41 @@
     }
     return cell;
 }
+
+
+//{
+//    [super viewDidLoad];
+//    //1F601,1F602,1F603,1F604,1F605,1F606
+//    emojiArray=[[NSArray alloc]initWithObjects:@"\U0001F601",@"\U0001F602",@"\U0001F603",@"\U0001F604",@"\U0001F605",@"\U0001F606", nil];
+//    _emoji6.text=[emojiArray objectAtIndex:5];
+//    _emoji5.text=[emojiArray objectAtIndex:4];
+//    _emoji4.text=[emojiArray objectAtIndex:3];
+//    _emoji3.text=[emojiArray objectAtIndex:2];
+//    _emoji2.text=[emojiArray objectAtIndex:1];
+//    _emoji1.text=[emojiArray objectAtIndex:0];
+//    
+//    //utf-8
+//    //    _emoji1.text = [NSString stringWithFormat:@"%C", 0xe04f];
+//    //    //unicode
+//    //    _emoji2.text=@"\U0001F601";
+//    //
+//    //    //string with emoji
+//    //    NSString *str = @"Happy to help you \U0001F431";
+//    //
+//    //    NSData *data = [str dataUsingEncoding:NSNonLossyASCIIStringEncoding];
+//    //    NSString *valueUnicode = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+//    //
+//    //    NSData *dataa = [valueUnicode dataUsingEncoding:NSUTF8StringEncoding];
+//    //    NSString *valueEmoj = [[NSString alloc] initWithData:dataa encoding:NSNonLossyASCIIStringEncoding];
+//    //    NSLog(@"%@",valueEmoj);
+//    //
+//    //    _emoji3.text = @"\ue04b";
+//    //    _emoji4.text=@"\ue420";
+//    //    //utf-8
+//    //    _emoji5.text=@"\xF0\x9F\x99\x8F";
+//    //    _emoji6.text=@"\ue40c";
+//    // Do any additional setup after loading the view, typically from a nib.
+//}
 
 - (NSString *)changeTimeFormat:(NSString *)timeString {
     

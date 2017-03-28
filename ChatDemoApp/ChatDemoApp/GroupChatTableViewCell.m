@@ -76,7 +76,8 @@
     else {
 //        self.userImage.image=friendUserPhoto;
         [self getProfileImageUsingJid:[innerData attributeStringValueForName:@"from"] cellImage:self.userImage];
-        self.nameLabel.textColor=[memberColor objectForKey:[innerData attributeStringValueForName:@"from"]];
+//        self.nameLabel.textColor=[memberColor objectForKey:[innerData attributeStringValueForName:@"from"]];
+        self.nameLabel.textColor=[UIColor blueColor];
     }
     
     self.nameLabel.translatesAutoresizingMaskIntoConstraints=YES;

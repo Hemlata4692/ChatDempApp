@@ -593,7 +593,7 @@
     groupMemberList=[NSMutableDictionary new];
     for (NSString *listItem in memberList) {
         
-        [groupMemberList setObject:[self randomColor] forKey:listItem];
+//        [groupMemberList setObject:[self randomColor] forKey:listItem];
         switch ([self getPresenceStatus:listItem]) {
             case 0:     // online/available
                 [membersPresentStatus setObject:[NSNumber numberWithBool:YES] forKey:listItem];
@@ -1026,7 +1026,8 @@
     
     if (status==1) {
         
-//        [self sendImageAttachment:imageName imageCaption:imageCaption friendName:self.friendUserName];//friendName:self.friendUserName
+        [self sendImageAttachment:imageName imageCaption:imageCaption roomName:[roomDetail objectForKey:@"roomName"]];//friendName:self.friendUserName
+//        [self sendLocationXmppMessage:[roomDetail objectForKey:@"roomJid"] roomName:[roomDetail objectForKey:@"roomName"]  messageString:locationAddress latitude:latitude longitude:longitude]
     }
 }
 

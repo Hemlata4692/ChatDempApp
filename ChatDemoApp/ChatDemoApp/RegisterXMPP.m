@@ -307,7 +307,7 @@
         if (isRegisterAuthenticate) {
             if (methodCallingCount==0) {
                 methodCallingCount=1;
-                [appDelegate methodCalling:xmppProfileData];
+                [appDelegate registerProfileImageUploading:xmppProfileData];
             }
             else {
                 

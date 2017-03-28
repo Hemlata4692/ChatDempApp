@@ -1010,8 +1010,42 @@
 - (void)historyUpdateNotify:(NSXMLElement *)message {}
 - (void)XmppGroupUserPresenceUpdateNotify:(NSNotification *)notification {}
 
+#pragma mark - Send document/Image
+- (void)sendImageAttachment:(NSString *)fileName imageCaption:(NSString *)imageCaption roomName:(NSString *)roomName {
+    
+    fileAttachmentMessage=nil;
+    uniqueId=@"";
+    NSData *imageData=[appDelegate listionSendAttachedImageCacheDirectoryFileName:fileName];
+    XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/1111111112",appDelegate.chatRoomAppDelegateRoomJid]];
+    //    if (!_fileTransfer) {
+    _fileTransfer = [[XMPPOutgoingFileTransfer alloc]
+                     initWithDispatchQueue:dispatch_get_main_queue()];
+    _fileTransfer.disableIBB = NO;
+    _fileTransfer.disableSOCKS5 = YES;
+    [_fileTransfer activate:myDelegate.xmppStream];
+    [_fileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    //    }
+    
+    uniqueId=[[fileName componentsSeparatedByString:@"."] objectAtIndex:0];
+    fileAttachmentMessage=[self convertedMessage:appDelegate.chatRoomAppDelegateRoomJid roomName:roomName fileName:fileName messageString:imageCaption fileType:@"ImageAttachment"];
+    NSError *err;
+    //    if (![_fileTransfer sendData:imageData
+    //                           named:fileName
+    //                     toRecipient:jid
+    //                     description:imageCaption
+    //                           error:&err]) {
+    //        NSLog(@"You messed something up: %@", err);
+    //    }
+    
+    
+    NSXMLElement *messageData=[fileAttachmentMessage elementForName:@"data"];
+    if ([_fileTransfer sendCustomizedData:imageData named:fileName toRecipient:jid description:imageCaption date:[messageData attributeStringValueForName:@"date"] time:[messageData attributeStringValueForName:@"time"] senderId:[messageData attributeStringValueForName:@"from"] chatType:@"ImageAttachment" senderName:appDelegate.xmppLogedInUserName receiverName:roomName error:&err]) {
+        
+        [[XmppCoreDataHandler sharedManager] insertLocalImageMessageStorageDataBase:appDelegate.chatRoomAppDelegateRoomJid message:fileAttachmentMessage uniquiId:uniqueId];
+        [self sendFileProgressDelegate:[fileAttachmentMessage copy]];
+    }
+}
 
-#pragma mark - Send document
 - (void)sendDocumentAttachment:(NSString *)fileName roomName:(NSString *)roomName {
     
     fileAttachmentMessage=nil;

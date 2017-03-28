@@ -97,7 +97,7 @@ XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate>
 -(BOOL)connect;
 -(void)disconnect;
 -(void)editProfileImageUploading:(NSMutableDictionary *)profileData;
--(void)methodCalling:(NSMutableDictionary *)profileData;
+-(void)registerProfileImageUploading:(NSMutableDictionary *)profileData;
 
 - (NSManagedObjectContext *)managedObjectContext_roster;
 - (NSManagedObjectContext *)managedObjectContext_capabilities;

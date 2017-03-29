@@ -17,6 +17,7 @@
 
 //File transfer
 #import "XMPPIncomingFileTransfer.h"
+#import "XMPPOutgoingFileTransfer.h"
 
 //Group chat
 #import <XMPPRoomMemoryStorage.h>
@@ -25,7 +26,7 @@
 //end
 
 @interface AppDelegateObjectFile : UIResponder<XMPPRosterDelegate,XMPPStreamDelegate,
-XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate>
+XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate,XMPPOutgoingFileTransferDelegate>
 {
     XMPPStream *xmppStream;
     XMPPReconnect *xmppReconnect;
@@ -45,6 +46,7 @@ XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate>
     
     //File transfer
     XMPPIncomingFileTransfer *xmppIncomingFileTransfer;
+    XMPPOutgoingFileTransfer *xmppOutgoingFileTransfer;
     
     XMPPMUC *_xmppMUC;//Group chat
     XMPPAutoPing *xmppAutoPing;
@@ -160,6 +162,7 @@ XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate>
 - (NSData *)listionSendAttachedLocationImageCacheDirectoryFileName:(NSString *)fileName;
 
 //Group chat
+@property(strong, nonatomic)NSMutableDictionary *xmppSendGroupAttachment;
 @property(strong, nonatomic)NSMutableArray *selectedMemberUserIds;
 @property(nonatomic,strong) NSMutableArray *groupChatMyBookMarkConferences;
 @property(nonatomic,strong) NSMutableArray *groupChatRoomInfoList;
@@ -171,5 +174,7 @@ XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate>
 @property(nonatomic,strong) NSString *chatRoomAppDelegateRoomJid;
 @property(nonatomic,strong) UIImage *chatRoomAppDelegateImage;
 - (NSData*)reducedImageSize:(UIImage *)selectedImage;
+//Send document/Images
+- (void)sendImageDocumentAppdelegateMethod:(NSString *)fileName imageCaption:(NSString *)imageCaption roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid;
 //end
 @end

@@ -604,7 +604,6 @@
         }
     }
     [self.chatTableView reloadData];
-    [myDelegate stopIndicator];
 //    [self sendXmppMessage:[roomDetail objectForKey:@"roomJid"] subjectName:[roomDetail objectForKey:@"roomName"] messageString:messageTextView.text];
 }
 
@@ -1001,7 +1000,7 @@
         NSIndexPath* ip = [NSIndexPath indexPathForRow:userData.count-1 inSection:0];
         [chatTableView scrollToRowAtIndexPath:ip atScrollPosition:UITableViewScrollPositionBottom animated:NO];
     }
-
+    [myDelegate stopIndicator];
 }
 
 - (void)XmppGroupUserPresenceUpdateNotify:(NSNotification *)notification {
@@ -1026,8 +1025,31 @@
     
     if (status==1) {
         
-        [self sendImageAttachment:imageName imageCaption:imageCaption roomName:[roomDetail objectForKey:@"roomName"]];//friendName:self.friendUserName
-//        [self sendLocationXmppMessage:[roomDetail objectForKey:@"roomJid"] roomName:[roomDetail objectForKey:@"roomName"]  messageString:locationAddress latitude:latitude longitude:longitude]
+//        switch ([self getPresenceStatus:notification.object]) {
+//            case 0:     // online/available
+//                [membersPresentStatus setObject:[NSNumber numberWithBool:YES] forKey:notification.object];
+//                break;
+//            default:    //offline
+//                [membersPresentStatus setObject:[NSNumber numberWithBool:NO] forKey:notification.object];
+//                break;
+//        }
+        NSArray *keys=[membersPresentStatus allKeys];
+        NSMutableArray *onlineMember=[NSMutableArray new];
+        for (NSString *key in keys) {
+            
+            if ([[membersPresentStatus objectForKey:key] boolValue]) {
+                
+                [onlineMember addObject:[[key componentsSeparatedByString:@"@"] objectAtIndex:0]];
+//                [onlineMember addObject:@"0000000000"];
+            }
+        }
+        if (onlineMember.count>0) {
+            [self sendImageAttachment:imageName imageCaption:imageCaption roomName:[roomDetail objectForKey:@"roomName"] memberlist:onlineMember];
+        }
+        else {
+            [UserDefaultManager showAlertMessage:@"Alert" message:@"All Recipient may be offline."];
+        }
+        
     }
 }
 

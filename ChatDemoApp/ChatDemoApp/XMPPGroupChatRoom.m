@@ -44,6 +44,11 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(historUpdated:) name:@"UserHistory" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XmppGroupUserPresenceUpdateNotify:) name:@"XmppGroupUserPresenceUpdate" object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sendFileSuccessNotify:) name:@"SendFileSuccessNotify" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sendFileFailNotify:) name:@"SendFileFailNotify" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sendFileProgressNotify:) name:@"SendFileProgressNotify" object:nil];
+
     // Do any additional setup after loading the view.
 }
 
@@ -302,9 +307,20 @@
     [xmppRoom addDelegate:self delegateQueue:dispatch_get_main_queue()];
 
     //This method is used to create group if not exist and if this group is exist then join it
-    [xmppRoom joinRoomUsingNickname:[[appDelegate.xmppLogedInUserId componentsSeparatedByString:@"@"] objectAtIndex:0]
-                            history:nil
-                           password:nil];
+//    [xmppRoom joinRoomUsingNickname:[[appDelegate.xmppLogedInUserId componentsSeparatedByString:@"@"] objectAtIndex:0]
+//                            history:nil
+//                           password:nil];
+    NSString *fetchID = @"GroupAdminList";
+    
+    NSXMLElement *item = [NSXMLElement elementWithName:@"item"];
+    [item addAttributeWithName:@"affiliation" stringValue:@"admin"];
+    
+    NSXMLElement *query = [NSXMLElement elementWithName:@"query" xmlns:XMPPMUCAdminNamespace];
+    [query addChild:item];
+    
+    XMPPIQ *iq = [XMPPIQ iqWithType:@"get" to:[xmppRoom roomJID] elementID:fetchID child:query];
+    
+    [self.xmppStream sendElement:iq];
 }
 
 - (void)xmppRoomDidCreate:(XMPPRoom *)sender{
@@ -1009,42 +1025,87 @@
 
 - (void)historyUpdateNotify:(NSXMLElement *)message {}
 - (void)XmppGroupUserPresenceUpdateNotify:(NSNotification *)notification {}
-
 #pragma mark - Send document/Image
-- (void)sendImageAttachment:(NSString *)fileName imageCaption:(NSString *)imageCaption roomName:(NSString *)roomName {
+- (void)sendImageAttachment:(NSString *)fileName imageCaption:(NSString *)imageCaption roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist {
     
-    fileAttachmentMessage=nil;
-    uniqueId=@"";
-    NSData *imageData=[appDelegate listionSendAttachedImageCacheDirectoryFileName:fileName];
-    XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/1111111112",appDelegate.chatRoomAppDelegateRoomJid]];
-    //    if (!_fileTransfer) {
-    _fileTransfer = [[XMPPOutgoingFileTransfer alloc]
-                     initWithDispatchQueue:dispatch_get_main_queue()];
-    _fileTransfer.disableIBB = NO;
-    _fileTransfer.disableSOCKS5 = YES;
-    [_fileTransfer activate:myDelegate.xmppStream];
-    [_fileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
-    //    }
+//    - (void)sendImageDocumentAppdelegateMethod:(NSString *)fileName imageCaption:(NSString *)imageCaption roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid
     
-    uniqueId=[[fileName componentsSeparatedByString:@"."] objectAtIndex:0];
-    fileAttachmentMessage=[self convertedMessage:appDelegate.chatRoomAppDelegateRoomJid roomName:roomName fileName:fileName messageString:imageCaption fileType:@"ImageAttachment"];
-    NSError *err;
-    //    if (![_fileTransfer sendData:imageData
-    //                           named:fileName
-    //                     toRecipient:jid
-    //                     description:imageCaption
-    //                           error:&err]) {
-    //        NSLog(@"You messed something up: %@", err);
-    //    }
+    [appDelegate sendImageDocumentAppdelegateMethod:fileName imageCaption:imageCaption roomName:roomName memberlist:[memberlist mutableCopy] type:@"image" roomJid:appDelegate.chatRoomAppDelegateRoomJid];
+//    fileAttachmentMessage=nil;
+//    uniqueId=@"";
+//    NSData *imageData=[appDelegate listionSendAttachedImageCacheDirectoryFileName:fileName];
+//    
+//    //    if (!_fileTransfer) {
+//    _fileTransfer = [[XMPPOutgoingFileTransfer alloc]
+//                     initWithDispatchQueue:dispatch_get_main_queue()];
+//    _fileTransfer.disableIBB = NO;
+//    _fileTransfer.disableSOCKS5 = YES;
+//    [_fileTransfer activate:myDelegate.xmppStream];
+//    [_fileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
+//    //    }
+//    
+//    uniqueId=[[fileName componentsSeparatedByString:@"."] objectAtIndex:0];
+//    fileAttachmentMessage=[self convertedMessage:appDelegate.chatRoomAppDelegateRoomJid roomName:roomName fileName:fileName messageString:imageCaption fileType:@"ImageAttachment"];
+//    NSError *err;
+//    //    if (![_fileTransfer sendData:imageData
+//    //                           named:fileName
+//    //                     toRecipient:jid
+//    //                     description:imageCaption
+//    //                           error:&err]) {
+//    //        NSLog(@"You messed something up: %@", err);
+//    //    }
+//    
+//    
+//
+//    for (NSString *s in memberlist) {
+//        XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",appDelegate.chatRoomAppDelegateRoomJid,s]];
+//        NSLog(@"jid------------->> %@",jid);
+//        NSXMLElement *messageData=[fileAttachmentMessage elementForName:@"data"];
+//        if ([_fileTransfer sendCustomizedData:imageData named:fileName toRecipient:jid description:imageCaption date:[messageData attributeStringValueForName:@"date"] time:[messageData attributeStringValueForName:@"time"] senderId:[messageData attributeStringValueForName:@"from"] chatType:@"ImageAttachment" senderName:appDelegate.xmppLogedInUserName receiverName:roomName error:&err]) {
+//            
+////            [[XmppCoreDataHandler sharedManager] insertLocalImageMessageStorageDataBase:appDelegate.chatRoomAppDelegateRoomJid message:fileAttachmentMessage uniquiId:uniqueId];
+//            [[XmppCoreDataHandler sharedManager] updateLocalMessageStorageDatabaseBareJidStr:appDelegate.chatRoomAppDelegateRoomJid message:fileAttachmentMessage uniquiId:uniqueId];
+//            [self sendFileProgressDelegate:[fileAttachmentMessage copy]];
+//        }
+//    }
     
-    
-    NSXMLElement *messageData=[fileAttachmentMessage elementForName:@"data"];
-    if ([_fileTransfer sendCustomizedData:imageData named:fileName toRecipient:jid description:imageCaption date:[messageData attributeStringValueForName:@"date"] time:[messageData attributeStringValueForName:@"time"] senderId:[messageData attributeStringValueForName:@"from"] chatType:@"ImageAttachment" senderName:appDelegate.xmppLogedInUserName receiverName:roomName error:&err]) {
-        
-        [[XmppCoreDataHandler sharedManager] insertLocalImageMessageStorageDataBase:appDelegate.chatRoomAppDelegateRoomJid message:fileAttachmentMessage uniquiId:uniqueId];
-        [self sendFileProgressDelegate:[fileAttachmentMessage copy]];
-    }
 }
+
+//- (void)sendImageAttachment:(NSString *)fileName imageCaption:(NSString *)imageCaption roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist {
+//    
+//    fileAttachmentMessage=nil;
+//    uniqueId=@"";
+//    NSData *imageData=[appDelegate listionSendAttachedImageCacheDirectoryFileName:fileName];
+//    XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/1111111112",appDelegate.chatRoomAppDelegateRoomJid]];
+//    //    if (!_fileTransfer) {
+//    _fileTransfer = [[XMPPOutgoingFileTransfer alloc]
+//                     initWithDispatchQueue:dispatch_get_main_queue()];
+//    _fileTransfer.disableIBB = NO;
+//    _fileTransfer.disableSOCKS5 = YES;
+//    [_fileTransfer activate:myDelegate.xmppStream];
+//    [_fileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
+//    //    }
+//    
+//    uniqueId=[[fileName componentsSeparatedByString:@"."] objectAtIndex:0];
+//    fileAttachmentMessage=[self convertedMessage:appDelegate.chatRoomAppDelegateRoomJid roomName:roomName fileName:fileName messageString:imageCaption fileType:@"ImageAttachment"];
+//    NSError *err;
+//    //    if (![_fileTransfer sendData:imageData
+//    //                           named:fileName
+//    //                     toRecipient:jid
+//    //                     description:imageCaption
+//    //                           error:&err]) {
+//    //        NSLog(@"You messed something up: %@", err);
+//    //    }
+//    
+//    
+//    NSXMLElement *messageData=[fileAttachmentMessage elementForName:@"data"];
+//    if ([_fileTransfer sendCustomizedData:imageData named:fileName toRecipient:jid description:imageCaption date:[messageData attributeStringValueForName:@"date"] time:[messageData attributeStringValueForName:@"time"] senderId:[messageData attributeStringValueForName:@"from"] chatType:@"ImageAttachment" senderName:appDelegate.xmppLogedInUserName receiverName:roomName error:&err]) {
+//        
+//        [[XmppCoreDataHandler sharedManager] insertLocalImageMessageStorageDataBase:appDelegate.chatRoomAppDelegateRoomJid message:fileAttachmentMessage uniquiId:uniqueId];
+//        [self sendFileProgressDelegate:[fileAttachmentMessage copy]];
+//    }
+//}
+
 
 - (void)sendDocumentAttachment:(NSString *)fileName roomName:(NSString *)roomName {
     
@@ -1162,6 +1223,19 @@
     [successMessage addAttributeWithName:@"progress" stringValue:@"1"];
     [[XmppCoreDataHandler sharedManager] updateLocalMessageStorageDatabaseBareJidStr:appDelegate.chatRoomAppDelegateRoomJid message:successMessage uniquiId:uniqueId];
     [self sendFileSuccessDelegate:successMessage uniquiId:uniqueId];
+}
+
+
+- (void)sendFileSuccessNotify:(NSNotification *)notification {
+
+}
+
+- (void)sendFileFailNotify:(NSNotification *)notification {
+    
+}
+
+- (void)sendFileProgressNotify:(NSNotification *)notification {
+    
 }
 
 - (void)sendFileSuccessDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId{}

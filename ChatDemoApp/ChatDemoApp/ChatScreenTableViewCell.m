@@ -98,6 +98,11 @@
     
     self.nameLabel.frame=CGRectMake(76, 5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"nameHeight"] floatValue]); //Here frame = (Namelabel_x_Space, NameLabel_TopSpace, screenWidth - (Namelabel_x_Space + Namelabel_trailingSpace), NameHeight)
 
+    self.attachedImageView.backgroundColor=[UIColor clearColor];
+    self.attachedImageView.layer.cornerRadius=0;
+    self.attachedImageView.layer.masksToBounds=YES;
+    self.attachedImageView.contentMode=UIViewContentModeScaleToFill;
+    
     if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]) {
         self.attachedImageView.frame=CGRectMake(76, (5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+5), 200, 128); //Here frame = (AttachedImage_x_Space, (NameLabel_TopSpace + NameLabel_Height + space_Between_NameLabel_And_AttachedImage), AttachedImage_width, AttachedImage_height
         if ([chatType isEqualToString:@"FileAttachment"]) {
@@ -113,6 +118,12 @@
             self.attachedImageView.image=[UIImage imageNamed:@"locationPlaceholder.jpg"];
         }
         else {
+            
+            self.attachedImageView.backgroundColor=[UIColor colorWithRed:215.0/255.0 green:215.0/255.0 blue:215.0/255.0 alpha:1.0];
+            self.attachedImageView.layer.cornerRadius=8;
+            self.attachedImageView.layer.masksToBounds=YES;
+            self.attachedImageView.contentMode=UIViewContentModeScaleAspectFit;
+            
             self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
         }
     }
@@ -156,6 +167,11 @@
         self.messageLabel.numberOfLines=0;
         self.messageLabel.text=[[currentMessage elementForName:@"body"] stringValue];
         
+        self.attachedImageView.backgroundColor=[UIColor clearColor];
+        self.attachedImageView.layer.cornerRadius=0;
+        self.attachedImageView.layer.masksToBounds=YES;
+        self.attachedImageView.contentMode=UIViewContentModeScaleToFill;
+        
         if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]) {
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 128); //Here frame = (AttachedImage_x_Space, attachedImageView_TopSpace, AttachedImage_width, AttachedImage_height
             
@@ -172,6 +188,11 @@
                 self.attachedImageView.image=[UIImage imageNamed:@"locationPlaceholder.jpg"];
             }
             else {
+                self.attachedImageView.backgroundColor=[UIColor colorWithRed:215.0/255.0 green:215.0/255.0 blue:215.0/255.0 alpha:1.0];
+                self.attachedImageView.layer.cornerRadius=8;
+                self.attachedImageView.layer.masksToBounds=YES;
+                self.attachedImageView.contentMode=UIViewContentModeScaleAspectFit;
+                
                 self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
             }
         }
@@ -190,6 +211,11 @@
         self.messageLabel.numberOfLines=0;
         self.messageLabel.text=[[currentMessage elementForName:@"body"] stringValue];
         
+        self.attachedImageView.backgroundColor=[UIColor clearColor];
+        self.attachedImageView.layer.cornerRadius=0;
+        self.attachedImageView.layer.masksToBounds=YES;
+        self.attachedImageView.contentMode=UIViewContentModeScaleToFill;
+        
         if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]) {
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 128); //Here frame = (AttachedImage_x_Space, attachedImageView_TopSpace, AttachedImage_width, AttachedImage_height
             if ([chatType isEqualToString:@"FileAttachment"]) {
@@ -205,6 +231,12 @@
                 self.attachedImageView.image=[UIImage imageNamed:@"locationPlaceholder.jpg"];
             }
             else {
+                
+                self.attachedImageView.backgroundColor=[UIColor colorWithRed:215.0/255.0 green:215.0/255.0 blue:215.0/255.0 alpha:1.0];
+                self.attachedImageView.layer.cornerRadius=8;
+                self.attachedImageView.layer.masksToBounds=YES;
+                self.attachedImageView.contentMode=UIViewContentModeScaleAspectFit;
+                
                 self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
             }
         }
@@ -253,6 +285,11 @@
         self.messageLabel.numberOfLines=0;
         NSLog(@"%f %@",[[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue], [innerData attributeStringValueForName:@"messageBodyHeight"]);
         
+        self.attachedImageView.backgroundColor=[UIColor clearColor];
+        self.attachedImageView.layer.cornerRadius=0;
+        self.attachedImageView.layer.masksToBounds=YES;
+        self.attachedImageView.contentMode=UIViewContentModeScaleToFill;
+        
         if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]) {
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 128); //Here frame = (AttachedImage_x_Space, attachedImageView_TopSpace, AttachedImage_width, AttachedImage_height
             
@@ -269,6 +306,11 @@
                 self.attachedImageView.image=[UIImage imageNamed:@"locationPlaceholder.jpg"];
             }
             else {
+                self.attachedImageView.backgroundColor=[UIColor colorWithRed:215.0/255.0 green:215.0/255.0 blue:215.0/255.0 alpha:1.0];
+                self.attachedImageView.layer.cornerRadius=8;
+                self.attachedImageView.layer.masksToBounds=YES;
+                self.attachedImageView.contentMode=UIViewContentModeScaleAspectFit;
+                
                 self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
             }
         }

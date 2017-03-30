@@ -633,6 +633,15 @@
     [self.dasboardTableListing reloadData];
 }
 #pragma mark - end
+
+#pragma mark - Refresh connection
+- (void)XMPPReloadConnection {
+
+    profileLocalDictData=[NSMutableDictionary new];
+    [myDelegate showIndicator];
+    [self performSelector:@selector(reloadUserData) withObject:nil afterDelay:0.1];
+}
+#pragma mark - end
 /*
 #pragma mark - Navigation
 

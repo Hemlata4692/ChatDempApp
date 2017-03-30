@@ -31,6 +31,7 @@
     appDelegate = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
     appDelegate.myView=@"DashboardXmppUserList";
     appDelegate.isContactListIsLoaded=NO;
+     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPReloadConnection) name:@"XMPPReloadConnection" object:nil];
 //    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppUserListNotificationResponse) name:@"XMPPUserListResponse" object:nil];
     
     // Do any additional setup after loading the view.
@@ -67,6 +68,7 @@
     [super viewWillDisappear:YES];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPReloadConnection) name:@"XMPPReloadConnection" object:nil];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -536,6 +538,8 @@
     
     return [[[message attributeForName:@"type"] stringValue] isEqualToString:@"groupchat"];
 }
+
+- (void)XMPPReloadConnection {}
 /*
 #pragma mark - Navigation
 

@@ -365,7 +365,7 @@
                                                 <button opaque="NO" tag="3" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iuv-wc-CWd" customClass="MyButton">
                                                     <rect key="frame" x="12" y="10" width="40" height="40"/>
                                                 </button>
-                                                <label opaque="NO" userInteractionEnabled="NO" tag="5" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="12:23 pm" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uAs-nb-2nH">
+                                                <label opaque="NO" userInteractionEnabled="NO" tag="5" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="12:23 pm" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uAs-nb-2nH">
                                                     <rect key="frame" x="251" y="10" width="61" height="21"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="61" id="eR0-2U-yU6"/>

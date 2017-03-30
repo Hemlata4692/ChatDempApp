@@ -49,4 +49,7 @@
 
 - (BOOL)isChatTypeMessageElement:(NSXMLElement *)message;
 - (BOOL)isGroupChatTypeMessageElement:(NSXMLElement *)message;
+
+
+- (void)XMPPReloadConnection;
 @end

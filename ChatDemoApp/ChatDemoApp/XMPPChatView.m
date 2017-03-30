@@ -201,6 +201,7 @@
     [myDelegate.xmppMessageArchivingModule addDelegate:self delegateQueue:dispatch_get_main_queue()];
     NSString *messageStr = [messageString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
     [dateFormatter setDateFormat:@"HH:mm:ss"];
     NSDate *date = [NSDate date];
     //    [dateFormatter setDateFormat:@"hh:mm a"];

@@ -25,6 +25,8 @@
 #import <XMPPIDTracker.h>
 //end
 
+#import "Reachability.h"
+
 @interface AppDelegateObjectFile : UIResponder<XMPPRosterDelegate,XMPPStreamDelegate,
 XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate,XMPPOutgoingFileTransferDelegate>
 {
@@ -177,5 +179,12 @@ XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate,XMPPOutgoingFi
 //Send document/Images
 - (void)sendImageAppdelegateMethod:(NSString *)fileName imageCaption:(NSString *)imageCaption roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid;
 - (void)sendDocumentAppdelegateMethod:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid;
+//end
+
+
+//Internet reachability
+@property (nonatomic) Reachability *hostReachability;
+@property (nonatomic) Reachability *internetReachability;
+@property(nonatomic,assign) BOOL isReachable;
 //end
 @end

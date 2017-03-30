@@ -199,6 +199,19 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     
     
      [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(groupFileTransferSuccessFully) name:@"XMPPGroupFileTransferSuccessFully" object:nil];
+    
+    //Internet reachability
+    self.isReachable=YES;
+    NSString *remoteHostName = @"www.apple.com";
+    self.hostReachability = [Reachability reachabilityWithHostName:remoteHostName];
+    [self.hostReachability startNotifier];
+    [self updateInterfaceWithReachability:self.hostReachability];
+    
+    self.internetReachability = [Reachability reachabilityForInternetConnection];
+    [self.internetReachability startNotifier];
+    [self updateInterfaceWithReachability:self.internetReachability];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
+    //end
 }
 #pragma mark - end
 
@@ -2346,4 +2359,52 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     }
 }
 #pragma mark - end
+
+//Internet reachability
+- (void) reachabilityChanged:(NSNotification *)note {
+    
+    Reachability* curReach = [note object];
+    NSParameterAssert([curReach isKindOfClass:[Reachability class]]);
+    switch ([curReach currentReachabilityStatus])
+    {
+        case NotReachable:
+        {
+            NSLog(@"not reachable");
+            self.isReachable=NO;
+        }
+            break;
+        default:
+        {
+            NSLog(@"Reachable");
+            if (!self.isReachable) {
+                self.isReachable=YES;
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPReloadConnection" object:nil];
+            }
+        }
+            break;
+    }
+}
+
+- (void)updateInterfaceWithReachability:(Reachability *)reachability {
+    
+    switch ([reachability currentReachabilityStatus])
+    {
+        case NotReachable:
+        {
+            self.isReachable=NO;
+            NSLog(@"not reachable");
+        }
+            break;
+        default:
+        {
+            NSLog(@"Reachable");
+            if (!self.isReachable) {
+                self.isReachable=YES;
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPReloadConnection" object:nil];
+            }
+        }
+            break;
+    }
+}
+//end
 @end

@@ -22,6 +22,7 @@
 		B715A0C31E5EB55300B36D16 /* DocumentAttachmentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B715A0C21E5EB55300B36D16 /* DocumentAttachmentViewController.m */; };
 		B715A0C81E5EF47E00B36D16 /* pdf_placeholder.png in Resources */ = {isa = PBXBuildFile; fileRef = B715A0C71E5EF47E00B36D16 /* pdf_placeholder.png */; };
 		B71B73CD1E542BC600D57E7D /* SendImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B71B73CC1E542BC600D57E7D /* SendImageViewController.m */; };
+		B72D4EEE1E8D36E500D22E67 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = B72D4EED1E8D36E500D22E67 /* Reachability.m */; };
 		B72DD0781E5DAC0A0017C488 /* EditUserStatusViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B72DD0771E5DAC0A0017C488 /* EditUserStatusViewController.m */; };
 		B738ED431E6FFF99001AC7F5 /* GroupInvideTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B738ED421E6FFF99001AC7F5 /* GroupInvideTableViewCell.m */; };
 		B745F8291E234D55001119BD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B745F8281E234D55001119BD /* main.m */; };
@@ -97,6 +98,8 @@
 		B715A0C71E5EF47E00B36D16 /* pdf_placeholder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pdf_placeholder.png; sourceTree = "<group>"; };
 		B71B73CB1E542BC600D57E7D /* SendImageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SendImageViewController.h; sourceTree = "<group>"; };
 		B71B73CC1E542BC600D57E7D /* SendImageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SendImageViewController.m; sourceTree = "<group>"; };
+		B72D4EEC1E8D36E500D22E67 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
+		B72D4EED1E8D36E500D22E67 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		B72DD0761E5DAC0A0017C488 /* EditUserStatusViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditUserStatusViewController.h; sourceTree = "<group>"; };
 		B72DD0771E5DAC0A0017C488 /* EditUserStatusViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditUserStatusViewController.m; sourceTree = "<group>"; };
 		B738ED411E6FFF99001AC7F5 /* GroupInvideTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GroupInvideTableViewCell.h; sourceTree = "<group>"; };
@@ -322,6 +325,15 @@
 			name = ImageAttachment;
 			sourceTree = "<group>";
 		};
+		B72D4EEB1E8D36C300D22E67 /* InternetReachability */ = {
+			isa = PBXGroup;
+			children = (
+				B72D4EEC1E8D36E500D22E67 /* Reachability.h */,
+				B72D4EED1E8D36E500D22E67 /* Reachability.m */,
+			);
+			name = InternetReachability;
+			sourceTree = "<group>";
+		};
 		B72DD0751E5DABF20017C488 /* EditUserStatus */ = {
 			isa = PBXGroup;
 			children = (
@@ -463,6 +475,7 @@
 		B745F84D1E23535F001119BD /* HelperClasses */ = {
 			isa = PBXGroup;
 			children = (
+				B72D4EEB1E8D36C300D22E67 /* InternetReachability */,
 				B70BF22F1E812282005C5B03 /* ButtonClass */,
 				B77DFFE91E4C329E00921126 /* FileTransfer */,
 				B7CC6C511E27B0A000F471B6 /* XMPPFramework.h */,
@@ -733,6 +746,7 @@
 				B77EE6391E4DE73200A38ADD /* CustomFilterViewController.m in Sources */,
 				B75792581E42E22300AC48D0 /* UserProfileViewController.m in Sources */,
 				B75126E01E30745000495348 /* LoginXMPP.m in Sources */,
+				B72D4EEE1E8D36E500D22E67 /* Reachability.m in Sources */,
 				B70FC3061E6EB8DD00292950 /* GroupChatViewController.m in Sources */,
 				B738ED431E6FFF99001AC7F5 /* GroupInvideTableViewCell.m in Sources */,
 				B77DFFF51E4C32C500921126 /* XMPPOutgoingFileTransfer.m in Sources */,

@@ -864,7 +864,13 @@ receiverName:(NSString *)receiverName
                 
                 NSLog(@"%@",_outgoingFileName);
                 
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPFileTransferSuccessFully" object:nil];
+                if ([[NSString stringWithFormat:@"%@",_recipientJID] containsString:@"@conference"]) {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPGroupFileTransferSuccessFully" object:nil];
+                }
+                else {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPFileTransferSuccessFully" object:nil];
+                }
+                
 //                [multicastDelegate xmppOutgoingFileTransferDidSucceed:self];
 //               [self closeIBB];
                 //add post notification

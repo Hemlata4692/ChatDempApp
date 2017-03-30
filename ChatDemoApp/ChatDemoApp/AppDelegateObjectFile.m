@@ -196,6 +196,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     }
     
     [self createNotificationView];
+    
+    
+     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(groupFileTransferSuccessFully) name:@"XMPPGroupFileTransferSuccessFully" object:nil];
 }
 #pragma mark - end
 
@@ -2044,38 +2047,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 }
 #pragma mark - end
 
-//- (void)saveFirstLetterImageFolderName:(NSString *)tempFolderName imageName:(NSString*)imageName jid:(NSString *)jid success:(void(^)())completion {
-//    
-//    
-////    let lblNameInitialize = UILabel()
-////    lblNameInitialize.frame.size = CGSize(width: 100.0, height: 100.0)
-////    lblNameInitialize.textColor = UIColor.white
-////    lblNameInitialize.text = String(IBtxtFieldName.text!.characters.first!) + String(IBtxtFieldSurname.text!.characters.first!)
-////    lblNameInitialize.textAlignment = NSTextAlignment.center
-////    lblNameInitialize.backgroundColor = UIColor.black
-////    lblNameInitialize.layer.cornerRadius = 50.0
-////    
-////    UIGraphicsBeginImageContext(lblNameInitialize.frame.size)
-////    lblNameInitialize.layer.render(in: UIGraphicsGetCurrentContext()!)
-////    IBImgViewUserProfile.image = UIGraphicsGetImageFromCurrentImageContext()
-////    UIGraphicsEndImageContext()
-//    dispatch_queue_t queue = dispatch_queue_create("setFirstLetterImageQueue", DISPATCH_QUEUE_PRIORITY_DEFAULT);
-//    dispatch_async(queue, ^
-//                   {
-//                       
-//                       UILabel *firstLetterLabel=[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
-//                       UIImageView *firstLetterImageView=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 150, 150)];
-//                       firstLetterLabel.textColor=[UIColor whiteColor];
-//                       firstLetterLabel.text=[imageName substringFromIndex:1];;
-//                       
-//                       dispatch_async(dispatch_get_main_queue(), ^{
-//                           
-//                           completion();
-//                       });
-//                   });
-//}
-#pragma mark - end
-
 #pragma mark - Send document/Images
 - (void)sendImageDocumentAppdelegateMethod:(NSString *)fileName imageCaption:(NSString *)imageCaption roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid {
     
@@ -2285,7 +2256,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [self fileTransferHandling:YES];
 }
 
-- (void)fileTransferSuccessFully {
+- (void)groupFileTransferSuccessFully {
     
     NSLog(@"File transfer successful.");
     [self fileTransferHandling:YES];

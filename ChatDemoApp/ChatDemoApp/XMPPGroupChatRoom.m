@@ -49,6 +49,8 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sendFileFailNotify:) name:@"SendFileFailNotify" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sendFileProgressNotify:) name:@"SendFileProgressNotify" object:nil];
 
+    
+    
     // Do any additional setup after loading the view.
 }
 
@@ -1216,7 +1218,7 @@
     //    [alert show];
 }
 
-- (void)fileTransferSuccessFully {
+- (void)groupFileTransferSuccessFully {
     
     NSLog(@"File transfer successful.");
     NSXMLElement *successMessage=[fileAttachmentMessage copy];
@@ -1228,14 +1230,22 @@
 
 - (void)sendFileSuccessNotify:(NSNotification *)notification {
 
+    NSLog(@"%@",notification.object);
+    [self sendFileSuccessDelegate:[[notification.object objectForKey:@"Attachment"] copy] uniquiId:[notification.object objectForKey:@"UniqueId"]];
+//    [self sendFileSuccessDelegate:successMessage uniquiId:uniqueId];
 }
 
 - (void)sendFileFailNotify:(NSNotification *)notification {
     
+    NSLog(@"%@",notification.object);
+    [self sendFileFailDelegate:[[notification.object objectForKey:@"Attachment"] copy] uniquiId:[notification.object objectForKey:@"UniqueId"]];
 }
 
 - (void)sendFileProgressNotify:(NSNotification *)notification {
     
+    NSLog(@"%@",notification.object);
+    [self sendFileProgressDelegate:[[notification.object objectForKey:@"Attachment"] copy]];
+//    [self sendFileProgressDelegate:[fileAttachmentMessage copy]];
 }
 
 - (void)sendFileSuccessDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId{}

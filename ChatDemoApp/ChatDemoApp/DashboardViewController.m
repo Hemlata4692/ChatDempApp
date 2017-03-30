@@ -161,17 +161,22 @@
             
             //            profileDic=[[profileLocalDictData objectForKey:[historyElement attributeStringValueForName:@"from"]] mutableCopy];
             if ([self isChatTypeMessageElement:historyElement]) {
+                if ([[XMPPUserDefaultManager getXMPPBadgeIndicatorValue:[innerData attributeStringValueForName:@"from"]] intValue]!=0) {
+                    badgeLabel.hidden=NO;
+                    badgeLabel.text=[XMPPUserDefaultManager getXMPPBadgeIndicatorValue:[innerData attributeStringValueForName:@"from"]];
+                }
                  [self configurePhotoForCell:cell jid:[innerData attributeStringValueForName:@"from"]];
             }
             else {
+                if ([[XMPPUserDefaultManager getXMPPBadgeIndicatorValue:[innerData attributeStringValueForName:@"to"]] intValue]!=0) {
+                    badgeLabel.hidden=NO;
+                    badgeLabel.text=[XMPPUserDefaultManager getXMPPBadgeIndicatorValue:[innerData attributeStringValueForName:@"to"]];
+                }
                 userImage.image=[UIImage imageNamed:@"groupPlaceholderImage.png"];
             }
            
             nameLabel.text = [[innerData attributeStringValueForName:@"senderName"] capitalizedString];
-            if ([[XMPPUserDefaultManager getXMPPBadgeIndicatorValue:[innerData attributeStringValueForName:@"from"]] intValue]!=0) {
-                badgeLabel.hidden=NO;
-                badgeLabel.text=[XMPPUserDefaultManager getXMPPBadgeIndicatorValue:[innerData attributeStringValueForName:@"from"]];
-            }
+            
         }
         else {
             

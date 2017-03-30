@@ -1874,16 +1874,18 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
             
             [[XmppCoreDataHandler sharedManager] insertLocalMessageStorageDataBase:[innerElementData attributeStringValueForName:@"from"] message:message];
             
-            NSString *messageString;
-            if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"Location"]) {
-                messageString=@"Location";
+            if (![[innerElementData attributeStringValueForName:@"from"] isEqualToString:selectedFriendUserId]) {
+                NSString *messageString;
+                if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"Location"]) {
+                    messageString=@"Location";
+                }
+                else {
+                    messageString=[[message elementForName:@"body"] stringValue];
+                }
+                
+                [self addLocalNotification:[innerElementData attributeStringValueForName:@"senderName"] message:messageString userId:[innerElementData attributeStringValueForName:@"from"]];
+                [XMPPUserDefaultManager setXMPPBadgeIndicatorKey:[innerElementData attributeStringValueForName:@"from"]];
             }
-            else {
-                messageString=[[message elementForName:@"body"] stringValue];
-            }
-            
-            [self addLocalNotification:[innerElementData attributeStringValueForName:@"senderName"] message:messageString userId:[innerElementData attributeStringValueForName:@"from"]];
-            [XMPPUserDefaultManager setXMPPBadgeIndicatorKey:[innerElementData attributeStringValueForName:@"from"]];
         }
 //        else if ([[UIApplication sharedApplication] applicationState]==UIApplicationStateBackground) {
 //            [self addLocalNotification:[innerElementData attributeStringValueForName:@"senderName"] message:[[message elementForName:@"body"] stringValue] userId:[innerElementData attributeStringValueForName:@"from"]];

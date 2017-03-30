@@ -24,6 +24,8 @@
 	<string>117.240.110.83</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>We need to access your camera in order to attach them</string>
 	<key>NSContactsUsageDescription</key>
 	<string>We need to access your contacts in order to attach them</string>
 	<key>NSLocationAlwaysUsageDescription</key>

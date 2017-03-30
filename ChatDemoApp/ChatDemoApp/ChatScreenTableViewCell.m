@@ -82,7 +82,18 @@
     self.nameLabel.numberOfLines=0;
     self.messageLabel.numberOfLines=0;
     
-    self.nameLabel.text=[[innerData attributeStringValueForName:@"senderName"] capitalizedString];
+    NSString *nameString;
+    if (![[innerData attributeStringValueForName:@"from"] isEqualToString:[NSString stringWithFormat:@"%@",myDelegate.xmppLogedInUserId]]) {
+        
+        nameString=[innerData attributeStringValueForName:@"senderName"];
+    }
+    else {
+        
+        nameString=@"You";
+    }
+    self.nameLabel.text=[nameString capitalizedString];
+    
+//    self.nameLabel.text=[[innerData attributeStringValueForName:@"senderName"] capitalizedString];
     self.messageLabel.text=[[message elementForName:@"body"] stringValue];
     
     self.nameLabel.frame=CGRectMake(76, 5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"nameHeight"] floatValue]); //Here frame = (Namelabel_x_Space, NameLabel_TopSpace, screenWidth - (Namelabel_x_Space + Namelabel_trailingSpace), NameHeight)

@@ -309,8 +309,11 @@
 //        [tempDict setObject:[NSString stringWithFormat:@"%d",tempCount] forKey:keyName];
 //        [UserDefaultManager setValue:tempDict key:@"CountData"];
 //    }
+    
     NSXMLElement* message = [notification object];
-    [self historyUpdateNotify:message];
+    if (![[[[message elementForName:@"data"] attributeForName:@"to"] stringValue] containsString:@"@conference"]) {
+        [self historyUpdateNotify:message];
+    }
 }
 
 - (void)historyUpdateNotify:(NSXMLElement *)message {}

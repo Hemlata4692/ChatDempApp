@@ -2048,7 +2048,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 #pragma mark - end
 
 #pragma mark - Send document/Images
-- (void)sendImageDocumentAppdelegateMethod:(NSString *)fileName imageCaption:(NSString *)imageCaption roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid {
+- (void)sendImageAppdelegateMethod:(NSString *)fileName imageCaption:(NSString *)imageCaption roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid {
     
     if (nil==xmppSendGroupAttachment) {
         xmppSendGroupAttachment=[NSMutableDictionary new];
@@ -2080,45 +2080,58 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     
     [xmppSendGroupAttachment setObject:tempDictionary forKey:[[fileName componentsSeparatedByString:@"."] objectAtIndex:0]];
 //    [self sendImageAttachment:fileName imageCaption:imageCaption roomName:roomName merberJid:[memberlist objectAtIndex:0]];
-    [self sendImageAttachmentUniqueId:[[fileName componentsSeparatedByString:@"."] objectAtIndex:0]];
+    
+    dispatch_queue_t queue = dispatch_queue_create("groupFileTransferQueue", DISPATCH_QUEUE_PRIORITY_DEFAULT);
+    dispatch_async(queue, ^
+                   {
+                       [self sendImageAttachmentUniqueId:[[fileName componentsSeparatedByString:@"."] objectAtIndex:0]];
+                       dispatch_async(dispatch_get_main_queue(), ^{
+                       });
+                   });
 }
 
-- (void)sendImageDocumentAppdelegateMethod:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid {
+- (void)sendDocumentAppdelegateMethod:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid {
     
     if (nil==xmppSendGroupAttachment) {
         xmppSendGroupAttachment=[NSMutableDictionary new];
     }
+    else {
+        
+        NSArray *tempArray=[xmppSendGroupAttachment allKeys];
+        for(NSString *uID in tempArray) {
+            
+            NSMutableDictionary *tempDic=[[xmppSendGroupAttachment objectForKey:uID] mutableCopy];
+            [tempDic setObject:@"0" forKey:@"Status"];
+            [xmppSendGroupAttachment setObject:[tempDic mutableCopy] forKey:uID];
+        }
+    }
     
+    NSXMLElement *attachmentXml=[self convertedMessage:roomJid roomName:roomName fileName:fileName messageString:fileName fileType:@"FileAttachment"];
     NSMutableDictionary *tempDictionary=[NSMutableDictionary new];
+    [tempDictionary setObject:[[fileName componentsSeparatedByString:@"."] objectAtIndex:0] forKey:@"UniqueId"];
     [tempDictionary setObject:@"1" forKey:@"Status"];
     [tempDictionary setObject:@"2" forKey:@"Progress"];
-    [tempDictionary setObject:@"1" forKey:@"roomName"];
-    [tempDictionary setObject:@"1" forKey:@"fileName"];
+    [tempDictionary setObject:roomName forKey:@"roomName"];
+    [tempDictionary setObject:roomJid forKey:@"RoomJid"];
+    [tempDictionary setObject:fileName forKey:@"fileName"];
     [tempDictionary setObject:type forKey:@"Type"];
-    [tempDictionary setObject:@"1" forKey:@"Attachment"];
-//    [tempDictionary setObject:[self convertedMessage:roomJid roomName:roomName fileName:fileName messageString:imageCaption fileType:@"ImageAttachment"] forKey:@"Progress"]
-    
+    [tempDictionary setObject:[memberlist mutableCopy] forKey:@"MembersList"];
+    [tempDictionary setObject:[memberlist objectAtIndex:0] forKey:@"SelectedMember"];
+    [tempDictionary setObject:attachmentXml forKey:@"Attachment"];
     
     [xmppSendGroupAttachment setObject:tempDictionary forKey:[[fileName componentsSeparatedByString:@"."] objectAtIndex:0]];
+    //    [self sendImageAttachment:fileName imageCaption:imageCaption roomName:roomName merberJid:[memberlist objectAtIndex:0]];
+    dispatch_queue_t queue = dispatch_queue_create("groupFileTransferQueue", DISPATCH_QUEUE_PRIORITY_DEFAULT);
+    dispatch_async(queue, ^
+                   {
+                        [self sendDocumentAttachmentUniqueId:[[fileName componentsSeparatedByString:@"."] objectAtIndex:0]];
+                       dispatch_async(dispatch_get_main_queue(), ^{
+                       });
+                   });
 }
 
 - (void)sendImageAttachmentUniqueId:(NSString *)uniqueId {
     
-//    fileAttachmentMessage=nil;
-//    uniqueId=@"";
-    //    NSXMLElement *attachmentXml=[self convertedMessage:roomJid roomName:roomName fileName:fileName messageString:imageCaption fileType:@"ImageAttachment"];
-    //    NSMutableDictionary *tempDictionary=[NSMutableDictionary new];
-    //    [tempDictionary setObject:@"1" forKey:@"Status"];
-    //    [tempDictionary setObject:@"2" forKey:@"Progress"];
-    //    [tempDictionary setObject:imageCaption forKey:@"imageCaption"];
-    //    [tempDictionary setObject:roomName forKey:@"roomName"];
-    //    [tempDictionary setObject:roomJid forKey:@"RoomJid"];
-    //    [tempDictionary setObject:fileName forKey:@"fileName"];
-    //    [tempDictionary setObject:type forKey:@"Type"];
-    //    [tempDictionary setObject:[memberlist mutableCopy] forKey:@"MembersList"];
-    //    [tempDictionary setObject:[memberlist objectAtIndex:0] forKey:@"SelectedMember"];
-    //    [tempDictionary setObject:attachmentXml forKey:@"Attachment"];
-
     NSData *imageData=[self listionSendAttachedImageCacheDirectoryFileName:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"fileName"]];
     //Send files
     xmppOutgoingFileTransfer = [[XMPPOutgoingFileTransfer alloc]
@@ -2128,41 +2141,47 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [xmppOutgoingFileTransfer activate:xmppStream];
     [xmppOutgoingFileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
     //end
-    
-    //    if (!_fileTransfer) {
-//    xmppOutgoingFileTransfer = [[XMPPOutgoingFileTransfer alloc]
-//                     initWithDispatchQueue:dispatch_get_main_queue()];
-//    _fileTransfer.disableIBB = NO;
-//    _fileTransfer.disableSOCKS5 = YES;
-//    [_fileTransfer activate:myDelegate.xmppStream];
-//    [_fileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
-    //    }
-    
-//    uniqueId=[[fileName componentsSeparatedByString:@"."] objectAtIndex:0];
-//    fileAttachmentMessage=[self convertedMessage:appDelegate.chatRoomAppDelegateRoomJid roomName:roomName fileName:fileName messageString:imageCaption fileType:@"ImageAttachment"];
+
     NSError *err;
-    //    if (![_fileTransfer sendData:imageData
-    //                           named:fileName
-    //                     toRecipient:jid
-    //                     description:imageCaption
-    //                           error:&err]) {
-    //        NSLog(@"You messed something up: %@", err);
-    //    }
-    
-    
-//    for (NSString *s in memberlist) {
+
         XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"RoomJid"],[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"SelectedMember"]]];
         NSLog(@"jid------------->> %@",jid);
         NSXMLElement *messageData=[[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"Attachment"] elementForName:@"data"];
         if ([xmppOutgoingFileTransfer sendCustomizedData:imageData named:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"fileName"] toRecipient:jid description:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"imageCaption"] date:[messageData attributeStringValueForName:@"date"] time:[messageData attributeStringValueForName:@"time"] senderId:[messageData attributeStringValueForName:@"from"] chatType:@"ImageAttachment" senderName:xmppLogedInUserName receiverName:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"roomName"] error:&err]) {
             
-            //            [[XmppCoreDataHandler sharedManager] insertLocalImageMessageStorageDataBase:appDelegate.chatRoomAppDelegateRoomJid message:fileAttachmentMessage uniquiId:uniqueId];
             [[XmppCoreDataHandler sharedManager] updateLocalMessageStorageDatabaseBareJidStr:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"RoomJid"] message:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"Attachment"] uniquiId:uniqueId];
 //            [self sendFileProgressDelegate:[roomJid copy]];
             [[NSNotificationCenter defaultCenter] postNotificationName:@"SendFileProgressNotify" object:[xmppSendGroupAttachment objectForKey:uniqueId]];
         }
 //    }
     
+}
+
+- (void)sendDocumentAttachmentUniqueId:(NSString *)uniqueId {
+    
+    NSData *fileData=[self documentCacheDirectoryFileName:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"fileName"]];
+    
+    //Send files
+    xmppOutgoingFileTransfer = [[XMPPOutgoingFileTransfer alloc]
+                                initWithDispatchQueue:dispatch_get_main_queue()];
+    xmppOutgoingFileTransfer.disableIBB = NO;
+    xmppOutgoingFileTransfer.disableSOCKS5 = YES;
+    [xmppOutgoingFileTransfer activate:xmppStream];
+    [xmppOutgoingFileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    //end
+    
+    NSError *err;
+
+    XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"RoomJid"],[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"SelectedMember"]]];
+    
+    NSXMLElement *messageData=[[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"Attachment"] elementForName:@"data"];
+    if ([xmppOutgoingFileTransfer sendCustomizedData:fileData named:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"fileName"] toRecipient:jid description:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"fileName"] date:[messageData attributeStringValueForName:@"date"] time:[messageData attributeStringValueForName:@"time"] senderId:[messageData attributeStringValueForName:@"from"] chatType:@"FileAttachment" senderName:xmppLogedInUserName receiverName:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"roomName"] error:&err]) {
+        
+        [[XmppCoreDataHandler sharedManager] updateLocalMessageStorageDatabaseBareJidStr:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"RoomJid"] message:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"Attachment"] uniquiId:uniqueId];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"SendFileProgressNotify" object:[xmppSendGroupAttachment objectForKey:uniqueId]];
+        });
+    }
 }
 
 - (NSXMLElement *)convertedMessage:(NSString *)to roomName:(NSString *)roomName fileName:(NSString *)fileName messageString:(NSString *)messageString fileType:(NSString *)fileType {
@@ -2300,11 +2319,16 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         else {
             
             //Post notifcation with [xmppSendGroupAttachment objectForKey:uniqueId] object
+            
             if (isSuccess) {
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"SendFileSuccessNotify" object:[xmppSendGroupAttachment objectForKey:uniqueId]];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"SendFileSuccessNotify" object:[xmppSendGroupAttachment objectForKey:uniqueId]];
+                });
             }
             else {
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"SendFileFailNotify" object:[xmppSendGroupAttachment objectForKey:uniqueId]];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                     [[NSNotificationCenter defaultCenter] postNotificationName:@"SendFileFailNotify" object:[xmppSendGroupAttachment objectForKey:uniqueId]];
+                });
             }
             
             [xmppSendGroupAttachment removeObjectForKey:uniqueId];

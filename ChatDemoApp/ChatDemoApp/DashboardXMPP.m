@@ -306,21 +306,29 @@
 
 #pragma mark - Fetch chat history
 - (void)fetchAllHistoryChat:(void(^)(NSMutableArray *tempHistoryData)) completion {
-
+    
     NSArray *messages_arc = [[[XmppCoreDataHandler sharedManager] readAllLocalMessageStorageDatabase] copy];
     
     NSMutableArray *historyArray=[NSMutableArray new];
     NSMutableArray *tempArray=[NSMutableArray new];
     NSMutableDictionary *tempDict=[NSMutableDictionary new];
-
+    
     @autoreleasepool {
-
+        
         for (NSManagedObject *message in messages_arc) {
             
             NSXMLElement *element = [[NSXMLElement alloc] initWithXMLString:[message valueForKey:@"messageString"] error:nil];
             NSXMLElement *innerElementData = [element elementForName:@"data"];
-            if (![[innerElementData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]&&[[innerElementData attributeStringValueForName:@"to"] isEqualToString:appDelegate.xmppLogedInUserId]) {
+            if ([[innerElementData attributeStringValueForName:@"to"] containsString:@"@conference"]) {
                 
+                if ([tempArray containsObject:[innerElementData attributeStringValueForName:@"to"]]) {
+                    
+                    [tempArray removeObject:[innerElementData attributeStringValueForName:@"to"]];
+                }
+                [tempArray addObject:[innerElementData attributeStringValueForName:@"to"]];
+                [tempDict setObject:element forKey:[innerElementData attributeStringValueForName:@"to"]];
+            }
+            else if (![[innerElementData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]&&[[innerElementData attributeStringValueForName:@"to"] isEqualToString:appDelegate.xmppLogedInUserId]) {
                 
                 if ([tempArray containsObject:[innerElementData attributeStringValueForName:@"from"]]) {
                     

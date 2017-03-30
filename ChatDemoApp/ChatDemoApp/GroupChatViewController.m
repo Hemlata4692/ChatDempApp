@@ -1044,7 +1044,7 @@
             }
         }
         if (onlineMember.count>0) {
-            [self sendImageAttachment:imageName imageCaption:imageCaption roomName:[roomDetail objectForKey:@"roomName"] memberlist:onlineMember];
+            [self sendImageAttachment:imageName imageCaption:imageCaption roomName:[roomDetail objectForKey:@"roomName"] memberlist:[onlineMember mutableCopy]];
         }
         else {
             [UserDefaultManager showAlertMessage:@"Alert" message:@"All Recipient may be offline."];
@@ -1109,8 +1109,31 @@
 #pragma mark - Send file delegates
 - (void)sendDocumentDelegateAction:(NSString *)documentName {
     
-//        [self sendImageAttachment:imageName imageCaption:imageCaption friendName:self.friendUserName]
-    [self sendDocumentAttachment:documentName roomName:[roomDetail objectForKey:@"roomName"]];
+    //        switch ([self getPresenceStatus:notification.object]) {
+    //            case 0:     // online/available
+    //                [membersPresentStatus setObject:[NSNumber numberWithBool:YES] forKey:notification.object];
+    //                break;
+    //            default:    //offline
+    //                [membersPresentStatus setObject:[NSNumber numberWithBool:NO] forKey:notification.object];
+    //                break;
+    //        }
+    NSArray *keys=[membersPresentStatus allKeys];
+    NSMutableArray *onlineMember=[NSMutableArray new];
+    for (NSString *key in keys) {
+        
+        if ([[membersPresentStatus objectForKey:key] boolValue]) {
+            
+            [onlineMember addObject:[[key componentsSeparatedByString:@"@"] objectAtIndex:0]];
+            //                [onlineMember addObject:@"0000000000"];
+        }
+    }
+    if (onlineMember.count>0) {
+        [self sendDocumentAttachment:documentName roomName:[roomDetail objectForKey:@"roomName"] memberlist:[onlineMember mutableCopy]];
+    }
+    else {
+        [UserDefaultManager showAlertMessage:@"Alert" message:@"All Recipient may be offline."];
+    }
+    
 }
 
 - (void)sendLocationDelegateAction:(NSString *)locationAddress latitude:(NSString *)latitude longitude:(NSString *)longitude {

@@ -54,7 +54,7 @@
     groupChatListArray=[NSMutableArray new];
     userDetailedList=[NSMutableDictionary new];
     historyChatData=[NSMutableArray new];
-    
+    self.dasboardTableListing.hidden=YES;
     [myDelegate showIndicator];
     [self performSelector:@selector(userList) withObject:nil afterDelay:0.1];
     // Do any additional setup after loading the view.
@@ -378,7 +378,7 @@
     customSegmentedControl.frame = CGRectMake(0, 0, self.view.frame.size.width, 44);
     customSegmentedControl.backgroundColor=[UIColor darkGrayColor];
     customSegmentedControl.segmentEdgeInset = UIEdgeInsetsMake(0, 10, 0, 10);
-    customSegmentedControl.selectionIndicatorColor = [UIColor whiteColor];
+    customSegmentedControl.selectionIndicatorColor = [UIColor clearColor];
     customSegmentedControl.selectionIndicatorHeight = 3.0;
     customSegmentedControl.selectionStyle = HMSegmentedControlSelectionStyleFullWidthStripe;//
     customSegmentedControl.selectionIndicatorLocation = HMSegmentedControlSelectionIndicatorLocationDown;
@@ -600,6 +600,8 @@
     userDetailedList=[xmppUserDetails mutableCopy];
     userListArray=[xmppUserListIds mutableCopy];
     
+    customSegmentedControl.selectedSegmentIndex=2;
+    [self.dasboardTableListing reloadData];
     //    profileLocalDictData=[self getProfileUsersData];
     [self getProfileData1:^(NSDictionary *tempProfileData) {
         // do something with your BOOL
@@ -629,6 +631,15 @@
 - (void)getListOfGroupsNotify:(NSMutableArray *)groupInfo {
 
     [myDelegate stopIndicator];
+    
+    self.dasboardTableListing.hidden=NO;
+    customSegmentedControl.selectedSegmentIndex=0;
+    [self.dasboardTableListing reloadData];
+    
+    //After complete loading show segment bottom lin
+    customSegmentedControl.selectionIndicatorColor = [UIColor whiteColor];
+    //end
+    
     groupChatListArray=[groupInfo mutableCopy];
     [self.dasboardTableListing reloadData];
 }

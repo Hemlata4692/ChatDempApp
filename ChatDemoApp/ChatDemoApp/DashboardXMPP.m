@@ -31,14 +31,6 @@
     appDelegate = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
     appDelegate.myView=@"DashboardXmppUserList";
     appDelegate.isContactListIsLoaded=NO;
-     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPReloadConnection) name:@"XMPPReloadConnection" object:nil];
-//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppUserListNotificationResponse) name:@"XMPPUserListResponse" object:nil];
-    
-    // Do any additional setup after loading the view.
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:YES];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(UserDidAuthenticated) name:@"XMPPDidAuthenticatedResponse" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(UserNotAuthenticated) name:@"XMPPDidNotAuthenticatedResponse" object:nil];
@@ -51,12 +43,39 @@
     
     //Group chat
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPFetchBookmarktList:) name:@"XMPPFetchBookmarktList" object:nil];
-     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPAddedNewGroup) name:@"XMPPUpdatedGroup" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPAddedNewGroup) name:@"XMPPUpdatedGroup" object:nil];
     //end
     
-    appDelegate.selectedFriendUserId=@"";
+    //Reachability handle
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPReloadConnection) name:@"XMPPReloadConnection" object:nil];
+    
     appDelegate.xmppLogedInUserId=[XMPPUserDefaultManager getValue:@"LoginCred"];
     
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppUserListNotificationResponse) name:@"XMPPUserListResponse" object:nil];
+    
+    // Do any additional setup after loading the view.
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:YES];
+    
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(UserDidAuthenticated) name:@"XMPPDidAuthenticatedResponse" object:nil];
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(UserNotAuthenticated) name:@"XMPPDidNotAuthenticatedResponse" object:nil];
+//    
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProfileInformation) name:@"XMPPProfileUpdation" object:nil];
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppNewUserAddedNotify) name:@"XmppNewUserAdded" object:nil];
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppNewUserAddedNotify) name:@"XmppUserPresenceUpdate" object:nil];
+//    
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(historUpdated:) name:@"UserHistory" object:nil];
+//    
+//    //Group chat
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPFetchBookmarktList:) name:@"XMPPFetchBookmarktList" object:nil];
+//     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPAddedNewGroup) name:@"XMPPUpdatedGroup" object:nil];
+//    //end
+    
+    appDelegate.selectedFriendUserId=@"";
+//    appDelegate.xmppLogedInUserId=[XMPPUserDefaultManager getValue:@"LoginCred"];
+    appDelegate.selectedFriendUserId=@"";
 //    isrefresh=YES;
 //    if ([myDelegate connect])
 //    {
@@ -67,8 +86,8 @@
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:YES];
     
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPReloadConnection) name:@"XMPPReloadConnection" object:nil];
+//    [[NSNotificationCenter defaultCenter] removeObserver:self];
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(XMPPReloadConnection) name:@"XMPPReloadConnection" object:nil];
 }
 
 - (void)didReceiveMemoryWarning {

@@ -122,7 +122,10 @@
         [xmppDataEntry setValue:xmppEmailAddress forKey:@"xmppEmailAddress"];
         [xmppDataEntry setValue:xmppUserBirthDay forKey:@"xmppUserBirthDay"];
         [xmppDataEntry setValue:xmppGender forKey:@"xmppGender"];
-        [context save:nil];
+        NSError *error = nil;
+        if (![context save:&error]) {
+            NSLog(@"Can't Save! %@ %@", error, [error localizedDescription]);
+        }
     } else {
         NSManagedObject *xmppDataEntry = [NSEntityDescription insertNewObjectForEntityForName:UserEntry inManagedObjectContext:context];
         [xmppDataEntry setValue:registredUserId forKey:@"xmppRegisterId"];
@@ -321,7 +324,7 @@
         }
     }
     
-    return tempDict;
+    return [tempDict mutableCopy];
 }
 //end
 

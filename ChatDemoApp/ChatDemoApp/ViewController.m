@@ -142,10 +142,6 @@
     
     [myDelegate stopIndicator];
     [UserDefaultManager setValue:self.usernameField.text key:@"userName"];
-//    UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-//    UIViewController * objReveal = [storyboard instantiateViewControllerWithIdentifier:@"DashboardViewController"];
-//    [self.navigationController setViewControllers: [NSArray arrayWithObject: objReveal]
-//                                         animated: NO];
     
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     UIViewController * homeView = [storyboard instantiateViewControllerWithIdentifier:@"DashboardNavigation"];

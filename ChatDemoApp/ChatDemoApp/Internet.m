@@ -9,7 +9,6 @@
 #import "Reachability.h"
 #import "Internet.h"
 #import "UIView+Toast.h"
-#import "iToast.h"
 
 @implementation Internet {
     
@@ -36,8 +35,8 @@
 //                                   }];
 //        
 //        [alertController addAction:okAction];
-
-         [[[[iToast makeText:NSLocalizedString(@"Please check your internet connection.", @"")] setGravity:iToastGravityBottom] setDuration:iToastDurationShort] show];
+//        [[[UIApplication sharedApplication] keyWindow].rootViewController presentViewController:alertController animated:YES completion:nil];
+         [[[UIApplication sharedApplication] keyWindow].rootViewController.view makeToast:@"Please check your internet connection."]; 
         return YES;
     }
     else {

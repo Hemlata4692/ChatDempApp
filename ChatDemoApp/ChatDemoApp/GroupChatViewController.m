@@ -446,6 +446,7 @@
 
 - (void)menuAction:(id)sender {
     
+    [self.view endEditing:YES];
     UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     CustomFilterViewController *filterViewObj =[storyboard instantiateViewControllerWithIdentifier:@"CustomFilterViewController"];
     filterViewObj.delegate=self;
@@ -522,63 +523,37 @@
     
     dispatch_async(dispatch_get_main_queue(), ^{
         
-        int flag=0;
-        NSArray *memberIds=[membersPresentStatus allKeys];
-        
-        for (NSString *memberTemp in memberIds) {
-            if ([[membersPresentStatus objectForKey:memberTemp] boolValue]) {
-                flag=1;
-                break;
-            }
-        }
         if (status==1) {
             NSLog(@"1");
             
-            if (flag) {
-                UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-                DocumentAttachmentViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"DocumentAttachmentViewController"];
-                [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
-                popupView.delegate=self;
-                [self presentViewController:popupView animated:YES completion:nil];
-            }
-            else {
-                [UserDefaultManager showAlertMessage:@"Alert" message:@"All Recipients may be offline so please try again later."];
-            }
+            UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+            DocumentAttachmentViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"DocumentAttachmentViewController"];
+            [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+            popupView.delegate=self;
+            [self presentViewController:popupView animated:YES completion:nil];
         }
         else if (status==2) {
             NSLog(@"2");
-            if (flag) {
-                [self openCamera];
-            }
-            else {
-                [UserDefaultManager showAlertMessage:@"Alert" message:@"All Recipients may be offline so please try again later."];
-            }
+            
+            [self openCamera];
         }
         else if (status==3) {
             NSLog(@"3");
-            if (flag) {
-                [self openGallery];
-            }
-            else {
-                [UserDefaultManager showAlertMessage:@"Alert" message:@"All Recipients may be offline so please try again later."];
-            }
+            
+            [self openGallery];
         }
         else if (status==4) {
             NSLog(@"3");
-            if (flag) {
-                isAttachmentOpen=true;
-                UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-                LocationViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"LocationViewController"];
-                popupView.delegate=self;
-                [self presentViewController:popupView animated:YES completion:NULL];
-            }
-            else {
-                [UserDefaultManager showAlertMessage:@"Alert" message:@"All Recipients may be offline so please try again later."];
-            }
+            
+            isAttachmentOpen=true;
+            UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+            LocationViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"LocationViewController"];
+            popupView.delegate=self;
+            [self presentViewController:popupView animated:YES completion:NULL];
         }
         else if (status==5) {
             NSLog(@"5");
-            [self inviteAction];            
+            [self inviteAction];
         }
         else if (status==6) {
             NSLog(@"6");

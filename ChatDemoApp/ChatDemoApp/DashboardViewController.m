@@ -53,6 +53,7 @@
     userDetailedList=[NSMutableDictionary new];
     historyChatData=[NSMutableArray new];
     self.dasboardTableListing.hidden=YES;
+    
     [myDelegate showIndicator];
     [self performSelector:@selector(userList) withObject:nil afterDelay:0.1];
     // Do any additional setup after loading the view.
@@ -72,7 +73,15 @@
 
 - (void)userList {
     
-    [self xmppUserConnect];
+    Internet *internet=[[Internet alloc] init];
+    if ([internet start]) {
+        
+        [myDelegate stopIndicator];
+        [self xmppOfflineUserConnect];
+    }
+    else {
+        [self xmppUserConnect];
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -469,9 +478,13 @@
 
 - (void)reloadAction :(id)sender {
     
-    profileLocalDictData=[NSMutableDictionary new];
-    [myDelegate showIndicator];
-    [self performSelector:@selector(reloadUserData) withObject:nil afterDelay:0.1];
+    Internet *internet=[[Internet alloc] init];
+    if (![internet start]) {
+        self.dasboardTableListing.hidden=YES;
+        profileLocalDictData=[NSMutableDictionary new];
+        [myDelegate showIndicator];
+        [self performSelector:@selector(reloadUserData) withObject:nil afterDelay:0.1];
+    }
 }
 
 - (void)reloadUserData {
@@ -604,7 +617,21 @@
     [self getProfileData1:^(NSDictionary *tempProfileData) {
         // do something with your BOOL
         profileLocalDictData=[tempProfileData mutableCopy];
-        [self getListOfGroups];
+        Internet *internet=[[Internet alloc] init];
+        if ([internet start]) {
+            
+            [myDelegate stopIndicator];
+            self.dasboardTableListing.hidden=NO;
+            customSegmentedControl.selectedSegmentIndex=0;
+            //After complete loading show segment bottom lin
+            customSegmentedControl.selectionIndicatorColor = [UIColor whiteColor];
+            //end
+            [self.dasboardTableListing reloadData];
+        }
+        else {
+            [self getListOfGroups];
+        }
+        
     }];
 }
 

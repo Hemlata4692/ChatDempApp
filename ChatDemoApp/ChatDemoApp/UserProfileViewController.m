@@ -72,26 +72,6 @@
     else {
         [self setFriendProfileDataUsingCompletionBlock];
     }
-    
-//    dispatch_queue_t queue1 = dispatch_queue_create("queue1", DISPATCH_QUEUE_PRIORITY_DEFAULT);
-//    dispatch_async(queue1, ^{
-//        
-//        if ([self.friendId isEqualToString:myDelegate.xmppLogedInUserId]) {
-//            friendProfileDic=[self getEditProfileData:self.friendId];
-//        }
-//        else {
-//            friendProfileDic=[self getProfileData:self.friendId];
-//        }
-//        
-//        dispatch_async(dispatch_get_main_queue(), ^{
-//            
-//            self.userName.text=[friendProfileDic objectForKey:@"Name"];
-//            self.userStatus.text=[friendProfileDic objectForKey:@"UserStatus"];
-//            self.phoneNumber.text=[friendProfileDic objectForKey:@"PhoneNumber"];
-//            
-//            NSLog(@" Desc:%@ \n address:%@ \n emailid:%@ \n birthDay:%@ \n gender:%@",[friendProfileDic objectForKey:@"Description"],[friendProfileDic objectForKey:@"Address"],[friendProfileDic objectForKey:@"EmailAddress"],[friendProfileDic objectForKey:@"UserBirthDay"],[friendProfileDic objectForKey:@"Gender"]);
-//        });
-//    });
 }
 
 - (void)setEditProfileDataUsingCompletionBlock {

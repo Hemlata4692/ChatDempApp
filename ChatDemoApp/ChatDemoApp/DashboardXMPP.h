@@ -26,6 +26,7 @@
 - (NSMutableDictionary *)getProfileUsersData;
 - (void)xmppUserRefreshResponse;
 - (void)xmppUserConnect;
+- (void)xmppOfflineUserConnect;
 - (void)xmppNewUserAddedNotify;
 - (void)historyUpdateNotify;
 - (void)getProfilePhotosJid:(NSString *)jid profileImageView:(UIImageView *)profileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(UIImage *tempImage)) completion;

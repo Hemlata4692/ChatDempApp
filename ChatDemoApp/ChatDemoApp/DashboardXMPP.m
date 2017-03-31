@@ -245,21 +245,23 @@
 
 - (void)xmppUserConnect {
     
-
-//    //If net is not available
-//    appDelegate.xmppUserListArray=[[XMPPUserDefaultManager getValue:@"xmppUserListArray"] mutableCopy];
-//    appDelegate.xmppUserDetailedList=[NSMutableDictionary new];
-//    isrefresh=false;
-//    appDelegate.isContactListIsLoaded=YES;
-//    [self xmppUserListResponse:appDelegate.xmppUserDetailedList xmppUserListIds:appDelegate.xmppUserListArray];
-    
     isrefresh=true;
     [appDelegate disconnect];
     appDelegate.afterAutentication=1;
     if ([appDelegate connect])
     {
-//        [self fetchedResultsController];
+        //        [self fetchedResultsController];
     }
+}
+
+- (void)xmppOfflineUserConnect {
+    
+    //If net is not available
+    appDelegate.xmppUserListArray=[[XMPPUserDefaultManager getValue:@"xmppUserListArray"] mutableCopy];
+    appDelegate.xmppUserDetailedList=[NSMutableDictionary new];
+    isrefresh=false;
+    appDelegate.isContactListIsLoaded=YES;
+    [self xmppUserListResponse:appDelegate.xmppUserDetailedList xmppUserListIds:appDelegate.xmppUserListArray];
 }
 
 - (void)getProfileData:(NSString *)jid result:(void(^)(NSDictionary *tempProfileData)) completion {

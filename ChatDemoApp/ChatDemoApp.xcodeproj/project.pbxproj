@@ -45,7 +45,7 @@
 		B75E7EF61E5BF1E600634A68 /* XmppCoreDataHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = B75E7EF51E5BF1E600634A68 /* XmppCoreDataHandler.m */; };
 		B76F75E91E40ABD8001FE579 /* DashboardXMPP.m in Sources */ = {isa = PBXBuildFile; fileRef = B76F75E81E40ABD8001FE579 /* DashboardXMPP.m */; };
 		B770B8B51E8E272C0008563A /* Internet.m in Sources */ = {isa = PBXBuildFile; fileRef = B770B8B41E8E272C0008563A /* Internet.m */; };
-		B770B8B91E8E2F0A0008563A /* iToast.m in Sources */ = {isa = PBXBuildFile; fileRef = B770B8B81E8E2F0A0008563A /* iToast.m */; };
+		B770B8BD1E8E52160008563A /* UIView+Toast.m in Sources */ = {isa = PBXBuildFile; fileRef = B770B8BC1E8E52160008563A /* UIView+Toast.m */; };
 		B77DB0E71E7FE90F00D0259C /* alreadyAdded.png in Resources */ = {isa = PBXBuildFile; fileRef = B77DB0E61E7FE90F00D0259C /* alreadyAdded.png */; };
 		B77DFFDF1E4C2E2100921126 /* ChatScreenViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B77DFFDE1E4C2E2100921126 /* ChatScreenViewController.m */; };
 		B77DFFE21E4C2E3100921126 /* XMPPChatView.m in Sources */ = {isa = PBXBuildFile; fileRef = B77DFFE11E4C2E3100921126 /* XMPPChatView.m */; };
@@ -144,8 +144,8 @@
 		B76F75E81E40ABD8001FE579 /* DashboardXMPP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DashboardXMPP.m; sourceTree = "<group>"; };
 		B770B8B31E8E272C0008563A /* Internet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Internet.h; sourceTree = "<group>"; };
 		B770B8B41E8E272C0008563A /* Internet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Internet.m; sourceTree = "<group>"; };
-		B770B8B71E8E2F0A0008563A /* iToast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iToast.h; sourceTree = "<group>"; };
-		B770B8B81E8E2F0A0008563A /* iToast.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iToast.m; sourceTree = "<group>"; };
+		B770B8BB1E8E52160008563A /* UIView+Toast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Toast.h"; sourceTree = "<group>"; };
+		B770B8BC1E8E52160008563A /* UIView+Toast.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Toast.m"; sourceTree = "<group>"; };
 		B77DB0E61E7FE90F00D0259C /* alreadyAdded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = alreadyAdded.png; sourceTree = "<group>"; };
 		B77DFFDD1E4C2E2100921126 /* ChatScreenViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatScreenViewController.h; sourceTree = "<group>"; };
 		B77DFFDE1E4C2E2100921126 /* ChatScreenViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatScreenViewController.m; sourceTree = "<group>"; };
@@ -334,6 +334,8 @@
 		B72D4EEB1E8D36C300D22E67 /* InternetReachability */ = {
 			isa = PBXGroup;
 			children = (
+				B72D4EEC1E8D36E500D22E67 /* Reachability.h */,
+				B72D4EED1E8D36E500D22E67 /* Reachability.m */,
 				B770B8B31E8E272C0008563A /* Internet.h */,
 				B770B8B41E8E272C0008563A /* Internet.m */,
 			);
@@ -391,10 +393,8 @@
 				B70FC2FF1E6EB6C100292950 /* groupPlaceholderImage.png */,
 				B7C25C871E63F61100CD7270 /* locationPlaceholder.jpg */,
 				B715A0C71E5EF47E00B36D16 /* pdf_placeholder.png */,
-				B7E0D99C1E4048C500397393 /* RegistrationProcess.rtf */,
 				B77DFFF61E4C433C00921126 /* arrow_down@3x.png */,
 				B79CA2571E30B91A007CDB23 /* images.png */,
-				B780E9F81E2F9FC200437B4E /* ReadMe.rtf */,
 				B745F8281E234D55001119BD /* main.m */,
 				B7B9A5631E23A07E00DB4429 /* PrefixHeader.pch */,
 			);
@@ -466,7 +466,6 @@
 			isa = PBXGroup;
 			children = (
 				B770B8AE1E8E1AE20008563A /* ToastFile */,
-				B72D4EEB1E8D36C300D22E67 /* InternetReachability */,
 				B70BF22F1E812282005C5B03 /* ButtonClass */,
 				B745F8661E23595F001119BD /* SegmentControl */,
 				B745F8571E235425001119BD /* BSKeyboardControl */,
@@ -545,8 +544,9 @@
 		B770B8A61E8E19940008563A /* XMPPCustomFiles */ = {
 			isa = PBXGroup;
 			children = (
-				B72D4EEC1E8D36E500D22E67 /* Reachability.h */,
-				B72D4EED1E8D36E500D22E67 /* Reachability.m */,
+				B72D4EEB1E8D36C300D22E67 /* InternetReachability */,
+				B7E0D99C1E4048C500397393 /* RegistrationProcess.rtf */,
+				B780E9F81E2F9FC200437B4E /* ReadMe.rtf */,
 				B770B8B61E8E28020008563A /* AppdelegateXMPP */,
 				B770B8AD1E8E1A470008563A /* GroupChatXMPP */,
 				B770B8AC1E8E1A350008563A /* UserProfileXMPP */,
@@ -627,8 +627,8 @@
 		B770B8AE1E8E1AE20008563A /* ToastFile */ = {
 			isa = PBXGroup;
 			children = (
-				B770B8B71E8E2F0A0008563A /* iToast.h */,
-				B770B8B81E8E2F0A0008563A /* iToast.m */,
+				B770B8BB1E8E52160008563A /* UIView+Toast.h */,
+				B770B8BC1E8E52160008563A /* UIView+Toast.m */,
 			);
 			name = ToastFile;
 			sourceTree = "<group>";
@@ -857,11 +857,11 @@
 				B745F85A1E235435001119BD /* BSKeyboardControls.m in Sources */,
 				B70FC3091E6EB8EB00292950 /* GroupInvitationViewController.m in Sources */,
 				B745F8691E23596D001119BD /* HMSegmentedControl.m in Sources */,
-				B770B8B91E8E2F0A0008563A /* iToast.m in Sources */,
 				B77DFFF31E4C32C500921126 /* XMPPIncomingFileTransfer.m in Sources */,
 				B70FC30D1E6EB8FF00292950 /* GroupChatFormViewController.m in Sources */,
 				B7B9A5661E23B17A00DB4429 /* MMMaterialDesignSpinner.m in Sources */,
 				B745F8291E234D55001119BD /* main.m in Sources */,
+				B770B8BD1E8E52160008563A /* UIView+Toast.m in Sources */,
 				B757925B1E42E23800AC48D0 /* XmppProfileView.m in Sources */,
 				B70BF22E1E81227D005C5B03 /* MyButton.m in Sources */,
 				B715A0C31E5EB55300B36D16 /* DocumentAttachmentViewController.m in Sources */,

@@ -113,13 +113,13 @@
 #pragma mark - XMPP delegates
 - (XMPPStream *)xmppStream
 {
-    return [myDelegate xmppStream];
+    return [appDelegate xmppStream];
 }
 - (NSFetchedResultsController *)fetchedResultsController
 {
     if (fetchedResultsController == nil)
     {
-        NSManagedObjectContext *moc = [myDelegate managedObjectContext_roster];
+        NSManagedObjectContext *moc = [appDelegate managedObjectContext_roster];
         NSEntityDescription *entity = [NSEntityDescription entityForName:@"XMPPUserCoreDataStorageObject"
                                                   inManagedObjectContext:moc];
         NSSortDescriptor *sd1 = [[NSSortDescriptor alloc] initWithKey:@"sectionNum" ascending:YES];
@@ -235,9 +235,9 @@
     isrefresh=true;
     appDelegate.isContactListIsLoaded=NO;
 //    appDelegate.myView=@"Other";
-    [myDelegate disconnect];
-    myDelegate.afterAutentication=1;
-    if ([myDelegate connect])
+    [appDelegate disconnect];
+    appDelegate.afterAutentication=1;
+    if ([appDelegate connect])
     {
         [self fetchedResultsController];
     }
@@ -254,9 +254,9 @@
 //    [self xmppUserListResponse:appDelegate.xmppUserDetailedList xmppUserListIds:appDelegate.xmppUserListArray];
     
     isrefresh=true;
-    [myDelegate disconnect];
-    myDelegate.afterAutentication=1;
-    if ([myDelegate connect])
+    [appDelegate disconnect];
+    appDelegate.afterAutentication=1;
+    if ([appDelegate connect])
     {
 //        [self fetchedResultsController];
     }
@@ -310,7 +310,7 @@
         dispatch_queue_t queue = dispatch_queue_create("profilePhotoQueue", DISPATCH_QUEUE_PRIORITY_DEFAULT);
         dispatch_async(queue, ^
                        {
-                           UIImage *tempPhoto=[UIImage imageWithData:[[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:jid]]];
+                           UIImage *tempPhoto=[UIImage imageWithData:[[appDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:jid]]];
                            if (tempPhoto!=nil) {
                                [appDelegate saveDataInCacheDirectory:(UIImage *)tempPhoto folderName:appDelegate.appProfilePhotofolderName jid:jid];
                            }
@@ -515,7 +515,7 @@
 
 - (void)deleteBookmark {
     
-    XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:[XMPPJID jidWithString:myDelegate.hostName]];
+    XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:[XMPPJID jidWithString:appDelegate.hostName]];
     [iq addAttributeWithName:@"from" stringValue:[self.xmppStream myJID].full];
     //    [iq addAttributeWithName:@"id" stringValue:[NSString stringWithFormat:@"BookMarkManager2.%@",[self getUniqueRoomName]]];
     [iq addAttributeWithName:@"id" stringValue:@"BookMarkManager"];

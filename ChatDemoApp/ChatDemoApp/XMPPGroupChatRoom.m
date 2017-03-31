@@ -245,7 +245,7 @@
         dispatch_queue_t queue = dispatch_queue_create("invitationPhotoQueue", DISPATCH_QUEUE_PRIORITY_DEFAULT);
         dispatch_async(queue, ^
                        {
-                           UIImage *tempPhoto=[UIImage imageWithData:[[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:jid]]];
+                           UIImage *tempPhoto=[UIImage imageWithData:[[appDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:jid]]];
                            if (tempPhoto!=nil) {
                                [appDelegate saveDataInCacheDirectory:(UIImage *)tempPhoto folderName:appDelegate.appProfilePhotofolderName jid:jid];
                            }
@@ -368,21 +368,21 @@
     
     NSLog(@"%@",notification.object);
     
-    myDelegate.selectedMemberUserIds=[notification.object mutableCopy];
+    appDelegate.selectedMemberUserIds=[notification.object mutableCopy];
     
     if ([self isOwner]) {
         
-        myDelegate.selectedMemberUserIds=[notification.object mutableCopy];
+        appDelegate.selectedMemberUserIds=[notification.object mutableCopy];
     }
     else {
-        myDelegate.selectedMemberUserIds=[notification.object mutableCopy];
+        appDelegate.selectedMemberUserIds=[notification.object mutableCopy];
         //        appDelegate.chatRoomAppDelegateSelectedRoomOwnerJid;
-        [myDelegate.selectedMemberUserIds addObject:appDelegate.chatRoomAppDelegateSelectedRoomOwnerJid];
-        if ([myDelegate.selectedMemberUserIds containsObject:[[[NSString stringWithFormat:@"%@",[self.xmppStream myJID]] componentsSeparatedByString:@"/"] objectAtIndex:0]]) {
-            [myDelegate.selectedMemberUserIds removeObject:[[[NSString stringWithFormat:@"%@",[self.xmppStream myJID]] componentsSeparatedByString:@"/"] objectAtIndex:0]];
+        [appDelegate.selectedMemberUserIds addObject:appDelegate.chatRoomAppDelegateSelectedRoomOwnerJid];
+        if ([appDelegate.selectedMemberUserIds containsObject:[[[NSString stringWithFormat:@"%@",[self.xmppStream myJID]] componentsSeparatedByString:@"/"] objectAtIndex:0]]) {
+            [appDelegate.selectedMemberUserIds removeObject:[[[NSString stringWithFormat:@"%@",[self.xmppStream myJID]] componentsSeparatedByString:@"/"] objectAtIndex:0]];
         }
     }
-    [self groupJoined:[myDelegate.selectedMemberUserIds mutableCopy]];
+    [self groupJoined:[appDelegate.selectedMemberUserIds mutableCopy]];
 }
 
 - (void)groupJoined:(NSMutableArray *)memberList{}
@@ -426,7 +426,7 @@
             //            if (type==XMPP_GroupCreate) {
             //                [field removeChildAtIndex:0];
             //
-            //                NSData *tempImageData=[myDelegate reducedImageSize:appDelegate.chatRoomAppDelegateImage];
+            //                NSData *tempImageData=[appDelegate reducedImageSize:appDelegate.chatRoomAppDelegateImage];
             //                //            NSXMLElement *binval = [NSXMLElement elementWithName:@"BINVAL"];
             //                //
             //                //            [binval setStringValue:[tempImageData xmpp_base64Encoded]];
@@ -499,7 +499,7 @@
     
     //    NSString* server = @"test@pc"; //or whatever the server address for muc is
     //    XMPPJID *servrJID = [XMPPJID jidWithString:server];
-    XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:[XMPPJID jidWithString:myDelegate.serverName]];
+    XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:[XMPPJID jidWithString:appDelegate.serverName]];
     [iq addAttributeWithName:@"from" stringValue:[self.xmppStream myJID].full];
     //    [iq addAttributeWithName:@"id" stringValue:[NSString stringWithFormat:@"BookMarkManager2.%@",[self getUniqueRoomName]]];
     [iq addAttributeWithName:@"id" stringValue:@"BookMarkManager"];
@@ -530,7 +530,7 @@
     }
     
     if (appDelegate.chatRoomAppDelegateImage) {
-        NSData *tempImageData=[myDelegate reducedImageSize:appDelegate.chatRoomAppDelegateImage];
+        NSData *tempImageData=[appDelegate reducedImageSize:appDelegate.chatRoomAppDelegateImage];
         [self setPhoto:tempImageData xmlElement:conference_s];
         [self setChatRoomImage:[UIImage imageWithData:tempImageData]];
     }
@@ -796,15 +796,15 @@
     [query addChild:destroy];
     
     NSString *iqID = [self.xmppStream generateUUID];
-    myDelegate.groupDeleteid=iqID;
+    appDelegate.groupDeleteid=iqID;
     XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:[XMPPJID jidWithString:appDelegate.chatRoomAppDelegateRoomJid] elementID:iqID child:query];
-    //    [iq addAttributeWithName:@"from" stringValue:[NSString stringWithFormat:@"%@/%@",appDelegate.xmppLogedInUserId,[[myDelegate.xmppStream myJID] resource]]];
+    //    [iq addAttributeWithName:@"from" stringValue:[NSString stringWithFormat:@"%@/%@",appDelegate.xmppLogedInUserId,[[appDelegate.xmppStream myJID] resource]]];
     [self.xmppStream sendElement:iq];
 }
 
 - (void)deleteBookmark:(NSString*)jid conferenceList:(NSMutableArray *)conferenceList {
     
-    XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:[XMPPJID jidWithString:myDelegate.hostName]];
+    XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:[XMPPJID jidWithString:appDelegate.hostName]];
     [iq addAttributeWithName:@"from" stringValue:[self.xmppStream myJID].full];
     //    [iq addAttributeWithName:@"id" stringValue:[NSString stringWithFormat:@"BookMarkManager2.%@",[self getUniqueRoomName]]];
     [iq addAttributeWithName:@"id" stringValue:@"BookMarkManager"];
@@ -828,7 +828,7 @@
 //Delete group notify
 - (void)xmppRoomDidDestroySuccess {
     
-    myDelegate.groupDeleteid=nil;
+    appDelegate.groupDeleteid=nil;
     
     //    [self fetchJoinedGroupList];
     
@@ -875,7 +875,7 @@
 }
 
 - (void)xmppRoomDidDestroyFail {
-    myDelegate.groupDeleteid=nil;
+    appDelegate.groupDeleteid=nil;
     NSLog(@"fail destroy");
     [self xmppRoomDeleteFail];
 }
@@ -910,7 +910,7 @@
                            UIImage *tempPhoto;
                            
                            if (nil==tempImageData) {
-                               tempPhoto=[UIImage imageWithData:[[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:Jid]]];
+                               tempPhoto=[UIImage imageWithData:[[appDelegateVar xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:Jid]]];
                                if (tempPhoto!=nil) {
                                    [appDelegateVar saveDataInCacheDirectory:(UIImage *)tempPhoto folderName:appDelegateVar.appProfilePhotofolderName jid:Jid];
                                }
@@ -977,9 +977,9 @@
 
 - (void)sendXmppMessage:(NSString *)roomJid subjectName:(NSString *)subjectName messageString:(NSString *)messageString {
     
-    [myDelegate.xmppMessageArchivingModule setClientSideMessageArchivingOnly:YES];
-    [myDelegate.xmppMessageArchivingModule activate:[self xmppStream]];    //By this line all your messages are stored in CoreData
-    [myDelegate.xmppMessageArchivingModule addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    [appDelegate.xmppMessageArchivingModule setClientSideMessageArchivingOnly:YES];
+    [appDelegate.xmppMessageArchivingModule activate:[self xmppStream]];    //By this line all your messages are stored in CoreData
+    [appDelegate.xmppMessageArchivingModule addDelegate:self delegateQueue:dispatch_get_main_queue()];
     NSString *messageStr = [messageString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"HH:mm:ss"];
@@ -999,19 +999,19 @@
     
     [message addAttributeWithName:@"type" stringValue:@"groupchat"];
     [message addAttributeWithName:@"to" stringValue:roomJid];
-    [message addAttributeWithName:@"from" stringValue:myDelegate.xmppLogedInUserId];
+    [message addAttributeWithName:@"from" stringValue:appDelegate.xmppLogedInUserId];
     
     [dataTag addAttributeWithName:@"xmlns" stringValue:@"main"];
     [dataTag addAttributeWithName:@"chatType" stringValue:@"Single"];
     [message addAttributeWithName:@"to" stringValue:roomJid];
-    [message addAttributeWithName:@"from" stringValue:myDelegate.xmppLogedInUserId];
+    [message addAttributeWithName:@"from" stringValue:appDelegate.xmppLogedInUserId];
     
     [dataTag addAttributeWithName:@"to" stringValue:roomJid];
-    [dataTag addAttributeWithName:@"from" stringValue:myDelegate.xmppLogedInUserId];
+    [dataTag addAttributeWithName:@"from" stringValue:appDelegate.xmppLogedInUserId];
     [dataTag addAttributeWithName:@"time" stringValue:formattedTime];
     //        [message addAttributeWithName:@"Name" stringValue:[UserDefaultManager getValue:@"userName"]];
     [dataTag addAttributeWithName:@"date" stringValue:formattedDate];
-    //        [message addAttributeWithName:@"from-To" stringValue:[NSString stringWithFormat:@"%@-%@",myDelegate.xmppLogedInUserId,friendUserJid]];
+    //        [message addAttributeWithName:@"from-To" stringValue:[NSString stringWithFormat:@"%@-%@",appDelegate.xmppLogedInUserId,friendUserJid]];
     [dataTag addAttributeWithName:@"senderName" stringValue:appDelegate.xmppLogedInUserName];
     [dataTag addAttributeWithName:@"receiverName" stringValue:subjectName];
     //    }
@@ -1028,7 +1028,7 @@
 
 - (void)historUpdated:(NSNotification *)notification {
     
-    //    NSString *keyName = myDelegate.chatUser;
+    //    NSString *keyName = appDelegate.chatUser;
     //    if ([[UserDefaultManager getValue:@"CountData"] objectForKey:keyName] != nil) {
     //        int tempCount = 0;
     //        NSMutableDictionary *tempDict = [[UserDefaultManager getValue:@"CountData"] mutableCopy];
@@ -1082,7 +1082,7 @@
 //    [dataTag addAttributeWithName:@"time" stringValue:formattedTime];
 //    //        [message addAttributeWithName:@"Name" stringValue:[UserDefaultManager getValue:@"userName"]];
 //    [dataTag addAttributeWithName:@"date" stringValue:formattedDate];
-//    //        [message addAttributeWithName:@"from-To" stringValue:[NSString stringWithFormat:@"%@-%@",myDelegate.xmppLogedInUserId,friendUserJid]];
+//    //        [message addAttributeWithName:@"from-To" stringValue:[NSString stringWithFormat:@"%@-%@",appDelegate.xmppLogedInUserId,friendUserJid]];
 //    [dataTag addAttributeWithName:@"senderName" stringValue:appDelegate.xmppLogedInUserName];
 //    [dataTag addAttributeWithName:@"receiverName" stringValue:roomName];
 //    //    }
@@ -1161,9 +1161,9 @@
 #pragma mark - Send location
 - (void)sendLocationXmppMessage:(NSString *)roomJid roomName:(NSString *)roomName messageString:(NSString *)messageString latitude:(NSString *)latitude longitude:(NSString *)longitude {
     
-    [myDelegate.xmppMessageArchivingModule setClientSideMessageArchivingOnly:YES];
-    [myDelegate.xmppMessageArchivingModule activate:[self xmppStream]];    //By this line all your messages are stored in CoreData
-    [myDelegate.xmppMessageArchivingModule addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    [appDelegate.xmppMessageArchivingModule setClientSideMessageArchivingOnly:YES];
+    [appDelegate.xmppMessageArchivingModule activate:[self xmppStream]];    //By this line all your messages are stored in CoreData
+    [appDelegate.xmppMessageArchivingModule addDelegate:self delegateQueue:dispatch_get_main_queue()];
     NSString *messageStr = [messageString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"HH:mm:ss"];
@@ -1184,15 +1184,15 @@
     
     [message addAttributeWithName:@"type" stringValue:@"groupchat"];
     [message addAttributeWithName:@"to" stringValue:roomJid];
-    [message addAttributeWithName:@"from" stringValue:myDelegate.xmppLogedInUserId];
+    [message addAttributeWithName:@"from" stringValue:appDelegate.xmppLogedInUserId];
     
     [dataTag addAttributeWithName:@"xmlns" stringValue:@"main"];
     [dataTag addAttributeWithName:@"chatType" stringValue:@"Location"];
     [message addAttributeWithName:@"to" stringValue:roomJid];
-    [message addAttributeWithName:@"from" stringValue:myDelegate.xmppLogedInUserId];
+    [message addAttributeWithName:@"from" stringValue:appDelegate.xmppLogedInUserId];
     
     [dataTag addAttributeWithName:@"to" stringValue:roomJid];
-    [dataTag addAttributeWithName:@"from" stringValue:myDelegate.xmppLogedInUserId];
+    [dataTag addAttributeWithName:@"from" stringValue:appDelegate.xmppLogedInUserId];
     [dataTag addAttributeWithName:@"time" stringValue:formattedTime];
     [dataTag addAttributeWithName:@"date" stringValue:formattedDate];
     [dataTag addAttributeWithName:@"senderName" stringValue:appDelegate.xmppLogedInUserName];

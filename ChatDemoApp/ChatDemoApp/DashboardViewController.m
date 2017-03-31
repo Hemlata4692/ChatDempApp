@@ -25,7 +25,6 @@
 @interface DashboardViewController () {
 
     HMSegmentedControl *customSegmentedControl;
-    AppDelegateObjectFile *appDelegate;
     
     NSMutableArray *historyChatData;
     NSMutableDictionary *profileLocalDictData;
@@ -46,7 +45,6 @@
     
     self.navigationItem.title=@"Dashboard";
    
-    appDelegate = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
     [self addBarButton];
     [self addSegmentBar];
     
@@ -157,7 +155,7 @@
         NSXMLElement *innerData=[historyElement elementForName:@"data"];
         //        NSMutableDictionary *profileDic;
         
-        if (![[innerData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]) {
+        if (![[innerData attributeStringValueForName:@"from"] isEqualToString:myDelegate.xmppLogedInUserId]) {
             
             //            profileDic=[[profileLocalDictData objectForKey:[historyElement attributeStringValueForName:@"from"]] mutableCopy];
             if ([self isChatTypeMessageElement:historyElement]) {
@@ -288,7 +286,7 @@
     ChatScreenViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"ChatScreenViewController"];
     profileObj.friendUserJid=[userListArray objectAtIndex:indexPath.row];
     profileObj.friendUserName=[[profileLocalDictData objectForKey:[userListArray objectAtIndex:indexPath.row]] objectForKey:@"Name"];
-//    profileObj.loginUserName=[[profileLocalDictData objectForKey:appDelegate.xmppLogedInUserId] objectForKey:@"Name"];
+//    profileObj.loginUserName=[[profileLocalDictData objectForKey:myDelegate.xmppLogedInUserId] objectForKey:@"Name"];
     [self.navigationController pushViewController:profileObj animated:YES];
     }
     else if (customSegmentedControl.selectedSegmentIndex==0) {
@@ -300,7 +298,7 @@
             
             ChatScreenViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"ChatScreenViewController"];
             
-            if (![[innerData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]) {
+            if (![[innerData attributeStringValueForName:@"from"] isEqualToString:myDelegate.xmppLogedInUserId]) {
                 
                 profileObj.friendUserJid=[innerData attributeStringValueForName:@"from"];
                 profileObj.friendUserName=[[innerData attributeStringValueForName:@"senderName"] capitalizedString];
@@ -446,7 +444,7 @@
         
         if ([self isChatTypeMessageElement:historyElement]) {
             UserProfileViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"UserProfileViewController"];
-            if (![[innerData attributeStringValueForName:@"from"] isEqualToString:appDelegate.xmppLogedInUserId]) {
+            if (![[innerData attributeStringValueForName:@"from"] isEqualToString:myDelegate.xmppLogedInUserId]) {
                 
                 profileObj.friendId=[innerData attributeStringValueForName:@"from"];
             }
@@ -465,7 +463,7 @@
 - (void)profileAction :(id)sender {
     
     UserProfileViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"UserProfileViewController"];
-    profileObj.friendId=appDelegate.xmppLogedInUserId;
+    profileObj.friendId=myDelegate.xmppLogedInUserId;
     [self.navigationController pushViewController:profileObj animated:YES];
 }
 

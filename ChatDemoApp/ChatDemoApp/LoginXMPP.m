@@ -59,7 +59,7 @@
     [XMPPUserDefaultManager setValue:password key:@"PassCred"];
     [XMPPUserDefaultManager setValue:@"1" key:@"CountValue"];
     [appDelegate disconnect];
-    myDelegate.afterAutentication=1;
+    appDelegate.afterAutentication=1;
     [appDelegate connect];
 }
 #pragma mark - end

@@ -44,7 +44,6 @@
     [super viewWillAppear:YES];
     
     //Adding textfield to keyboard controls array
-   
 }
 
 - (void)didReceiveMemoryWarning {
@@ -57,6 +56,7 @@
 
     self.groupImage.layer.cornerRadius=35;
     self.groupImage.layer.masksToBounds=YES;
+    self.groupImage.enabled=NO;
     
     self.groupDescription.contentInset = UIEdgeInsetsMake(-5, 5, 0, 0);
     self.groupDescription.placeholder=@"Room Desccription (Optional)";
@@ -160,26 +160,31 @@
 - (void)nextAction :(id)sender {
     
     [self.view endEditing:YES];
-    if (([self.addRoomName.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].length == 0)) {
+    Internet *internet=[[Internet alloc] init];
+    if (![internet start]) {
         
-        [UserDefaultManager showAlertMessage:@"Alert" message:@"Subject field is required."];
-    }
-    else {
-    
-        GroupInvitationViewController *invitationViewObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"GroupInvitationViewController"];
-        invitationViewObj.isCreate=true;
-        invitationViewObj.roomSubject=self.addRoomName.text;
-        invitationViewObj.roomDescription=self.groupDescription.text;
-        if (![self image:self.groupImage.imageView.image isEqualTo:[UIImage imageNamed:@"groupPlaceholderImage.png"]]) {
-            invitationViewObj.friendImage=self.groupImage.imageView.image;
+        if (([self.addRoomName.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].length == 0)) {
+            
+            [UserDefaultManager showAlertMessage:@"Alert" message:@"Subject field is required."];
         }
         else {
-        
-            invitationViewObj.friendImage=nil;
+            
+            GroupInvitationViewController *invitationViewObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"GroupInvitationViewController"];
+            invitationViewObj.isCreate=true;
+            invitationViewObj.roomSubject=self.addRoomName.text;
+            invitationViewObj.roomDescription=self.groupDescription.text;
+            if (![self image:self.groupImage.imageView.image isEqualTo:[UIImage imageNamed:@"groupPlaceholderImage.png"]]) {
+                invitationViewObj.friendImage=self.groupImage.imageView.image;
+            }
+            else {
+                
+                invitationViewObj.friendImage=nil;
+            }
+            
+            [self.navigationController pushViewController:invitationViewObj animated:YES];
         }
-        
-        [self.navigationController pushViewController:invitationViewObj animated:YES];
     }
+    
 }
 
 - (BOOL)image:(UIImage *)image1 isEqualTo:(UIImage *)image2

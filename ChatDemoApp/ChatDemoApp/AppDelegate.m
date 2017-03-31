@@ -31,10 +31,12 @@
 
 @implementation AppDelegate
 @synthesize navigationController;
+@synthesize isIndicatorShow;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     
+    isIndicatorShow=NO;
     //set navigation bar properties.
     [[UINavigationBar appearance] setBarTintColor:[UIColor darkGrayColor]];
     [[UINavigationBar appearance] setTranslucent:NO];
@@ -177,6 +179,9 @@
 #pragma mark - Global indicator view
 - (void)showIndicator {
     
+    if (!isIndicatorShow) {
+        
+        isIndicatorShow=YES;
     spinnerBackground=[[UIImageView alloc]initWithFrame:CGRectMake(3, 3, 50, 50)];
     spinnerBackground.backgroundColor=[UIColor whiteColor];
     spinnerBackground.layer.cornerRadius=25.0f;
@@ -204,14 +209,19 @@
     [self.window addSubview:self.spinnerView];
     [self.window addSubview:self.loaderLabel];
     [self.spinnerView startAnimating];
+    }
 }
 
 - (void)stopIndicator
 {
+    if (isIndicatorShow) {
+        
+        isIndicatorShow=NO;
     [self.spinnerView stopAnimating];
     [loaderView removeFromSuperview];
     [self.spinnerView removeFromSuperview];
     [self.loaderLabel removeFromSuperview];
+    }
 }
 #pragma mark - end
 

@@ -267,6 +267,7 @@
 
 #pragma mark - Keyboard delegates
 - (void)registerForKeyboardNotifications {
+    
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWillShow:)
                                                  name:UIKeyboardWillShowNotification object:nil];
@@ -486,7 +487,11 @@
 
 -(IBAction)sendMessage:(id)sender {
     
-    [self sendXmppMessage:friendUserJid friendName:self.friendUserName messageString:messageTextView.text];
+    Internet *internet=[[Internet alloc] init];
+    if (![internet start]) {
+        
+        [self sendXmppMessage:friendUserJid friendName:self.friendUserName messageString:messageTextView.text];
+    }
 }
 
 - (void)backAction {
@@ -928,7 +933,11 @@
 
     if (status==1) {
     
-        [self sendImageAttachment:imageName imageCaption:imageCaption friendName:self.friendUserName];//friendName:self.friendUserName
+        Internet *internet=[[Internet alloc] init];
+        if (![internet start]) {
+            
+            [self sendImageAttachment:imageName imageCaption:imageCaption friendName:self.friendUserName];
+        }
     }
 }
 
@@ -988,13 +997,20 @@
 #pragma mark - Send file delegates
 - (void)sendDocumentDelegateAction:(NSString *)documentName {
 
-//    [self sendImageAttachment:imageName imageCaption:imageCaption friendName:self.friendUserName]
-    [self sendDocumentAttachment:documentName friendName:self.friendUserName];
+    Internet *internet=[[Internet alloc] init];
+    if (![internet start]) {
+        
+        [self sendDocumentAttachment:documentName friendName:self.friendUserName];
+    }
 }
 
 - (void)sendLocationDelegateAction:(NSString *)locationAddress latitude:(NSString *)latitude longitude:(NSString *)longitude {
 
-    [self sendLocationXmppMessage:friendUserJid friendName:self.friendUserName  messageString:locationAddress latitude:latitude longitude:longitude];
+    Internet *internet=[[Internet alloc] init];
+    if (![internet start]) {
+        
+        [self sendLocationXmppMessage:friendUserJid friendName:self.friendUserName  messageString:locationAddress latitude:latitude longitude:longitude];
+    }
 }
 
 

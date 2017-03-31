@@ -577,8 +577,8 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 
 - (void)xmppStreamDidAuthenticate:(XMPPStream *)sender
 {
-    if (myDelegate.afterAutentication==1) {
-         myDelegate.afterAutentication=2;
+    if (afterAutentication==1) {
+         afterAutentication=2;
     DDLogVerbose(@"%@: %@", THIS_FILE, THIS_METHOD);
     
     [self goOnline];
@@ -605,9 +605,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 
 - (void)xmppStream:(XMPPStream *)sender didNotAuthenticate:(NSXMLElement *)error
 {
-    if (myDelegate.afterAutentication==1) {
+    if (afterAutentication==1) {
         
-        myDelegate.afterAutentication=2;
+        afterAutentication=2;
     DDLogVerbose(@"%@: %@", THIS_FILE, THIS_METHOD);
         [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPDidNotAuthenticatedResponse" object:nil];
 
@@ -1757,7 +1757,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 
 - (void)addBookMarkConferenceList:(NSMutableArray *)conferenceList jid:(NSString *)jid{
     
-    XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:[XMPPJID jidWithString:myDelegate.serverName]];
+    XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:[XMPPJID jidWithString:serverName]];
     [iq addAttributeWithName:@"from" stringValue:[self.xmppStream myJID].full];
     [iq addAttributeWithName:@"id" stringValue:[NSString stringWithFormat:@"BookMarkManager%@",jid]];
     NSXMLElement *query = [NSXMLElement elementWithName:@"query"];
@@ -1826,7 +1826,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 - (void)deleteBookMarkConferenceList:(NSMutableArray *)conferenceList jid:(NSString *)jid{
     
     [deleteUserInfo addObject:jid];
-    XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:[XMPPJID jidWithString:myDelegate.serverName]];
+    XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:[XMPPJID jidWithString:serverName]];
     [iq addAttributeWithName:@"from" stringValue:[self.xmppStream myJID].full];
     [iq addAttributeWithName:@"id" stringValue:[NSString stringWithFormat:@"DeleteBookMarkManager%@",jid]];
     NSXMLElement *query = [NSXMLElement elementWithName:@"query"];

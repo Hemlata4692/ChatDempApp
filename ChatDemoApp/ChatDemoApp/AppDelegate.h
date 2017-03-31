@@ -13,6 +13,7 @@
 
 @property (strong, nonatomic) UIWindow *window;
 @property(nonatomic,retain) UINavigationController *navigationController;
+@property(nonatomic,assign) BOOL isIndicatorShow;
 
 //Indicator method
 - (void)showIndicator;

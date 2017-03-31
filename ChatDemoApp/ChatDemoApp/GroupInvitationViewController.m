@@ -168,15 +168,19 @@
 
 - (IBAction)createGroup:(UIButton *)sender {
 
-    if (isCreate) {
+    Internet *internet=[[Internet alloc] init];
+    if (![internet start]) {
         
-        [myDelegate showIndicator];
-        [self performSelector:@selector(creteGroupService) withObject:nil afterDelay:0.1];
-    }
-    else {
-       
-        if (selectedJids.count>0) {
-            [self sendFriendInvitation];
+        if (isCreate) {
+            
+            [myDelegate showIndicator];
+            [self performSelector:@selector(creteGroupService) withObject:nil afterDelay:0.1];
+        }
+        else {
+            
+            if (selectedJids.count>0) {
+                [self sendFriendInvitation];
+            }
         }
     }
 }

@@ -121,11 +121,19 @@
 #pragma mark - Webservice
 - (void)userLogin {
     
-    //If you want to login without password then commented this code
-    [self loginConnectPassword:self.passwordField.text username:self.usernameField.text];
-    /*//If you want to login without password then uncomment this code
-     [self loginConnectWithoutPassword:self.usernameField.text];
-     */
+    Internet *internet=[[Internet alloc] init];
+    if ([internet start]) {
+        
+        [myDelegate stopIndicator];
+    }
+    else {
+        
+        //If you want to login without password then commented this code
+        [self loginConnectPassword:self.passwordField.text username:self.usernameField.text];
+        /*//If you want to login without password then uncomment this code
+         [self loginConnectWithoutPassword:self.usernameField.text];
+         */
+    }
 }
 #pragma mark - end
 

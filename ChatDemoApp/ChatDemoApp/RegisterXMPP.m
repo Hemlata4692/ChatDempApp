@@ -78,8 +78,8 @@
 #pragma mark - User registration at XMPP server(OpenFire)
 - (void)userRegistrationPassword:(NSString *)userPassword userName:(NSString*)userName profileData:(NSMutableDictionary*)profileData profilePlaceholder:(NSString *)profilePlaceholder profileImageView:(UIImage *)profileImageView {
     
-    myDelegate.afterAutentication=0;
-    myDelegate.afterAutenticationRegistration=0;
+    appDelegate.afterAutentication=0;
+    appDelegate.afterAutenticationRegistration=0;
 
     [appDelegate disconnect];
     isRegisterAuthenticate=false;
@@ -137,7 +137,7 @@
 
 - (void)createConnection {
 
-    myDelegate.afterAutentication=1;
+    appDelegate.afterAutentication=1;
     [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%@@%@",appDelegate.xmppUniqueId,appDelegate.serverName] key:@"LoginCred"];
     [XMPPUserDefaultManager setValue:appDelegate.defaultPassword key:@"PassCred"];
     [appDelegate connect];
@@ -152,7 +152,7 @@
     
     //    dispatch_block_t block = ^{ @autoreleasepool {
     
-    if ( myDelegate.xmppStream.myJID == nil)
+    if ( appDelegate.xmppStream.myJID == nil)
     {
         NSString *errMsg = @"You must set myJID before calling registerWithPassword:error:.";
         NSDictionary *info = @{NSLocalizedDescriptionKey : errMsg};
@@ -163,14 +163,14 @@
         //            return_from_block;
     }
     
-    NSString *username = [myDelegate.xmppStream.myJID user];
+    NSString *username = [appDelegate.xmppStream.myJID user];
     
     NSMutableArray *elements = [NSMutableArray array];
     [elements addObject:[NSXMLElement elementWithName:@"username" stringValue:username]];
     [elements addObject:[NSXMLElement elementWithName:@"password" stringValue:password]];
     [elements addObject:[NSXMLElement elementWithName:@"name" stringValue:name]];
     
-    [myDelegate.xmppStream registerWithElements:elements error:errPtr];
+    [appDelegate.xmppStream registerWithElements:elements error:errPtr];
     return result;
 }
 
@@ -211,14 +211,13 @@
     [XMPPUserDefaultManager setValue:xmppUserNameCredential key:@"LoginCred"];
     [XMPPUserDefaultManager setValue:password key:@"PassCred"];
     [XMPPUserDefaultManager setValue:@"1" key:@"CountValue"];
-    myDelegate.afterAutentication=1;
+    appDelegate.afterAutentication=1;
     [appDelegate connect];
 }
 #pragma mark - end
 
 #pragma mark - Login user after registration
 - (void)loginRegisteredUser:(NSString *)userName password:(NSString *)passwordValue {
-    
     
     isRegisterAuthenticate=false;
     if ([XMPPUserDefaultManager getValue:@"CountData"] == nil) {
@@ -235,7 +234,7 @@
     [XMPPUserDefaultManager setValue:[NSString stringWithFormat:@"%@@%@",userName,appDelegate.serverName] key:@"LoginCred"];
     [XMPPUserDefaultManager setValue:password key:@"PassCred"];
     [XMPPUserDefaultManager setValue:@"1" key:@"CountValue"];
-    myDelegate.afterAutentication=1;
+    appDelegate.afterAutentication=1;
     [appDelegate connect];
     //    [self xmppConnect];
 }

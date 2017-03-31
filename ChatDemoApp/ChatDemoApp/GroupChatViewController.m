@@ -422,7 +422,11 @@
 
 -(IBAction)sendMessage:(id)sender {
     
-    [self sendXmppMessage:[roomDetail objectForKey:@"roomJid"] subjectName:[roomDetail objectForKey:@"roomName"] messageString:messageTextView.text];
+    Internet *internet=[[Internet alloc] init];
+    if (![internet start]) {
+        
+        [self sendXmppMessage:[roomDetail objectForKey:@"roomJid"] subjectName:[roomDetail objectForKey:@"roomName"] messageString:messageTextView.text];
+    }
 }
 
 - (void)backAction {
@@ -579,8 +583,12 @@
         else if (status==6) {
             NSLog(@"6");
             
-            [myDelegate showIndicator];
-            [self performSelector:@selector(deleteGroupService) withObject:nil afterDelay:0.1];
+            Internet *internet=[[Internet alloc] init];
+            if (![internet start]) {
+                
+                [myDelegate showIndicator];
+                [self performSelector:@selector(deleteGroupService) withObject:nil afterDelay:0.1];
+            }
         }
     });
 }
@@ -1024,32 +1032,27 @@
 - (void)sendImageDelegateAction:(int)status imageName:(NSString *)imageName imageCaption:(NSString *)imageCaption {
     
     if (status==1) {
-        
-//        switch ([self getPresenceStatus:notification.object]) {
-//            case 0:     // online/available
-//                [membersPresentStatus setObject:[NSNumber numberWithBool:YES] forKey:notification.object];
-//                break;
-//            default:    //offline
-//                [membersPresentStatus setObject:[NSNumber numberWithBool:NO] forKey:notification.object];
-//                break;
-//        }
-        NSArray *keys=[membersPresentStatus allKeys];
-        NSMutableArray *onlineMember=[NSMutableArray new];
-        for (NSString *key in keys) {
+    
+        Internet *internet=[[Internet alloc] init];
+        if (![internet start]) {
             
-            if ([[membersPresentStatus objectForKey:key] boolValue]) {
+            NSArray *keys=[membersPresentStatus allKeys];
+            NSMutableArray *onlineMember=[NSMutableArray new];
+            for (NSString *key in keys) {
                 
-                [onlineMember addObject:[[key componentsSeparatedByString:@"@"] objectAtIndex:0]];
-//                [onlineMember addObject:@"0000000000"];
+                if ([[membersPresentStatus objectForKey:key] boolValue]) {
+                    
+                    [onlineMember addObject:[[key componentsSeparatedByString:@"@"] objectAtIndex:0]];
+                    //                [onlineMember addObject:@"0000000000"];
+                }
+            }
+            if (onlineMember.count>0) {
+                [self sendImageAttachment:imageName imageCaption:imageCaption roomName:[roomDetail objectForKey:@"roomName"] memberlist:[onlineMember mutableCopy]];
+            }
+            else {
+                [UserDefaultManager showAlertMessage:@"Alert" message:@"All Recipient may be offline."];
             }
         }
-        if (onlineMember.count>0) {
-            [self sendImageAttachment:imageName imageCaption:imageCaption roomName:[roomDetail objectForKey:@"roomName"] memberlist:[onlineMember mutableCopy]];
-        }
-        else {
-            [UserDefaultManager showAlertMessage:@"Alert" message:@"All Recipient may be offline."];
-        }
-        
     }
 }
 
@@ -1109,36 +1112,35 @@
 #pragma mark - Send file delegates
 - (void)sendDocumentDelegateAction:(NSString *)documentName {
     
-    //        switch ([self getPresenceStatus:notification.object]) {
-    //            case 0:     // online/available
-    //                [membersPresentStatus setObject:[NSNumber numberWithBool:YES] forKey:notification.object];
-    //                break;
-    //            default:    //offline
-    //                [membersPresentStatus setObject:[NSNumber numberWithBool:NO] forKey:notification.object];
-    //                break;
-    //        }
-    NSArray *keys=[membersPresentStatus allKeys];
-    NSMutableArray *onlineMember=[NSMutableArray new];
-    for (NSString *key in keys) {
+    Internet *internet=[[Internet alloc] init];
+    if (![internet start]) {
         
-        if ([[membersPresentStatus objectForKey:key] boolValue]) {
+        NSArray *keys=[membersPresentStatus allKeys];
+        NSMutableArray *onlineMember=[NSMutableArray new];
+        for (NSString *key in keys) {
             
-            [onlineMember addObject:[[key componentsSeparatedByString:@"@"] objectAtIndex:0]];
-            //                [onlineMember addObject:@"0000000000"];
+            if ([[membersPresentStatus objectForKey:key] boolValue]) {
+                
+                [onlineMember addObject:[[key componentsSeparatedByString:@"@"] objectAtIndex:0]];
+                //                [onlineMember addObject:@"0000000000"];
+            }
+        }
+        if (onlineMember.count>0) {
+            [self sendDocumentAttachment:documentName roomName:[roomDetail objectForKey:@"roomName"] memberlist:[onlineMember mutableCopy]];
+        }
+        else {
+            [UserDefaultManager showAlertMessage:@"Alert" message:@"All Recipient may be offline."];
         }
     }
-    if (onlineMember.count>0) {
-        [self sendDocumentAttachment:documentName roomName:[roomDetail objectForKey:@"roomName"] memberlist:[onlineMember mutableCopy]];
-    }
-    else {
-        [UserDefaultManager showAlertMessage:@"Alert" message:@"All Recipient may be offline."];
-    }
-    
 }
 
 - (void)sendLocationDelegateAction:(NSString *)locationAddress latitude:(NSString *)latitude longitude:(NSString *)longitude {
     
-    [self sendLocationXmppMessage:[roomDetail objectForKey:@"roomJid"] roomName:[roomDetail objectForKey:@"roomName"]  messageString:locationAddress latitude:latitude longitude:longitude];
+    Internet *internet=[[Internet alloc] init];
+    if (![internet start]) {
+        
+        [self sendLocationXmppMessage:[roomDetail objectForKey:@"roomJid"] roomName:[roomDetail objectForKey:@"roomName"]  messageString:locationAddress latitude:latitude longitude:longitude];
+    }
 }
 #pragma mark - end
 

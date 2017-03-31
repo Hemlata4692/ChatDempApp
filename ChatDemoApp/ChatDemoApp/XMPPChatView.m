@@ -152,7 +152,7 @@
                            UIImage *tempPhoto,*friendTempPhoto;
                            
                            if (nil==tempImageData) {
-                               tempPhoto=[UIImage imageWithData:[[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:appDelegate.xmppLogedInUserId]]];
+                               tempPhoto=[UIImage imageWithData:[[appDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:appDelegate.xmppLogedInUserId]]];
                                if (tempPhoto!=nil) {
                                    [appDelegate saveDataInCacheDirectory:(UIImage *)tempPhoto folderName:appDelegate.appProfilePhotofolderName jid:appDelegate.xmppLogedInUserId];
                                }
@@ -165,7 +165,7 @@
                            }
                            
                            if (nil==tempFriendImageData) {
-                               friendTempPhoto=[UIImage imageWithData:[[myDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:friendJid]]];
+                               friendTempPhoto=[UIImage imageWithData:[[appDelegate xmppvCardAvatarModule] photoDataForJID:[XMPPJID jidWithString:friendJid]]];
                                if (friendTempPhoto!=nil) {
                                    [appDelegate saveDataInCacheDirectory:(UIImage *)friendTempPhoto folderName:appDelegate.appProfilePhotofolderName jid:friendJid];
                                }
@@ -196,9 +196,9 @@
 #pragma mark - Send message
 - (void)sendXmppMessage:(NSString *)friendJid friendName:(NSString *)friendName messageString:(NSString *)messageString {
     
-    [myDelegate.xmppMessageArchivingModule setClientSideMessageArchivingOnly:YES];
-    [myDelegate.xmppMessageArchivingModule activate:[self xmppStream]];    //By this line all your messages are stored in CoreData
-    [myDelegate.xmppMessageArchivingModule addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    [appDelegate.xmppMessageArchivingModule setClientSideMessageArchivingOnly:YES];
+    [appDelegate.xmppMessageArchivingModule activate:[self xmppStream]];    //By this line all your messages are stored in CoreData
+    [appDelegate.xmppMessageArchivingModule addDelegate:self delegateQueue:dispatch_get_main_queue()];
     NSString *messageStr = [messageString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
@@ -219,19 +219,19 @@
     
     [message addAttributeWithName:@"type" stringValue:@"chat"];
     [message addAttributeWithName:@"to" stringValue:friendJid];
-    [message addAttributeWithName:@"from" stringValue:myDelegate.xmppLogedInUserId];
+    [message addAttributeWithName:@"from" stringValue:appDelegate.xmppLogedInUserId];
     
     [dataTag addAttributeWithName:@"xmlns" stringValue:@"main"];
     [dataTag addAttributeWithName:@"chatType" stringValue:@"Single"];
     [message addAttributeWithName:@"to" stringValue:friendJid];
-    [message addAttributeWithName:@"from" stringValue:myDelegate.xmppLogedInUserId];
+    [message addAttributeWithName:@"from" stringValue:appDelegate.xmppLogedInUserId];
     
     [dataTag addAttributeWithName:@"to" stringValue:friendJid];
-    [dataTag addAttributeWithName:@"from" stringValue:myDelegate.xmppLogedInUserId];
+    [dataTag addAttributeWithName:@"from" stringValue:appDelegate.xmppLogedInUserId];
     [dataTag addAttributeWithName:@"time" stringValue:formattedTime];
     //        [message addAttributeWithName:@"Name" stringValue:[UserDefaultManager getValue:@"userName"]];
     [dataTag addAttributeWithName:@"date" stringValue:formattedDate];
-    //        [message addAttributeWithName:@"from-To" stringValue:[NSString stringWithFormat:@"%@-%@",myDelegate.xmppLogedInUserId,friendUserJid]];
+    //        [message addAttributeWithName:@"from-To" stringValue:[NSString stringWithFormat:@"%@-%@",appDelegate.xmppLogedInUserId,friendUserJid]];
     [dataTag addAttributeWithName:@"senderName" stringValue:appDelegate.xmppLogedInUserName];
     [dataTag addAttributeWithName:@"receiverName" stringValue:friendName];
     //    }
@@ -245,9 +245,9 @@
 
 - (void)sendLocationXmppMessage:(NSString *)friendJid friendName:(NSString *)friendName messageString:(NSString *)messageString latitude:(NSString *)latitude longitude:(NSString *)longitude {
     
-    [myDelegate.xmppMessageArchivingModule setClientSideMessageArchivingOnly:YES];
-    [myDelegate.xmppMessageArchivingModule activate:[self xmppStream]];    //By this line all your messages are stored in CoreData
-    [myDelegate.xmppMessageArchivingModule addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    [appDelegate.xmppMessageArchivingModule setClientSideMessageArchivingOnly:YES];
+    [appDelegate.xmppMessageArchivingModule activate:[self xmppStream]];    //By this line all your messages are stored in CoreData
+    [appDelegate.xmppMessageArchivingModule addDelegate:self delegateQueue:dispatch_get_main_queue()];
     NSString *messageStr = [messageString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"HH:mm:ss"];
@@ -268,15 +268,15 @@
     
     [message addAttributeWithName:@"type" stringValue:@"chat"];
     [message addAttributeWithName:@"to" stringValue:friendJid];
-    [message addAttributeWithName:@"from" stringValue:myDelegate.xmppLogedInUserId];
+    [message addAttributeWithName:@"from" stringValue:appDelegate.xmppLogedInUserId];
     
     [dataTag addAttributeWithName:@"xmlns" stringValue:@"main"];
     [dataTag addAttributeWithName:@"chatType" stringValue:@"Location"];
     [message addAttributeWithName:@"to" stringValue:friendJid];
-    [message addAttributeWithName:@"from" stringValue:myDelegate.xmppLogedInUserId];
+    [message addAttributeWithName:@"from" stringValue:appDelegate.xmppLogedInUserId];
     
     [dataTag addAttributeWithName:@"to" stringValue:friendJid];
-    [dataTag addAttributeWithName:@"from" stringValue:myDelegate.xmppLogedInUserId];
+    [dataTag addAttributeWithName:@"from" stringValue:appDelegate.xmppLogedInUserId];
     [dataTag addAttributeWithName:@"time" stringValue:formattedTime];
     [dataTag addAttributeWithName:@"date" stringValue:formattedDate];
     [dataTag addAttributeWithName:@"senderName" stringValue:appDelegate.xmppLogedInUserName];
@@ -303,7 +303,7 @@
 
 - (void)historUpdated:(NSNotification *)notification {
     
-//    NSString *keyName = myDelegate.chatUser;
+//    NSString *keyName = appDelegate.chatUser;
 //    if ([[UserDefaultManager getValue:@"CountData"] objectForKey:keyName] != nil) {
 //        int tempCount = 0;
 //        NSMutableDictionary *tempDict = [[UserDefaultManager getValue:@"CountData"] mutableCopy];
@@ -330,13 +330,13 @@
     fileAttachmentMessage=nil;
     uniqueId=@"";
     NSData *imageData=[appDelegate listionSendAttachedImageCacheDirectoryFileName:fileName];
-    XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",appDelegate.selectedFriendUserId,[[myDelegate.xmppStream myJID] resource]]];
+    XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",appDelegate.selectedFriendUserId,[[appDelegate.xmppStream myJID] resource]]];
 //    if (!_fileTransfer) {
         _fileTransfer = [[XMPPOutgoingFileTransfer alloc]
                          initWithDispatchQueue:dispatch_get_main_queue()];
     _fileTransfer.disableIBB = NO;
     _fileTransfer.disableSOCKS5 = YES;
-        [_fileTransfer activate:myDelegate.xmppStream];
+        [_fileTransfer activate:appDelegate.xmppStream];
         [_fileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
 //    }
     
@@ -365,13 +365,13 @@
     fileAttachmentMessage=nil;
     uniqueId=@"";
     NSData *locaitonImageData=[appDelegate listionSendAttachedLocationImageCacheDirectoryFileName:fileName];
-    XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",appDelegate.selectedFriendUserId,[[myDelegate.xmppStream myJID] resource]]];
+    XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",appDelegate.selectedFriendUserId,[[appDelegate.xmppStream myJID] resource]]];
     //    if (!_fileTransfer) {
     _fileTransfer = [[XMPPOutgoingFileTransfer alloc]
                      initWithDispatchQueue:dispatch_get_main_queue()];
     _fileTransfer.disableIBB = NO;
     _fileTransfer.disableSOCKS5 = YES;
-    [_fileTransfer activate:myDelegate.xmppStream];
+    [_fileTransfer activate:appDelegate.xmppStream];
     [_fileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
     //    }
     
@@ -400,13 +400,13 @@
     fileAttachmentMessage=nil;
     uniqueId=@"";
     NSData *fileData=[appDelegate documentCacheDirectoryFileName:fileName];
-    XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",appDelegate.selectedFriendUserId,[[myDelegate.xmppStream myJID] resource]]];
+    XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",appDelegate.selectedFriendUserId,[[appDelegate.xmppStream myJID] resource]]];
     //    if (!_fileTransfer) {
     _fileTransfer = [[XMPPOutgoingFileTransfer alloc]
                      initWithDispatchQueue:dispatch_get_main_queue()];
     _fileTransfer.disableIBB = NO;
     _fileTransfer.disableSOCKS5 = YES;
-    [_fileTransfer activate:myDelegate.xmppStream];
+    [_fileTransfer activate:appDelegate.xmppStream];
     [_fileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
     //    }
     
@@ -460,7 +460,7 @@
     [dataTag addAttributeWithName:@"time" stringValue:formattedTime];
     //        [message addAttributeWithName:@"Name" stringValue:[UserDefaultManager getValue:@"userName"]];
     [dataTag addAttributeWithName:@"date" stringValue:formattedDate];
-    //        [message addAttributeWithName:@"from-To" stringValue:[NSString stringWithFormat:@"%@-%@",myDelegate.xmppLogedInUserId,friendUserJid]];
+    //        [message addAttributeWithName:@"from-To" stringValue:[NSString stringWithFormat:@"%@-%@",appDelegate.xmppLogedInUserId,friendUserJid]];
     [dataTag addAttributeWithName:@"senderName" stringValue:appDelegate.xmppLogedInUserName];
     [dataTag addAttributeWithName:@"receiverName" stringValue:friendName];
     //    }

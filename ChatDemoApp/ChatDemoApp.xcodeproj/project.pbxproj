@@ -44,6 +44,8 @@
 		B75BC5781E3F620500E5F780 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B75BC5771E3F620500E5F780 /* CoreData.framework */; };
 		B75E7EF61E5BF1E600634A68 /* XmppCoreDataHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = B75E7EF51E5BF1E600634A68 /* XmppCoreDataHandler.m */; };
 		B76F75E91E40ABD8001FE579 /* DashboardXMPP.m in Sources */ = {isa = PBXBuildFile; fileRef = B76F75E81E40ABD8001FE579 /* DashboardXMPP.m */; };
+		B770B8B51E8E272C0008563A /* Internet.m in Sources */ = {isa = PBXBuildFile; fileRef = B770B8B41E8E272C0008563A /* Internet.m */; };
+		B770B8B91E8E2F0A0008563A /* iToast.m in Sources */ = {isa = PBXBuildFile; fileRef = B770B8B81E8E2F0A0008563A /* iToast.m */; };
 		B77DB0E71E7FE90F00D0259C /* alreadyAdded.png in Resources */ = {isa = PBXBuildFile; fileRef = B77DB0E61E7FE90F00D0259C /* alreadyAdded.png */; };
 		B77DFFDF1E4C2E2100921126 /* ChatScreenViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B77DFFDE1E4C2E2100921126 /* ChatScreenViewController.m */; };
 		B77DFFE21E4C2E3100921126 /* XMPPChatView.m in Sources */ = {isa = PBXBuildFile; fileRef = B77DFFE11E4C2E3100921126 /* XMPPChatView.m */; };
@@ -140,6 +142,10 @@
 		B75E7EF71E5C1CA200634A68 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		B76F75E71E40ABD8001FE579 /* DashboardXMPP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DashboardXMPP.h; sourceTree = "<group>"; };
 		B76F75E81E40ABD8001FE579 /* DashboardXMPP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DashboardXMPP.m; sourceTree = "<group>"; };
+		B770B8B31E8E272C0008563A /* Internet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Internet.h; sourceTree = "<group>"; };
+		B770B8B41E8E272C0008563A /* Internet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Internet.m; sourceTree = "<group>"; };
+		B770B8B71E8E2F0A0008563A /* iToast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iToast.h; sourceTree = "<group>"; };
+		B770B8B81E8E2F0A0008563A /* iToast.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iToast.m; sourceTree = "<group>"; };
 		B77DB0E61E7FE90F00D0259C /* alreadyAdded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = alreadyAdded.png; sourceTree = "<group>"; };
 		B77DFFDD1E4C2E2100921126 /* ChatScreenViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatScreenViewController.h; sourceTree = "<group>"; };
 		B77DFFDE1E4C2E2100921126 /* ChatScreenViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatScreenViewController.m; sourceTree = "<group>"; };
@@ -328,8 +334,8 @@
 		B72D4EEB1E8D36C300D22E67 /* InternetReachability */ = {
 			isa = PBXGroup;
 			children = (
-				B72D4EEC1E8D36E500D22E67 /* Reachability.h */,
-				B72D4EED1E8D36E500D22E67 /* Reachability.m */,
+				B770B8B31E8E272C0008563A /* Internet.h */,
+				B770B8B41E8E272C0008563A /* Internet.m */,
 			);
 			name = InternetReachability;
 			sourceTree = "<group>";
@@ -365,6 +371,7 @@
 			isa = PBXGroup;
 			children = (
 				B77DFFF81E4C72D200921126 /* a.pdf */,
+				B770B8A61E8E19940008563A /* XMPPCustomFiles */,
 				B745F83E1E235190001119BD /* AppDelegate */,
 				B745F83F1E23519A001119BD /* Views */,
 				B745F84D1E23535F001119BD /* HelperClasses */,
@@ -399,13 +406,6 @@
 			children = (
 				B745F82A1E234D55001119BD /* AppDelegate.h */,
 				B745F82B1E234D55001119BD /* AppDelegate.m */,
-				B70AE6681E2F1EC600554038 /* AppDelegateObjectFile.h */,
-				B70AE6691E2F1EC600554038 /* AppDelegateObjectFile.m */,
-				B75E7EF41E5BF1E600634A68 /* XmppCoreDataHandler.h */,
-				B75E7EF51E5BF1E600634A68 /* XmppCoreDataHandler.m */,
-				B780E9F51E2F6E1A00437B4E /* ErrorCode.h */,
-				B780E9F61E2F6E1A00437B4E /* ErrorCode.m */,
-				B75BC5741E3F60A500E5F780 /* XmppStorageModel.xcdatamodeld */,
 			);
 			name = AppDelegate;
 			sourceTree = "<group>";
@@ -413,14 +413,14 @@
 		B745F83F1E23519A001119BD /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				B715A0B51E5E9BA700B36D16 /* SettingView */,
-				B72DD0751E5DABF20017C488 /* EditUserStatus */,
 				B745F8401E2351A7001119BD /* LoginView */,
 				B745F8411E2351B1001119BD /* RegisterView */,
+				B75792551E42E1F000AC48D0 /* UserProfile */,
+				B72DD0751E5DABF20017C488 /* EditUserStatus */,
 				B745F8421E2351B9001119BD /* DashboardView */,
 				B77DFFDC1E4C2DFD00921126 /* ChatScreenView */,
-				B75792551E42E1F000AC48D0 /* UserProfile */,
 				B745F8431E2351C3001119BD /* GroupConversationView */,
+				B715A0B51E5E9BA700B36D16 /* SettingView */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -430,10 +430,6 @@
 			children = (
 				B745F82D1E234D55001119BD /* ViewController.h */,
 				B745F82E1E234D55001119BD /* ViewController.m */,
-				B75126DE1E30745000495348 /* LoginXMPP.h */,
-				B75126DF1E30745000495348 /* LoginXMPP.m */,
-				B79CA25C1E30BCFC007CDB23 /* XMPPUserDefaultManager.h */,
-				B79CA25D1E30BCFC007CDB23 /* XMPPUserDefaultManager.m */,
 			);
 			name = LoginView;
 			sourceTree = "<group>";
@@ -443,8 +439,6 @@
 			children = (
 				B745F8441E2351F1001119BD /* RegisterViewController.h */,
 				B745F8451E2351F1001119BD /* RegisterViewController.m */,
-				B7A7A99E1E2F64060027D2B6 /* RegisterXMPP.h */,
-				B7A7A99F1E2F64060027D2B6 /* RegisterXMPP.m */,
 			);
 			name = RegisterView;
 			sourceTree = "<group>";
@@ -454,8 +448,6 @@
 			children = (
 				B745F8471E2351FF001119BD /* DashboardViewController.h */,
 				B745F8481E2351FF001119BD /* DashboardViewController.m */,
-				B76F75E71E40ABD8001FE579 /* DashboardXMPP.h */,
-				B76F75E81E40ABD8001FE579 /* DashboardXMPP.m */,
 			);
 			name = DashboardView;
 			sourceTree = "<group>";
@@ -466,8 +458,6 @@
 				B70FC2D61E6E6AEE00292950 /* GroupChatFormView */,
 				B70FC2D71E6E6B0E00292950 /* GroupInvitionView */,
 				B70FC2D81E6E6BB200292950 /* GroupChatView */,
-				B70FC3011E6EB8BE00292950 /* XMPPGroupChatRoom.h */,
-				B70FC3021E6EB8BE00292950 /* XMPPGroupChatRoom.m */,
 			);
 			name = GroupConversationView;
 			sourceTree = "<group>";
@@ -475,10 +465,9 @@
 		B745F84D1E23535F001119BD /* HelperClasses */ = {
 			isa = PBXGroup;
 			children = (
+				B770B8AE1E8E1AE20008563A /* ToastFile */,
 				B72D4EEB1E8D36C300D22E67 /* InternetReachability */,
 				B70BF22F1E812282005C5B03 /* ButtonClass */,
-				B77DFFE91E4C329E00921126 /* FileTransfer */,
-				B7CC6C511E27B0A000F471B6 /* XMPPFramework.h */,
 				B745F8661E23595F001119BD /* SegmentControl */,
 				B745F8571E235425001119BD /* BSKeyboardControl */,
 				B745F8501E2353C1001119BD /* Loader */,
@@ -549,10 +538,113 @@
 				B75792571E42E22300AC48D0 /* UserProfileViewController.m */,
 				B757925C1E43289300AC48D0 /* EditProfileViewController.h */,
 				B757925D1E43289300AC48D0 /* EditProfileViewController.m */,
+			);
+			name = UserProfile;
+			sourceTree = "<group>";
+		};
+		B770B8A61E8E19940008563A /* XMPPCustomFiles */ = {
+			isa = PBXGroup;
+			children = (
+				B72D4EEC1E8D36E500D22E67 /* Reachability.h */,
+				B72D4EED1E8D36E500D22E67 /* Reachability.m */,
+				B770B8B61E8E28020008563A /* AppdelegateXMPP */,
+				B770B8AD1E8E1A470008563A /* GroupChatXMPP */,
+				B770B8AC1E8E1A350008563A /* UserProfileXMPP */,
+				B770B8AB1E8E1A1A0008563A /* OneToOneChatXMPP */,
+				B770B8AA1E8E19FD0008563A /* DashboardXMPP */,
+				B770B8A91E8E19F00008563A /* RegisterXMPP */,
+				B770B8A81E8E19DA0008563A /* LgoinXMPP */,
+				B770B8A71E8E19C80008563A /* XMPPUserDefault */,
+				B77DFFE91E4C329E00921126 /* FileTransfer */,
+				B7CC6C511E27B0A000F471B6 /* XMPPFramework.h */,
+			);
+			name = XMPPCustomFiles;
+			sourceTree = "<group>";
+		};
+		B770B8A71E8E19C80008563A /* XMPPUserDefault */ = {
+			isa = PBXGroup;
+			children = (
+				B79CA25C1E30BCFC007CDB23 /* XMPPUserDefaultManager.h */,
+				B79CA25D1E30BCFC007CDB23 /* XMPPUserDefaultManager.m */,
+			);
+			name = XMPPUserDefault;
+			sourceTree = "<group>";
+		};
+		B770B8A81E8E19DA0008563A /* LgoinXMPP */ = {
+			isa = PBXGroup;
+			children = (
+				B75126DE1E30745000495348 /* LoginXMPP.h */,
+				B75126DF1E30745000495348 /* LoginXMPP.m */,
+			);
+			name = LgoinXMPP;
+			sourceTree = "<group>";
+		};
+		B770B8A91E8E19F00008563A /* RegisterXMPP */ = {
+			isa = PBXGroup;
+			children = (
+				B7A7A99E1E2F64060027D2B6 /* RegisterXMPP.h */,
+				B7A7A99F1E2F64060027D2B6 /* RegisterXMPP.m */,
+			);
+			name = RegisterXMPP;
+			sourceTree = "<group>";
+		};
+		B770B8AA1E8E19FD0008563A /* DashboardXMPP */ = {
+			isa = PBXGroup;
+			children = (
+				B76F75E71E40ABD8001FE579 /* DashboardXMPP.h */,
+				B76F75E81E40ABD8001FE579 /* DashboardXMPP.m */,
+			);
+			name = DashboardXMPP;
+			sourceTree = "<group>";
+		};
+		B770B8AB1E8E1A1A0008563A /* OneToOneChatXMPP */ = {
+			isa = PBXGroup;
+			children = (
+				B77DFFE01E4C2E3100921126 /* XMPPChatView.h */,
+				B77DFFE11E4C2E3100921126 /* XMPPChatView.m */,
+			);
+			name = OneToOneChatXMPP;
+			sourceTree = "<group>";
+		};
+		B770B8AC1E8E1A350008563A /* UserProfileXMPP */ = {
+			isa = PBXGroup;
+			children = (
 				B75792591E42E23800AC48D0 /* XmppProfileView.h */,
 				B757925A1E42E23800AC48D0 /* XmppProfileView.m */,
 			);
-			name = UserProfile;
+			name = UserProfileXMPP;
+			sourceTree = "<group>";
+		};
+		B770B8AD1E8E1A470008563A /* GroupChatXMPP */ = {
+			isa = PBXGroup;
+			children = (
+				B70FC3011E6EB8BE00292950 /* XMPPGroupChatRoom.h */,
+				B70FC3021E6EB8BE00292950 /* XMPPGroupChatRoom.m */,
+			);
+			name = GroupChatXMPP;
+			sourceTree = "<group>";
+		};
+		B770B8AE1E8E1AE20008563A /* ToastFile */ = {
+			isa = PBXGroup;
+			children = (
+				B770B8B71E8E2F0A0008563A /* iToast.h */,
+				B770B8B81E8E2F0A0008563A /* iToast.m */,
+			);
+			name = ToastFile;
+			sourceTree = "<group>";
+		};
+		B770B8B61E8E28020008563A /* AppdelegateXMPP */ = {
+			isa = PBXGroup;
+			children = (
+				B70AE6681E2F1EC600554038 /* AppDelegateObjectFile.h */,
+				B70AE6691E2F1EC600554038 /* AppDelegateObjectFile.m */,
+				B75E7EF41E5BF1E600634A68 /* XmppCoreDataHandler.h */,
+				B75E7EF51E5BF1E600634A68 /* XmppCoreDataHandler.m */,
+				B780E9F51E2F6E1A00437B4E /* ErrorCode.h */,
+				B780E9F61E2F6E1A00437B4E /* ErrorCode.m */,
+				B75BC5741E3F60A500E5F780 /* XmppStorageModel.xcdatamodeld */,
+			);
+			name = AppdelegateXMPP;
 			sourceTree = "<group>";
 		};
 		B77DFFDC1E4C2DFD00921126 /* ChatScreenView */ = {
@@ -566,8 +658,6 @@
 				B77DFFDE1E4C2E2100921126 /* ChatScreenViewController.m */,
 				B7131E5B1E52DA3A00A435A3 /* ChatScreenTableViewCell.h */,
 				B7131E5C1E52DA3A00A435A3 /* ChatScreenTableViewCell.m */,
-				B77DFFE01E4C2E3100921126 /* XMPPChatView.h */,
-				B77DFFE11E4C2E3100921126 /* XMPPChatView.m */,
 			);
 			name = ChatScreenView;
 			sourceTree = "<group>";
@@ -761,11 +851,13 @@
 				B7005C1F1E5FE62F003A56D3 /* LocationViewController.m in Sources */,
 				B7A7A9A01E2F64060027D2B6 /* RegisterXMPP.m in Sources */,
 				B77DFFE21E4C2E3100921126 /* XMPPChatView.m in Sources */,
+				B770B8B51E8E272C0008563A /* Internet.m in Sources */,
 				B77DFFE81E4C2F3200921126 /* UIPlaceHolderTextView.m in Sources */,
 				B75E7EF61E5BF1E600634A68 /* XmppCoreDataHandler.m in Sources */,
 				B745F85A1E235435001119BD /* BSKeyboardControls.m in Sources */,
 				B70FC3091E6EB8EB00292950 /* GroupInvitationViewController.m in Sources */,
 				B745F8691E23596D001119BD /* HMSegmentedControl.m in Sources */,
+				B770B8B91E8E2F0A0008563A /* iToast.m in Sources */,
 				B77DFFF31E4C32C500921126 /* XMPPIncomingFileTransfer.m in Sources */,
 				B70FC30D1E6EB8FF00292950 /* GroupChatFormViewController.m in Sources */,
 				B7B9A5661E23B17A00DB4429 /* MMMaterialDesignSpinner.m in Sources */,

@@ -219,22 +219,30 @@
 #pragma mark - Webservice
 - (void)userSignUp {
     
-    //If you want no password form then commented this code
-    //You can add these optional values
-    NSMutableDictionary *profileData=[NSMutableDictionary new];
-    [profileData setObject:self.usernameField.text forKey:self.xmppName];
-    [profileData setObject:self.mobileField.text forKey:self.xmppPhoneNumber];
-    [profileData setObject:@"" forKey:self.xmppGender];
-    [profileData setObject:@"" forKey:self.xmppAddress];
-    [profileData setObject:self.userStatusField.text forKey:self.xmppUserStatus];
-    [profileData setObject:@"" forKey:self.xmppDescription];
-    [profileData setObject:self.emailField.text forKey:self.xmppEmailAddress];
-    [profileData setObject:@"" forKey:self.xmppUserBirthDay];
-    
-    [self userRegistrationPassword:self.password.text userName:self.mobileField.text profileData:profileData profilePlaceholder:@"profile_camera" profileImageView:self.profileImageView.image];
-    /*//If you want no password form then uncomment this code
-    [self userRegistrationWithoutPassword:self.mobileField.text profileData:profileData profilePlaceholder:@"profile_camera" profileImageView:self.profileImageView.image];
-     */
+    Internet *internet=[[Internet alloc] init];
+    if ([internet start]) {
+        
+        [myDelegate stopIndicator];
+    }
+    else {
+        
+        //If you want no password form then commented this code
+        //You can add these optional values
+        NSMutableDictionary *profileData=[NSMutableDictionary new];
+        [profileData setObject:self.usernameField.text forKey:self.xmppName];
+        [profileData setObject:self.mobileField.text forKey:self.xmppPhoneNumber];
+        [profileData setObject:@"" forKey:self.xmppGender];
+        [profileData setObject:@"" forKey:self.xmppAddress];
+        [profileData setObject:self.userStatusField.text forKey:self.xmppUserStatus];
+        [profileData setObject:@"" forKey:self.xmppDescription];
+        [profileData setObject:self.emailField.text forKey:self.xmppEmailAddress];
+        [profileData setObject:@"" forKey:self.xmppUserBirthDay];
+        
+        [self userRegistrationPassword:self.password.text userName:self.mobileField.text profileData:profileData profilePlaceholder:@"profile_camera" profileImageView:self.profileImageView.image];
+        /*//If you want no password form then uncomment this code
+         [self userRegistrationWithoutPassword:self.mobileField.text profileData:profileData profilePlaceholder:@"profile_camera" profileImageView:self.profileImageView.image];
+         */
+    }
 }
 
 //Register XMPP method

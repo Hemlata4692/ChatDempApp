@@ -253,6 +253,13 @@
 #pragma mark - Webservice
 - (void)userUpdateProfile {
     
+    Internet *internet=[[Internet alloc] init];
+    if ([internet start]) {
+        
+        [myDelegate stopIndicator];
+    }
+    else {
+
     //You can add these optional values. if you donot add these values then set @"" as default value
     NSMutableDictionary *profileData=[NSMutableDictionary new];
     [profileData setObject:self.userNameField.text forKey:self.xmppName];
@@ -265,6 +272,7 @@
     [profileData setObject:[profileDic objectForKey:@"UserBirthDay"] forKey:self.xmppUserBirthDay];
     
     [self userUpdateProfileUsingVCard:profileData profilePlaceholder:@"profile_camera" profileImageView:self.profileImage.image];
+    }
 }
 
 #pragma mark - ImagePicker delegate

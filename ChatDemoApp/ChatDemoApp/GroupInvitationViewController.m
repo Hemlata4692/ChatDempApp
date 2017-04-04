@@ -124,7 +124,7 @@
                                       reuseIdentifier:CellIdentifier];
     }
     
-    [cell displayContactInformation:[[friendDetails objectForKey:[friendJids objectAtIndex:indexPath.row]] mutableCopy] isSelected:[selectedJids containsObject:[friendJids objectAtIndex:indexPath.row]] isAlreadyAdded:[alreadyAddJids containsObject:[friendJids objectAtIndex:indexPath.row]]];
+    [cell displayContactInformation:[[friendDetails objectForKey:[friendJids objectAtIndex:indexPath.row]] mutableCopy] isSelected:[selectedJids containsObject:[friendJids objectAtIndex:indexPath.row]] isAlreadyAdded:[alreadyAddJids containsObject:[friendJids objectAtIndex:indexPath.row]] presenceStatus:[self getPresenceStatus:[friendJids objectAtIndex:indexPath.row]]];
     [self configurePhotoForCell:cell jid:[friendJids objectAtIndex:indexPath.row]];
     
     cell.friendProfilePhoto.userInteractionEnabled=YES;

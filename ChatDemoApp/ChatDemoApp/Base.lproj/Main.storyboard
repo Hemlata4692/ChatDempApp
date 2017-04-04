@@ -641,9 +641,21 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="J4p-Bn-H4c">
+                                                    <rect key="frame" x="35" y="36" width="14" height="14"/>
+                                                    <color key="backgroundColor" red="0.0" green="0.62745098040000002" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="14" id="j18-7D-zXU"/>
+                                                        <constraint firstAttribute="width" constant="14" id="zDH-2E-6Gq"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="bottom" secondItem="QvH-qP-hzm" secondAttribute="bottom" id="7rq-i9-Cxv"/>
+                                                <constraint firstItem="J4p-Bn-H4c" firstAttribute="leading" secondItem="cgp-kD-LU6" secondAttribute="leading" constant="35" id="JLT-9i-IRZ"/>
                                                 <constraint firstAttribute="trailing" secondItem="UoF-WV-vts" secondAttribute="trailing" constant="8" id="NXS-TV-ayq"/>
                                                 <constraint firstItem="UoF-WV-vts" firstAttribute="centerY" secondItem="cgp-kD-LU6" secondAttribute="centerY" id="PBC-kO-QSr"/>
                                                 <constraint firstAttribute="trailing" secondItem="OZW-hn-YHv" secondAttribute="trailing" constant="8" id="Pfa-Lt-65R"/>
@@ -651,6 +663,7 @@
                                                 <constraint firstItem="IUM-fR-Ed6" firstAttribute="leading" secondItem="cgp-kD-LU6" secondAttribute="leading" constant="8" id="WcK-4q-Cvj"/>
                                                 <constraint firstItem="IUM-fR-Ed6" firstAttribute="centerY" secondItem="cgp-kD-LU6" secondAttribute="centerY" id="XeC-ae-yfn"/>
                                                 <constraint firstItem="QvH-qP-hzm" firstAttribute="top" secondItem="cgp-kD-LU6" secondAttribute="top" id="mvU-bt-Ltc"/>
+                                                <constraint firstAttribute="bottom" secondItem="J4p-Bn-H4c" secondAttribute="bottom" constant="9" id="tvr-Kf-HhG"/>
                                                 <constraint firstItem="QvH-qP-hzm" firstAttribute="leading" secondItem="IUM-fR-Ed6" secondAttribute="trailing" constant="8" id="vzi-7h-g9d"/>
                                                 <constraint firstItem="UoF-WV-vts" firstAttribute="leading" secondItem="QvH-qP-hzm" secondAttribute="trailing" constant="8" id="xbo-LV-noP"/>
                                             </constraints>
@@ -659,6 +672,7 @@
                                             <outlet property="alreadyAddedIcon" destination="OZW-hn-YHv" id="fsD-C2-OgX"/>
                                             <outlet property="friendName" destination="QvH-qP-hzm" id="sba-dK-Jee"/>
                                             <outlet property="friendProfilePhoto" destination="IUM-fR-Ed6" id="RZe-tO-fOh"/>
+                                            <outlet property="presenceIndicator" destination="J4p-Bn-H4c" id="6gm-ve-iCW"/>
                                             <outlet property="selectedIcon" destination="UoF-WV-vts" id="Yk6-Nt-yaM"/>
                                         </connections>
                                     </tableViewCell>

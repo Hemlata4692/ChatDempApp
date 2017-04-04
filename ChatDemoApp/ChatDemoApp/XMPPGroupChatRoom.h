@@ -78,4 +78,6 @@ typedef NS_ENUM (NSInteger, GroupChatType){
 - (void)sendFileFailDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId;
 - (void)sendFileProgressDelegate:(NSXMLElement *)message;
 
+//Check presence
+- (int)getPresenceStatus:(NSString *)jid;
 @end

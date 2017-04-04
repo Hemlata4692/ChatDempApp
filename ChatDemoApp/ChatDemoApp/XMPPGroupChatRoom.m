@@ -48,9 +48,6 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sendFileSuccessNotify:) name:@"SendFileSuccessNotify" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sendFileFailNotify:) name:@"SendFileFailNotify" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sendFileProgressNotify:) name:@"SendFileProgressNotify" object:nil];
-
-    
-    
     // Do any additional setup after loading the view.
 }
 
@@ -1210,6 +1207,22 @@
     [[XmppCoreDataHandler sharedManager] insertLocalMessageStorageDataBase:roomJid message:message];
     [self XmppSendMessageResponse:[message copy]];
 }
+
+#pragma mark - Check presence
+- (int)getPresenceStatus:(NSString *)jid {
+    
+    if (appDelegate.xmppUserDetailedList==nil || appDelegate.xmppUserDetailedList.count==0) {
+        
+        NSMutableDictionary *temp=[XMPPUserDefaultManager getValue:@"xmppUserDetailedList"];
+        return [[temp objectForKey:jid] intValue];
+    }
+    else {
+        
+        XMPPUserCoreDataStorageObject *user=[appDelegate.xmppUserDetailedList objectForKey:jid];
+        return [user.sectionNum intValue];
+    }
+}
+#pragma mark - end
 
 /*
 #pragma mark - Navigation

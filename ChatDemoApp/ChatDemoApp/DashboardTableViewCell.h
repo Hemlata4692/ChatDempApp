@@ -16,8 +16,10 @@
 @property (strong, nonatomic) IBOutlet UIButton *profileBtn;
 @property (strong, nonatomic) IBOutlet UILabel *timeLabel;
 @property (strong, nonatomic) IBOutlet UILabel *badgeLabel;
+@property (strong, nonatomic) IBOutlet UILabel *presenceIndicator;
 
-- (void)displayContactListUserData:(NSMutableDictionary *)userProfileData jid:(NSString *)jid index:(int)index;
+
+- (void)displayContactListUserData:(NSMutableDictionary *)userProfileData jid:(NSString *)jid index:(int)index presenceStatus:(int)presenceStatus;
 - (void)displayHistoryListUserData:(NSXMLElement *)historyElement index:(int)index;
 - (void)displayGroupListData:(NSMutableDictionary *)groupDataDic;
 @end

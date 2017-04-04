@@ -35,7 +35,7 @@
     self.navigationItem.title=@"New Group";
     [self setKeyboardControls:[[BSKeyboardControls alloc] initWithFields:@[self.addRoomName, self.groupDescription]]];
     [self.keyboardControls setDelegate:self];
-    [self addLeftBarButtonWithImage:[UIImage imageNamed:@"back_white"]];
+    [self addLeftBarButtonWithImage:[UIImage imageNamed:@"back"]];
     [self viewInitialized];
     // Do any additional setup after loading the view.
 }

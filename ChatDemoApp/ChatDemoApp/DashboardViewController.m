@@ -130,8 +130,8 @@
     if (customSegmentedControl.selectedSegmentIndex==2) {
 
         NSLog(@"%@",[userListArray objectAtIndex:indexPath.row]);
-        [cell displayContactListUserData:[[profileLocalDictData objectForKey:[userListArray objectAtIndex:indexPath.row]] mutableCopy] jid:[userListArray objectAtIndex:indexPath.row] index:(int)indexPath.row];
-        [cell.profileBtn addTarget:self action:@selector(friendProfileAction:) forControlEvents:UIControlEventTouchUpInside];
+        [cell displayContactListUserData:[[profileLocalDictData objectForKey:[userListArray objectAtIndex:indexPath.row]] mutableCopy] jid:[userListArray objectAtIndex:indexPath.row] index:(int)indexPath.row presenceStatus:[self getPresenceStatus:[userListArray objectAtIndex:indexPath.row]]];
+        [cell.profileBtn addTarget:self action:@selector(friendProfileAction:) forControlEvents:UIControlEventTouchUpInside];        
     }
     else if (customSegmentedControl.selectedSegmentIndex==0) {
         
@@ -440,6 +440,14 @@
 #pragma mark - end
 
 #pragma mark - DashboardXMPP method
+- (void)xmppPresenceUpdateNotify {
+
+    if (customSegmentedControl.selectedSegmentIndex==2) {
+        
+        [self.dasboardTableListing reloadData];
+    }
+}
+
 - (void)xmppUserListResponse:(NSMutableDictionary *)xmppUserDetails xmppUserListIds:(NSMutableArray *)xmppUserListIds {
     
     [self addBarButton];
@@ -466,7 +474,6 @@
         else {
             [self getListOfGroups];
         }
-        
     }];
 }
 

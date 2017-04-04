@@ -41,7 +41,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:YES];
     
-    [self addLeftBarButtonWithImage:[UIImage imageNamed:@"back_white"]];
+    [self addLeftBarButtonWithImage:[UIImage imageNamed:@"back"]];
     self.profileImageView.layer.cornerRadius=96/2;
     self.profileImageView.layer.masksToBounds=YES;
 }

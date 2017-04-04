@@ -1912,8 +1912,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     return false;
 }
 
-- (void)xmppStream:(XMPPStream *)sender didReceivePresence:(XMPPPresence *)presence
-{
+- (void)xmppStream:(XMPPStream *)sender didReceivePresence:(XMPPPresence *)presence {
     
     NSString *presenceType = [presence type];
     if  ([presenceType isEqualToString:@"subscribe"]) {
@@ -1938,7 +1937,20 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         }
     }
     
-    if (isContactListIsLoaded && xmppUserListArray!=nil && [NSString stringWithFormat:@"%@",[presence from]]!=nil && [xmppUserListArray containsObject:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]] && [selectedFriendUserId isEqualToString:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]]) {
+    if (isContactListIsLoaded && xmppUserListArray!=nil && [NSString stringWithFormat:@"%@",[presence from]]!=nil && [xmppUserListArray containsObject:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]] && [selectedMemberUserIds containsObject:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]]) {
+        
+        XMPPUserCoreDataStorageObject *user=[xmppUserDetailedList objectForKey:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]];
+        if ([presenceType isEqualToString:@"available"]) {
+            user.sectionNum=[NSNumber numberWithInt:0];
+        }
+        else {
+            user.sectionNum=[NSNumber numberWithInt:2];
+        }
+        //Send presence status and set at particular jid in xmppUserDetailedList key
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"XmppGroupUserPresenceUpdate" object:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]];
+    }
+    //    if (isContactListIsLoaded && xmppUserListArray!=nil && [NSString stringWithFormat:@"%@",[presence from]]!=nil && [xmppUserListArray containsObject:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]] && [selectedFriendUserId isEqualToString:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]]) {
+    else  if (isContactListIsLoaded && xmppUserListArray!=nil && [NSString stringWithFormat:@"%@",[presence from]]!=nil && [xmppUserListArray containsObject:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]]) {
         
         //        switch (section)
         //        {
@@ -1965,18 +1977,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         }
         //Send presence status and set at particular jid in xmppUserDetailedList key
         [[NSNotificationCenter defaultCenter] postNotificationName:@"XmppUserPresenceUpdate" object:nil];
-    }
-    else if (isContactListIsLoaded && xmppUserListArray!=nil && [NSString stringWithFormat:@"%@",[presence from]]!=nil && [xmppUserListArray containsObject:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]] && [selectedMemberUserIds containsObject:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]]) {
-        
-        XMPPUserCoreDataStorageObject *user=[xmppUserDetailedList objectForKey:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]];
-        if ([presenceType isEqualToString:@"available"]) {
-            user.sectionNum=[NSNumber numberWithInt:0];
-        }
-        else {
-            user.sectionNum=[NSNumber numberWithInt:2];
-        }
-        //Send presence status and set at particular jid in xmppUserDetailedList key
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"XmppGroupUserPresenceUpdate" object:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]];
     }
     else if(nil!=groupDeleteInfo && [groupDeleteInfo containsString:@"muc#user"]) {
         

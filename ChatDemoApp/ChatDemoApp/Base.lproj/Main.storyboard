@@ -338,7 +338,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="60"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView userInteractionEnabled="NO" tag="2" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="cKd-yi-rQp">
+                                                <imageView userInteractionEnabled="NO" tag="2" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="galleryAttachment" translatesAutoresizingMaskIntoConstraints="NO" id="cKd-yi-rQp">
                                                     <rect key="frame" x="12" y="10" width="40" height="40"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="40" id="86D-pa-16T"/>
@@ -397,6 +397,17 @@
                                                     <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RVn-jv-4XR">
+                                                    <rect key="frame" x="41" y="37" width="14" height="14"/>
+                                                    <color key="backgroundColor" red="0.0" green="0.62745098039215685" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="14" id="2gC-W1-ATv"/>
+                                                        <constraint firstAttribute="height" constant="14" id="qN9-2M-bRp"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="trailing" secondItem="uAs-nb-2nH" secondAttribute="trailing" constant="8" id="0r7-gk-xJq"/>
@@ -404,6 +415,7 @@
                                                 <constraint firstItem="WYi-Y8-oJ1" firstAttribute="leading" secondItem="iuv-wc-CWd" secondAttribute="trailing" constant="8" id="6uW-74-GI5"/>
                                                 <constraint firstAttribute="bottom" secondItem="LFL-RF-hUQ" secondAttribute="bottom" constant="8" id="Bsg-b3-WlM"/>
                                                 <constraint firstItem="MeM-HM-zzK" firstAttribute="top" secondItem="BVb-Bs-if6" secondAttribute="bottom" constant="7" id="Eaa-MN-N1I"/>
+                                                <constraint firstAttribute="bottom" secondItem="RVn-jv-4XR" secondAttribute="bottom" constant="9" id="EfH-Hw-Vgp"/>
                                                 <constraint firstItem="iuv-wc-CWd" firstAttribute="height" secondItem="cKd-yi-rQp" secondAttribute="height" id="IBj-mD-wpn"/>
                                                 <constraint firstItem="MeM-HM-zzK" firstAttribute="leading" secondItem="hnu-96-Ra1" secondAttribute="leading" constant="51" id="LFO-8T-L4Z"/>
                                                 <constraint firstAttribute="trailing" secondItem="WYi-Y8-oJ1" secondAttribute="trailing" constant="77" id="SsM-i5-vA6"/>
@@ -411,6 +423,7 @@
                                                 <constraint firstAttribute="trailing" secondItem="LFL-RF-hUQ" secondAttribute="trailing" constant="8" id="ZeE-xn-ZRp"/>
                                                 <constraint firstAttribute="trailing" secondItem="BVb-Bs-if6" secondAttribute="trailing" constant="8" id="aR3-ic-rYb"/>
                                                 <constraint firstItem="cKd-yi-rQp" firstAttribute="centerY" secondItem="hnu-96-Ra1" secondAttribute="centerY" id="bZh-QR-Y35"/>
+                                                <constraint firstItem="RVn-jv-4XR" firstAttribute="leading" secondItem="hnu-96-Ra1" secondAttribute="leading" constant="41" id="dqZ-hQ-uRH"/>
                                                 <constraint firstItem="WYi-Y8-oJ1" firstAttribute="top" secondItem="hnu-96-Ra1" secondAttribute="top" constant="10" id="iKA-qp-N9E"/>
                                                 <constraint firstItem="LFL-RF-hUQ" firstAttribute="leading" secondItem="iuv-wc-CWd" secondAttribute="trailing" constant="8" id="lKe-hW-696"/>
                                                 <constraint firstItem="cKd-yi-rQp" firstAttribute="leading" secondItem="hnu-96-Ra1" secondAttribute="leading" constant="12" id="oYJ-bR-xKs"/>
@@ -423,6 +436,7 @@
                                         <connections>
                                             <outlet property="badgeLabel" destination="BVb-Bs-if6" id="fTA-8v-yqc"/>
                                             <outlet property="nameLabel" destination="WYi-Y8-oJ1" id="jKv-yX-gNO"/>
+                                            <outlet property="presenceIndicator" destination="RVn-jv-4XR" id="S35-ol-pFq"/>
                                             <outlet property="profileBtn" destination="iuv-wc-CWd" id="ahZ-Ks-NhQ"/>
                                             <outlet property="statusLabel" destination="LFL-RF-hUQ" id="9BL-Mq-dRk"/>
                                             <outlet property="timeLabel" destination="uAs-nb-2nH" id="BKf-zt-gSI"/>
@@ -2153,6 +2167,7 @@
         <image name="cross" width="33" height="33"/>
         <image name="currentLocationIcon" width="40" height="40"/>
         <image name="editProfile" width="40" height="40"/>
+        <image name="galleryAttachment" width="50" height="50"/>
         <image name="groupPlaceholderImage.png" width="300" height="300"/>
         <image name="profile_camera" width="96" height="96"/>
         <image name="sendIcon" width="30" height="30"/>

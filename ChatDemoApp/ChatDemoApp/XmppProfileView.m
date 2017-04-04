@@ -92,8 +92,9 @@
         return [[temp objectForKey:jid] intValue];
     }
     else {
-    XMPPUserCoreDataStorageObject *user=[appDelegate.xmppUserDetailedList objectForKey:jid];
-    return [user.sectionNum intValue];
+        
+        XMPPUserCoreDataStorageObject *user=[appDelegate.xmppUserDetailedList objectForKey:jid];
+        return [user.sectionNum intValue];
     }
 }
 

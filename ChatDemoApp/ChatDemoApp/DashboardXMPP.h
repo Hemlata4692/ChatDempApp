@@ -28,9 +28,12 @@
 - (void)xmppUserConnect;
 - (void)xmppOfflineUserConnect;
 - (void)xmppNewUserAddedNotify;
+- (void)xmppPresenceUpdateNotify;
 - (void)historyUpdateNotify;
 - (void)getProfilePhotosJid:(NSString *)jid profileImageView:(UIImageView *)profileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(UIImage *tempImage)) completion;
 //end
+//Check presence
+- (int)getPresenceStatus:(NSString *)jid;
 
 - (NSFetchedResultsController *)fetchedResultsController;
 

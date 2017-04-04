@@ -540,9 +540,9 @@
 		B770B8A61E8E19940008563A /* XMPPCustomFiles */ = {
 			isa = PBXGroup;
 			children = (
-				B72D4EEB1E8D36C300D22E67 /* InternetReachability */,
 				B7E0D99C1E4048C500397393 /* RegistrationProcess.rtf */,
 				B780E9F81E2F9FC200437B4E /* ReadMe.rtf */,
+				B72D4EEB1E8D36C300D22E67 /* InternetReachability */,
 				B770B8B61E8E28020008563A /* AppdelegateXMPP */,
 				B770B8AD1E8E1A470008563A /* GroupChatXMPP */,
 				B770B8AC1E8E1A350008563A /* UserProfileXMPP */,

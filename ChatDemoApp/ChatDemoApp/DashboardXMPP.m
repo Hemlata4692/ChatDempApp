@@ -37,7 +37,7 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProfileInformation) name:@"XMPPProfileUpdation" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppNewUserAddedNotify) name:@"XmppNewUserAdded" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppNewUserAddedNotify) name:@"XmppUserPresenceUpdate" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xmppPresenceUpdateNotify) name:@"XmppUserPresenceUpdate" object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(historUpdated:) name:@"UserHistory" object:nil];
     
@@ -208,6 +208,22 @@
 }
 #pragma mark - end
 
+#pragma mark - Check presence
+- (int)getPresenceStatus:(NSString *)jid {
+    
+    if (appDelegate.xmppUserDetailedList==nil || appDelegate.xmppUserDetailedList.count==0) {
+        
+        NSMutableDictionary *temp=[XMPPUserDefaultManager getValue:@"xmppUserDetailedList"];
+        return [[temp objectForKey:jid] intValue];
+    }
+    else {
+        
+        XMPPUserCoreDataStorageObject *user=[appDelegate.xmppUserDetailedList objectForKey:jid];
+        return [user.sectionNum intValue];
+    }
+}
+#pragma mark - end
+
 #pragma mark - Post notification action
 - (void)updateProfileInformation {}
 - (void)xmppUserListResponse:(NSMutableDictionary *)xmppUserDetails xmppUserListIds:(NSMutableArray *)xmppUserListIds {}
@@ -231,6 +247,7 @@
 #pragma mark - end
 
 - (void)xmppNewUserAddedNotify {}
+- (void)xmppPresenceUpdateNotify {}
 
 - (void)xmppUserRefreshResponse {
 

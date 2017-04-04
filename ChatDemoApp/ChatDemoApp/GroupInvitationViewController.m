@@ -38,7 +38,7 @@
     
     self.navigationItem.title=roomSubject;
     
-    [self addLeftBarButtonWithImage:[UIImage imageNamed:@"back_white"]];
+    [self addLeftBarButtonWithImage:[UIImage imageNamed:@"back"]];
     [self initializedView];
     
     if (!alreadyAddJids) {

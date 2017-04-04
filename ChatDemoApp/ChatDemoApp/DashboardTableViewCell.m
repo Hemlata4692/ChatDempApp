@@ -34,7 +34,7 @@
 
 #pragma mark - Display cell data
 //Set contact list user data
-- (void)displayContactListUserData:(NSMutableDictionary *)userProfileData jid:(NSString *)jid index:(int)index {
+- (void)displayContactListUserData:(NSMutableDictionary *)userProfileData jid:(NSString *)jid index:(int)index presenceStatus:(int)presenceStatus {
     
     self.badgeLabel.hidden=YES;
     self.profileBtn.hidden=NO;
@@ -42,11 +42,25 @@
     self.profileBtn.tag=(int)index;
     self.userImage.layer.cornerRadius=20;
     self.userImage.layer.masksToBounds=YES;
+    self.presenceIndicator.hidden=NO;
+    self.presenceIndicator.layer.cornerRadius=7;
+    self.presenceIndicator.layer.masksToBounds=YES;
     
     self.nameLabel.text = [userProfileData objectForKey:@"Name"];
     self.statusLabel.text=[userProfileData objectForKey:@"UserStatus"];
     NSLog(@" userStatus:%@ \n phoneNumber:%@ Desc:%@ \n address:%@ \n emailid:%@ \n birthDay:%@ \n gender:%@",[userProfileData objectForKey:@"UserStatus"],[userProfileData objectForKey:@"PhoneNumber"],[userProfileData objectForKey:@"Description"],[userProfileData objectForKey:@"Address"],[userProfileData objectForKey:@"EmailAddress"],[userProfileData objectForKey:@"UserBirthDay"],[userProfileData objectForKey:@"Gender"]);
     [self configurePhotoForCell:self jid:jid];
+    
+    self.presenceIndicator.layer.borderWidth=1.5;
+    self.presenceIndicator.layer.borderColor=[UIColor whiteColor].CGColor;
+    switch (presenceStatus) {
+        case 0:     // online/available
+            self.presenceIndicator.backgroundColor=[UIColor colorWithRed:0.0/255.0 green:160.0/255.0 blue:0.0/255.0 alpha:1.0];
+            break;
+        default:    //offline
+            self.presenceIndicator.backgroundColor=[UIColor redColor];
+            break;
+    }
 }
 
 //Set user history data
@@ -56,6 +70,7 @@
     self.profileBtn.hidden=NO;
     self.badgeLabel.layer.masksToBounds=YES;
     self.badgeLabel.layer.cornerRadius=10;
+    self.presenceIndicator.hidden=YES;
     
     NSXMLElement *innerData=[historyElement elementForName:@"data"];
     
@@ -119,6 +134,7 @@
 //Set user group chat data
 - (void)displayGroupListData:(NSMutableDictionary *)groupDataDic {
     
+    self.presenceIndicator.hidden=YES;
     self.timeLabel.hidden=YES;
     self.profileBtn.hidden=YES;
     self.userImage.layer.cornerRadius=20;

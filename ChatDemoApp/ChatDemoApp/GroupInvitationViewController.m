@@ -56,7 +56,7 @@
 - (void)addLeftBarButtonWithImage:(UIImage *)backImage {
     
     UIBarButtonItem *backBarButton;
-    CGRect framing = CGRectMake(0, 0, backImage.size.width, backImage.size.height);
+    CGRect framing = CGRectMake(0, 0, 25, 25);
     UIButton *back = [[UIButton alloc] initWithFrame:framing];
     [back setBackgroundImage:backImage forState:UIControlStateNormal];
     backBarButton =[[UIBarButtonItem alloc] initWithCustomView:back];
@@ -126,6 +126,14 @@
     
     [cell displayContactInformation:[[friendDetails objectForKey:[friendJids objectAtIndex:indexPath.row]] mutableCopy] isSelected:[selectedJids containsObject:[friendJids objectAtIndex:indexPath.row]] isAlreadyAdded:[alreadyAddJids containsObject:[friendJids objectAtIndex:indexPath.row]]];
     [self configurePhotoForCell:cell jid:[friendJids objectAtIndex:indexPath.row]];
+    
+    cell.friendProfilePhoto.userInteractionEnabled=YES;
+    cell.friendProfilePhoto.tag=indexPath.row;
+    UITapGestureRecognizer *singleFingerTap =
+    [[UITapGestureRecognizer alloc] initWithTarget:self
+                                            action:@selector(showUserFullImage:)];
+    [cell.friendProfilePhoto addGestureRecognizer:singleFingerTap];
+    
     return cell;
 }
 
@@ -160,6 +168,17 @@
 #pragma mark - end
 
 #pragma mark - IBActions
+- (IBAction)showUserFullImage:(UITapGestureRecognizer *)sender {
+    
+    UITapGestureRecognizer *gesture = (UITapGestureRecognizer *) sender;
+    UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    GlobalImageViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"GlobalImageViewController"];
+    popupView.globalImage=[UIImage imageWithData:[myDelegate listionDataFromCacheDirectoryFolderName:myDelegate.appProfilePhotofolderName jid:[friendJids objectAtIndex:(int)gesture.view.tag]]];
+    popupView.view.backgroundColor = [UIColor colorWithWhite:0 alpha:0.6f];
+    [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+    [self presentViewController:popupView animated:YES completion:nil];
+}
+
 //Back button action
 - (void)backButtonAction :(id)sender {
     

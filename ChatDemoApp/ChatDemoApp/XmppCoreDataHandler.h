@@ -38,4 +38,8 @@
 - (void)insertGroupEntryInXmppUserModelXmppGroupJid:(NSString *)xmppGroupJid xmppGroupName:(NSString *)xmppGroupName xmppGroupDescription:(NSString *)xmppGroupDescription xmppGroupOnwerId:(NSString *)xmppGroupOnwerId;
 - (void)deleteGroupEntry:(NSString *)roomJid;
 //end
+
+//Remove complete history
+- (void)removeAllLocalMessageStorageDataBase;
+//end
 @end

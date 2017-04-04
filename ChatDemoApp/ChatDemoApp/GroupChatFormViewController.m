@@ -70,7 +70,7 @@
 - (void)addLeftBarButtonWithImage:(UIImage *)backImage {
     
     UIBarButtonItem *backBarButton;
-    CGRect framing = CGRectMake(0, 0, backImage.size.width, backImage.size.height);
+    CGRect framing = CGRectMake(0, 0, 25, 25);
     UIButton *back = [[UIButton alloc] initWithFrame:framing];
     [back setBackgroundImage:backImage forState:UIControlStateNormal];
     backBarButton =[[UIBarButtonItem alloc] initWithCustomView:back];

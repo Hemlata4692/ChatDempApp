@@ -26,7 +26,6 @@
 
 @property (strong, nonatomic) IBOutlet UIView *editStatusView;
 @property (strong, nonatomic) IBOutlet UITextField *editStatusField;
-@property (strong, nonatomic) IBOutlet UITextView *editStatusTextView;
 @property (strong, nonatomic) IBOutlet UILabel *statusCount;
 
 @end

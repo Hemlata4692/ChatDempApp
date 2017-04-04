@@ -219,9 +219,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 
     dispatch_async(dispatch_get_main_queue(), ^{
         AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-//        UIView *redView = [[UIView alloc] initWithFrame:CGRectMake(100,100, 100, 100)];
-//        [redView setBackgroundColor:[UIColor redColor]];
-//        [[appDelegate window] addSubview:redView];
         
         notificationView.translatesAutoresizingMaskIntoConstraints=YES;
         notificationView=[[UIView alloc] initWithFrame:CGRectMake(3, -90, [[UIScreen mainScreen] bounds].size.width-6, 80)];
@@ -663,22 +660,13 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
             
             [self updateBookmarkOfJid:[[groupChat componentsSeparatedByString:@"BookMarkManager"] objectAtIndex:1]];
         }
-        
-//        [[[groupChat componentsSeparatedByString:@"@"] objectAtIndex:1] isEqualToString:conferenceServerJid]
-//        <iq xmlns="jabber:client" type="result" id="47ACF5E7-F088-4053-BE0D-4F96469A6557" from="010317094630@conference.192.168.18.171" to="1111111111@192.168.18.171//Smack"></iq>
-//        [self getGroupChatInformation:iq];
     }
     else if (nil!=storageElement&&NULL!=storageElement&&([[storageElement namespaceForPrefix:nil].stringValue isEqualToString:@"storage:bookmarks"])) {
     
         NSMutableArray *itemElements=[[[[iq elementForName:@"query"] elementForName:@"storage"] elementsForName:@"conference"] mutableCopy];
-//        NSString *inviteText=[[[iq elementForName:@"query"] attributeForName:@"isInvite"] stringValue];
-//        query addAttributeWithName:@"isInvite" stringValue:jid];
         if (itemElements/*&&!inviteText*/) {
             [[NSNotificationCenter defaultCenter] postNotificationName:@"XMPPFetchBookmarktList" object:itemElements];
         }
-//        else if (itemElements&&inviteText&&[[inviteUserInfo allKeys] containsObject:inviteText]) {
-//            [self addBookMarkConferenceList:itemElements jid:inviteText];
-//        }
     }
     else if ([[iq attributeStringValueForName:@"id"] isEqualToString:@"InvitationInfoId"]){
         
@@ -759,8 +747,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 
 - (void)xmppStreamDidRegister:(XMPPStream *)sender{
     
-//    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Registration" message:@"Registration Successful!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
-//    [alert show];
     if (afterAutenticationRegistration==0) {
         afterAutenticationRegistration=1;
         NSMutableDictionary *registerSuccessDict=[NSMutableDictionary new];
@@ -775,10 +761,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         afterAutenticationRegistration=1;
     DDXMLElement *errorXML = [error elementForName:@"error"];
     NSString *errorCode  = [[errorXML attributeForName:@"code"] stringValue];
-    
-//    NSString *regError = [NSString stringWithFormat:@"ERROR :- %@",error.description];
-    
-//    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Registration Failed!" message:regError delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+
     NSMutableDictionary *registerFailureDict=[NSMutableDictionary new];
     [registerFailureDict setObject:@"0" forKey:@"Status"];
     [registerFailureDict setObject:errorCode forKey:@"ErrorCode"];
@@ -1250,36 +1233,18 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     
     NSData *imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(selectedImage, 1)];
     
-//        int imageSize = imageData.length;
-//        NSLog(@"SIZE OF IMAGE: %.2f", (float)imageSize/1024/1024);
-    
     selectedImage = [self imageWithRoundedCornersSize:0 usingImage:selectedImage];
-    
     imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(selectedImage, 1)];
-    
-//        imageSize = imageData.length;
-//        NSLog(@"SIZE OF IMAGE: %.2f Mb", (float)imageSize/1024/1024);
     CGSize mySize;
     mySize.height = 200;
     mySize.width = 200;
-    
     CGFloat oldWidth = selectedImage.size.width;
     CGFloat oldHeight = selectedImage.size.height;
-    
     CGFloat scaleFactor = (oldWidth > oldHeight) ? mySize.width / oldWidth : mySize.height / oldHeight;
-    
-    
     mySize.height = oldHeight * scaleFactor;
     mySize.width = oldWidth * scaleFactor;
-    
-    
     selectedImage = [self imageWithImage:selectedImage scaledToSize:mySize];
-    
-    
     NSData *pngData = UIImageJPEGRepresentation(selectedImage, .1);
-    //    imageSize = pngData.length;
-    //    NSLog(@"SIZE OF IMAGE: %.2f Mb", (float)imageSize/1024/1024);
-    //    UIImage *im=[UIImage imageWithData:pngData];
     return pngData;
 }
 #pragma mark - end
@@ -1376,12 +1341,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     
     DDLogVerbose(@"%@: Incoming file transfer did succeed.", THIS_FILE);
     NSLog(@"%@",desc);
-    //    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
-    //                                                         NSUserDomainMask,
-    //                                                         YES);
-    //    NSString *fullPath = [[paths lastObject] stringByAppendingPathComponent:name];
-    //    [data writeToFile:fullPath options:0 error:nil];
-    //    saveFileInLocalDocumentDirectory
     
     NSXMLElement *messageData;
      if ([to containsString:@"conference"]) {
@@ -1741,20 +1700,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 //    [self fetchJoinedGroupList:[iq attributeStringValueForName:@"from"]];
 }
 
-//- (void)fetchJoinedGroupList:(NSString*)jid {
-//    
-//    XMPPIQ *iq = [[XMPPIQ alloc]init];
-//    [iq addAttributeWithName:@"type" stringValue:@"get"];
-//    NSString *from = conferenceServerJid;
-//    [iq addAttributeWithName:@"from" stringValue:from];
-//    NSXMLElement *query =[NSXMLElement elementWithName:@"query" xmlns:@"jabber:iq:private"];
-//    [query addAttributeWithName:@"isInvite" stringValue:jid];
-//    NSXMLElement *storage = [NSXMLElement elementWithName:@"storage" xmlns:@"storage:bookmarks"];
-//    [query addChild:storage];
-//    [iq addChild:query];
-//    [self.xmppStream sendElement:iq];
-//}
-
 - (void)addBookMarkConferenceList:(NSMutableArray *)conferenceList jid:(NSString *)jid{
     
     XMPPIQ *iq = [XMPPIQ iqWithType:@"set" to:[XMPPJID jidWithString:serverName]];
@@ -1899,10 +1844,19 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
                 [self addLocalNotification:[innerElementData attributeStringValueForName:@"senderName"] message:messageString userId:[innerElementData attributeStringValueForName:@"from"]];
                 [XMPPUserDefaultManager setXMPPBadgeIndicatorKey:[innerElementData attributeStringValueForName:@"from"]];
             }
+            else if ([[UIApplication sharedApplication] applicationState]==UIApplicationStateBackground) {
+                NSString *messageString;
+                if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"Location"]) {
+                    messageString=@"Location";
+                }
+                else {
+                    messageString=[[message elementForName:@"body"] stringValue];
+                }
+                
+                [self addLocalNotification:[innerElementData attributeStringValueForName:@"senderName"] message:messageString userId:[innerElementData attributeStringValueForName:@"from"]];
+            }
         }
-//        else if ([[UIApplication sharedApplication] applicationState]==UIApplicationStateBackground) {
-//            [self addLocalNotification:[innerElementData attributeStringValueForName:@"senderName"] message:[[message elementForName:@"body"] stringValue] userId:[innerElementData attributeStringValueForName:@"from"]];
-//        }
+        
         //        else {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"UserHistory" object:message];
         //        }
@@ -1931,9 +1885,17 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
                 [self addLocalNotification:[innerElementData attributeStringValueForName:@"senderName"] message:messageString userId:[innerElementData attributeStringValueForName:@"to"]];
                 [XMPPUserDefaultManager setXMPPBadgeIndicatorKey:[innerElementData attributeStringValueForName:@"to"]];
             }
-//            else if ([[UIApplication sharedApplication] applicationState]==UIApplicationStateBackground) {
-//                [self addLocalNotification:[innerElementData attributeStringValueForName:@"senderName"] message:[[message elementForName:@"body"] stringValue] userId:[innerElementData attributeStringValueForName:@"to"]];
-//            }
+            else if ([[UIApplication sharedApplication] applicationState]==UIApplicationStateBackground) {
+                NSString *messageString;
+                if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"Location"]) {
+                    messageString=@"Location";
+                }
+                else {
+                    messageString=[[message elementForName:@"body"] stringValue];
+                }
+                
+                [self addLocalNotification:[innerElementData attributeStringValueForName:@"senderName"] message:messageString userId:[innerElementData attributeStringValueForName:@"to"]];
+            }
             //        else {
             [[NSNotificationCenter defaultCenter] postNotificationName:@"UserHistory" object:message];
             //        }
@@ -2005,22 +1967,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         [[NSNotificationCenter defaultCenter] postNotificationName:@"XmppUserPresenceUpdate" object:nil];
     }
     else if (isContactListIsLoaded && xmppUserListArray!=nil && [NSString stringWithFormat:@"%@",[presence from]]!=nil && [xmppUserListArray containsObject:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]] && [selectedMemberUserIds containsObject:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]]) {
-        
-        //        switch (section)
-        //        {
-        //            case 0  :
-        //                label.text = @"Available";
-        //                label.textColor=[UIColor colorWithRed:13.0/255.0 green:213.0/255.0 blue:178.0/255.0 alpha:1.0];
-        //                break;
-        //            case 1  :
-        //                label.text =  @"Away";
-        //                label.textColor=[UIColor yellowColor];
-        //                break;
-        //            default :
-        //                label.text =  @"Offline";
-        //                label.textColor=[UIColor redColor];
-        //                break;
-        //        }
         
         XMPPUserCoreDataStorageObject *user=[xmppUserDetailedList objectForKey:[[[NSString stringWithFormat:@"%@",[presence from]] componentsSeparatedByString:@"/"] objectAtIndex:0]];
         if ([presenceType isEqualToString:@"available"]) {
@@ -2245,41 +2191,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     //    DDLogInfo(@"Outgoing file transfer failed with error: %@", error);
     NSLog(@"%ld",(long)error.code);
     if (error.code!=-1) {
-        
-//        NSString *uniqueId;
-//        NSArray *tempArray=[xmppSendGroupAttachment allKeys];
-//        for(NSString *uID in tempArray) {
-//            
-//            if ([[[xmppSendGroupAttachment objectForKey:uID] objectForKey:@"Status"] isEqualToString:@"1"]) {
-//                uniqueId=uID;
-//                break;
-//            }
-//        }
-//        
-//        if ([[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"MembersList"] count]>1) {
-//            
-//            NSMutableDictionary *tempDic=[[xmppSendGroupAttachment objectForKey:uniqueId] mutableCopy];
-//            NSMutableArray *tempMemberArray=[[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"MembersList"] mutableCopy];
-//            [tempMemberArray removeObject:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"SelectedMember"]];
-//            [tempDic setObject:[tempMemberArray mutableCopy] forKey:@"MembersList"];
-//            [tempDic setObject:[tempMemberArray objectAtIndex:0] forKey:@"SelectedMember"];
-//            [xmppSendGroupAttachment setObject:[tempDic mutableCopy] forKey:uniqueId];
-//            
-//            [self sendImageAttachmentUniqueId:uniqueId];
-//        }
-//        else {
-//            
-//            //Post notifcation with [xmppSendGroupAttachment objectForKey:uniqueId] object
-//            [xmppSendGroupAttachment removeObjectForKey:uniqueId];
-//            if ([[xmppSendGroupAttachment allKeys] count]>0) {
-//                
-//                NSArray *tempArray=[xmppSendGroupAttachment allKeys];
-//                NSMutableDictionary *tempDic=[[xmppSendGroupAttachment objectForKey:[tempArray objectAtIndex:0]] mutableCopy];
-//                [tempDic setObject:@"1" forKey:@"Status"];
-//                [xmppSendGroupAttachment setObject:[tempDic mutableCopy] forKey:uniqueId];
-//                [self sendImageAttachmentUniqueId:[tempArray objectAtIndex:0]];
-//            }
-//        }
         [self fileTransferHandling:NO];
     }
 }
@@ -2294,10 +2205,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     
     NSLog(@"File transfer successful.");
     [self fileTransferHandling:YES];
-//    NSXMLElement *successMessage=[fileAttachmentMessage copy];
-//    [successMessage addAttributeWithName:@"progress" stringValue:@"1"];
-//    [[XmppCoreDataHandler sharedManager] updateLocalMessageStorageDatabaseBareJidStr:appDelegate.chatRoomAppDelegateRoomJid message:successMessage uniquiId:uniqueId];
-//    [self sendFileSuccessDelegate:successMessage uniquiId:uniqueId];
 }
 
 - (void)fileTransferHandling:(BOOL)isSuccess {

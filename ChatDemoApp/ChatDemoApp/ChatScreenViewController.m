@@ -85,14 +85,8 @@
     [self addBackBarButton];    //Add navigation bar buttons
     
     [self initializeFriendProfile:friendUserJid];   //Set current friend jid
-    
     chatTableView.backgroundColor=[UIColor whiteColor];
     isAttachmentOpen=false;
-//    UIImage *im=[UIImage imageNamed:@"arrow_down@3x.png"];
-//    [myDelegate saveDataInCacheDirectory:(UIImage *)im folderName:myDelegate.appProfilePhotofolderName jid:friendUserJid];
-    
-    //file transfer pdf file
-//    [self createCopyOfDatabaseIfNeeded];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -105,9 +99,6 @@
         [self viewInitialized]; //Initialised view
         [self registerForKeyboardNotifications];
         
-        //    self.tabBarController.tabBar.hidden=NO;
-        //    [[self navigationController] setNavigationBarHidden:NO];
-        //    [[UIApplication sharedApplication] setStatusBarHidden:NO];
         [myDelegate showIndicator];
         [self performSelector:@selector(getHistoryChatData) withObject:nil afterDelay:.1];
     }
@@ -133,6 +124,13 @@
     
     [navBackView removeFromSuperview];
     }
+}
+#pragma mark - end
+
+#pragma mark - XMPP delegates
+- (XMPPStream *)xmppStream {
+    
+    return [myDelegate xmppStream];
 }
 #pragma mark - end
 
@@ -306,32 +304,13 @@
 }
 #pragma mark - end
 
-/*
-#pragma mark - Keyboard control delegate
-- (void)keyboardControls:(BSKeyboardControls *)keyboardControls selectedField:(UIView *)field inDirection:(BSKeyboardControlsDirection)direction {
-    
-    UIView *view;
-    view = field.superview.superview.superview;
-}
-
-- (void)keyboardControlsDonePressed:(BSKeyboardControls *)keyboardControls {
-    
-    [keyboardControls.activeField resignFirstResponder];
-}
-#pragma mark - end
-*/
 #pragma mark - Textfield delegates
 - (void)textViewDidBeginEditing:(UITextView *)textView {
     //handle user taps text view to type text
-    
-//    [self.keyboardControls setActiveField:textView];
 }
 
 -(BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-    //    if([text isEqualToString:@"\n"]) {
-    //        [textView resignFirstResponder];
-    //        return NO;
-    //    }
+    
     if ([text isEqualToString:[UIPasteboard generalPasteboard].string]) {
         
         CGSize size = CGSizeMake(messageTextView.frame.size.height,messageTextviewHeightLimit);
@@ -445,23 +424,12 @@
     }
     else if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"ImageAttachment"]) {
         
-        imagePreviewView=[[UIView alloc] initWithFrame:CGRectMake(0,self.view.bounds.size.height,self.view.bounds.size.width,self.view.bounds.size.height)];
-        UIImageView *popImage=[[UIImageView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,self.view.frame.size.height)];
-        imagePreviewView.backgroundColor = [UIColor blackColor];
-        popImage.contentMode = UIViewContentModeScaleAspectFit;
-        popImage.backgroundColor = [UIColor clearColor];
-        popImage.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
-        //    [userData objectAtIndex:(int)gesture.view.tag]
-        UIButton *close_button=[[UIButton alloc]initWithFrame:CGRectMake(self.view.frame.size.width - 60,10,48,48)];
-        [close_button setImage:[UIImage imageNamed:@"cross"] forState:UIControlStateNormal];
-        [close_button addTarget:self action:@selector(closeAction:) forControlEvents:UIControlEventTouchUpInside];
-        [imagePreviewView addSubview:popImage];
-        [imagePreviewView addSubview:close_button];
-        [self.view addSubview:imagePreviewView];
-        
-        [UIView animateWithDuration:0.3f animations:^{
-            imagePreviewView.frame = CGRectMake(0,0,self.view.bounds.size.width,self.view.bounds.size.height);
-        }];
+        UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+        GlobalImageViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"GlobalImageViewController"];
+        popupView.globalImage=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+        popupView.view.backgroundColor = [UIColor colorWithWhite:0 alpha:0.6f];
+        [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+        [self presentViewController:popupView animated:YES completion:nil];
     }
     else if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"Location"]) {
     
@@ -607,6 +575,8 @@
             }
         }
         else{
+            
+            //Set cell height according to next message and current message userId's
             NSXMLElement* message1 = [userData objectAtIndex:(int)indexPath.row - 1];
             NSXMLElement *innerData1=[message1 elementForName:@"data"];
             if ([[innerData attributeStringValueForName:@"from"] isEqualToString:[innerData1 attributeStringValueForName:@"from"]]) {
@@ -703,17 +673,11 @@
 }
 */
 
-#pragma mark - XMPP delegates
-- (XMPPStream *)xmppStream {
-    
-    return [myDelegate xmppStream];
-}
-#pragma mark - end
-
 #pragma mark - Custom filter delegate
 - (void)customFilterDelegateAction:(int)status{
     
     dispatch_async(dispatch_get_main_queue(), ^{
+        
         if (status==1) {
             NSLog(@"1");
             
@@ -830,7 +794,15 @@
     messageTextView.text=@"";
     messageHeight = messageTextviewInitialHeight;
     messageTextView.frame = CGRectMake(messageTextView.frame.origin.x, messageTextView.frame.origin.y, messageTextView.frame.size.width, messageHeight-8);
-    messageView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height-(keyboardHeight+navigationBarHeight+messageHeight+10)  , self.view.bounds.size.width, messageHeight + 10);
+    if ([[[[xmpMessage elementForName:@"data"] attributeForName:@"chatType"] stringValue] isEqualToString:@"Location"]) {
+        
+        messageView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height- messageView.frame.size.height -navigationBarHeight, self.view.bounds.size.width, messageHeight+ 10);
+        messageYValue = [UIScreen mainScreen].bounds.size.height -49 -10;
+    }
+    else {
+       
+        messageView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height-(keyboardHeight+navigationBarHeight+messageHeight+10)  , self.view.bounds.size.width, messageHeight + 10);
+    }
     chatTableView.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, messageView.frame.origin.y-2);
     if (userData.count > 0) {
         NSIndexPath* ip = [NSIndexPath indexPathForRow:userData.count-1 inSection:0];
@@ -1012,27 +984,5 @@
         [self sendLocationXmppMessage:friendUserJid friendName:self.friendUserName  messageString:locationAddress latitude:latitude longitude:longitude];
     }
 }
-
-
 #pragma mark - end
-
-/*file transfer
- - (void)pdfTransfer:(XMPPJID *)jid {
- 
- //    NSString *filePath = [myDelegate applicationCacheDirectory];
- NSString *filePath = [[myDelegate applicationCacheDirectory] stringByAppendingPathComponent:myDelegate.appProfilePhotofolderName];
- NSString *fileAtPath = [filePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_%@.pdf",myDelegate.folderName,[[friendUserJid componentsSeparatedByString:@"@"] objectAtIndex:0]]];
- NSData *data = [NSData dataWithContentsOfFile:fileAtPath];
- 
- NSError *err;
- if (![_fileTransfer sendData:data
- named:@"a.pdf"
- toRecipient:jid
- description:@"Baal's Soulstone."
- error:&err]) {
- NSLog(@"You messed something up: %@", err);
- }
- }
-*/
-
 @end

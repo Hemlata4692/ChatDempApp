@@ -888,7 +888,15 @@
     messageTextView.text=@"";
     messageHeight = messageTextviewInitialHeight;
     messageTextView.frame = CGRectMake(messageTextView.frame.origin.x, messageTextView.frame.origin.y, messageTextView.frame.size.width, messageHeight-8);
-    messageView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height-(keyboardHeight+navigationBarHeight+messageHeight+10)  , self.view.bounds.size.width, messageHeight + 10);
+    if ([[[[xmpMessage elementForName:@"data"] attributeForName:@"chatType"] stringValue] isEqualToString:@"Location"]) {
+        
+        messageView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height- messageView.frame.size.height -navigationBarHeight, self.view.bounds.size.width, messageHeight+ 10);
+        messageYValue = [UIScreen mainScreen].bounds.size.height -49 -10;
+    }
+    else {
+        
+        messageView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height-(keyboardHeight+navigationBarHeight+messageHeight+10)  , self.view.bounds.size.width, messageHeight + 10);
+    }
     chatTableView.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, messageView.frame.origin.y-2);
     if (userData.count > 0) {
         NSIndexPath* ip = [NSIndexPath indexPathForRow:userData.count-1 inSection:0];

@@ -10,7 +10,6 @@
 		90DC0D66A2ED385893C02E29 /* libPods-ChatDemoApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE07D7CB35D225B6FB24E1D2 /* libPods-ChatDemoApp.a */; };
 		B7005C1F1E5FE62F003A56D3 /* LocationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B7005C1E1E5FE62E003A56D3 /* LocationViewController.m */; };
 		B70AE66A1E2F1EC600554038 /* AppDelegateObjectFile.m in Sources */ = {isa = PBXBuildFile; fileRef = B70AE6691E2F1EC600554038 /* AppDelegateObjectFile.m */; };
-		B70BF22E1E81227D005C5B03 /* MyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = B70BF22D1E81227D005C5B03 /* MyButton.m */; };
 		B70FC3001E6EB6C100292950 /* groupPlaceholderImage.png in Resources */ = {isa = PBXBuildFile; fileRef = B70FC2FF1E6EB6C100292950 /* groupPlaceholderImage.png */; };
 		B70FC3031E6EB8BE00292950 /* XMPPGroupChatRoom.m in Sources */ = {isa = PBXBuildFile; fileRef = B70FC3021E6EB8BE00292950 /* XMPPGroupChatRoom.m */; };
 		B70FC3061E6EB8DD00292950 /* GroupChatViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B70FC3051E6EB8DD00292950 /* GroupChatViewController.m */; };
@@ -68,6 +67,8 @@
 		B7A7A9A01E2F64060027D2B6 /* RegisterXMPP.m in Sources */ = {isa = PBXBuildFile; fileRef = B7A7A99F1E2F64060027D2B6 /* RegisterXMPP.m */; };
 		B7B9A5661E23B17A00DB4429 /* MMMaterialDesignSpinner.m in Sources */ = {isa = PBXBuildFile; fileRef = B7B9A5651E23B17A00DB4429 /* MMMaterialDesignSpinner.m */; };
 		B7C25C881E63F61100CD7270 /* locationPlaceholder.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B7C25C871E63F61100CD7270 /* locationPlaceholder.jpg */; };
+		B7C6B5211E9212D100E7C554 /* GlobalImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B7C6B5201E9212D100E7C554 /* GlobalImageViewController.m */; };
+		B7C6B5241E92156900E7C554 /* DashboardTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B7C6B5231E92156900E7C554 /* DashboardTableViewCell.m */; };
 		B7E0D99D1E4048C500397393 /* RegistrationProcess.rtf in Resources */ = {isa = PBXBuildFile; fileRef = B7E0D99C1E4048C500397393 /* RegistrationProcess.rtf */; };
 /* End PBXBuildFile section */
 
@@ -76,8 +77,6 @@
 		B7005C1E1E5FE62E003A56D3 /* LocationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationViewController.m; sourceTree = "<group>"; };
 		B70AE6681E2F1EC600554038 /* AppDelegateObjectFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegateObjectFile.h; sourceTree = "<group>"; };
 		B70AE6691E2F1EC600554038 /* AppDelegateObjectFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegateObjectFile.m; sourceTree = "<group>"; };
-		B70BF22C1E81227D005C5B03 /* MyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyButton.h; sourceTree = "<group>"; };
-		B70BF22D1E81227D005C5B03 /* MyButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyButton.m; sourceTree = "<group>"; };
 		B70F93281E4DB51C0064EF29 /* AddressBookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBookUI.framework; path = System/Library/Frameworks/AddressBookUI.framework; sourceTree = SDKROOT; };
 		B70F932A1E4DB5290064EF29 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		B70FC2FF1E6EB6C100292950 /* groupPlaceholderImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = groupPlaceholderImage.png; sourceTree = "<group>"; };
@@ -182,6 +181,10 @@
 		B7B9A5641E23B17A00DB4429 /* MMMaterialDesignSpinner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMMaterialDesignSpinner.h; sourceTree = "<group>"; };
 		B7B9A5651E23B17A00DB4429 /* MMMaterialDesignSpinner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMMaterialDesignSpinner.m; sourceTree = "<group>"; };
 		B7C25C871E63F61100CD7270 /* locationPlaceholder.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = locationPlaceholder.jpg; sourceTree = "<group>"; };
+		B7C6B51F1E9212D100E7C554 /* GlobalImageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GlobalImageViewController.h; sourceTree = "<group>"; };
+		B7C6B5201E9212D100E7C554 /* GlobalImageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GlobalImageViewController.m; sourceTree = "<group>"; };
+		B7C6B5221E92156900E7C554 /* DashboardTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DashboardTableViewCell.h; sourceTree = "<group>"; };
+		B7C6B5231E92156900E7C554 /* DashboardTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DashboardTableViewCell.m; sourceTree = "<group>"; };
 		B7CC6C511E27B0A000F471B6 /* XMPPFramework.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMPPFramework.h; sourceTree = "<group>"; };
 		B7E0D99C1E4048C500397393 /* RegistrationProcess.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = RegistrationProcess.rtf; sourceTree = "<group>"; };
 		BE07D7CB35D225B6FB24E1D2 /* libPods-ChatDemoApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ChatDemoApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -236,15 +239,6 @@
 				B7005C1E1E5FE62E003A56D3 /* LocationViewController.m */,
 			);
 			name = LocationAttachment;
-			sourceTree = "<group>";
-		};
-		B70BF22F1E812282005C5B03 /* ButtonClass */ = {
-			isa = PBXGroup;
-			children = (
-				B70BF22C1E81227D005C5B03 /* MyButton.h */,
-				B70BF22D1E81227D005C5B03 /* MyButton.m */,
-			);
-			name = ButtonClass;
 			sourceTree = "<group>";
 		};
 		B70FC2D61E6E6AEE00292950 /* GroupChatFormView */ = {
@@ -413,6 +407,7 @@
 		B745F83F1E23519A001119BD /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				B7C6B51E1E9212AB00E7C554 /* GlobalImageView */,
 				B745F8401E2351A7001119BD /* LoginView */,
 				B745F8411E2351B1001119BD /* RegisterView */,
 				B75792551E42E1F000AC48D0 /* UserProfile */,
@@ -448,6 +443,8 @@
 			children = (
 				B745F8471E2351FF001119BD /* DashboardViewController.h */,
 				B745F8481E2351FF001119BD /* DashboardViewController.m */,
+				B7C6B5221E92156900E7C554 /* DashboardTableViewCell.h */,
+				B7C6B5231E92156900E7C554 /* DashboardTableViewCell.m */,
 			);
 			name = DashboardView;
 			sourceTree = "<group>";
@@ -466,7 +463,6 @@
 			isa = PBXGroup;
 			children = (
 				B770B8AE1E8E1AE20008563A /* ToastFile */,
-				B70BF22F1E812282005C5B03 /* ButtonClass */,
 				B745F8661E23595F001119BD /* SegmentControl */,
 				B745F8571E235425001119BD /* BSKeyboardControl */,
 				B745F8501E2353C1001119BD /* Loader */,
@@ -686,6 +682,15 @@
 			name = AddAttacment;
 			sourceTree = "<group>";
 		};
+		B7C6B51E1E9212AB00E7C554 /* GlobalImageView */ = {
+			isa = PBXGroup;
+			children = (
+				B7C6B51F1E9212D100E7C554 /* GlobalImageViewController.h */,
+				B7C6B5201E9212D100E7C554 /* GlobalImageViewController.m */,
+			);
+			name = GlobalImageView;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -720,7 +725,7 @@
 				TargetAttributes = {
 					B745F8231E234D54001119BD = {
 						CreatedOnToolsVersion = 8.1;
-						DevelopmentTeam = T7GN63HCDX;
+						DevelopmentTeam = M8A7BYS443;
 						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
@@ -852,6 +857,7 @@
 				B7A7A9A01E2F64060027D2B6 /* RegisterXMPP.m in Sources */,
 				B77DFFE21E4C2E3100921126 /* XMPPChatView.m in Sources */,
 				B770B8B51E8E272C0008563A /* Internet.m in Sources */,
+				B7C6B5241E92156900E7C554 /* DashboardTableViewCell.m in Sources */,
 				B77DFFE81E4C2F3200921126 /* UIPlaceHolderTextView.m in Sources */,
 				B75E7EF61E5BF1E600634A68 /* XmppCoreDataHandler.m in Sources */,
 				B745F85A1E235435001119BD /* BSKeyboardControls.m in Sources */,
@@ -863,11 +869,11 @@
 				B745F8291E234D55001119BD /* main.m in Sources */,
 				B770B8BD1E8E52160008563A /* UIView+Toast.m in Sources */,
 				B757925B1E42E23800AC48D0 /* XmppProfileView.m in Sources */,
-				B70BF22E1E81227D005C5B03 /* MyButton.m in Sources */,
 				B715A0C31E5EB55300B36D16 /* DocumentAttachmentViewController.m in Sources */,
 				B7131E5D1E52DA3A00A435A3 /* ChatScreenTableViewCell.m in Sources */,
 				B745F8561E2353DD001119BD /* UserDefaultManager.m in Sources */,
 				B745F8461E2351F1001119BD /* RegisterViewController.m in Sources */,
+				B7C6B5211E9212D100E7C554 /* GlobalImageViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -907,10 +913,11 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: shiv vaishnav (GZ989JSYX6)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: shiv vaishnav (GZ989JSYX6)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Ranosys Technologies Pte Ltd";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Ranosys Technologies Pte Ltd";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = M8A7BYS443;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -931,7 +938,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PROVISIONING_PROFILE = "9b632c28-d446-4fef-ba3d-7c5982609414";
+				PROVISIONING_PROFILE = "5d36d161-4eab-49e9-b4bd-cc5088e93d30";
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -958,10 +965,11 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: shiv vaishnav (GZ989JSYX6)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: shiv vaishnav (GZ989JSYX6)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Ranosys Technologies Pte Ltd";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Ranosys Technologies Pte Ltd";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = M8A7BYS443;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -975,7 +983,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PROVISIONING_PROFILE = "9b632c28-d446-4fef-ba3d-7c5982609414";
+				PROVISIONING_PROFILE = "5d36d161-4eab-49e9-b4bd-cc5088e93d30";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -987,17 +995,17 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer: shiv vaishnav (GZ989JSYX6)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: shiv vaishnav (GZ989JSYX6)";
-				DEVELOPMENT_TEAM = T7GN63HCDX;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Ranosys Technologies Pte Ltd";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Ranosys Technologies Pte Ltd";
+				DEVELOPMENT_TEAM = M8A7BYS443;
 				GCC_PREFIX_HEADER = ChatDemoApp/PrefixHeader.pch;
 				INFOPLIST_FILE = ChatDemoApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ranosys.chatDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "9b632c28-d446-4fef-ba3d-7c5982609414";
-				PROVISIONING_PROFILE_SPECIFIER = "Common Ranosys Profile";
+				PROVISIONING_PROFILE = "5d36d161-4eab-49e9-b4bd-cc5088e93d30";
+				PROVISIONING_PROFILE_SPECIFIER = RanosysWildcard;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -1008,17 +1016,17 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer: shiv vaishnav (GZ989JSYX6)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: shiv vaishnav (GZ989JSYX6)";
-				DEVELOPMENT_TEAM = T7GN63HCDX;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Ranosys Technologies Pte Ltd";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Ranosys Technologies Pte Ltd";
+				DEVELOPMENT_TEAM = M8A7BYS443;
 				GCC_PREFIX_HEADER = ChatDemoApp/PrefixHeader.pch;
 				INFOPLIST_FILE = ChatDemoApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ranosys.chatDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "9b632c28-d446-4fef-ba3d-7c5982609414";
-				PROVISIONING_PROFILE_SPECIFIER = "Common Ranosys Profile";
+				PROVISIONING_PROFILE = "5d36d161-4eab-49e9-b4bd-cc5088e93d30";
+				PROVISIONING_PROFILE_SPECIFIER = RanosysWildcard;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;

@@ -23,6 +23,8 @@
 
 - (void)displayContactInformation:(NSMutableDictionary *)contactInfo isSelected:(bool)isSelected isAlreadyAdded:(bool)isAlreadyAdded {
 
+    self.friendProfilePhoto.layer.masksToBounds=YES;
+    self.friendProfilePhoto.layer.cornerRadius=20;
     if(isSelected) {
     
         self.selectedIcon.hidden=NO;

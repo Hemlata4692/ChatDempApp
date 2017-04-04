@@ -97,47 +97,13 @@
         locationManager = [[CLLocationManager alloc] init];
         //Make this controller the delegate for the location manager.
         [locationManager setDelegate:self];
-        [locationManager requestAlwaysAuthorization];
+        if ([locationManager respondsToSelector:@selector(requestAlwaysAuthorization)]||[locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {
+            
+            [locationManager requestAlwaysAuthorization];//--------Show blue line during background location update------
+        }
         //Set some paramater for the location object.
         [locationManager setDistanceFilter:kCLDistanceFilterNone];
         [locationManager setDesiredAccuracy:kCLLocationAccuracyBest];
-    }
-}
-
--(void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
-{
-    switch (status)
-    {
-        case kCLAuthorizationStatusNotDetermined:
-        {
-            [self showLocationSettingAlert];
-        }
-            break;
-        case kCLAuthorizationStatusRestricted:{
-            [self showLocationSettingAlert];
-        }
-            break;
-        case kCLAuthorizationStatusDenied:
-        {
-            if ([CLLocationManager locationServicesEnabled]) {
-                
-               [self showLocationSettingAlert];
-            }
-        }
-            break;
-        case kCLAuthorizationStatusAuthorizedWhenInUse:
-        case kCLAuthorizationStatusAuthorizedAlways:
-        {
-            [locationManager requestAlwaysAuthorization];
-            [self getCurrentLocation];
-        }
-            break;
-            
-        default:
-        {
-//            [self getCurrentLocation];
-        }
-            break;
     }
 }
 
@@ -166,18 +132,58 @@
         }
     }];
 }
+#pragma mark - end
+
+#pragma mark - Location authorization status delegate
+-(void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
+{
+    switch (status)
+    {
+        case kCLAuthorizationStatusNotDetermined:
+        {
+            [self showLocationSettingAlert];
+        }
+            break;
+        case kCLAuthorizationStatusRestricted:{
+            [self showLocationSettingAlert];
+        }
+            break;
+        case kCLAuthorizationStatusDenied:
+        {
+            if ([CLLocationManager locationServicesEnabled]) {
+                
+                [self showLocationSettingAlert];
+            }
+        }
+            break;
+        case kCLAuthorizationStatusAuthorizedWhenInUse:
+        case kCLAuthorizationStatusAuthorizedAlways:
+        {
+            [locationManager requestAlwaysAuthorization];
+            [self getCurrentLocation];
+        }
+            break;
+            
+        default:
+        {
+            //            [self getCurrentLocation];
+        }
+            break;
+    }
+}
+#pragma mark - end
 
 #pragma mark - Set pin on google map
 - (void)setGoogleMapData {
-
-        camera = [GMSCameraPosition cameraWithLatitude:currentLocation.latitude
-                                             longitude:currentLocation.longitude
-                                                  zoom:14.0];
+    
+    camera = [GMSCameraPosition cameraWithLatitude:currentLocation.latitude
+                                         longitude:currentLocation.longitude
+                                              zoom:14.0];
     self.googleMapView.camera = camera;
     marker.position = currentLocation;
-//    marker.tappable = true;
+    //    marker.tappable = true;
     marker.map= self.googleMapView;
-//    marker.draggable = true;
+    //    marker.draggable = true;
 }
 #pragma mark - end
 
@@ -195,7 +201,6 @@
 
 - (IBAction)send:(UIButton *)sender {
     
-//    [_delegate sendLocationDelegateAction:[self pb_takeSnapshot] locationAddress:self.currentSelectedAddress.text latitude:[NSString stringWithFormat:@"%f",currentLocation.latitude] longitude:[NSString stringWithFormat:@"%f",currentLocation.longitude]];
     [_delegate sendLocationDelegateAction:[NSString stringWithFormat:@"%@, %@",self.currentSelectedPlaceName.text, self.currentSelectedAddress.text ] latitude:[NSString stringWithFormat:@"%f",currentLocation.latitude] longitude:[NSString stringWithFormat:@"%f",currentLocation.longitude]];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
@@ -259,6 +264,7 @@
 }
 #pragma mark - end
 
+#pragma mark - Show location alert
 - (void)showLocationSettingAlert {
 
     UIAlertController *alertController = [UIAlertController
@@ -286,9 +292,8 @@
     [alertController addAction:cancelAction];
     [alertController addAction:okAction];
     [self presentViewController:alertController animated:YES completion:nil];
-    
-    
 }
+#pragma mark - end
 /*
 #pragma mark - Navigation
 

@@ -18,8 +18,7 @@
 
 #import "CustomFilterViewController.h"
 #import "GroupChatViewController.h"
-
-#import "MyButton.h"
+#import "DashboardTableViewCell.h"
 
 @class XMPPvCardTempModuleStorage;
 @interface DashboardViewController () {
@@ -91,8 +90,8 @@
 #pragma mark - end
 
 #pragma mark - Table view delegates
-- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section;
-{
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    
     return 0.01;
 }
 
@@ -109,8 +108,7 @@
     }
 }
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     /*
     //This is used to listed according to presence(offline/online)
     return [[[self fetchedResultsController] sections] count];
@@ -119,261 +117,52 @@
     return 1;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString *CellIdentifier = @"Cell";
     
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (cell == nil)
-    {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
+    DashboardTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    if (cell == nil) {
+        
+        cell = [[DashboardTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
                                       reuseIdentifier:CellIdentifier];
     }
     
-    UILabel* nameLabel = (UILabel*)[cell viewWithTag:1];
-    UIImageView *userImage = (UIImageView*)[cell viewWithTag:2];
-    MyButton* profileBtn = (MyButton*)[cell viewWithTag:3];
-    UILabel* statusLabel = (UILabel*)[cell viewWithTag:4];
-    UILabel* dateLabel = (UILabel*)[cell viewWithTag:5];
-    UILabel* badgeLabel = (UILabel*)[cell viewWithTag:6];
-    
-    badgeLabel.hidden=YES;
-    profileBtn.hidden=NO;
     if (customSegmentedControl.selectedSegmentIndex==2) {
 
         NSLog(@"%@",[userListArray objectAtIndex:indexPath.row]);
-        NSMutableDictionary *profileDic=[[profileLocalDictData objectForKey:[userListArray objectAtIndex:indexPath.row]] mutableCopy];
-        
-        dateLabel.hidden=YES;
-        profileBtn.Tag=(int)indexPath.row;
-        [profileBtn addTarget:self action:@selector(friendProfileAction:) forControlEvents:UIControlEventTouchUpInside];
-        userImage.layer.cornerRadius=20;
-        userImage.layer.masksToBounds=YES;
-        
-        nameLabel.text = [profileDic objectForKey:@"Name"];
-        statusLabel.text=[profileDic objectForKey:@"UserStatus"];
-        NSLog(@" userStatus:%@ \n phoneNumber:%@ Desc:%@ \n address:%@ \n emailid:%@ \n birthDay:%@ \n gender:%@",[profileDic objectForKey:@"UserStatus"],[profileDic objectForKey:@"PhoneNumber"],[profileDic objectForKey:@"Description"],[profileDic objectForKey:@"Address"],[profileDic objectForKey:@"EmailAddress"],[profileDic objectForKey:@"UserBirthDay"],[profileDic objectForKey:@"Gender"]);
-        [self configurePhotoForCell:cell jid:[userListArray objectAtIndex:indexPath.row]];
+        [cell displayContactListUserData:[[profileLocalDictData objectForKey:[userListArray objectAtIndex:indexPath.row]] mutableCopy] jid:[userListArray objectAtIndex:indexPath.row] index:(int)indexPath.row];
+        [cell.profileBtn addTarget:self action:@selector(friendProfileAction:) forControlEvents:UIControlEventTouchUpInside];
     }
     else if (customSegmentedControl.selectedSegmentIndex==0) {
         
-        badgeLabel.layer.masksToBounds=YES;
-        badgeLabel.layer.cornerRadius=10;
-        
-        NSXMLElement *historyElement=[historyChatData objectAtIndex:indexPath.row];
-        NSXMLElement *innerData=[historyElement elementForName:@"data"];
-        //        NSMutableDictionary *profileDic;
-        
-        if (![[innerData attributeStringValueForName:@"from"] isEqualToString:myDelegate.xmppLogedInUserId]) {
-            
-            //            profileDic=[[profileLocalDictData objectForKey:[historyElement attributeStringValueForName:@"from"]] mutableCopy];
-            if ([self isChatTypeMessageElement:historyElement]) {
-                if ([[XMPPUserDefaultManager getXMPPBadgeIndicatorValue:[innerData attributeStringValueForName:@"from"]] intValue]!=0) {
-                    badgeLabel.hidden=NO;
-                    badgeLabel.text=[XMPPUserDefaultManager getXMPPBadgeIndicatorValue:[innerData attributeStringValueForName:@"from"]];
-                }
-                 [self configurePhotoForCell:cell jid:[innerData attributeStringValueForName:@"from"]];
-            }
-            else {
-                if ([[XMPPUserDefaultManager getXMPPBadgeIndicatorValue:[innerData attributeStringValueForName:@"to"]] intValue]!=0) {
-                    badgeLabel.hidden=NO;
-                    badgeLabel.text=[XMPPUserDefaultManager getXMPPBadgeIndicatorValue:[innerData attributeStringValueForName:@"to"]];
-                }
-                userImage.image=[UIImage imageNamed:@"groupPlaceholderImage.png"];
-            }
-           
-            nameLabel.text = [[innerData attributeStringValueForName:@"senderName"] capitalizedString];
-            
-        }
-        else {
-            
-            //            profileDic=[[profileLocalDictData objectForKey:[historyElement attributeStringValueForName:@"to"]] mutableCopy];
-            
-            if ([self isChatTypeMessageElement:historyElement]) {
-                [self configurePhotoForCell:cell jid:[innerData attributeStringValueForName:@"to"]];
-            }
-            else {
-                userImage.image=[UIImage imageNamed:@"groupPlaceholderImage.png"];
-            }
-            
-            nameLabel.text = [[innerData attributeStringValueForName:@"receiverName"] capitalizedString];
-            if ([[XMPPUserDefaultManager getXMPPBadgeIndicatorValue:[innerData attributeStringValueForName:@"to"]] intValue]!=0) {
-                badgeLabel.hidden=NO;
-                badgeLabel.text=[XMPPUserDefaultManager getXMPPBadgeIndicatorValue:[innerData attributeStringValueForName:@"to"]];
-            }
-        }
-        
-        dateLabel.hidden=NO;
-        profileBtn.Tag=(int)indexPath.row;
-        [profileBtn addTarget:self action:@selector(friendProfileAction:) forControlEvents:UIControlEventTouchUpInside];
-        userImage.layer.cornerRadius=20;
-        userImage.layer.masksToBounds=YES;
-        
-        if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"FileAttachment"]) {
-            statusLabel.text=@"File \U0001F4D1";
-        }
-        else if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"ImageAttachment"]) {
-            statusLabel.text=@"Photo \U0001F4F7";
-        }
-        else if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"Location"]) {
-            statusLabel.text=@"Location \U0001F4CC";
-        }
-        else {
-            statusLabel.text=[[historyElement elementForName:@"body"] stringValue];
-        }
-//        statusLabel.text=[[historyElement elementForName:@"body"] stringValue];
-        dateLabel.text=[self changeTimeFormat:[innerData attributeStringValueForName:@"time"]];
-        //        NSLog(@" userStatus:%@ \n phoneNumber:%@ Desc:%@ \n address:%@ \n emailid:%@ \n birthDay:%@ \n gender:%@",[profileDic objectForKey:@"UserStatus"],[profileDic objectForKey:@"PhoneNumber"],[profileDic objectForKey:@"Description"],[profileDic objectForKey:@"Address"],[profileDic objectForKey:@"EmailAddress"],[profileDic objectForKey:@"UserBirthDay"],[profileDic objectForKey:@"Gender"]);
+        [cell displayHistoryListUserData:[historyChatData objectAtIndex:indexPath.row] index:(int)indexPath.row];
+        [cell.profileBtn addTarget:self action:@selector(friendProfileAction:) forControlEvents:UIControlEventTouchUpInside];
     }
     else {
+        
         //Group content
-        NSMutableDictionary *groupDataDic=[[groupChatListArray objectAtIndex:indexPath.row] mutableCopy];
-        
-        dateLabel.hidden=YES;
-        profileBtn.hidden=YES;
-        userImage.layer.cornerRadius=20;
-        userImage.layer.masksToBounds=YES;
-        
-        nameLabel.text = [groupDataDic objectForKey:@"roomName"];
-        statusLabel.text=[groupDataDic objectForKey:@"roomDescription"];
-        [self configureGroupPhotoForCell:cell jid:[groupDataDic objectForKey:@"roomJid"]];
+        [cell displayGroupListData:[[groupChatListArray objectAtIndex:indexPath.row] mutableCopy]];
     }
     return cell;
 }
 
-
-//{
-//    [super viewDidLoad];
-//    //1F601,1F602,1F603,1F604,1F605,1F606
-//    emojiArray=[[NSArray alloc]initWithObjects:@"\U0001F601",@"\U0001F602",@"\U0001F603",@"\U0001F604",@"\U0001F605",@"\U0001F606", nil];
-//    _emoji6.text=[emojiArray objectAtIndex:5];
-//    _emoji5.text=[emojiArray objectAtIndex:4];
-//    _emoji4.text=[emojiArray objectAtIndex:3];
-//    _emoji3.text=[emojiArray objectAtIndex:2];
-//    _emoji2.text=[emojiArray objectAtIndex:1];
-//    _emoji1.text=[emojiArray objectAtIndex:0];
-//    
-//    //utf-8
-//    //    _emoji1.text = [NSString stringWithFormat:@"%C", 0xe04f];
-//    //    //unicode
-//    //    _emoji2.text=@"\U0001F601";
-//    //
-//    //    //string with emoji
-//    //    NSString *str = @"Happy to help you \U0001F431";
-//    //
-//    //    NSData *data = [str dataUsingEncoding:NSNonLossyASCIIStringEncoding];
-//    //    NSString *valueUnicode = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-//    //
-//    //    NSData *dataa = [valueUnicode dataUsingEncoding:NSUTF8StringEncoding];
-//    //    NSString *valueEmoj = [[NSString alloc] initWithData:dataa encoding:NSNonLossyASCIIStringEncoding];
-//    //    NSLog(@"%@",valueEmoj);
-//    //
-//    //    _emoji3.text = @"\ue04b";
-//    //    _emoji4.text=@"\ue420";
-//    //    //utf-8
-//    //    _emoji5.text=@"\xF0\x9F\x99\x8F";
-//    //    _emoji6.text=@"\ue40c";
-//    // Do any additional setup after loading the view, typically from a nib.
-//}
-
-- (NSString *)changeTimeFormat:(NSString *)timeString {
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"HH:mm:ss"];
-    
-    NSDate *date = [dateFormatter dateFromString:timeString];
-    [dateFormatter setDateFormat:@"hh:mm a"];
-    return [dateFormatter stringFromDate:date];
-}
-
--(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-//    XMPPUserCoreDataStorageObject *user = [[self fetchedResultsController] objectAtIndexPath:indexPath];
-    
+    //    XMPPUserCoreDataStorageObject *user = [[self fetchedResultsController] objectAtIndexPath:indexPath];
     if (customSegmentedControl.selectedSegmentIndex==2) {
         
-    ChatScreenViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"ChatScreenViewController"];
-    profileObj.friendUserJid=[userListArray objectAtIndex:indexPath.row];
-    profileObj.friendUserName=[[profileLocalDictData objectForKey:[userListArray objectAtIndex:indexPath.row]] objectForKey:@"Name"];
-//    profileObj.loginUserName=[[profileLocalDictData objectForKey:myDelegate.xmppLogedInUserId] objectForKey:@"Name"];
-    [self.navigationController pushViewController:profileObj animated:YES];
+        [self didSelectAtContactList:(int)indexPath.row];
     }
     else if (customSegmentedControl.selectedSegmentIndex==0) {
-    
-        NSXMLElement *historyElement=[historyChatData objectAtIndex:indexPath.row];
-         NSXMLElement *innerData=[historyElement elementForName:@"data"];
         
-        if ([self isChatTypeMessageElement:historyElement]) {
-            
-            ChatScreenViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"ChatScreenViewController"];
-            
-            if (![[innerData attributeStringValueForName:@"from"] isEqualToString:myDelegate.xmppLogedInUserId]) {
-                
-                profileObj.friendUserJid=[innerData attributeStringValueForName:@"from"];
-                profileObj.friendUserName=[[innerData attributeStringValueForName:@"senderName"] capitalizedString];
-            }
-            else {
-                
-                profileObj.friendUserJid=[innerData attributeStringValueForName:@"to"];
-                profileObj.friendUserName=[[innerData attributeStringValueForName:@"receiverName"] capitalizedString];
-            }
-            [self.navigationController pushViewController:profileObj animated:YES];
-        }
-        else {
-        
-            //Group content click
-            GroupChatViewController *groupChatObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"GroupChatViewController"];
-            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"roomJid == %@", [NSString stringWithFormat:@"%@",[innerData attributeStringValueForName:@"to"]]];
-            NSArray *filteredarray = [groupChatListArray filteredArrayUsingPredicate:predicate];
-            
-            if (filteredarray.count>0) {
-                
-                NSUInteger index = [groupChatListArray indexOfObjectPassingTest:^(id obj, NSUInteger idx, BOOL *stop) {
-                    return [predicate evaluateWithObject:obj];
-                }];
-                groupChatObj.roomDetail=[[groupChatListArray objectAtIndex:index] mutableCopy];
-            }
-            else {
-                
-                NSMutableDictionary *roomData=[NSMutableDictionary new];
-                [roomData setObject:[NSNumber numberWithBool:false] forKey:@"isPhoto"];
-                [roomData setObject:@"" forKey:@"roomDescription"];
-                [roomData setObject:[innerData attributeStringValueForName:@"to"] forKey:@"roomJid"];
-                [roomData setObject:[innerData attributeStringValueForName:@"receiverName"] forKey:@"roomName"];
-                [roomData setObject:@"" forKey:@"roomOwnerJid"];
-                groupChatObj.roomDetail=[roomData mutableCopy];
-            }
-            
-            
-            [self.navigationController pushViewController:groupChatObj animated:YES];
-
-        }
+        [self didSelectAtHistoryList:(int)indexPath.row];
     }
     else {
-    
-        //Group content click
-        GroupChatViewController *groupChatObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"GroupChatViewController"];
-        groupChatObj.roomDetail=[[groupChatListArray objectAtIndex:indexPath.row] mutableCopy];
-        [self.navigationController pushViewController:groupChatObj animated:YES];
+        
+        [self didSelectAtGroupList:(int)indexPath.row];
     }
 }
 
-- (void)configurePhotoForCell:(UITableViewCell *)cell jid:(NSString *)jid {
-    
-    // Our xmppRosterStorage will cache photos as they arrive from the xmppvCardAvatarModule.
-    // We only need to ask the avatar module for a photo, if the roster doesn't have it.
-    UIImageView *userImage = (UIImageView*)[cell viewWithTag:2];
-    [self getProfilePhotosJid:jid profileImageView:userImage placeholderImage:@"images.png" result:^(UIImage *tempImage) {
-        // do something with your BOOL
-        if (tempImage!=nil) {
-            userImage.image=tempImage;
-        }
-        else {
-            
-            userImage.image=[UIImage imageNamed:@"images.png"];
-        }
-    }];
-}
 #pragma mark - end
 
 #pragma mark - Custom accessors
@@ -437,9 +226,9 @@
 #pragma mark - end
 
 #pragma mark - IBActions
-- (IBAction)friendProfileAction:(MyButton *)sender {
+- (IBAction)friendProfileAction:(UIButton *)sender {
     
-    int tagValue=(int)[sender Tag];
+    int tagValue=(int)[sender tag];
     if (customSegmentedControl.selectedSegmentIndex==2) {
         
         UserProfileViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"UserProfileViewController"];
@@ -547,11 +336,39 @@
         }
         else if (status==4) {
             NSLog(@"4");
-            [UserDefaultManager removeValue:@"userName"];
-            [self userLogout];
-            UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-            myDelegate.navigationController = [storyboard instantiateViewControllerWithIdentifier:@"loginNavigation"];
-            myDelegate.window.rootViewController = myDelegate.navigationController;
+            Internet *internet=[[Internet alloc] init];
+            if (![internet start]) {
+                
+                UIAlertController *alertController = [UIAlertController
+                                                      alertControllerWithTitle:@"Alert"
+                                                      message:@"Logging out will clear your current history."
+                                                      preferredStyle:UIAlertControllerStyleAlert];
+                
+                UIAlertAction *okAction = [UIAlertAction
+                                           actionWithTitle:@"OK"
+                                           style:UIAlertActionStyleDefault
+                                           handler:^(UIAlertAction *action)
+                                           {
+                                               [UserDefaultManager removeValue:@"userName"];
+                                               [self userLogout];
+                                               UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+                                               myDelegate.navigationController = [storyboard instantiateViewControllerWithIdentifier:@"loginNavigation"];
+                                               myDelegate.window.rootViewController = myDelegate.navigationController;
+                                               
+                                               [alertController dismissViewControllerAnimated:YES completion:nil];
+                                           }];
+                
+                UIAlertAction *cancelAction = [UIAlertAction
+                                               actionWithTitle:@"CANCEL"
+                                               style:UIAlertActionStyleDefault
+                                               handler:^(UIAlertAction *action)
+                                               {
+                                                   [alertController dismissViewControllerAnimated:YES completion:nil];
+                                               }];
+                [alertController addAction:cancelAction];
+                [alertController addAction:okAction];
+                [[[UIApplication sharedApplication] keyWindow].rootViewController presentViewController:alertController animated:YES completion:nil];
+            }
         }
     });
 }
@@ -603,8 +420,26 @@
     [reload addTarget:self action:@selector(reloadAction:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.rightBarButtonItems=[NSArray arrayWithObjects:menuBarButton,reloadBarButton, nil];
 }
+
+//Group chat
+- (void)getListOfGroupsNotify:(NSMutableArray *)groupInfo {
+    
+    [myDelegate stopIndicator];
+    
+    self.dasboardTableListing.hidden=NO;
+    customSegmentedControl.selectedSegmentIndex=0;
+    [self.dasboardTableListing reloadData];
+    
+    //After complete loading show segment bottom lin
+    customSegmentedControl.selectionIndicatorColor = [UIColor whiteColor];
+    //end
+    
+    groupChatListArray=[groupInfo mutableCopy];
+    [self.dasboardTableListing reloadData];
+}
 #pragma mark - end
 
+#pragma mark - DashboardXMPP method
 - (void)xmppUserListResponse:(NSMutableDictionary *)xmppUserDetails xmppUserListIds:(NSMutableArray *)xmppUserListIds {
     
     [self addBarButton];
@@ -635,47 +470,89 @@
     }];
 }
 
-#pragma mark - Group chat
-- (void)configureGroupPhotoForCell:(UITableViewCell *)cell jid:(NSString *)jid {
-    
-    // Our xmppRosterStorage will cache photos as they arrive from the xmppvCardAvatarModule.
-    // We only need to ask the avatar module for a photo, if the roster doesn't have it.
-    UIImageView *userImage = (UIImageView*)[cell viewWithTag:2];
-    [self getGroupPhotoJid:jid profileImageView:userImage placeholderImage:@"groupPlaceholderImage.png" result:^(UIImage *tempImage) {
-        // do something with your BOOL
-        if (tempImage!=nil) {
-            userImage.image=tempImage;
-        }
-        else {
-            
-            userImage.image=[UIImage imageNamed:@"groupPlaceholderImage.png"];
-        }
-    }];
-}
-
-- (void)getListOfGroupsNotify:(NSMutableArray *)groupInfo {
-
-    [myDelegate stopIndicator];
-    
-    self.dasboardTableListing.hidden=NO;
-    customSegmentedControl.selectedSegmentIndex=0;
-    [self.dasboardTableListing reloadData];
-    
-    //After complete loading show segment bottom lin
-    customSegmentedControl.selectionIndicatorColor = [UIColor whiteColor];
-    //end
-    
-    groupChatListArray=[groupInfo mutableCopy];
-    [self.dasboardTableListing reloadData];
-}
-#pragma mark - end
-
-#pragma mark - Refresh connection
+//Refresh connection
 - (void)XMPPReloadConnection {
-
+    
     profileLocalDictData=[NSMutableDictionary new];
     [myDelegate showIndicator];
     [self performSelector:@selector(reloadUserData) withObject:nil afterDelay:0.1];
+}
+#pragma mark - end
+
+#pragma mark - DidSelect table view cell action perform
+- (void)didSelectAtContactList:(int)index {
+    
+    ChatScreenViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"ChatScreenViewController"];
+    profileObj.friendUserJid=[userListArray objectAtIndex:index];
+    profileObj.friendUserName=[[profileLocalDictData objectForKey:[userListArray objectAtIndex:index]] objectForKey:@"Name"];
+    //    profileObj.loginUserName=[[profileLocalDictData objectForKey:myDelegate.xmppLogedInUserId] objectForKey:@"Name"];
+    [self.navigationController pushViewController:profileObj animated:YES];
+}
+
+- (void)didSelectAtHistoryList:(int)index {
+    
+    NSXMLElement *historyElement=[historyChatData objectAtIndex:index];
+    if ([self isChatTypeMessageElement:historyElement]) {
+        
+        [self didSelectAtHistoryListOneToOneChatType:[historyElement elementForName:@"data"]];
+    }
+    else {
+        
+        //Group content click
+        [self didSelectAtHistoryListGroupChatType:[historyElement elementForName:@"data"]];
+    }
+}
+
+- (void)didSelectAtHistoryListOneToOneChatType:(NSXMLElement *)innerData {
+    
+    ChatScreenViewController *profileObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"ChatScreenViewController"];
+    
+    if (![[innerData attributeStringValueForName:@"from"] isEqualToString:myDelegate.xmppLogedInUserId]) {
+        
+        profileObj.friendUserJid=[innerData attributeStringValueForName:@"from"];
+        profileObj.friendUserName=[[innerData attributeStringValueForName:@"senderName"] capitalizedString];
+    }
+    else {
+        
+        profileObj.friendUserJid=[innerData attributeStringValueForName:@"to"];
+        profileObj.friendUserName=[[innerData attributeStringValueForName:@"receiverName"] capitalizedString];
+    }
+    [self.navigationController pushViewController:profileObj animated:YES];
+}
+
+- (void)didSelectAtHistoryListGroupChatType:(NSXMLElement *)innerData {
+    
+    //Group content click
+    GroupChatViewController *groupChatObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"GroupChatViewController"];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"roomJid == %@", [NSString stringWithFormat:@"%@",[innerData attributeStringValueForName:@"to"]]];
+    NSArray *filteredarray = [groupChatListArray filteredArrayUsingPredicate:predicate];
+    
+    if (filteredarray.count>0) {
+        
+        NSUInteger index = [groupChatListArray indexOfObjectPassingTest:^(id obj, NSUInteger idx, BOOL *stop) {
+            return [predicate evaluateWithObject:obj];
+        }];
+        groupChatObj.roomDetail=[[groupChatListArray objectAtIndex:index] mutableCopy];
+    }
+    else {
+        
+        NSMutableDictionary *roomData=[NSMutableDictionary new];
+        [roomData setObject:[NSNumber numberWithBool:false] forKey:@"isPhoto"];
+        [roomData setObject:@"" forKey:@"roomDescription"];
+        [roomData setObject:[innerData attributeStringValueForName:@"to"] forKey:@"roomJid"];
+        [roomData setObject:[innerData attributeStringValueForName:@"receiverName"] forKey:@"roomName"];
+        [roomData setObject:@"" forKey:@"roomOwnerJid"];
+        groupChatObj.roomDetail=[roomData mutableCopy];
+    }
+    [self.navigationController pushViewController:groupChatObj animated:YES];
+}
+
+- (void)didSelectAtGroupList:(int)index {
+    
+    //Group content click
+    GroupChatViewController *groupChatObj = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"GroupChatViewController"];
+    groupChatObj.roomDetail=[[groupChatListArray objectAtIndex:index] mutableCopy];
+    [self.navigationController pushViewController:groupChatObj animated:YES];
 }
 #pragma mark - end
 /*

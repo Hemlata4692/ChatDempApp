@@ -35,7 +35,7 @@
 }
 #pragma mark - end
 
-//Users delete/insert/update data in local storage
+#pragma mark - Users delete/insert/update data in local storage
 - (void)deleteDataModelEntry:(NSString *)registredUserId {
     
     NSManagedObjectContext *context = [self managedObjectContext];
@@ -144,9 +144,9 @@
         }
     }
 }
-//end
+#pragma mark - end
 
-//Manage local chat storage
+#pragma mark - Manage local chat storage
 - (void)removeLocalMessageStorageDataBase:(NSString *)userId {
     
     //Remove local dataBase user chat
@@ -263,9 +263,9 @@
         [self insertMessageData:bareJidStr message:[NSString stringWithFormat:@"%@",message] uniquiId:uniquiId];
     }
 }
-//end
+#pragma mark - end
 
-//User profile storage methods
+#pragma mark - User profile storage methods
 - (NSDictionary *)getProfileDicData:(NSString *)jid {
     
     NSManagedObjectContext *managedObjectContext = [self managedObjectContext];
@@ -326,9 +326,9 @@
     
     return [tempDict mutableCopy];
 }
-//end
+#pragma mark - end
 
-//Group chat
+#pragma mark - Group chat
 - (void)insertGroupEntryInXmppUserModelXmppGroupJid:(NSString *)xmppGroupJid xmppGroupName:(NSString *)xmppGroupName xmppGroupDescription:(NSString *)xmppGroupDescription xmppGroupOnwerId:(NSString *)xmppGroupOnwerId {
     
     NSManagedObjectContext *context = [self managedObjectContext];
@@ -385,7 +385,7 @@
         [self removeLocalMessageStorageDataBase:roomJid];
     }
 }
-//end
+#pragma mark - end
 
 - (NSManagedObjectContext *)managedObjectContext {
     NSManagedObjectContext *context = nil;
@@ -395,4 +395,28 @@
     }
     return context;
 }
+
+#pragma mark - Remove all local database history data
+- (void)removeAllLocalMessageStorageDataBase {
+    
+    //Remove local dataBase user chat
+    NSManagedObjectContext *context = [self managedObjectContext];
+    //    [request setPredicate:predicate];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]initWithEntityName:ChatMessageHistory];
+    NSArray *results = [context executeFetchRequest:fetchRequest error:nil];
+    
+    if (results.count > 0) {
+        
+        for (NSManagedObject *object in results) {
+            [context deleteObject:object];
+        }
+        NSError *error = nil;
+        if (![context save:&error]) {
+            NSLog(@"Can't Delete! %@ %@", error, [error localizedDescription]);
+            return;
+        }
+    }
+    //end
+}
+#pragma mark - end
 @end

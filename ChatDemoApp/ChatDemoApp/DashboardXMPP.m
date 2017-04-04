@@ -99,6 +99,8 @@
 - (void)userLogout {
     
     [appDelegate disconnect];
+    
+    [[XmppCoreDataHandler sharedManager] removeAllLocalMessageStorageDataBase];
     appDelegate.myView=@"";
     appDelegate.isContactListIsLoaded=NO;
     appDelegate.xmppLogedInUserId=@"";
@@ -306,6 +308,7 @@
 
 - (void)getProfilePhotosJid:(NSString *)jid profileImageView:(UIImageView *)profileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(UIImage *tempImage)) completion {
     
+    appDelegate = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
     NSData *tempImageData=[appDelegate listionDataFromCacheDirectoryFolderName:appDelegate.appProfilePhotofolderName jid:jid];
     if (nil==tempImageData) {
         profileImageView.image=[UIImage imageNamed:placeholderImage];
@@ -533,6 +536,7 @@
 
 - (void)getGroupPhotoJid:(NSString *)jid profileImageView:(UIImageView *)profileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(UIImage *tempImage)) completion {
     
+    appDelegate = (AppDelegateObjectFile *)[[UIApplication sharedApplication] delegate];
     NSData *tempImageData=[appDelegate listionDataFromCacheDirectoryFolderName:appDelegate.appProfilePhotofolderName jid:jid];
     completion([UIImage imageWithData:tempImageData]);
 }

@@ -58,6 +58,7 @@
 		B77EE6391E4DE73200A38ADD /* CustomFilterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B77EE6381E4DE73200A38ADD /* CustomFilterViewController.m */; };
 		B780E9F71E2F6E1A00437B4E /* ErrorCode.m in Sources */ = {isa = PBXBuildFile; fileRef = B780E9F61E2F6E1A00437B4E /* ErrorCode.m */; };
 		B780E9F91E2F9FC200437B4E /* ReadMe.rtf in Resources */ = {isa = PBXBuildFile; fileRef = B780E9F81E2F9FC200437B4E /* ReadMe.rtf */; };
+		B78856861E94BED900494D41 /* SendAudioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B78856851E94BED900494D41 /* SendAudioViewController.m */; };
 		B79353D61E28B28800E7EEB8 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B79353D51E28B28800E7EEB8 /* Security.framework */; };
 		B79353D81E28B28E00E7EEB8 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B79353D71E28B28E00E7EEB8 /* CFNetwork.framework */; };
 		B79353DA1E28B29500E7EEB8 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B79353D91E28B29500E7EEB8 /* SystemConfiguration.framework */; };
@@ -167,6 +168,8 @@
 		B780E9F51E2F6E1A00437B4E /* ErrorCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ErrorCode.h; sourceTree = "<group>"; };
 		B780E9F61E2F6E1A00437B4E /* ErrorCode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ErrorCode.m; sourceTree = "<group>"; };
 		B780E9F81E2F9FC200437B4E /* ReadMe.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = ReadMe.rtf; sourceTree = "<group>"; };
+		B78856841E94BED900494D41 /* SendAudioViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SendAudioViewController.h; sourceTree = "<group>"; };
+		B78856851E94BED900494D41 /* SendAudioViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SendAudioViewController.m; sourceTree = "<group>"; };
 		B79353D51E28B28800E7EEB8 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		B79353D71E28B28E00E7EEB8 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		B79353D91E28B29500E7EEB8 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
@@ -646,6 +649,7 @@
 		B77DFFDC1E4C2DFD00921126 /* ChatScreenView */ = {
 			isa = PBXGroup;
 			children = (
+				B78856831E94BEAC00494D41 /* AudioAttachment */,
 				B7005C1C1E5FE609003A56D3 /* LocationAttachment */,
 				B715A0C01E5EB43C00B36D16 /* ImageAttachment */,
 				B715A0BF1E5EB42D00B36D16 /* DocumentAttachment */,
@@ -680,6 +684,15 @@
 				B77EE6381E4DE73200A38ADD /* CustomFilterViewController.m */,
 			);
 			name = AddAttacment;
+			sourceTree = "<group>";
+		};
+		B78856831E94BEAC00494D41 /* AudioAttachment */ = {
+			isa = PBXGroup;
+			children = (
+				B78856841E94BED900494D41 /* SendAudioViewController.h */,
+				B78856851E94BED900494D41 /* SendAudioViewController.m */,
+			);
+			name = AudioAttachment;
 			sourceTree = "<group>";
 		};
 		B7C6B51E1E9212AB00E7C554 /* GlobalImageView */ = {
@@ -874,6 +887,7 @@
 				B745F8561E2353DD001119BD /* UserDefaultManager.m in Sources */,
 				B745F8461E2351F1001119BD /* RegisterViewController.m in Sources */,
 				B7C6B5211E9212D100E7C554 /* GlobalImageViewController.m in Sources */,
+				B78856861E94BED900494D41 /* SendAudioViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

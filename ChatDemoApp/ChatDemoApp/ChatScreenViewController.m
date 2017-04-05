@@ -22,6 +22,7 @@
 #import "UserDefaultManager.h"
 #import <AVFoundation/AVFoundation.h>
 #import "LocationViewController.h"
+#import "SendAudioViewController.h"
 
 #define navigationBarHeight 64
 #define toolbarHeight 0
@@ -34,7 +35,7 @@
 #define messageTextViewFont [UIFont systemFontOfSize:17]
 #define DEFAULT_FONT(size) [UIFont systemFontOfSize:size]
 
-@interface ChatScreenViewController ()<CustomFilterDelegate,/*BSKeyboardControlsDelegate,*/UIGestureRecognizerDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate, SendImageDelegate, SendDocumentDelegate,UIDocumentInteractionControllerDelegate,SendLocationDelegate>{
+@interface ChatScreenViewController ()<CustomFilterDelegate,/*BSKeyboardControlsDelegate,*/ UIGestureRecognizerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, SendImageDelegate, SendDocumentDelegate, UIDocumentInteractionControllerDelegate, SendLocationDelegate, SendAudioDelegate>{
     CGFloat messageHeight, messageYValue;
     NSMutableArray *userData;
     NSString *otherUserId;
@@ -487,15 +488,23 @@
             [tempAttachment setObject:[NSNumber numberWithInt:1] forKey:@"Documents"];
             [tempAttachmentArra addObject:@"Documents"];
             [tempAttachmentImageArra addObject:@"documentsAttachment"];
+            
             [tempAttachment setObject:[NSNumber numberWithInt:2] forKey:@"Camera"];
             [tempAttachmentArra addObject:@"Camera"];
             [tempAttachmentImageArra addObject:@"cameraAttachment"];
+            
             [tempAttachment setObject:[NSNumber numberWithInt:3] forKey:@"Gallery"];
             [tempAttachmentArra addObject:@"Gallery"];
             [tempAttachmentImageArra addObject:@"galleryAttachment"];
+            
             [tempAttachment setObject:[NSNumber numberWithInt:4] forKey:@"Location"];
             [tempAttachmentArra addObject:@"Location"];
             [tempAttachmentImageArra addObject:@"locationIcon"];
+            
+            [tempAttachment setObject:[NSNumber numberWithInt:5] forKey:@"Audio"];
+            [tempAttachmentArra addObject:@"Audio"];
+            [tempAttachmentImageArra addObject:@"audioIcon"];
+            
             filterViewObj.filterDict=[tempAttachment mutableCopy];
             filterViewObj.filterArray=[tempAttachmentArra mutableCopy];
             filterViewObj.filterImageArray=[tempAttachmentImageArra mutableCopy];
@@ -678,32 +687,54 @@
     
     dispatch_async(dispatch_get_main_queue(), ^{
         
-        if (status==1) {
-            NSLog(@"1");
-            
-            UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-            DocumentAttachmentViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"DocumentAttachmentViewController"];
-            [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
-            popupView.delegate=self;
-            [self presentViewController:popupView animated:YES completion:nil];
-        }
-        else if (status==2) {
-            NSLog(@"2");
-            [self openCamera];            
-        }
-        else if (status==3) {
-            NSLog(@"3");
-            [self openGallery];
-        }
-        else if (status==4) {
-            NSLog(@"3");
-            isAttachmentOpen=true;
-            UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-            LocationViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"LocationViewController"];
-//            [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
-            popupView.delegate=self;
-            
-            [self presentViewController:popupView animated:YES completion:NULL];
+        switch (status) {
+            case 1:
+            {
+                NSLog(@"1");
+                
+                UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+                DocumentAttachmentViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"DocumentAttachmentViewController"];
+                [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+                popupView.delegate=self;
+                [self presentViewController:popupView animated:YES completion:nil];
+            }
+                break;
+            case 2:
+            {
+                NSLog(@"2");
+                [self openCamera];
+            }
+                break;
+            case 3:
+            {
+                NSLog(@"3");
+                [self openGallery];
+            }
+                break;
+            case 4:
+            {
+                NSLog(@"4");
+                isAttachmentOpen=true;
+                UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+                LocationViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"LocationViewController"];
+                //            [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+                popupView.delegate=self;
+                
+                [self presentViewController:popupView animated:YES completion:NULL];
+            }
+                break;
+            case 5:
+            {
+                UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+                SendAudioViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"SendAudioViewController"];
+                popupView.view.backgroundColor = [UIColor colorWithWhite:1 alpha:1.0f];
+                [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+                [self presentViewController:popupView animated:YES completion:nil];
+            }
+                break;
+                
+            default:
+                break;
         }
     });
 }

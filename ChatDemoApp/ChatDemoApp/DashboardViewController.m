@@ -290,18 +290,23 @@
     NSMutableDictionary *tempAttachment=[NSMutableDictionary new];
     NSMutableArray *tempAttachmentArra=[NSMutableArray new];
     NSMutableArray *tempAttachmentImageArra=[NSMutableArray new];
+    
     [tempAttachment setObject:[NSNumber numberWithInt:1] forKey:@"Status"];
     [tempAttachmentArra addObject:@"Status"];
     [tempAttachmentImageArra addObject:@"editStatus"];
+    
     [tempAttachment setObject:[NSNumber numberWithInt:2] forKey:@"New Group"];
     [tempAttachmentArra addObject:@"New Group"];
     [tempAttachmentImageArra addObject:@"group"];
+    
     [tempAttachment setObject:[NSNumber numberWithInt:3] forKey:@"Settings"];
     [tempAttachmentArra addObject:@"Settings"];
     [tempAttachmentImageArra addObject:@"settings"];
+    
     [tempAttachment setObject:[NSNumber numberWithInt:4] forKey:@"Logout"];
     [tempAttachmentArra addObject:@"Logout"];
     [tempAttachmentImageArra addObject:@"logout"];
+    
     filterViewObj.filterDict=[tempAttachment mutableCopy];
     filterViewObj.filterArray=[tempAttachmentArra mutableCopy];
     filterViewObj.filterImageArray=[tempAttachmentImageArra mutableCopy];
@@ -315,62 +320,82 @@
 - (void)customFilterDelegateAction:(int)status{
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (status==1) {
-            NSLog(@"1");
-            UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-            UIViewController *objStatusView = [storyboard instantiateViewControllerWithIdentifier:@"EditUserStatusViewController"];
-            [self.navigationController pushViewController:objStatusView animated:YES];
-        }
-        else if (status==2) {
-            NSLog(@"2");
-            
-            UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-            UIViewController *objGroupView = [storyboard instantiateViewControllerWithIdentifier:@"GroupChatFormViewController"];
-            [self.navigationController pushViewController:objGroupView animated:YES];
-        }
-        else if (status==3) {
-            NSLog(@"3");
-            UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-            UIViewController *objSettingView = [storyboard instantiateViewControllerWithIdentifier:@"SettingViewController"];
-            [self.navigationController pushViewController:objSettingView animated:YES];
-        }
-        else if (status==4) {
-            NSLog(@"4");
-            Internet *internet=[[Internet alloc] init];
-            if (![internet start]) {
-                
-                UIAlertController *alertController = [UIAlertController
-                                                      alertControllerWithTitle:@"Alert"
-                                                      message:@"Logging out will clear your current history."
-                                                      preferredStyle:UIAlertControllerStyleAlert];
-                
-                UIAlertAction *okAction = [UIAlertAction
-                                           actionWithTitle:@"OK"
-                                           style:UIAlertActionStyleDefault
-                                           handler:^(UIAlertAction *action)
-                                           {
-                                               [UserDefaultManager removeValue:@"userName"];
-                                               [self userLogout];
-                                               UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-                                               myDelegate.navigationController = [storyboard instantiateViewControllerWithIdentifier:@"loginNavigation"];
-                                               myDelegate.window.rootViewController = myDelegate.navigationController;
-                                               
-                                               [alertController dismissViewControllerAnimated:YES completion:nil];
-                                           }];
-                
-                UIAlertAction *cancelAction = [UIAlertAction
-                                               actionWithTitle:@"CANCEL"
-                                               style:UIAlertActionStyleDefault
-                                               handler:^(UIAlertAction *action)
-                                               {
-                                                   [alertController dismissViewControllerAnimated:YES completion:nil];
-                                               }];
-                [alertController addAction:cancelAction];
-                [alertController addAction:okAction];
-                [[[UIApplication sharedApplication] keyWindow].rootViewController presentViewController:alertController animated:YES completion:nil];
+        
+        switch (status) {
+            case 1:
+            {
+                NSLog(@"1");
+                UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+                UIViewController *objStatusView = [storyboard instantiateViewControllerWithIdentifier:@"EditUserStatusViewController"];
+                [self.navigationController pushViewController:objStatusView animated:YES];
             }
+                break;
+            case 2:
+            {
+                NSLog(@"2");
+                
+                UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+                UIViewController *objGroupView = [storyboard instantiateViewControllerWithIdentifier:@"GroupChatFormViewController"];
+                [self.navigationController pushViewController:objGroupView animated:YES];
+            }
+                break;
+            case 3:
+            {
+                NSLog(@"3");
+                UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+                UIViewController *objSettingView = [storyboard instantiateViewControllerWithIdentifier:@"SettingViewController"];
+                [self.navigationController pushViewController:objSettingView animated:YES];
+            }
+                break;
+            case 4:
+            {
+                NSLog(@"4");
+                [self userLogoutMethod];
+            }
+                break;
+            default:
+                break;
         }
     });
+}
+#pragma mark - end
+
+#pragma mark - User logout
+- (void)userLogoutMethod {
+    NSLog(@"4");
+    Internet *internet=[[Internet alloc] init];
+    if (![internet start]) {
+        
+        UIAlertController *alertController = [UIAlertController
+                                              alertControllerWithTitle:@"Alert"
+                                              message:@"Logging out will clear your current history."
+                                              preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction *okAction = [UIAlertAction
+                                   actionWithTitle:@"OK"
+                                   style:UIAlertActionStyleDefault
+                                   handler:^(UIAlertAction *action)
+                                   {
+                                       [UserDefaultManager removeValue:@"userName"];
+                                       [self userXMPPLogout];
+                                       UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+                                       myDelegate.navigationController = [storyboard instantiateViewControllerWithIdentifier:@"loginNavigation"];
+                                       myDelegate.window.rootViewController = myDelegate.navigationController;
+                                       
+                                       [alertController dismissViewControllerAnimated:YES completion:nil];
+                                   }];
+        
+        UIAlertAction *cancelAction = [UIAlertAction
+                                       actionWithTitle:@"CANCEL"
+                                       style:UIAlertActionStyleDefault
+                                       handler:^(UIAlertAction *action)
+                                       {
+                                           [alertController dismissViewControllerAnimated:YES completion:nil];
+                                       }];
+        [alertController addAction:cancelAction];
+        [alertController addAction:okAction];
+        [[[UIApplication sharedApplication] keyWindow].rootViewController presentViewController:alertController animated:YES completion:nil];
+    }
 }
 #pragma mark - end
 

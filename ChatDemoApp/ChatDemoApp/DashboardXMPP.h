@@ -38,7 +38,7 @@
 - (NSFetchedResultsController *)fetchedResultsController;
 
 //This method is used for logout user
-- (void)userLogout;
+- (void)userXMPPLogout;
 
 //Fetch chat history
 - (void)fetchAllHistoryChat:(void(^)(NSMutableArray *tempHistoryData))completion;

@@ -523,47 +523,59 @@
     
     dispatch_async(dispatch_get_main_queue(), ^{
         
-        if (status==1) {
-            NSLog(@"1");
-            
-            UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-            DocumentAttachmentViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"DocumentAttachmentViewController"];
-            [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
-            popupView.delegate=self;
-            [self presentViewController:popupView animated:YES completion:nil];
-        }
-        else if (status==2) {
-            NSLog(@"2");
-            
-            [self openCamera];
-        }
-        else if (status==3) {
-            NSLog(@"3");
-            
-            [self openGallery];
-        }
-        else if (status==4) {
-            NSLog(@"3");
-            
-            isAttachmentOpen=true;
-            UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-            LocationViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"LocationViewController"];
-            popupView.delegate=self;
-            [self presentViewController:popupView animated:YES completion:NULL];
-        }
-        else if (status==5) {
-            NSLog(@"5");
-            [self inviteAction];
-        }
-        else if (status==6) {
-            NSLog(@"6");
-            
-            Internet *internet=[[Internet alloc] init];
-            if (![internet start]) {
-                
-                [myDelegate showIndicator];
-                [self performSelector:@selector(deleteGroupService) withObject:nil afterDelay:0.1];
+        switch (status) {
+            case 1:
+            {
+                NSLog(@"1");
+                UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+                DocumentAttachmentViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"DocumentAttachmentViewController"];
+                [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+                popupView.delegate=self;
+                [self presentViewController:popupView animated:YES completion:nil];
             }
+                break;
+            case 2:
+            {
+                NSLog(@"2");
+                [self openCamera];
+            }
+                break;
+            case 3:
+            {
+                NSLog(@"3");
+                [self openGallery];
+            }
+                break;
+            case 4:
+            {
+                NSLog(@"4");
+                isAttachmentOpen=true;
+                UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+                LocationViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"LocationViewController"];
+                popupView.delegate=self;
+                [self presentViewController:popupView animated:YES completion:NULL];
+            }
+                break;
+            case 5:
+            {
+                NSLog(@"5");
+                [self inviteAction];
+            }
+                break;
+            case 6:
+            {
+                NSLog(@"6");
+                Internet *internet=[[Internet alloc] init];
+                if (![internet start]) {
+                    
+                    [myDelegate showIndicator];
+                    [self performSelector:@selector(deleteGroupService) withObject:nil afterDelay:0.1];
+                }
+            }
+                break;
+                
+            default:
+                break;
         }
     });
 }

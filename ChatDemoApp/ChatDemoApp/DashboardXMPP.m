@@ -96,7 +96,7 @@
 }
 
 #pragma mark - User logout
-- (void)userLogout {
+- (void)userXMPPLogout {
     
     [appDelegate disconnect];
     

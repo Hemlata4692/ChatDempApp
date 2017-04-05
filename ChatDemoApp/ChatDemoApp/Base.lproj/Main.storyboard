@@ -1971,11 +1971,7 @@
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <subviews>
                                                         <label opaque="NO" userInteractionEnabled="NO" tag="2" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ghF-hX-GDZ">
-                                                            <rect key="frame" x="66" y="20" width="163" height="40"/>
-                                                            <constraints>
-                                                                <constraint firstAttribute="height" constant="40" id="NsV-DJ-ZLF"/>
-                                                                <constraint firstAttribute="width" constant="163" id="VBS-aS-ih6"/>
-                                                            </constraints>
+                                                            <rect key="frame" x="66" y="8" width="163" height="63"/>
                                                             <fontDescription key="fontDescription" name="Calibri" family="Calibri" pointSize="17"/>
                                                             <color key="textColor" red="0.0" green="0.4549019608" blue="0.74509803919999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                             <nil key="highlightedColor"/>
@@ -1983,8 +1979,7 @@
                                                         <imageView userInteractionEnabled="NO" tag="1" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="k1g-mm-fPi">
                                                             <rect key="frame" x="8" y="15" width="50" height="50"/>
                                                             <constraints>
-                                                                <constraint firstAttribute="width" constant="50" id="TUv-Qu-OQL"/>
-                                                                <constraint firstAttribute="height" constant="50" id="kyc-x3-i7k"/>
+                                                                <constraint firstAttribute="width" secondItem="k1g-mm-fPi" secondAttribute="height" multiplier="1:1" id="UUP-J0-cBK"/>
                                                             </constraints>
                                                         </imageView>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cdP-n7-yCw">
@@ -2000,12 +1995,15 @@
                                                     </subviews>
                                                     <constraints>
                                                         <constraint firstAttribute="bottom" secondItem="cdP-n7-yCw" secondAttribute="bottom" id="2eA-UA-p9Q"/>
-                                                        <constraint firstItem="ghF-hX-GDZ" firstAttribute="centerY" secondItem="k1g-mm-fPi" secondAttribute="centerY" id="3DH-h6-BLB"/>
                                                         <constraint firstItem="cdP-n7-yCw" firstAttribute="leading" secondItem="glp-Td-v9R" secondAttribute="leading" id="6pa-7I-6at"/>
+                                                        <constraint firstItem="ghF-hX-GDZ" firstAttribute="top" secondItem="glp-Td-v9R" secondAttribute="top" constant="8" id="Dzi-Fd-MUG"/>
                                                         <constraint firstAttribute="trailing" secondItem="cdP-n7-yCw" secondAttribute="trailing" id="Izb-Tq-01R"/>
-                                                        <constraint firstItem="k1g-mm-fPi" firstAttribute="centerY" secondItem="glp-Td-v9R" secondAttribute="centerY" id="QDx-kj-J9e"/>
-                                                        <constraint firstItem="k1g-mm-fPi" firstAttribute="leading" secondItem="glp-Td-v9R" secondAttribute="leading" constant="8" id="jxD-bw-lzM"/>
-                                                        <constraint firstItem="ghF-hX-GDZ" firstAttribute="leading" secondItem="k1g-mm-fPi" secondAttribute="trailing" constant="8" id="xMG-sU-MM4"/>
+                                                        <constraint firstItem="k1g-mm-fPi" firstAttribute="leading" secondItem="glp-Td-v9R" secondAttribute="leading" constant="8" id="TwX-TR-rlO"/>
+                                                        <constraint firstItem="k1g-mm-fPi" firstAttribute="top" secondItem="glp-Td-v9R" secondAttribute="top" constant="15" id="aS2-00-hKU"/>
+                                                        <constraint firstItem="ghF-hX-GDZ" firstAttribute="leading" secondItem="k1g-mm-fPi" secondAttribute="trailing" constant="8" id="nEk-qi-tyr"/>
+                                                        <constraint firstItem="cdP-n7-yCw" firstAttribute="top" secondItem="ghF-hX-GDZ" secondAttribute="bottom" constant="8" id="p6c-oS-lnR"/>
+                                                        <constraint firstItem="cdP-n7-yCw" firstAttribute="top" secondItem="k1g-mm-fPi" secondAttribute="bottom" constant="14" id="w0U-EI-v2U"/>
+                                                        <constraint firstAttribute="trailing" secondItem="ghF-hX-GDZ" secondAttribute="trailing" constant="11" id="zj5-h4-BVZ"/>
                                                     </constraints>
                                                 </tableViewCellContentView>
                                             </tableViewCell>
@@ -2041,7 +2039,7 @@
                     </connections>
                 </tapGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="5325" y="123"/>
+            <point key="canvasLocation" x="5325" y="122.53521126760563"/>
         </scene>
         <!--Send Image View Controller-->
         <scene sceneID="oBJ-gX-LZI">

@@ -45,12 +45,8 @@ static int const widthValue=250;
     }
     [self removeAutolayout];
     [self layoutViewObjects];
-    [self.filterTableView reloadData];
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    
     [self showViewAnimation];
+    [self.filterTableView reloadData];
 }
 
 - (void)didReceiveMemoryWarning {

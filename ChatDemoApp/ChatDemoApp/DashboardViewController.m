@@ -286,7 +286,7 @@
     UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     CustomFilterViewController *filterViewObj =[storyboard instantiateViewControllerWithIdentifier:@"CustomFilterViewController"];
     filterViewObj.delegate=self;
-    filterViewObj.tableCellheightValue=70;
+    filterViewObj.tableCellheightValue=50;
     NSMutableDictionary *tempAttachment=[NSMutableDictionary new];
     NSMutableArray *tempAttachmentArra=[NSMutableArray new];
     NSMutableArray *tempAttachmentImageArra=[NSMutableArray new];

@@ -1729,7 +1729,7 @@
                 <navigationController storyboardIdentifier="loginNavigation" automaticallyAdjustsScrollViewInsets="NO" id="g5s-l7-tBw" sceneMemberID="viewController">
                     <toolbarItems/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="Hp1-z3-vWC">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" translucent="NO" id="Hp1-z3-vWC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -1748,7 +1748,7 @@
                 <navigationController storyboardIdentifier="DashboardNavigation" automaticallyAdjustsScrollViewInsets="NO" id="Vep-JT-HHx" sceneMemberID="viewController">
                     <toolbarItems/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="pVC-3M-Vd2">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" translucent="NO" id="pVC-3M-Vd2">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -2224,28 +2224,6 @@
                                     <action selector="startPause:" destination="ror-sx-Tl6" eventType="touchUpInside" id="rmr-k8-Qdk"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aiP-uE-Of0">
-                                <rect key="frame" x="77" y="356" width="38" height="38"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="38" id="ggO-Yo-dyq"/>
-                                    <constraint firstAttribute="width" constant="38" id="oVz-wY-aFc"/>
-                                </constraints>
-                                <state key="normal" image="play"/>
-                                <connections>
-                                    <action selector="stop:" destination="ror-sx-Tl6" eventType="touchUpInside" id="PQt-96-91J"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qIy-as-1ay">
-                                <rect key="frame" x="203" y="356" width="38" height="38"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="38" id="hK1-gN-XCt"/>
-                                    <constraint firstAttribute="height" constant="38" id="j1O-o7-zLh"/>
-                                </constraints>
-                                <state key="normal" image="recordclose"/>
-                                <connections>
-                                    <action selector="cancelAudio:" destination="ror-sx-Tl6" eventType="touchUpInside" id="xGM-WI-Rfc"/>
-                                </connections>
-                            </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="00:00" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uPd-K8-7Uv">
                                 <rect key="frame" x="96" y="168" width="129" height="46"/>
                                 <constraints>
@@ -2260,16 +2238,12 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="dPH-I4-eQ0" firstAttribute="centerY" secondItem="ov0-UP-JRB" secondAttribute="centerY" id="3Rs-l5-ZfH"/>
-                            <constraint firstItem="ETs-FT-wow" firstAttribute="leading" secondItem="aiP-uE-Of0" secondAttribute="trailing" constant="20" id="AxP-af-HcV"/>
                             <constraint firstItem="H0R-vt-ZQI" firstAttribute="top" secondItem="ONK-eD-AHA" secondAttribute="bottom" constant="-5" id="DaF-bv-5Ty"/>
-                            <constraint firstItem="qIy-as-1ay" firstAttribute="leading" secondItem="ETs-FT-wow" secondAttribute="trailing" constant="18" id="GPW-gT-c8Q"/>
                             <constraint firstItem="H0R-vt-ZQI" firstAttribute="leading" secondItem="ov0-UP-JRB" secondAttribute="leading" id="Hwy-sC-xw0"/>
                             <constraint firstItem="ETs-FT-wow" firstAttribute="centerX" secondItem="dPH-I4-eQ0" secondAttribute="centerX" id="J1u-eD-6Qr"/>
                             <constraint firstItem="k26-Cw-Pn8" firstAttribute="top" secondItem="ONK-eD-AHA" secondAttribute="bottom" constant="-5" id="X27-d2-RnF"/>
-                            <constraint firstItem="qIy-as-1ay" firstAttribute="centerY" secondItem="ETs-FT-wow" secondAttribute="centerY" id="Xmg-ci-LWa"/>
                             <constraint firstAttribute="trailing" secondItem="k26-Cw-Pn8" secondAttribute="trailing" id="bgX-nw-Dyo"/>
                             <constraint firstItem="dPH-I4-eQ0" firstAttribute="centerX" secondItem="ov0-UP-JRB" secondAttribute="centerX" id="bts-lG-Pjf"/>
-                            <constraint firstItem="aiP-uE-Of0" firstAttribute="centerY" secondItem="ETs-FT-wow" secondAttribute="centerY" id="g3F-Za-I4N"/>
                             <constraint firstItem="ETs-FT-wow" firstAttribute="top" secondItem="dPH-I4-eQ0" secondAttribute="bottom" constant="16" id="otm-f0-aiW"/>
                             <constraint firstItem="uPd-K8-7Uv" firstAttribute="centerX" secondItem="dPH-I4-eQ0" secondAttribute="centerX" id="qpu-IU-puh"/>
                             <constraint firstItem="dPH-I4-eQ0" firstAttribute="top" secondItem="uPd-K8-7Uv" secondAttribute="bottom" constant="20" id="scv-gw-3yA"/>
@@ -2277,10 +2251,9 @@
                     </view>
                     <extendedEdge key="edgesForExtendedLayout"/>
                     <connections>
-                        <outlet property="cancelAudioButton" destination="qIy-as-1ay" id="yjS-rv-q6u"/>
+                        <outlet property="doneButton" destination="k26-Cw-Pn8" id="1p7-0Y-g5e"/>
                         <outlet property="micImageView" destination="dPH-I4-eQ0" id="oza-ln-c8j"/>
-                        <outlet property="startPauseButton" destination="ETs-FT-wow" id="fcJ-jU-Ojz"/>
-                        <outlet property="stopButton" destination="aiP-uE-Of0" id="e1W-y6-phi"/>
+                        <outlet property="startPauseButton" destination="ETs-FT-wow" id="7PD-Rd-bdr"/>
                         <outlet property="timerLabel" destination="uPd-K8-7Uv" id="cjp-Kk-Eft"/>
                     </connections>
                 </viewController>
@@ -2301,9 +2274,7 @@
         <image name="galleryAttachment" width="50" height="50"/>
         <image name="groupPlaceholderImage.png" width="300" height="300"/>
         <image name="microphone" width="100" height="100"/>
-        <image name="play" width="43" height="43"/>
         <image name="profile_camera" width="96" height="96"/>
-        <image name="recordclose" width="43" height="43"/>
         <image name="recording" width="66" height="66"/>
         <image name="sendIcon" width="30" height="30"/>
         <image name="upArrow" width="20" height="10"/>

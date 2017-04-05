@@ -187,4 +187,7 @@ XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate,XMPPOutgoingFi
 @property (nonatomic) Reachability *internetReachability;
 @property(nonatomic,assign) BOOL isReachable;
 //end
+
+//Get audio file
+- (NSString *)getAudioFilePath;
 @end

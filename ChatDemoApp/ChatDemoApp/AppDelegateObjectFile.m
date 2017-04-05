@@ -1194,6 +1194,26 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 }
 #pragma mark - end
 
+#pragma mark - Get audio file
+- (NSString *)getAudioFilePath {
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    NSLocale *locale = [[NSLocale alloc]
+                        initWithLocaleIdentifier:@"en_US"];
+    [dateFormatter setLocale:locale];
+    [dateFormatter setDateFormat:@"ddMMYYhhmmss"];
+    NSString * datestr = [dateFormatter stringFromDate:[NSDate date]];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *audioPath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appMediafolderName];
+    if (![fileManager fileExistsAtPath:audioPath]) {
+        
+        [fileManager createDirectoryAtPath:audioPath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    
+    return [audioPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_%@.wav",folderName,datestr]];
+}
+#pragma mark - end
+
 #pragma mark - Save send/Receive Images 
 - (NSString *)setOtherImageInLocalDB:(UIImage*)image {
 

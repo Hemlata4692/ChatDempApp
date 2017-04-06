@@ -8,8 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
-@interface XMPPChatView : UIViewController
+typedef NS_ENUM (NSInteger, FileAtachmentType){
+    FileAtachmentType_File,
+    FileAtachmentType_Audio,
+    FileAtachmentType_Video
+};
 
+@interface XMPPChatView : UIViewController
 
 //Set/Get profile images
 - (void)getChatProfilePhotoFriendJid:(NSString *)friendJid profileImageView:(UIImage *)profileImageView friendProfileImageView:(UIImage *)friendProfileImageView placeholderImage:(NSString *)placeholderImage result:(void(^)(NSArray *imageArray)) completion;
@@ -28,7 +33,7 @@
 - (void)XmppSendMessageResponse:(NSXMLElement *)xmpMessage;
 
 - (void)sendImageAttachment:(NSString *)fileName imageCaption:(NSString *)imageCaption friendName:(NSString *)friendName;
-- (void)sendDocumentAttachment:(NSString *)fileName friendName:(NSString *)friendName;
+- (void)sendDocumentAttachment:(NSString *)fileName friendName:(NSString *)friendName attachmentType:(FileAtachmentType)attachmentType;
 - (void)sendFileSuccessDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId;
 - (void)sendFileFailDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId;
 - (void)sendFileProgressDelegate:(NSXMLElement *)message;

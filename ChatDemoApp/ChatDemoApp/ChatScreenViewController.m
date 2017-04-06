@@ -51,7 +51,7 @@
     
     float keyboardHeight;
     
-    BOOL isAttachmentOpen, isReceiptOffline;
+    BOOL isAttachmentOpen, isReceiptOffline, isKeyboardHide;
     UIView *imagePreviewView;
 }
 
@@ -88,6 +88,7 @@
     [self initializeFriendProfile:friendUserJid];   //Set current friend jid
     chatTableView.backgroundColor=[UIColor whiteColor];
     isAttachmentOpen=false;
+    isKeyboardHide=true;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -278,6 +279,7 @@
 
 - (void)keyboardWillShow:(NSNotification *)notification {
     
+    isKeyboardHide=NO;
     NSDictionary* info = [notification userInfo];
     NSValue *aValue = [info objectForKey:UIKeyboardFrameEndUserInfoKey];
     NSLog(@"%f",[aValue CGRectValue].size.height);
@@ -295,6 +297,7 @@
 
 - (void)keyboardWillHide:(NSNotification *)notification {
     
+    isKeyboardHide=YES;
     messageView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height- messageView.frame.size.height -navigationBarHeight, self.view.bounds.size.width, messageHeight+ 10);
     messageYValue = [UIScreen mainScreen].bounds.size.height -49 -10;
     chatTableView.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, messageView.frame.origin.y-2);
@@ -728,6 +731,7 @@
                 UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
                 SendAudioViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"SendAudioViewController"];
                 popupView.view.backgroundColor = [UIColor colorWithWhite:1 alpha:1.0f];
+                popupView.delegate=self;
                 [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
                 [self presentViewController:popupView animated:YES completion:nil];
             }
@@ -825,7 +829,7 @@
     messageTextView.text=@"";
     messageHeight = messageTextviewInitialHeight;
     messageTextView.frame = CGRectMake(messageTextView.frame.origin.x, messageTextView.frame.origin.y, messageTextView.frame.size.width, messageHeight-8);
-    if ([[[[xmpMessage elementForName:@"data"] attributeForName:@"chatType"] stringValue] isEqualToString:@"Location"]) {
+    if ([[[[xmpMessage elementForName:@"data"] attributeForName:@"chatType"] stringValue] isEqualToString:@"Location"]||isKeyboardHide) {
         
         messageView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height- messageView.frame.size.height -navigationBarHeight, self.view.bounds.size.width, messageHeight+ 10);
         messageYValue = [UIScreen mainScreen].bounds.size.height -49 -10;
@@ -1003,7 +1007,7 @@
     Internet *internet=[[Internet alloc] init];
     if (![internet start]) {
         
-        [self sendDocumentAttachment:documentName friendName:self.friendUserName];
+        [self sendDocumentAttachment:documentName friendName:self.friendUserName attachmentType:FileAtachmentType_File];
     }
 }
 
@@ -1013,6 +1017,17 @@
     if (![internet start]) {
         
         [self sendLocationXmppMessage:friendUserJid friendName:self.friendUserName  messageString:locationAddress latitude:latitude longitude:longitude];
+    }
+}
+#pragma mark - end
+
+#pragma mark - Send audio file delegates
+- (void)sendAudioDelegateAction:(NSString *)fileName {
+
+    Internet *internet=[[Internet alloc] init];
+    if (![internet start]) {
+        
+        [self sendDocumentAttachment:fileName friendName:self.friendUserName attachmentType:FileAtachmentType_Audio];
     }
 }
 #pragma mark - end

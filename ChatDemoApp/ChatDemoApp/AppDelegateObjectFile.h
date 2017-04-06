@@ -132,6 +132,7 @@ XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate,XMPPOutgoingFi
 @property(nonatomic,strong) NSString *appMediafolderName;
 @property(nonatomic,strong) NSString *appProfilePhotofolderName;
 @property(nonatomic,strong) NSString *appSentReceivePhotofolderName;
+@property(nonatomic,strong) NSString *appMediaAudiofolderName;
 @property(nonatomic,strong) NSString *appMapPhotofolderName;
 
 @property(nonatomic,strong) NSString *appDocumentfolderName;
@@ -190,4 +191,11 @@ XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate,XMPPOutgoingFi
 
 //Get audio file
 - (NSString *)getAudioFilePath;
+
+//Delete file from cache directory
+- (void)deleteCachePhotoFile:(NSString *)filename;
+- (void)deleteCacheAudioFile:(NSString *)filename;
+//end
+//Get file data from cache
+- (NSData *)audioDocumentCacheDirectoryFileName:(NSString *)fileName;
 @end

@@ -61,7 +61,7 @@
     second = 0;
     minute = 0;
     continousSecond = 0;
-    maxSize=0.5;
+    maxSize=2.0;
     
     [self.startPauseButton setImage:[UIImage imageNamed:@"recording"] forState:UIControlStateNormal];
     [self.startPauseButton setImage:[UIImage imageNamed:@"recordplay"] forState:UIControlStateSelected];
@@ -75,13 +75,12 @@
     AVAudioSession *session = [AVAudioSession sharedInstance];
     [session setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
     
-    //Define the recorder setting
+//    Define the recorder setting
     NSMutableDictionary *recordSetting = [[NSMutableDictionary alloc] init];
     [recordSetting setValue:[NSNumber numberWithInt:kAudioFormatLinearPCM] forKey:AVFormatIDKey];
-    [recordSetting setValue:[NSNumber numberWithFloat:44100.0] forKey:AVSampleRateKey];
+    [recordSetting setValue:[NSNumber numberWithFloat:100.0] forKey:AVSampleRateKey];
     [recordSetting setValue:[NSNumber numberWithInt: 2] forKey:AVNumberOfChannelsKey];
-    
-    //Initiate and prepare the recorder
+
     recorder = [[AVAudioRecorder alloc] initWithURL:outputFileURL settings:recordSetting error:NULL];
     recorder.delegate = self;
     recorder.meteringEnabled = YES;
@@ -97,11 +96,14 @@
     minute = (continousSecond /60) % 60;
     second = (continousSecond  % 60);
     self.timerLabel.text = [NSString stringWithFormat:@"%02d:%02d",minute,second];
+    
     if (recorder.recording) {
+        
         unsigned long long size = [[NSFileManager defaultManager] attributesOfItemAtPath:[recorder.url path] error:nil].fileSize;
         //check if recording exceeds the given file size
         if (size >= (1024*1024*maxSize)) {
-            [UserDefaultManager showAlertMessage:@"Alert" message:[NSString stringWithFormat:@"File size cannot exceed %.2f MB.",maxSize]];
+            
+            [self.view makeToast:[NSString stringWithFormat:@"File size cannot exceed %.2f MB.",maxSize]];
             
             isExceedSize=YES;
             self.startPauseButton.selected=NO;
@@ -137,6 +139,7 @@
 
 - (IBAction)cancel:(UIButton *)sender {
     
+    [myDelegate deleteCacheAudioFile:[audioFilePath lastPathComponent]];
     [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -153,8 +156,8 @@
         [player stop];
     }
     //Calculate length of answer
-    unsigned long long size = [[NSFileManager defaultManager] attributesOfItemAtPath:[recorder.url path] error:nil].fileSize;
-    
+//    unsigned long long size = [[NSFileManager defaultManager] attributesOfItemAtPath:[recorder.url path] error:nil].fileSize;
+    [self.delegate sendAudioDelegateAction:[audioFilePath lastPathComponent]];
     [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -172,8 +175,10 @@
     else {
         
         if (isExceedSize) {
-            
-            [UserDefaultManager showAlertMessage:@"Alert" message:[NSString stringWithFormat:@"File size cannot exceed %.2f MB.",maxSize]];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                
+                [self.view makeToast:[NSString stringWithFormat:@"File size cannot exceed %.2f MB.",maxSize]];
+            });
         }
         else {
             

@@ -1840,6 +1840,38 @@
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                 </imageView>
+                                                <view hidden="YES" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="b2q-Wk-cMM">
+                                                    <rect key="frame" x="76" y="33" width="200" height="48"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <subviews>
+                                                        <button hidden="YES" opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0YP-WR-APY">
+                                                            <rect key="frame" x="8" y="6" width="36" height="36"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                            <state key="normal" image="recordplay"/>
+                                                        </button>
+                                                        <progressView hidden="YES" opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" fixedFrame="YES" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="U4C-4O-AIR">
+                                                            <rect key="frame" x="50" y="23" width="142" height="2"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                            <color key="progressTintColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                                            <color key="trackTintColor" red="0.79092997750000005" green="0.79092997750000005" blue="0.79092997750000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        </progressView>
+                                                        <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="00:00" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bmi-FY-rJ2">
+                                                            <rect key="frame" x="50" y="27" width="40" height="16"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                                            <nil key="textColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                        <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="00:00" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oam-rx-3qz">
+                                                            <rect key="frame" x="152" y="27" width="40" height="16"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                                            <nil key="textColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                    </subviews>
+                                                    <color key="backgroundColor" red="0.88780084390000003" green="0.88780084390000003" blue="0.88780084390000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                </view>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="bottom" secondItem="xHU-JH-RgD" secondAttribute="bottom" id="BL5-7n-QUG"/>
@@ -1856,10 +1888,15 @@
                                         </tableViewCellContentView>
                                         <connections>
                                             <outlet property="attachedImageView" destination="qhV-xn-nHr" id="zBY-nI-ZZg"/>
+                                            <outlet property="audioBackView" destination="b2q-Wk-cMM" id="XhW-Vy-ytl"/>
+                                            <outlet property="audioEndTIme" destination="oam-rx-3qz" id="ODR-X0-pjy"/>
+                                            <outlet property="audioProgress" destination="U4C-4O-AIR" id="Fo6-ip-zex"/>
+                                            <outlet property="audioStartTime" destination="bmi-FY-rJ2" id="Fl0-8Y-gPg"/>
                                             <outlet property="dateLabel" destination="xrd-wy-QUD" id="iBG-0i-Xe2"/>
                                             <outlet property="halfSeparatorLabel" destination="X8l-dc-b2d" id="O6f-F7-n4b"/>
                                             <outlet property="messageLabel" destination="m4h-va-E1e" id="GcN-4q-7z3"/>
                                             <outlet property="nameLabel" destination="FUY-cz-KZw" id="1UL-7K-ct3"/>
+                                            <outlet property="playPauseButton" destination="0YP-WR-APY" id="GtV-r0-vvN"/>
                                             <outlet property="separatorLabel" destination="xHU-JH-RgD" id="YA6-uj-a3A"/>
                                             <outlet property="userImage" destination="guo-ZE-Zo6" id="vtL-we-5Q5"/>
                                         </connections>
@@ -2276,6 +2313,7 @@
         <image name="microphone" width="100" height="100"/>
         <image name="profile_camera" width="96" height="96"/>
         <image name="recording" width="66" height="66"/>
+        <image name="recordplay" width="66" height="66"/>
         <image name="sendIcon" width="30" height="30"/>
         <image name="upArrow" width="20" height="10"/>
         <image name="viewIcon" width="30" height="30"/>

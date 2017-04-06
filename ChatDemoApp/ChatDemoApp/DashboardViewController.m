@@ -451,13 +451,13 @@
     
     [myDelegate stopIndicator];
     
-    self.dasboardTableListing.hidden=NO;
     customSegmentedControl.selectedSegmentIndex=0;
     [self.dasboardTableListing reloadData];
     
     //After complete loading show segment bottom lin
     customSegmentedControl.selectionIndicatorColor = [UIColor whiteColor];
     //end
+    self.dasboardTableListing.hidden=NO;
     
     groupChatListArray=[groupInfo mutableCopy];
     [self.dasboardTableListing reloadData];
@@ -489,10 +489,10 @@
         if ([internet start]) {
             
             [myDelegate stopIndicator];
-            self.dasboardTableListing.hidden=NO;
             customSegmentedControl.selectedSegmentIndex=0;
             //After complete loading show segment bottom lin
             customSegmentedControl.selectionIndicatorColor = [UIColor whiteColor];
+            self.dasboardTableListing.hidden=NO;
             //end
             [self.dasboardTableListing reloadData];
         }

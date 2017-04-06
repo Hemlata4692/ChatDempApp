@@ -89,6 +89,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 //App folders
 @synthesize folderName;
 @synthesize appMediafolderName;
+@synthesize appMediaAudiofolderName;
 @synthesize appProfilePhotofolderName;
 @synthesize appSentReceivePhotofolderName;
 @synthesize appDocumentfolderName;
@@ -119,7 +120,8 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     folderName=[[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleNameKey];
     appMediafolderName=[NSString stringWithFormat:@"%@/%@_Media",folderName,folderName];
     appProfilePhotofolderName=[NSString stringWithFormat:@"%@/%@_ProfilePhotos",appMediafolderName,folderName];
-    appSentReceivePhotofolderName=[NSString stringWithFormat:@"%@/%@_Photos/%@_SentReceived",appMediafolderName,folderName,folderName];
+    appSentReceivePhotofolderName=[NSString stringWithFormat:@"%@/%@_Photos",appMediafolderName,folderName];
+    appMediaAudiofolderName=[NSString stringWithFormat:@"%@/%@_Audio",appMediafolderName,folderName];
     appDocumentfolderName=[NSString stringWithFormat:@"%@/%@_Documents",folderName,folderName];
     appMapPhotofolderName=[NSString stringWithFormat:@"%@/%@_Map",folderName,folderName];
     [self createCacheDirectory];
@@ -1140,60 +1142,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 }
 #pragma mark - end
 
-#pragma mark - Image save in cache
-- (NSURL *)applicationDocumentsDirectory
-{
-    return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
-}
-
-- (NSString *)applicationCacheDirectory
-{
-    return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
-}
-
-- (void)createCacheDirectory {
-    
-    [self createCacheDirectory:folderName];
-    [self createCacheDirectory:appMediafolderName];
-    [self createCacheDirectory:appProfilePhotofolderName];
-    [self createCacheDirectory:appSentReceivePhotofolderName];
-    [self createCacheDirectory:appDocumentfolderName];
-    [self createCacheDirectory:appMapPhotofolderName];
-}
-
-- (void)createCacheDirectory:(NSString *)FolderName {
-    
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSString *folderPath = [[self applicationCacheDirectory] stringByAppendingPathComponent:FolderName];
-    if (![fileManager fileExistsAtPath:folderPath]) {
-        
-        [fileManager createDirectoryAtPath:folderPath withIntermediateDirectories:YES attributes:nil error:nil];
-    }
-}
-
-- (void)saveDataInCacheDirectory:(UIImage *)tempImage folderName:(NSString *)tempFolderName jid:(NSString *)jid {
-    
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSString *imagesPath = [[self applicationCacheDirectory] stringByAppendingPathComponent:tempFolderName];
-    if (![fileManager fileExistsAtPath:imagesPath]) {
-        
-        [fileManager createDirectoryAtPath:imagesPath withIntermediateDirectories:YES attributes:nil error:nil];
-    }
-    NSString *filePath = [imagesPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_%@.jpeg",folderName,[[jid componentsSeparatedByString:@"@"] objectAtIndex:0]]];
-    NSData * imageData = UIImageJPEGRepresentation(tempImage, 1.0);
-    [imageData writeToFile:filePath atomically:YES];
-}
-
-- (NSData *)listionDataFromCacheDirectoryFolderName:(NSString *)tempFolderName jid:(NSString *)jid {
-    
-//    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSString *filePath = [[self applicationCacheDirectory] stringByAppendingPathComponent:tempFolderName];
-    NSString *fileAtPath = [filePath stringByAppendingString:[NSString stringWithFormat:@"/%@_%@.jpeg",folderName,[[jid componentsSeparatedByString:@"@"] objectAtIndex:0]]];
-    NSError* error = nil;
-    return [NSData dataWithContentsOfFile:fileAtPath options:0 error:&error];
-}
-#pragma mark - end
-
 #pragma mark - Get audio file
 - (NSString *)getAudioFilePath {
     
@@ -1204,7 +1152,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [dateFormatter setDateFormat:@"ddMMYYhhmmss"];
     NSString * datestr = [dateFormatter stringFromDate:[NSDate date]];
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSString *audioPath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appMediafolderName];
+    NSString *audioPath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appMediaAudiofolderName];
     if (![fileManager fileExistsAtPath:audioPath]) {
         
         [fileManager createDirectoryAtPath:audioPath withIntermediateDirectories:YES attributes:nil error:nil];
@@ -1213,116 +1161,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     return [audioPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_%@.wav",folderName,datestr]];
 }
 #pragma mark - end
-
-#pragma mark - Save send/Receive Images 
-- (NSString *)setOtherImageInLocalDB:(UIImage*)image {
-
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    NSLocale *locale = [[NSLocale alloc]
-                        initWithLocaleIdentifier:@"en_US"];
-    [dateFormatter setLocale:locale];
-    [dateFormatter setDateFormat:@"ddMMYYhhmmss"];
-    NSString * datestr = [dateFormatter stringFromDate:[NSDate date]];
-    NSString *fileName = [NSString stringWithFormat:@"%@_%@.jpeg",folderName,datestr];
-    [self saveImageInLocalDocumentDirectory:fileName image:[self sendReceiveReducedImageSize:image]];
-    return fileName;
-}
-
-- (void)saveImageInLocalDocumentDirectory:(NSString *)fileName image:(NSData *)imageData {
-
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSString *imagesPath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appSentReceivePhotofolderName];
-    if (![fileManager fileExistsAtPath:imagesPath]) {
-        
-        [fileManager createDirectoryAtPath:imagesPath withIntermediateDirectories:YES attributes:nil error:nil];
-    }
-    imagesPath=[imagesPath stringByAppendingPathComponent:fileName];
-    NSLog(@"SIZE OF IMAGE: %.2f Mb", (float)imageData.length/1024/1024);
-    [imageData writeToFile:imagesPath atomically:YES];
-}
-
-- (NSData *)listionSendAttachedImageCacheDirectoryFileName:(NSString *)fileName {
-    
-    NSString *filePath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appSentReceivePhotofolderName];
-    NSString *fileAtPath = [filePath stringByAppendingPathComponent:fileName];
-    NSError* error = nil;
-    return [NSData dataWithContentsOfFile:fileAtPath options:0 error:&error];
-}
-
-- (NSData*)sendReceiveReducedImageSize:(UIImage *)selectedImage {
-    
-    NSData *imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(selectedImage, 1)];
-    
-    selectedImage = [self imageWithRoundedCornersSize:0 usingImage:selectedImage];
-    imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(selectedImage, 1)];
-    CGSize mySize;
-    mySize.height = 200;
-    mySize.width = 200;
-    CGFloat oldWidth = selectedImage.size.width;
-    CGFloat oldHeight = selectedImage.size.height;
-    CGFloat scaleFactor = (oldWidth > oldHeight) ? mySize.width / oldWidth : mySize.height / oldHeight;
-    mySize.height = oldHeight * scaleFactor;
-    mySize.width = oldWidth * scaleFactor;
-    selectedImage = [self imageWithImage:selectedImage scaledToSize:mySize];
-    NSData *pngData = UIImageJPEGRepresentation(selectedImage, .1);
-    return pngData;
-}
-#pragma mark - end
-
-- (NSData *)listionSendAttachedLocationImageCacheDirectoryFileName:(NSString *)fileName {
-    
-    NSString *filePath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appMapPhotofolderName];
-    NSString *fileAtPath = [filePath stringByAppendingPathComponent:fileName];
-    NSError* error = nil;
-    return [NSData dataWithContentsOfFile:fileAtPath options:0 error:&error];
-}
-
-- (NSData*)reducedLocationImageSize:(UIImage *)selectedImage {
-    
-    NSData *imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(selectedImage, 1)];
-    selectedImage = [self imageWithRoundedCornersSize:0 usingImage:selectedImage];
-    
-    imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(selectedImage, 1)];
-    CGSize mySize;
-    mySize.height = 100;
-    mySize.width = 100;
-    
-    CGFloat oldWidth = selectedImage.size.width;
-    CGFloat oldHeight = selectedImage.size.height;
-    
-    CGFloat scaleFactor = (oldWidth > oldHeight) ? mySize.width / oldWidth : mySize.height / oldHeight;
-    mySize.height = oldHeight * scaleFactor;
-    mySize.width = oldWidth * scaleFactor;
-    selectedImage = [self imageWithImage:selectedImage scaledToSize:mySize];
-    NSData *pngData = UIImageJPEGRepresentation(selectedImage, .1);
-    return pngData;
-}
-
-- (NSString *)setMapImageInLocalDB:(UIImage*)image {
-    
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    NSLocale *locale = [[NSLocale alloc]
-                        initWithLocaleIdentifier:@"en_US"];
-    [dateFormatter setLocale:locale];
-    [dateFormatter setDateFormat:@"ddMMYYhhmmss"];
-    NSString * datestr = [dateFormatter stringFromDate:[NSDate date]];
-    NSString *fileName = [NSString stringWithFormat:@"Map_%@.jpeg",datestr];
-    [self saveMapImageInLocalDocumentDirectory:fileName image:[self reducedLocationImageSize:image]];
-    return fileName;
-}
-
-- (void)saveMapImageInLocalDocumentDirectory:(NSString *)fileName image:(NSData *)imageData {
-    
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSString *imagesPath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appMapPhotofolderName];
-    if (![fileManager fileExistsAtPath:imagesPath]) {
-        
-        [fileManager createDirectoryAtPath:imagesPath withIntermediateDirectories:YES attributes:nil error:nil];
-    }
-    imagesPath=[imagesPath stringByAppendingPathComponent:fileName];
-    NSLog(@"SIZE OF IMAGE: %.3f Mb", (float)imageData.length/1024/1024);
-    [imageData writeToFile:imagesPath atomically:YES];
-}
 
 //File transfer
 #pragma mark - XMPPIncomingFileTransferDelegate Methods
@@ -1391,6 +1229,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
                 else if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"FileAttachment"]) {
                     [self addLocalNotification:senderName message:@"File" userId:[innerElementData attributeStringValueForName:@"from"]];
                 }
+                else if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"AudioAttachment"]) {
+                    [self addLocalNotification:senderName message:@"Audio" userId:[innerElementData attributeStringValueForName:@"from"]];
+                }
                 [XMPPUserDefaultManager setXMPPBadgeIndicatorKey:[innerElementData attributeStringValueForName:@"from"]];
                 
             }
@@ -1400,6 +1241,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
                 }
                 else if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"FileAttachment"]) {
                     [self addLocalNotification:senderName message:@"File" userId:[innerElementData attributeStringValueForName:@"from"]];
+                }
+                else if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"AudioAttachment"]) {
+                    [self addLocalNotification:senderName message:@"Audio" userId:[innerElementData attributeStringValueForName:@"from"]];
                 }
             }
 
@@ -1424,6 +1268,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
                 else if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"FileAttachment"]) {
                     [self addLocalNotification:senderName message:@"File" userId:[innerElementData attributeStringValueForName:@"to"]];
                 }
+                else if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"AudioAttachment"]) {
+                    [self addLocalNotification:senderName message:@"Audio" userId:[innerElementData attributeStringValueForName:@"to"]];
+                }
                 [XMPPUserDefaultManager setXMPPBadgeIndicatorKey:[innerElementData attributeStringValueForName:@"to"]];
                 
             }
@@ -1433,6 +1280,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
                 }
                 else if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"FileAttachment"]) {
                     [self addLocalNotification:senderName message:@"File" userId:[innerElementData attributeStringValueForName:@"to"]];
+                }
+                else if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"AudioAttachment"]) {
+                    [self addLocalNotification:senderName message:@"Audio" userId:[innerElementData attributeStringValueForName:@"to"]];
                 }
             }
         }
@@ -1514,7 +1364,10 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         messageString=@"Photo \U0001F4F7";
     }
     else if ([message isEqualToString:@"Location"]) {
-        messageString=@"Location \U0001F4CC";
+        messageString=@"Location \U0001F4CD";//earth 1F4CC //other pin 1F30F
+    }
+    else if ([message isEqualToString:@"Audio"]) {
+        messageString=@"Audio \U0001F50A";
     }
     else {
         messageString=message;
@@ -1569,14 +1422,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
                            completion(tempArray);
                        });
                    });
-}
-
-- (NSData *)documentCacheDirectoryFileName:(NSString *)fileName {
-    
-    NSString *filePath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appDocumentfolderName];
-    NSString *fileAtPath = [filePath stringByAppendingPathComponent:fileName];
-    NSError* error = nil;
-    return [NSData dataWithContentsOfFile:fileAtPath options:0 error:&error];
 }
 
 - (NSString *)documentCacheDirectoryPathFileName:(NSString *)fileName {
@@ -2334,4 +2179,218 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     }
 }
 //end
+
+#pragma mark - Cache document Directory
+//Image save in cache
+- (NSURL *)applicationDocumentsDirectory
+{
+    return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+}
+
+- (NSString *)applicationCacheDirectory
+{
+    return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
+}
+
+- (void)createCacheDirectory {
+    
+    [self createCacheDirectory:folderName];
+    [self createCacheDirectory:appMediafolderName];
+    [self createCacheDirectory:appProfilePhotofolderName];
+    [self createCacheDirectory:appSentReceivePhotofolderName];
+    [self createCacheDirectory:appMediaAudiofolderName];
+    [self createCacheDirectory:appDocumentfolderName];
+    [self createCacheDirectory:appMapPhotofolderName];
+}
+
+- (void)createCacheDirectory:(NSString *)FolderName {
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *folderPath = [[self applicationCacheDirectory] stringByAppendingPathComponent:FolderName];
+    if (![fileManager fileExistsAtPath:folderPath]) {
+        
+        [fileManager createDirectoryAtPath:folderPath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+}
+
+- (void)saveDataInCacheDirectory:(UIImage *)tempImage folderName:(NSString *)tempFolderName jid:(NSString *)jid {
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *imagesPath = [[self applicationCacheDirectory] stringByAppendingPathComponent:tempFolderName];
+    if (![fileManager fileExistsAtPath:imagesPath]) {
+        
+        [fileManager createDirectoryAtPath:imagesPath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    NSString *filePath = [imagesPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_%@.jpeg",folderName,[[jid componentsSeparatedByString:@"@"] objectAtIndex:0]]];
+    NSData * imageData = UIImageJPEGRepresentation(tempImage, 1.0);
+    [imageData writeToFile:filePath atomically:YES];
+}
+
+- (NSData *)listionDataFromCacheDirectoryFolderName:(NSString *)tempFolderName jid:(NSString *)jid {
+    
+    //    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *filePath = [[self applicationCacheDirectory] stringByAppendingPathComponent:tempFolderName];
+    NSString *fileAtPath = [filePath stringByAppendingString:[NSString stringWithFormat:@"/%@_%@.jpeg",folderName,[[jid componentsSeparatedByString:@"@"] objectAtIndex:0]]];
+    NSError* error = nil;
+    return [NSData dataWithContentsOfFile:fileAtPath options:0 error:&error];
+}
+//end
+
+//Save send/Receive Images
+- (NSString *)setOtherImageInLocalDB:(UIImage*)image {
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    NSLocale *locale = [[NSLocale alloc]
+                        initWithLocaleIdentifier:@"en_US"];
+    [dateFormatter setLocale:locale];
+    [dateFormatter setDateFormat:@"ddMMYYhhmmss"];
+    NSString * datestr = [dateFormatter stringFromDate:[NSDate date]];
+    NSString *fileName = [NSString stringWithFormat:@"%@_%@.jpeg",folderName,datestr];
+    [self saveImageInLocalDocumentDirectory:fileName image:[self sendReceiveReducedImageSize:image]];
+    return fileName;
+}
+
+- (void)saveImageInLocalDocumentDirectory:(NSString *)fileName image:(NSData *)imageData {
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *imagesPath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appSentReceivePhotofolderName];
+    if (![fileManager fileExistsAtPath:imagesPath]) {
+        
+        [fileManager createDirectoryAtPath:imagesPath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    imagesPath=[imagesPath stringByAppendingPathComponent:fileName];
+    NSLog(@"SIZE OF IMAGE: %.2f Mb", (float)imageData.length/1024/1024);
+    [imageData writeToFile:imagesPath atomically:YES];
+}
+
+- (NSData *)listionSendAttachedImageCacheDirectoryFileName:(NSString *)fileName {
+    
+    NSString *filePath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appSentReceivePhotofolderName];
+    NSString *fileAtPath = [filePath stringByAppendingPathComponent:fileName];
+    NSError* error = nil;
+    return [NSData dataWithContentsOfFile:fileAtPath options:0 error:&error];
+}
+
+- (NSData*)sendReceiveReducedImageSize:(UIImage *)selectedImage {
+    
+    NSData *imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(selectedImage, 1)];
+    
+    selectedImage = [self imageWithRoundedCornersSize:0 usingImage:selectedImage];
+    imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(selectedImage, 1)];
+    CGSize mySize;
+    mySize.height = 200;
+    mySize.width = 200;
+    CGFloat oldWidth = selectedImage.size.width;
+    CGFloat oldHeight = selectedImage.size.height;
+    CGFloat scaleFactor = (oldWidth > oldHeight) ? mySize.width / oldWidth : mySize.height / oldHeight;
+    mySize.height = oldHeight * scaleFactor;
+    mySize.width = oldWidth * scaleFactor;
+    selectedImage = [self imageWithImage:selectedImage scaledToSize:mySize];
+    NSData *pngData = UIImageJPEGRepresentation(selectedImage, .1);
+    return pngData;
+}
+//end
+
+- (NSData *)listionSendAttachedLocationImageCacheDirectoryFileName:(NSString *)fileName {
+    
+    NSString *filePath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appMapPhotofolderName];
+    NSString *fileAtPath = [filePath stringByAppendingPathComponent:fileName];
+    NSError* error = nil;
+    return [NSData dataWithContentsOfFile:fileAtPath options:0 error:&error];
+}
+
+- (NSData*)reducedLocationImageSize:(UIImage *)selectedImage {
+    
+    NSData *imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(selectedImage, 1)];
+    selectedImage = [self imageWithRoundedCornersSize:0 usingImage:selectedImage];
+    
+    imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(selectedImage, 1)];
+    CGSize mySize;
+    mySize.height = 100;
+    mySize.width = 100;
+    
+    CGFloat oldWidth = selectedImage.size.width;
+    CGFloat oldHeight = selectedImage.size.height;
+    
+    CGFloat scaleFactor = (oldWidth > oldHeight) ? mySize.width / oldWidth : mySize.height / oldHeight;
+    mySize.height = oldHeight * scaleFactor;
+    mySize.width = oldWidth * scaleFactor;
+    selectedImage = [self imageWithImage:selectedImage scaledToSize:mySize];
+    NSData *pngData = UIImageJPEGRepresentation(selectedImage, .1);
+    return pngData;
+}
+
+- (NSString *)setMapImageInLocalDB:(UIImage*)image {
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    NSLocale *locale = [[NSLocale alloc]
+                        initWithLocaleIdentifier:@"en_US"];
+    [dateFormatter setLocale:locale];
+    [dateFormatter setDateFormat:@"ddMMYYhhmmss"];
+    NSString * datestr = [dateFormatter stringFromDate:[NSDate date]];
+    NSString *fileName = [NSString stringWithFormat:@"Map_%@.jpeg",datestr];
+    [self saveMapImageInLocalDocumentDirectory:fileName image:[self reducedLocationImageSize:image]];
+    return fileName;
+}
+
+- (void)saveMapImageInLocalDocumentDirectory:(NSString *)fileName image:(NSData *)imageData {
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *imagesPath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appMapPhotofolderName];
+    if (![fileManager fileExistsAtPath:imagesPath]) {
+        
+        [fileManager createDirectoryAtPath:imagesPath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    imagesPath=[imagesPath stringByAppendingPathComponent:fileName];
+    NSLog(@"SIZE OF IMAGE: %.3f Mb", (float)imageData.length/1024/1024);
+    [imageData writeToFile:imagesPath atomically:YES];
+}
+//end
+
+//Delete file from cache directory
+- (void)deleteCachePhotoFile:(NSString *)filename {
+
+    
+}
+
+- (void)deleteCacheAudioFile:(NSString *)filename {
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *documentsPath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appMediaAudiofolderName];
+    
+    NSString *filePath = [documentsPath stringByAppendingPathComponent:filename];
+    NSError *error;
+    BOOL success = [fileManager removeItemAtPath:filePath error:&error];
+    if (success) {
+//        UIAlertView *removedSuccessFullyAlert = [[UIAlertView alloc] initWithTitle:@"Congratulations:" message:@"Successfully removed" delegate:self cancelButtonTitle:@"Close" otherButtonTitles:nil];
+//        [removedSuccessFullyAlert show];
+    }
+    else
+    {
+//        NSLog(@"Could not delete file -:%@ ",[error localizedDescription]);
+    }
+}
+//end
+
+//Get file data from cache
+- (NSData *)documentCacheDirectoryFileName:(NSString *)fileName {
+    
+    NSString *filePath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appDocumentfolderName];
+    NSString *fileAtPath = [filePath stringByAppendingPathComponent:fileName];
+    NSError* error = nil;
+    return [NSData dataWithContentsOfFile:fileAtPath options:0 error:&error];
+}
+//end
+
+//Get file data from cache
+- (NSData *)audioDocumentCacheDirectoryFileName:(NSString *)fileName {
+    
+    NSString *filePath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appMediaAudiofolderName];
+    NSString *fileAtPath = [filePath stringByAppendingPathComponent:fileName];
+    NSError* error = nil;
+    return [NSData dataWithContentsOfFile:fileAtPath options:0 error:&error];
+}
+//end
+
+#pragma mark - end
 @end

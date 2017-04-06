@@ -395,11 +395,29 @@
     }
 }
 
-- (void)sendDocumentAttachment:(NSString *)fileName friendName:(NSString *)friendName {
+- (void)sendDocumentAttachment:(NSString *)fileName friendName:(NSString *)friendName attachmentType:(FileAtachmentType)attachmentType {
     
     fileAttachmentMessage=nil;
     uniqueId=@"";
-    NSData *fileData=[appDelegate documentCacheDirectoryFileName:fileName];
+    NSData *fileData;
+    NSString *attachmentFileType;
+    switch (attachmentType) {
+        case FileAtachmentType_File:
+        {
+            attachmentFileType=@"FileAttachment";
+            fileData=[appDelegate documentCacheDirectoryFileName:fileName];
+        }
+            break;
+        case FileAtachmentType_Audio:
+        {
+            attachmentFileType=@"AudioAttachment";
+            fileData=[appDelegate audioDocumentCacheDirectoryFileName:fileName];
+        }
+            break;
+        default:
+            break;
+    }
+    
     XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",appDelegate.selectedFriendUserId,[[appDelegate.xmppStream myJID] resource]]];
     //    if (!_fileTransfer) {
     _fileTransfer = [[XMPPOutgoingFileTransfer alloc]
@@ -411,7 +429,7 @@
     //    }
     
     uniqueId=[[fileName componentsSeparatedByString:@"."] objectAtIndex:0];
-    fileAttachmentMessage=[self convertedMessage:appDelegate.selectedFriendUserId friendName:friendName fileName:fileName messageString:fileName fileType:@"FileAttachment"];
+    fileAttachmentMessage=[self convertedMessage:appDelegate.selectedFriendUserId friendName:friendName fileName:fileName messageString:fileName fileType:attachmentFileType];
     NSError *err;
     //    if (![_fileTransfer sendData:imageData
     //                           named:fileName
@@ -423,7 +441,7 @@
     
     
     NSXMLElement *messageData=[fileAttachmentMessage elementForName:@"data"];
-    if ([_fileTransfer sendCustomizedData:fileData named:fileName toRecipient:jid description:fileName date:[messageData attributeStringValueForName:@"date"] time:[messageData attributeStringValueForName:@"time"] senderId:[messageData attributeStringValueForName:@"from"] chatType:@"FileAttachment" senderName:appDelegate.xmppLogedInUserName receiverName:friendName error:&err]) {
+    if ([_fileTransfer sendCustomizedData:fileData named:fileName toRecipient:jid description:fileName date:[messageData attributeStringValueForName:@"date"] time:[messageData attributeStringValueForName:@"time"] senderId:[messageData attributeStringValueForName:@"from"] chatType:attachmentFileType senderName:appDelegate.xmppLogedInUserName receiverName:friendName error:&err]) {
         
         [[XmppCoreDataHandler sharedManager] insertLocalImageMessageStorageDataBase:appDelegate.selectedFriendUserId message:fileAttachmentMessage uniquiId:uniqueId];
         [self sendFileProgressDelegate:[fileAttachmentMessage copy]];

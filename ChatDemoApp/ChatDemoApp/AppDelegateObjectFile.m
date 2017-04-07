@@ -1321,6 +1321,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     
     [dataTag addAttributeWithName:@"xmlns" stringValue:@"main"];
     [dataTag addAttributeWithName:@"chatType" stringValue:chatType];
+    if ([chatType isEqualToString:@"AudioAttachment"]) {
+        [dataTag addAttributeWithName:@"timeDuration" stringValue:[[messageString componentsSeparatedByString:@"__"] objectAtIndex:1]];
+    }
     
     [dataTag addAttributeWithName:@"to" stringValue:to];
     [dataTag addAttributeWithName:@"fileName" stringValue:imageName];

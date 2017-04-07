@@ -121,7 +121,10 @@
         self.statusLabel.text=@"Photo \U0001F4F7";
     }
     else if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"Location"]) {
-        self.statusLabel.text=@"Location \U0001F4CC";
+        self.statusLabel.text=@"Location \U0001F4CD";//earth 1F4CC //other pin 1F30F
+    }
+    else if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"AudioAttachment"]) {
+        self.statusLabel.text=@"Audio \U0001F50A";
     }
     else {
         self.statusLabel.text=[[historyElement elementForName:@"body"] stringValue];

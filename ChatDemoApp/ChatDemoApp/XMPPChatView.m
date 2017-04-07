@@ -439,9 +439,9 @@
     //        NSLog(@"You messed something up: %@", err);
     //    }
     
-    
+//    fileName
     NSXMLElement *messageData=[fileAttachmentMessage elementForName:@"data"];
-    if ([_fileTransfer sendCustomizedData:fileData named:fileName toRecipient:jid description:fileName date:[messageData attributeStringValueForName:@"date"] time:[messageData attributeStringValueForName:@"time"] senderId:[messageData attributeStringValueForName:@"from"] chatType:attachmentFileType senderName:appDelegate.xmppLogedInUserName receiverName:friendName error:&err]) {
+    if ([_fileTransfer sendCustomizedData:fileData named:fileName toRecipient:jid description:([timeDuration isEqualToString:@""]?fileName:[NSString stringWithFormat:@"%@__%@",fileName,timeDuration]) date:[messageData attributeStringValueForName:@"date"] time:[messageData attributeStringValueForName:@"time"] senderId:[messageData attributeStringValueForName:@"from"] chatType:attachmentFileType senderName:appDelegate.xmppLogedInUserName receiverName:friendName error:&err]) {
         
         [[XmppCoreDataHandler sharedManager] insertLocalImageMessageStorageDataBase:appDelegate.selectedFriendUserId message:fileAttachmentMessage uniquiId:uniqueId];
         [self sendFileProgressDelegate:[fileAttachmentMessage copy]];

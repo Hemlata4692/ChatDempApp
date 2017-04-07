@@ -379,24 +379,13 @@
         [self.docController presentOpenInMenuFromRect:CGRectZero inView:self.view animated:YES];
     }
     else if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"ImageAttachment"]) {
-        
-        imagePreviewView=[[UIView alloc] initWithFrame:CGRectMake(0,self.view.bounds.size.height,self.view.bounds.size.width,self.view.bounds.size.height)];
-        UIImageView *popImage=[[UIImageView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,self.view.frame.size.height)];
-        imagePreviewView.backgroundColor = [UIColor blackColor];
-        popImage.contentMode = UIViewContentModeScaleAspectFit;
-        popImage.backgroundColor = [UIColor clearColor];
-        popImage.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
-        //    [userData objectAtIndex:(int)gesture.view.tag]
-        UIButton *close_button=[[UIButton alloc]initWithFrame:CGRectMake(self.view.frame.size.width - 60,10,48,48)];
-        [close_button setImage:[UIImage imageNamed:@"cross"] forState:UIControlStateNormal];
-        [close_button addTarget:self action:@selector(closeAction:) forControlEvents:UIControlEventTouchUpInside];
-        [imagePreviewView addSubview:popImage];
-        [imagePreviewView addSubview:close_button];
-        [self.view addSubview:imagePreviewView];
-        
-        [UIView animateWithDuration:0.3f animations:^{
-            imagePreviewView.frame = CGRectMake(0,0,self.view.bounds.size.width,self.view.bounds.size.height);
-        }];
+                
+        UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+        GlobalImageViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"GlobalImageViewController"];
+        popupView.globalImage=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+        popupView.view.backgroundColor = [UIColor colorWithWhite:0 alpha:0.6f];
+        [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+        [self presentViewController:popupView animated:YES completion:nil];
     }
     else if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"Location"]) {
         

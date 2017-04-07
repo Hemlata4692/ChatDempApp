@@ -441,7 +441,7 @@
             self.audioStartTime.hidden=false;
             self.audioEndTIme.hidden=false;
             
-            self.audioBackView.frame=CGRectMake(76, (5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+5), [[UIScreen mainScreen] bounds].size.width-86, 48);
+            self.audioBackView.frame=CGRectMake(76, 5, [[UIScreen mainScreen] bounds].size.width-86, 48);
             self.playPauseButton.frame=CGRectMake(8,6,36,36);
             self.audioProgress.frame=CGRectMake(50,23,self.audioBackView.frame.size.width-50-8,2);
             self.audioStartTime.frame=CGRectMake(50,27,40,16);

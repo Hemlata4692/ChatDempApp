@@ -33,7 +33,7 @@ typedef NS_ENUM (NSInteger, FileAtachmentType){
 - (void)XmppSendMessageResponse:(NSXMLElement *)xmpMessage;
 
 - (void)sendImageAttachment:(NSString *)fileName imageCaption:(NSString *)imageCaption friendName:(NSString *)friendName;
-- (void)sendDocumentAttachment:(NSString *)fileName friendName:(NSString *)friendName attachmentType:(FileAtachmentType)attachmentType;
+- (void)sendDocumentAttachment:(NSString *)fileName friendName:(NSString *)friendName attachmentType:(FileAtachmentType)attachmentType timeDuration:(NSString *)timeDuration;
 - (void)sendFileSuccessDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId;
 - (void)sendFileFailDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId;
 - (void)sendFileProgressDelegate:(NSXMLElement *)message;

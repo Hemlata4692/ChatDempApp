@@ -573,6 +573,27 @@
             }
         }
     }
+    else if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"AudioAttachment"]) {
+        
+        NSLog(@"%f",([[innerData attributeStringValueForName:@"nameHeight"] floatValue]>20?[[innerData attributeStringValueForName:@"nameHeight"] floatValue]:20));
+        float mainCellHeight=5+([[innerData attributeStringValueForName:@"nameHeight"] floatValue]>20?[[innerData attributeStringValueForName:@"nameHeight"] floatValue]:20)+5+48+10+20+5; //here mainCellHeight = NameLabel_topSpace + NameHeight + space_Between_NameLabel_And_AudioView + AudioViewHeight + space_Between_AudioView_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
+        
+        if (userData.count==1 || indexPath.row == 0) {
+            
+            return mainCellHeight;
+        }
+        else{
+            NSXMLElement* message1 = [userData objectAtIndex:(int)indexPath.row - 1];
+            NSXMLElement *innerData1=[message1 elementForName:@"data"];
+            if ([[innerData attributeStringValueForName:@"from"] isEqualToString:[innerData1 attributeStringValueForName:@"from"]]) {
+                
+                return 5+48+10+20+5;//Topspace_AudioView + AudioViewHeight + space_Between_AudioView_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
+            }
+            else{
+                return mainCellHeight;
+            }
+        }
+    }
     else {
         
         float mainCellHeight=5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+10+[[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]+10+20+5; //here mainCellHeight = NameLabel_topSpace + NameHeight + space_Between_NameLabel_And_MessageLabel + MessageHeight + space_Between_MessageLabel_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
@@ -1007,7 +1028,7 @@
     Internet *internet=[[Internet alloc] init];
     if (![internet start]) {
         
-        [self sendDocumentAttachment:documentName friendName:self.friendUserName attachmentType:FileAtachmentType_File];
+        [self sendDocumentAttachment:documentName friendName:self.friendUserName attachmentType:FileAtachmentType_File timeDuration:@""];
     }
 }
 
@@ -1022,12 +1043,12 @@
 #pragma mark - end
 
 #pragma mark - Send audio file delegates
-- (void)sendAudioDelegateAction:(NSString *)fileName {
+- (void)sendAudioDelegateAction:(NSString *)fileName timeDuration:(NSString *)timeDuration {
 
     Internet *internet=[[Internet alloc] init];
     if (![internet start]) {
         
-        [self sendDocumentAttachment:fileName friendName:self.friendUserName attachmentType:FileAtachmentType_Audio];
+        [self sendDocumentAttachment:fileName friendName:self.friendUserName attachmentType:FileAtachmentType_Audio timeDuration:timeDuration];
     }
 }
 #pragma mark - end

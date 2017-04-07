@@ -341,7 +341,7 @@
 //    }
     
     uniqueId=[[fileName componentsSeparatedByString:@"."] objectAtIndex:0];
-    fileAttachmentMessage=[self convertedMessage:appDelegate.selectedFriendUserId friendName:friendName fileName:fileName messageString:imageCaption fileType:@"ImageAttachment"];
+    fileAttachmentMessage=[self convertedMessage:appDelegate.selectedFriendUserId friendName:friendName fileName:fileName messageString:imageCaption fileType:@"ImageAttachment" timeDuration:@""];
     NSError *err;
 //    if (![_fileTransfer sendData:imageData
 //                           named:fileName
@@ -395,7 +395,7 @@
     }
 }
 
-- (void)sendDocumentAttachment:(NSString *)fileName friendName:(NSString *)friendName attachmentType:(FileAtachmentType)attachmentType {
+- (void)sendDocumentAttachment:(NSString *)fileName friendName:(NSString *)friendName attachmentType:(FileAtachmentType)attachmentType timeDuration:(NSString *)timeDuration {
     
     fileAttachmentMessage=nil;
     uniqueId=@"";
@@ -429,7 +429,7 @@
     //    }
     
     uniqueId=[[fileName componentsSeparatedByString:@"."] objectAtIndex:0];
-    fileAttachmentMessage=[self convertedMessage:appDelegate.selectedFriendUserId friendName:friendName fileName:fileName messageString:fileName fileType:attachmentFileType];
+    fileAttachmentMessage=[self convertedMessage:appDelegate.selectedFriendUserId friendName:friendName fileName:fileName messageString:fileName fileType:attachmentFileType timeDuration:timeDuration];
     NSError *err;
     //    if (![_fileTransfer sendData:imageData
     //                           named:fileName
@@ -448,7 +448,7 @@
     }
 }
 
-- (NSXMLElement *)convertedMessage:(NSString *)to friendName:(NSString *)friendName fileName:(NSString *)fileName messageString:(NSString *)messageString fileType:(NSString *)fileType {
+- (NSXMLElement *)convertedMessage:(NSString *)to friendName:(NSString *)friendName fileName:(NSString *)fileName messageString:(NSString *)messageString fileType:(NSString *)fileType timeDuration:(NSString *)timeDuration {
 
     NSString *messageStr = [messageString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
@@ -473,6 +473,7 @@
 
     [dataTag addAttributeWithName:@"to" stringValue:to];
     [dataTag addAttributeWithName:@"fileName" stringValue:fileName];
+    [dataTag addAttributeWithName:@"timeDuration" stringValue:timeDuration];
 
     [dataTag addAttributeWithName:@"from" stringValue:appDelegate.xmppLogedInUserId];
     [dataTag addAttributeWithName:@"time" stringValue:formattedTime];

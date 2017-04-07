@@ -157,7 +157,7 @@
     }
     //Calculate length of answer
 //    unsigned long long size = [[NSFileManager defaultManager] attributesOfItemAtPath:[recorder.url path] error:nil].fileSize;
-    [self.delegate sendAudioDelegateAction:[audioFilePath lastPathComponent]];
+    [self.delegate sendAudioDelegateAction:[audioFilePath lastPathComponent] timeDuration:self.timerLabel.text];
     [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 

@@ -46,6 +46,12 @@
 - (void)displaySingleTypeMessageData:(NSXMLElement *)message profileImageView:(UIImage *)logedInUserPhoto friendProfileImageView:(UIImage *)friendUserPhoto chatType:(NSString *)chatType {
     
     //Unhide/hide all objects
+    self.audioBackView.hidden=true;
+    self.playPauseButton.hidden=true;
+    self.audioProgress.hidden=true;
+    self.audioStartTime.hidden=true;
+    self.audioEndTIme.hidden=true;
+    
     self.userImage.hidden=false;
     self.nameLabel.hidden=false;
     self.messageLabel.hidden=false;
@@ -94,7 +100,14 @@
     self.nameLabel.text=[nameString capitalizedString];
     
 //    self.nameLabel.text=[[innerData attributeStringValueForName:@"senderName"] capitalizedString];
-    self.messageLabel.text=[[message elementForName:@"body"] stringValue];
+    if (![chatType isEqualToString:@"AudioAttachment"]) {
+        
+        self.messageLabel.text=[[message elementForName:@"body"] stringValue];
+    }
+    else {
+    
+        self.messageLabel.hidden=YES;
+    }
     
     self.nameLabel.frame=CGRectMake(76, 5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"nameHeight"] floatValue]); //Here frame = (Namelabel_x_Space, NameLabel_TopSpace, screenWidth - (Namelabel_x_Space + Namelabel_trailingSpace), NameHeight)
 
@@ -132,14 +145,45 @@
         self.attachedImageView.frame=CGRectMake(76, (5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+5), 200, 0); //Here frame = (AttachedImage_x_Space, (NameLabel_TopSpace + NameLabel_Height + space_Between_NameLabel_And_AttachedImage), AttachedImage_width, AttachedImage_height
     }
     
-    self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
-    
+    if (![chatType isEqualToString:@"AudioAttachment"]) {
+        
+        self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
+    }
+    else {
+        
+        self.audioBackView.translatesAutoresizingMaskIntoConstraints=true;
+        self.playPauseButton.translatesAutoresizingMaskIntoConstraints=true;
+        self.audioProgress.translatesAutoresizingMaskIntoConstraints=true;
+        self.audioStartTime.translatesAutoresizingMaskIntoConstraints=true;
+        self.audioEndTIme.translatesAutoresizingMaskIntoConstraints=true;
+        
+        self.audioBackView.hidden=false;
+        self.playPauseButton.hidden=false;
+        self.audioProgress.hidden=false;
+        self.audioStartTime.hidden=false;
+        self.audioEndTIme.hidden=false;
+        
+        self.audioBackView.frame=CGRectMake(76, (5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+5), [[UIScreen mainScreen] bounds].size.width-86, 48);
+        self.playPauseButton.frame=CGRectMake(8,6,36,36);
+        self.audioProgress.frame=CGRectMake(50,23,self.audioBackView.frame.size.width-50-8,2);
+        self.audioStartTime.frame=CGRectMake(50,27,40,16);
+        self.audioEndTIme.frame=CGRectMake(self.audioBackView.frame.size.width-8-40,27,40,16);
+        self.audioEndTIme.text=(([[innerData attributeStringValueForName:@"timeDuration"] isEqualToString:@""]||(nil==[innerData attributeStringValueForName:@"timeDuration"]))?@"00:00":[innerData attributeStringValueForName:@"timeDuration"]);
+        
+        self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), 0); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
+    }
     self.dateLabel.text=[self changeTimeFormat:[innerData attributeStringValueForName:@"time"]];
 }
 
 - (void)displayMultipleMessage:(NSXMLElement *)currentMessage nextmessage:(NSXMLElement *)nextmessage previousMessage:(NSXMLElement *)previousMessage profileImageView:(UIImage *)logedInUserPhoto friendProfileImageView:(UIImage *)friendUserPhoto chatType:(NSString *)chatType {
     
     //Unhide/hide all objects
+    self.audioBackView.hidden=true;
+    self.playPauseButton.hidden=true;
+    self.audioProgress.hidden=true;
+    self.audioStartTime.hidden=true;
+    self.audioEndTIme.hidden=true;
+    
     self.userImage.hidden=true;
     self.nameLabel.hidden=true;
     self.messageLabel.hidden=false;
@@ -201,7 +245,33 @@
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 0); //Here frame = (AttachedImage_x_Space, (NameLabel_TopSpace + NameLabel_Height + space_Between_NameLabel_And_AttachedImage), AttachedImage_width, AttachedImage_height
         }
         
-        self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
+        if (![chatType isEqualToString:@"AudioAttachment"]) {
+            
+            self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
+        }
+        else {
+            
+            self.audioBackView.translatesAutoresizingMaskIntoConstraints=true;
+            self.playPauseButton.translatesAutoresizingMaskIntoConstraints=true;
+            self.audioProgress.translatesAutoresizingMaskIntoConstraints=true;
+            self.audioStartTime.translatesAutoresizingMaskIntoConstraints=true;
+            self.audioEndTIme.translatesAutoresizingMaskIntoConstraints=true;
+            
+            self.audioBackView.hidden=false;
+            self.playPauseButton.hidden=false;
+            self.audioProgress.hidden=false;
+            self.audioStartTime.hidden=false;
+            self.audioEndTIme.hidden=false;
+            
+            self.audioBackView.frame=CGRectMake(76, 5, [[UIScreen mainScreen] bounds].size.width-86, 48);
+            self.playPauseButton.frame=CGRectMake(8,6,36,36);
+            self.audioProgress.frame=CGRectMake(50,23,self.audioBackView.frame.size.width-50-8,2);
+            self.audioStartTime.frame=CGRectMake(50,27,40,16);
+            self.audioEndTIme.frame=CGRectMake(self.audioBackView.frame.size.width-8-40,27,40,16);
+            self.audioEndTIme.text=(([[innerData attributeStringValueForName:@"timeDuration"] isEqualToString:@""]||(nil==[innerData attributeStringValueForName:@"timeDuration"]))?@"00:00":[innerData attributeStringValueForName:@"timeDuration"]);
+            
+            self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), 0); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
+        }
     }
     else if ([[innerData attributeStringValueForName:@"from"] isEqualToString:[innerData2 attributeStringValueForName:@"from"]] && ![[innerData attributeStringValueForName:@"from"] isEqualToString:[innerData1 attributeStringValueForName:@"from"]]) {
         
@@ -245,7 +315,33 @@
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 0); //Here frame = (AttachedImage_x_Space, (NameLabel_TopSpace + NameLabel_Height + space_Between_NameLabel_And_AttachedImage), AttachedImage_width, AttachedImage_height
         }
         
-        self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
+        if (![chatType isEqualToString:@"AudioAttachment"]) {
+            
+            self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
+        }
+        else {
+            
+            self.audioBackView.translatesAutoresizingMaskIntoConstraints=true;
+            self.playPauseButton.translatesAutoresizingMaskIntoConstraints=true;
+            self.audioProgress.translatesAutoresizingMaskIntoConstraints=true;
+            self.audioStartTime.translatesAutoresizingMaskIntoConstraints=true;
+            self.audioEndTIme.translatesAutoresizingMaskIntoConstraints=true;
+            
+            self.audioBackView.hidden=false;
+            self.playPauseButton.hidden=false;
+            self.audioProgress.hidden=false;
+            self.audioStartTime.hidden=false;
+            self.audioEndTIme.hidden=false;
+            
+            self.audioBackView.frame=CGRectMake(76, 5, [[UIScreen mainScreen] bounds].size.width-86, 48);
+            self.playPauseButton.frame=CGRectMake(8,6,36,36);
+            self.audioProgress.frame=CGRectMake(50,23,self.audioBackView.frame.size.width-50-8,2);
+            self.audioStartTime.frame=CGRectMake(50,27,40,16);
+            self.audioEndTIme.frame=CGRectMake(self.audioBackView.frame.size.width-8-40,27,40,16);
+            self.audioEndTIme.text=(([[innerData attributeStringValueForName:@"timeDuration"] isEqualToString:@""]||(nil==[innerData attributeStringValueForName:@"timeDuration"]))?@"00:00":[innerData attributeStringValueForName:@"timeDuration"]);
+            
+            self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), 0); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
+        }
     }
     else /*if (![[currentMessage attributeStringValueForName:@"from"] isEqualToString:[previousMessage attributeStringValueForName:@"from"]] && [[currentMessage attributeStringValueForName:@"from"] isEqualToString:[nextmessage attributeStringValueForName:@"from"]])*/ {
         
@@ -257,6 +353,12 @@
 - (void)displayLastMessage:(NSXMLElement *)currentMessage previousMessage:(NSXMLElement *)previousMessage profileImageView:(UIImage *)logedInUserPhoto friendProfileImageView:(UIImage *)friendUserPhoto chatType:(NSString *)chatType {
     
     //Unhide/hide all objects
+    self.audioBackView.hidden=true;
+    self.playPauseButton.hidden=true;
+    self.audioProgress.hidden=true;
+    self.audioStartTime.hidden=true;
+    self.audioEndTIme.hidden=true;
+    
     self.userImage.hidden=false;
     self.nameLabel.hidden=false;
     self.messageLabel.hidden=false;
@@ -265,6 +367,7 @@
     self.halfSeparatorLabel.hidden=true;
     
     if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]) {
+        
         self.attachedImageView.hidden=false;
     }
     else {
@@ -284,6 +387,7 @@
         self.attachedImageView.translatesAutoresizingMaskIntoConstraints=YES;
         self.messageLabel.numberOfLines=0;
         NSLog(@"%f %@",[[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue], [innerData attributeStringValueForName:@"messageBodyHeight"]);
+        self.messageLabel.text=[[currentMessage elementForName:@"body"] stringValue];
         
         self.attachedImageView.backgroundColor=[UIColor clearColor];
         self.attachedImageView.layer.cornerRadius=0;
@@ -319,8 +423,33 @@
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 0); //Here frame = (AttachedImage_x_Space, (NameLabel_TopSpace + NameLabel_Height + space_Between_NameLabel_And_AttachedImage), AttachedImage_width, AttachedImage_height
         }
         
-        self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
-        self.messageLabel.text=[[currentMessage elementForName:@"body"] stringValue];
+        if (![chatType isEqualToString:@"AudioAttachment"]) {
+            
+            self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
+        }
+        else {
+            
+            self.audioBackView.translatesAutoresizingMaskIntoConstraints=true;
+            self.playPauseButton.translatesAutoresizingMaskIntoConstraints=true;
+            self.audioProgress.translatesAutoresizingMaskIntoConstraints=true;
+            self.audioStartTime.translatesAutoresizingMaskIntoConstraints=true;
+            self.audioEndTIme.translatesAutoresizingMaskIntoConstraints=true;
+            
+            self.audioBackView.hidden=false;
+            self.playPauseButton.hidden=false;
+            self.audioProgress.hidden=false;
+            self.audioStartTime.hidden=false;
+            self.audioEndTIme.hidden=false;
+            
+            self.audioBackView.frame=CGRectMake(76, (5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+5), [[UIScreen mainScreen] bounds].size.width-86, 48);
+            self.playPauseButton.frame=CGRectMake(8,6,36,36);
+            self.audioProgress.frame=CGRectMake(50,23,self.audioBackView.frame.size.width-50-8,2);
+            self.audioStartTime.frame=CGRectMake(50,27,40,16);
+            self.audioEndTIme.frame=CGRectMake(self.audioBackView.frame.size.width-8-40,27,40,16);
+            self.audioEndTIme.text=(([[innerData attributeStringValueForName:@"timeDuration"] isEqualToString:@""]||(nil==[innerData attributeStringValueForName:@"timeDuration"]))?@"00:00":[innerData attributeStringValueForName:@"timeDuration"]);
+            
+            self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), 0); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
+        }
     }
     else {
         

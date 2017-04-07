@@ -2390,6 +2390,13 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     NSError* error = nil;
     return [NSData dataWithContentsOfFile:fileAtPath options:0 error:&error];
 }
+
+//Get file path from cache
+- (NSString *)audioPathDocumentCacheDirectoryFileName:(NSString *)fileName {
+
+    NSString *filePath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appMediaAudiofolderName];
+    return [filePath stringByAppendingPathComponent:fileName];
+}
 //end
 
 #pragma mark - end

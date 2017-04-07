@@ -10,7 +10,7 @@
 
 @protocol SendAudioDelegate<NSObject>
 @optional
-- (void)sendAudioDelegateAction:(NSString *)fileName;
+- (void)sendAudioDelegateAction:(NSString *)fileName timeDuration:(NSString *)timeDuration;
 @end
 
 @interface SendAudioViewController : UIViewController {

@@ -198,4 +198,6 @@ XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate,XMPPOutgoingFi
 //end
 //Get file data from cache
 - (NSData *)audioDocumentCacheDirectoryFileName:(NSString *)fileName;
+//Get file path from cache
+- (NSString *)audioPathDocumentCacheDirectoryFileName:(NSString *)fileName;
 @end

@@ -1899,7 +1899,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         }
     }
     
-    NSXMLElement *attachmentXml=[self convertedMessage:roomJid roomName:roomName fileName:fileName messageString:imageCaption fileType:@"ImageAttachment"];
+    NSXMLElement *attachmentXml=[self convertedMessage:roomJid roomName:roomName fileName:fileName messageString:imageCaption fileType:@"ImageAttachment" timeDuration:@""];
     NSMutableDictionary *tempDictionary=[NSMutableDictionary new];
     [tempDictionary setObject:[[fileName componentsSeparatedByString:@"."] objectAtIndex:0] forKey:@"UniqueId"];
     [tempDictionary setObject:@"1" forKey:@"Status"];
@@ -1941,7 +1941,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         }
     }
     
-    NSXMLElement *attachmentXml=[self convertedMessage:roomJid roomName:roomName fileName:fileName messageString:fileName fileType:@"FileAttachment"];
+    NSXMLElement *attachmentXml=[self convertedMessage:roomJid roomName:roomName fileName:fileName messageString:fileName fileType:@"FileAttachment" timeDuration:@""];
     NSMutableDictionary *tempDictionary=[NSMutableDictionary new];
     [tempDictionary setObject:[[fileName componentsSeparatedByString:@"."] objectAtIndex:0] forKey:@"UniqueId"];
     [tempDictionary setObject:@"1" forKey:@"Status"];
@@ -1960,6 +1960,47 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     dispatch_async(queue, ^
                    {
                         [self sendDocumentAttachmentUniqueId:[[fileName componentsSeparatedByString:@"."] objectAtIndex:0]];
+                       dispatch_async(dispatch_get_main_queue(), ^{
+                       });
+                   });
+}
+
+- (void)sendAudioFileAppdelegateMethod:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid timeDuration:(NSString *)timeDuration {
+    
+    if (nil==xmppSendGroupAttachment) {
+        xmppSendGroupAttachment=[NSMutableDictionary new];
+    }
+    else {
+        
+        NSArray *tempArray=[xmppSendGroupAttachment allKeys];
+        for(NSString *uID in tempArray) {
+            
+            NSMutableDictionary *tempDic=[[xmppSendGroupAttachment objectForKey:uID] mutableCopy];
+            [tempDic setObject:@"0" forKey:@"Status"];
+            [xmppSendGroupAttachment setObject:[tempDic mutableCopy] forKey:uID];
+        }
+    }
+    
+    NSXMLElement *attachmentXml=[self convertedMessage:roomJid roomName:roomName fileName:fileName messageString:fileName fileType:@"AudioAttachment" timeDuration:timeDuration];
+    NSMutableDictionary *tempDictionary=[NSMutableDictionary new];
+    [tempDictionary setObject:[[fileName componentsSeparatedByString:@"."] objectAtIndex:0] forKey:@"UniqueId"];
+    [tempDictionary setObject:@"1" forKey:@"Status"];
+    [tempDictionary setObject:@"2" forKey:@"Progress"];
+    [tempDictionary setObject:roomName forKey:@"roomName"];
+    [tempDictionary setObject:roomJid forKey:@"RoomJid"];
+    [tempDictionary setObject:fileName forKey:@"fileName"];
+    [tempDictionary setObject:type forKey:@"Type"];
+    [tempDictionary setObject:timeDuration forKey:@"timeDuration"];
+    [tempDictionary setObject:[memberlist mutableCopy] forKey:@"MembersList"];
+    [tempDictionary setObject:[memberlist objectAtIndex:0] forKey:@"SelectedMember"];
+    [tempDictionary setObject:attachmentXml forKey:@"Attachment"];
+    
+    [xmppSendGroupAttachment setObject:tempDictionary forKey:[[fileName componentsSeparatedByString:@"."] objectAtIndex:0]];
+    //    [self sendImageAttachment:fileName imageCaption:imageCaption roomName:roomName merberJid:[memberlist objectAtIndex:0]];
+    dispatch_queue_t queue = dispatch_queue_create("groupFileTransferQueue", DISPATCH_QUEUE_PRIORITY_DEFAULT);
+    dispatch_async(queue, ^
+                   {
+                       [self sendAudioAttachmentUniqueId:[[fileName componentsSeparatedByString:@"."] objectAtIndex:0]];
                        dispatch_async(dispatch_get_main_queue(), ^{
                        });
                    });
@@ -2019,7 +2060,46 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     }
 }
 
-- (NSXMLElement *)convertedMessage:(NSString *)to roomName:(NSString *)roomName fileName:(NSString *)fileName messageString:(NSString *)messageString fileType:(NSString *)fileType {
+- (void)sendAudioAttachmentUniqueId:(NSString *)uniqueId {
+    
+    NSData *fileData=[self audioDocumentCacheDirectoryFileName:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"fileName"]];
+    
+    //Send files
+    xmppOutgoingFileTransfer = [[XMPPOutgoingFileTransfer alloc]
+                                initWithDispatchQueue:dispatch_get_main_queue()];
+    xmppOutgoingFileTransfer.disableIBB = NO;
+    xmppOutgoingFileTransfer.disableSOCKS5 = YES;
+    [xmppOutgoingFileTransfer activate:xmppStream];
+    [xmppOutgoingFileTransfer addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    //end
+    
+    NSError *err;
+    
+    NSString *timeDuration=[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"timeDuration"];
+    
+    XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"RoomJid"],[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"SelectedMember"]]];
+//    description:([timeDuration isEqualToString:@""]?[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"fileName"]:[NSString stringWithFormat:@"%@__%@",[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"fileName"],timeDuration])
+    NSXMLElement *messageData=[[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"Attachment"] elementForName:@"data"];
+    if ([xmppOutgoingFileTransfer sendCustomizedData:fileData
+                                               named:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"fileName"]
+                                         toRecipient:jid
+                                         description:([timeDuration isEqualToString:@""]?[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"fileName"]:[NSString stringWithFormat:@"%@__%@",[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"fileName"],timeDuration])
+                                                date:[messageData attributeStringValueForName:@"date"]
+                                                time:[messageData attributeStringValueForName:@"time"]
+                                            senderId:[messageData attributeStringValueForName:@"from"]
+                                            chatType:@"AudioAttachment"
+                                          senderName:xmppLogedInUserName
+                                        receiverName:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"roomName"]
+                                               error:&err]) {
+        
+        [[XmppCoreDataHandler sharedManager] updateLocalMessageStorageDatabaseBareJidStr:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"RoomJid"] message:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"Attachment"] uniquiId:uniqueId];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"SendFileProgressNotify" object:[xmppSendGroupAttachment objectForKey:uniqueId]];
+        });
+    }
+}
+
+- (NSXMLElement *)convertedMessage:(NSString *)to roomName:(NSString *)roomName fileName:(NSString *)fileName messageString:(NSString *)messageString fileType:(NSString *)fileType timeDuration:(NSString *)timeDuration {
     
     NSString *messageStr = [messageString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
@@ -2041,6 +2121,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     
     [dataTag addAttributeWithName:@"xmlns" stringValue:@"main"];
     [dataTag addAttributeWithName:@"chatType" stringValue:fileType];
+    [dataTag addAttributeWithName:@"timeDuration" stringValue:timeDuration];
     
     [dataTag addAttributeWithName:@"to" stringValue:to];
     [dataTag addAttributeWithName:@"fileName" stringValue:fileName];
@@ -2110,7 +2191,15 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
             }
             [xmppSendGroupAttachment setObject:[tempDic mutableCopy] forKey:uniqueId];
             
-            [self sendImageAttachmentUniqueId:uniqueId];
+            if ([[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"Type"] isEqualToString:@"image"]) {
+                [self sendImageAttachmentUniqueId:uniqueId];
+            }
+            else if ([[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"Type"] isEqualToString:@"file"]) {
+                [self sendDocumentAttachmentUniqueId:uniqueId];
+            }
+            else if ([[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"Type"] isEqualToString:@"audio"]) {
+                [self sendAudioAttachmentUniqueId:uniqueId];
+            }
         }
         else {
             
@@ -2134,7 +2223,17 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
                 NSMutableDictionary *tempDic=[[xmppSendGroupAttachment objectForKey:[tempArray objectAtIndex:0]] mutableCopy];
                 [tempDic setObject:@"1" forKey:@"Status"];
                 [xmppSendGroupAttachment setObject:[tempDic mutableCopy] forKey:uniqueId];
-                [self sendImageAttachmentUniqueId:[tempArray objectAtIndex:0]];
+                
+                if ([[[xmppSendGroupAttachment objectForKey:[tempArray objectAtIndex:0]] objectForKey:@"Type"] isEqualToString:@"image"]) {
+                    [self sendImageAttachmentUniqueId:[tempArray objectAtIndex:0]];
+                }
+                else if ([[[xmppSendGroupAttachment objectForKey:[tempArray objectAtIndex:0]] objectForKey:@"Type"] isEqualToString:@"file"]) {
+                    [self sendDocumentAttachmentUniqueId:[tempArray objectAtIndex:0]];
+                }
+                else if ([[[xmppSendGroupAttachment objectForKey:[tempArray objectAtIndex:0]] objectForKey:@"Type"] isEqualToString:@"audio"]) {
+                    [self sendAudioAttachmentUniqueId:[tempArray objectAtIndex:0]];
+                }
+                
             }
         }
     }

@@ -37,7 +37,7 @@
 #define dateLabelFont [UIFont systemFontOfSize:14]
 #define messageTextViewFont [UIFont systemFontOfSize:17]
 
-@interface GroupChatViewController ()<CustomFilterDelegate,/*BSKeyboardControlsDelegate,*/UIGestureRecognizerDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate, SendImageDelegate, SendDocumentDelegate,UIDocumentInteractionControllerDelegate,SendLocationDelegate,AVAudioPlayerDelegate> {
+@interface GroupChatViewController ()<CustomFilterDelegate,/*BSKeyboardControlsDelegate,*/UIGestureRecognizerDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate, SendImageDelegate, SendDocumentDelegate,UIDocumentInteractionControllerDelegate,SendLocationDelegate,SendAudioDelegate,AVAudioPlayerDelegate> {
 
     UIImage *groupImageIcon;
     NSMutableDictionary *groupMemberList;
@@ -1229,7 +1229,27 @@
     
     Internet *internet=[[Internet alloc] init];
     if (![internet start]) {
-        
+        Internet *internet=[[Internet alloc] init];
+        if (![internet start]) {
+            
+            NSArray *keys=[membersPresentStatus allKeys];
+            NSMutableArray *onlineMember=[NSMutableArray new];
+            for (NSString *key in keys) {
+                
+                if ([[membersPresentStatus objectForKey:key] boolValue]) {
+                    
+                    [onlineMember addObject:[[key componentsSeparatedByString:@"@"] objectAtIndex:0]];
+                    //                [onlineMember addObject:@"0000000000"];
+                }
+            }
+            if (onlineMember.count>0) {
+                [self sendAudioFileAttachment:fileName roomName:[roomDetail objectForKey:@"roomName"] memberlist:[onlineMember mutableCopy] timeDuration:timeDuration];
+//                [self sendDocumentAttachment:fileName roomName:[roomDetail objectForKey:@"roomName"] memberlist:[onlineMember mutableCopy]];
+            }
+            else {
+                [UserDefaultManager showAlertMessage:@"Alert" message:@"All Recipient may be offline."];
+            }
+        }
 //        [self sendDocumentAttachment:fileName friendName:self.friendUserName attachmentType:FileAtachmentType_Audio timeDuration:timeDuration];
     }
 }

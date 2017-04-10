@@ -1049,6 +1049,12 @@
     [appDelegate sendDocumentAppdelegateMethod:fileName roomName:roomName memberlist:[memberlist mutableCopy] type:@"file" roomJid:appDelegate.chatRoomAppDelegateRoomJid];
 }
 
+- (void)sendAudioFileAttachment:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist timeDuration:(NSString *)timeDuration {
+    
+    [appDelegate sendAudioFileAppdelegateMethod:fileName roomName:roomName memberlist:[memberlist mutableCopy] type:@"audio" roomJid:appDelegate.chatRoomAppDelegateRoomJid timeDuration:timeDuration];
+//    [appDelegate sendDocumentAppdelegateMethod:fileName roomName:roomName memberlist:[memberlist mutableCopy] type:@"audio" roomJid:appDelegate.chatRoomAppDelegateRoomJid];
+}
+
 //- (NSXMLElement *)convertedMessage:(NSString *)to roomName:(NSString *)roomName fileName:(NSString *)fileName messageString:(NSString *)messageString fileType:(NSString *)fileType {
 //    
 //    NSString *messageStr = [messageString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];

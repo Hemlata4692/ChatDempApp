@@ -178,9 +178,11 @@ XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate,XMPPOutgoingFi
 @property(nonatomic,strong) NSString *chatRoomAppDelegateRoomJid;
 @property(nonatomic,strong) UIImage *chatRoomAppDelegateImage;
 - (NSData*)reducedImageSize:(UIImage *)selectedImage;
-//Send document/Images
+
+//Send document/Images/Audio
 - (void)sendImageAppdelegateMethod:(NSString *)fileName imageCaption:(NSString *)imageCaption roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid;
 - (void)sendDocumentAppdelegateMethod:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid;
+- (void)sendAudioFileAppdelegateMethod:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid timeDuration:(NSString *)timeDuration;
 //end
 
 

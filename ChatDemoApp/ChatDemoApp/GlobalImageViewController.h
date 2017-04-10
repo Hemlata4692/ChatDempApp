@@ -11,4 +11,5 @@
 @interface GlobalImageViewController : UIViewController
 
 @property(nonatomic,retain)UIImage *globalImage;
+@property(nonatomic, retain)NSString *caption;
 @end

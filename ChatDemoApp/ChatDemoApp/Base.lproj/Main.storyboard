@@ -2218,13 +2218,25 @@
                                     <action selector="cancelAction:" destination="HYi-v0-lNT" eventType="touchUpInside" id="r2Q-Dl-qyL"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" minimumFontSize="11" translatesAutoresizingMaskIntoConstraints="NO" id="Q9e-j9-ibD">
+                                <rect key="frame" x="0.0" y="441" width="320" height="127"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="127" id="I7F-Aq-dYV"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstAttribute="trailing" secondItem="Q9e-j9-ibD" secondAttribute="trailing" id="3vl-Vy-ykg"/>
                             <constraint firstAttribute="trailing" secondItem="ZwF-7j-eZm" secondAttribute="trailing" constant="10" id="5Uh-A6-Cpw"/>
                             <constraint firstItem="CKv-VS-mpB" firstAttribute="top" secondItem="5zI-Ep-PfJ" secondAttribute="bottom" id="60q-4y-yMi"/>
                             <constraint firstAttribute="trailing" secondItem="5zI-Ep-PfJ" secondAttribute="trailing" id="Axd-s1-HTH"/>
                             <constraint firstItem="5zI-Ep-PfJ" firstAttribute="leading" secondItem="sXl-z3-Jvi" secondAttribute="leading" id="K7T-tk-iGX"/>
+                            <constraint firstItem="Q9e-j9-ibD" firstAttribute="leading" secondItem="sXl-z3-Jvi" secondAttribute="leading" id="ajF-I9-8uo"/>
+                            <constraint firstItem="CKv-VS-mpB" firstAttribute="top" secondItem="Q9e-j9-ibD" secondAttribute="bottom" id="eCn-Gw-xKs"/>
                             <constraint firstItem="ZwF-7j-eZm" firstAttribute="top" secondItem="qi5-cO-rci" secondAttribute="bottom" constant="10" id="kWG-vC-IHo"/>
                             <constraint firstItem="5zI-Ep-PfJ" firstAttribute="top" secondItem="sXl-z3-Jvi" secondAttribute="top" id="l6y-aM-i4p"/>
                         </constraints>
@@ -2232,6 +2244,7 @@
                     <extendedEdge key="edgesForExtendedLayout"/>
                     <connections>
                         <outlet property="globalImageView" destination="23l-2R-1Wf" id="KPs-DP-Mzw"/>
+                        <outlet property="imageCaption" destination="Q9e-j9-ibD" id="zeS-P0-BiM"/>
                         <outlet property="scrollView" destination="5zI-Ep-PfJ" id="UlF-G8-37X"/>
                     </connections>
                 </viewController>

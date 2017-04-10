@@ -1219,6 +1219,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
             else if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"FileAttachment"]) {
                 [self saveFileInLocalDocumentDirectory:name file:data];
             }
+            else if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"AudioAttachment"]) {
+                [self saveAudioFileInLocalDocumentDirectory:name file:data];
+            }
             [[XmppCoreDataHandler sharedManager] insertLocalMessageStorageDataBase:[innerElementData attributeStringValueForName:@"from"] message:messageData];
             
             if (![selectedFriendUserId isEqualToString:[innerElementData attributeStringValueForName:@"from"]]){
@@ -1257,6 +1260,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
             }
             else if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"FileAttachment"]) {
                 [self saveFileInLocalDocumentDirectory:name file:data];
+            }
+            else if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"AudioAttachment"]) {
+                [self saveAudioFileInLocalDocumentDirectory:name file:data];
             }
             [[XmppCoreDataHandler sharedManager] insertLocalMessageStorageDataBase:[innerElementData attributeStringValueForName:@"to"] message:messageData];
             
@@ -2401,6 +2407,19 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     return [filePath stringByAppendingPathComponent:fileName];
 }
 //end
+
+- (void)saveAudioFileInLocalDocumentDirectory:(NSString *)fileName file:(NSData *)fileData {
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *filePath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appMediaAudiofolderName];
+    if (![fileManager fileExistsAtPath:filePath]) {
+        
+        [fileManager createDirectoryAtPath:filePath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    filePath=[filePath stringByAppendingPathComponent:fileName];
+    [fileData writeToFile:filePath atomically:YES];
+}
+
 
 #pragma mark - end
 @end

@@ -35,7 +35,7 @@
 #define messageTextViewFont [UIFont systemFontOfSize:17]
 #define DEFAULT_FONT(size) [UIFont systemFontOfSize:size]
 
-@interface ChatScreenViewController ()<CustomFilterDelegate,/*BSKeyboardControlsDelegate,*/ UIGestureRecognizerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, SendImageDelegate, SendDocumentDelegate, UIDocumentInteractionControllerDelegate, SendLocationDelegate, SendAudioDelegate>{
+@interface ChatScreenViewController ()<CustomFilterDelegate,/*BSKeyboardControlsDelegate,*/ UIGestureRecognizerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, SendImageDelegate, SendDocumentDelegate, UIDocumentInteractionControllerDelegate, SendLocationDelegate, SendAudioDelegate, AVAudioPlayerDelegate>{
     CGFloat messageHeight, messageYValue;
     NSMutableArray *userData;
     NSString *otherUserId;
@@ -53,6 +53,14 @@
     
     BOOL isAttachmentOpen, isReceiptOffline, isKeyboardHide;
     UIView *imagePreviewView;
+    
+    //Maintain audio chat
+    NSMutableDictionary *chatAudioInfo;
+    UILabel *chatAudioStartTime;
+    int lastSelectedIndex;
+    AVAudioPlayer *player;
+    NSTimer *recordingTimer;
+    int second, minute, continousSecond;
 }
 
 @property (strong, nonatomic) IBOutlet UITableView *chatTableView;
@@ -89,12 +97,16 @@
     chatTableView.backgroundColor=[UIColor whiteColor];
     isAttachmentOpen=false;
     isKeyboardHide=true;
+    chatAudioInfo=[NSMutableDictionary new];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
 
 //    self.navigationController.navigationBarHidden=NO;
       //Customized navigation bar
+    second = 0;
+    minute = 0;
+    continousSecond = 0;
     if (!isAttachmentOpen) {
         [super viewWillAppear:YES];
         [self addNavigationtitle];
@@ -120,6 +132,10 @@
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
+    
+    [recordingTimer invalidate];
+    recordingTimer = nil;
+    chatAudioInfo=[NSMutableDictionary new];
     
     if (!isAttachmentOpen) {
     [super viewWillDisappear:YES];
@@ -414,6 +430,26 @@
     [messageTextView resignFirstResponder];
 }
 
+- (void)tappedOnUserImageImageView:(UIGestureRecognizer *)sender {
+    
+    [self.view endEditing:YES];
+    UITapGestureRecognizer *gesture = (UITapGestureRecognizer *) sender;
+    NSXMLElement *innerData=[[userData objectAtIndex:(int)gesture.view.tag] elementForName:@"data"];
+    
+    UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    GlobalImageViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"GlobalImageViewController"];
+    popupView.globalImage=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+    if ([[innerData attributeStringValueForName:@"from"] isEqualToString:myDelegate.xmppLogedInUserId]) {
+        popupView.globalImage=logedInUserPhoto;
+    }
+    else {
+        popupView.globalImage=friendUserPhoto;
+    }
+    popupView.view.backgroundColor = [UIColor colorWithWhite:0 alpha:0.6f];
+    [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+    [self presentViewController:popupView animated:YES completion:nil];
+}
+
 - (void)tappedOnImageView:(UIGestureRecognizer *)sender {
     
     [self.view endEditing:YES];
@@ -431,6 +467,7 @@
         UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
         GlobalImageViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"GlobalImageViewController"];
         popupView.globalImage=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+        popupView.caption=[[[userData objectAtIndex:(int)gesture.view.tag] elementForName:@"body"] stringValue];
         popupView.view.backgroundColor = [UIColor colorWithWhite:0 alpha:0.6f];
         [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
         [self presentViewController:popupView animated:YES completion:nil];
@@ -642,6 +679,11 @@
     [cell.attachedImageView addGestureRecognizer:tap];
     [cell.attachedImageView setUserInteractionEnabled:YES];
     
+    cell.userImage.tag=indexPath.row;
+    UITapGestureRecognizer *userImageTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tappedOnUserImageImageView:)];
+    [cell.userImage addGestureRecognizer:userImageTap];
+    [cell.userImage setUserInteractionEnabled:YES];
+    
     NSXMLElement* message = [userData objectAtIndex:indexPath.row];
     NSXMLElement *innerData=[message elementForName:@"data"];
     if (userData.count==1) {
@@ -655,11 +697,31 @@
             [cell displayFirstMessage:message nextmessage:[userData objectAtIndex:indexPath.row+1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto chatType:[innerData attributeStringValueForName:@"chatType"]];
         }
         else {
-            [cell displayMultipleMessage:message nextmessage:[userData objectAtIndex:indexPath.row+1] previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto  chatType:[innerData attributeStringValueForName:@"chatType"]];
+            [cell displayMultipleMessage:message nextmessage:[userData objectAtIndex:indexPath.row+1] previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto chatType:[innerData attributeStringValueForName:@"chatType"]];
         }
     }
     else {
-        [cell displayLastMessage:message previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto  chatType:[innerData attributeStringValueForName:@"chatType"]];
+        [cell displayLastMessage:message previousMessage:[userData objectAtIndex:indexPath.row-1] profileImageView:logedInUserPhoto friendProfileImageView:friendUserPhoto chatType:[innerData attributeStringValueForName:@"chatType"]];
+    }
+    
+    cell.playPauseButton.tag=indexPath.row;
+    [cell.playPauseButton addTarget:self action:@selector(playAudioAction:) forControlEvents:UIControlEventTouchUpInside];
+    if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"AudioAttachment"]&&(chatAudioInfo.count!=0)&&([[chatAudioInfo objectForKey:@"fileName"] isEqualToString:[innerData attributeStringValueForName:@"fileName"]])) {
+        
+        if ([[chatAudioInfo objectForKey:@"isRunning"] boolValue]) {
+            [cell.playPauseButton setImage:[UIImage imageNamed:@"recordplay"] forState:UIControlStateNormal];
+        }
+        else {
+            [cell.playPauseButton setImage:[UIImage imageNamed:@"play"] forState:UIControlStateNormal];
+        }
+        cell.audioProgress.progress=[[chatAudioInfo objectForKey:@"progress"] floatValue];
+        cell.audioStartTime.text=[chatAudioInfo objectForKey:@"startTime"];
+    }
+    else {
+    
+        [cell.playPauseButton setImage:[UIImage imageNamed:@"play"] forState:UIControlStateNormal];
+        cell.audioStartTime.text=@"00:00";
+        cell.audioProgress.progress=0.0;
     }
     return cell;
 }
@@ -1049,6 +1111,125 @@
     if (![internet start]) {
         
         [self sendDocumentAttachment:fileName friendName:self.friendUserName attachmentType:FileAtachmentType_Audio timeDuration:timeDuration];
+    }
+}
+#pragma mark - end
+
+#pragma mark - Play audio handling
+- (IBAction)playAudioAction:(UIButton *)sender {
+    
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:[sender tag] inSection:0]; // Assuming one section
+    ChatScreenTableViewCell *cell = [self.chatTableView cellForRowAtIndexPath:indexPath];
+    NSXMLElement* message = [userData objectAtIndex:indexPath.row];
+    NSXMLElement *innerData=[message elementForName:@"data"];
+    
+    if ((lastSelectedIndex==(int)[sender tag])&&(chatAudioInfo.count!=0)&&([[chatAudioInfo objectForKey:@"fileName"] isEqualToString:[innerData attributeStringValueForName:@"fileName"]])) {
+        
+        [recordingTimer invalidate];
+        recordingTimer = nil;
+        if ([[chatAudioInfo objectForKey:@"isRunning"] boolValue]) {
+            
+            [chatAudioInfo setObject:[NSNumber numberWithBool:NO] forKey:@"isRunning"];
+            [cell.playPauseButton setImage:[UIImage imageNamed:@"play"] forState:UIControlStateNormal];
+            [player pause];
+            
+        }
+        else {
+            
+            [chatAudioInfo setObject:[NSNumber numberWithBool:YES] forKey:@"isRunning"];
+            [cell.playPauseButton setImage:[UIImage imageNamed:@"recordplay"] forState:UIControlStateNormal];
+            [player play];
+            recordingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
+                                                              target:self
+                                                            selector:@selector(startRecordTimer)
+                                                            userInfo:nil
+                                                             repeats:YES];
+        }
+    }
+    else {
+        
+        NSIndexPath *lastindexPath = [NSIndexPath indexPathForRow:lastSelectedIndex inSection:0]; // Assuming one section
+        ChatScreenTableViewCell *lastcell = [self.chatTableView cellForRowAtIndexPath:lastindexPath];
+        [lastcell.playPauseButton setImage:[UIImage imageNamed:@"play"] forState:UIControlStateNormal];
+        lastcell.audioStartTime.text=@"00:00";
+        lastcell.audioProgress.progress=0.0;
+        
+        [recordingTimer invalidate];
+        recordingTimer = nil;
+        lastSelectedIndex=(int)[sender tag];
+        chatAudioInfo=[NSMutableDictionary new];
+        second = 0;
+        minute = 0;
+        continousSecond = 0;
+        
+        [cell.playPauseButton setImage:[UIImage imageNamed:@"recordplay"] forState:UIControlStateNormal];
+        [chatAudioInfo setObject:[NSNumber numberWithBool:YES] forKey:@"isRunning"];
+        cell.audioStartTime.text=[NSString stringWithFormat:@"%02d:%02d",minute,second];
+        [chatAudioInfo setObject:[NSNumber numberWithFloat:0.0] forKey:@"progress"];
+        [chatAudioInfo setObject:[innerData attributeStringValueForName:@"fileName"] forKey:@"fileName"];
+        
+        NSDateFormatter *timeFormatte=[[NSDateFormatter alloc] init];
+        NSLocale *locale = [[NSLocale alloc]
+                            initWithLocaleIdentifier:@"en_US"];
+        [timeFormatte setLocale:locale];
+        [timeFormatte setDateFormat:@"mm:ss"];
+        
+        NSDate *startDate=[timeFormatte dateFromString:@"00:00"];
+        NSDate *endDate=[timeFormatte dateFromString:[innerData attributeStringValueForName:@"timeDuration"]];
+        
+        NSTimeInterval secs = [endDate timeIntervalSinceDate:startDate];
+        NSLog(@"Seconds --------> %f", secs);
+        [chatAudioInfo setObject:[NSNumber numberWithFloat:secs] forKey:@"timelimit"];
+        cell.audioProgress.progress=[[chatAudioInfo objectForKey:@"progress"] floatValue];
+        
+        [chatAudioInfo setObject:[NSString stringWithFormat:@"%02d:%02d",minute,second] forKey:@"startTime"];
+        player = [[AVAudioPlayer alloc] initWithContentsOfURL:[NSURL URLWithString:[myDelegate audioPathDocumentCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]] error:nil];
+        [player setDelegate:self];
+        [player play];
+        recordingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
+                                                          target:self
+                                                        selector:@selector(startRecordTimer)
+                                                        userInfo:nil
+                                                         repeats:YES];
+    }
+}
+
+//Set timer
+//Wet recording timer in minutes and seconds
+- (void)startRecordTimer {
+    
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:lastSelectedIndex inSection:0]; // Assuming one section
+    ChatScreenTableViewCell *cell = [self.chatTableView cellForRowAtIndexPath:indexPath];
+    
+    continousSecond++;
+    minute = (continousSecond /60) % 60;
+    second = (continousSecond  % 60);
+    
+    [chatAudioInfo setObject:[NSNumber numberWithFloat:(float)continousSecond/[[chatAudioInfo objectForKey:@"timelimit"] floatValue]] forKey:@"progress"];
+    [chatAudioInfo setObject:[NSString stringWithFormat:@"%02d:%02d",minute,second] forKey:@"startTime"];
+    cell.audioProgress.progress=[[chatAudioInfo objectForKey:@"progress"] floatValue];
+    cell.audioStartTime.text=[chatAudioInfo objectForKey:@"startTime"];
+}
+//end
+
+//AVAudioPlayer delegate method
+- (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)tempPlayer successfully:(BOOL)flag {
+    //if recording finished set timer to 00:00 again
+    
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:lastSelectedIndex inSection:0]; // Assuming one section
+    ChatScreenTableViewCell *cell = [self.chatTableView cellForRowAtIndexPath:indexPath];
+    second = 0;
+    minute = 0;
+    continousSecond = 0;
+    chatAudioInfo=[NSMutableDictionary new];
+    [cell.playPauseButton setImage:[UIImage imageNamed:@"play"] forState:UIControlStateNormal];
+    cell.audioStartTime.text=[NSString stringWithFormat:@"%02d:%02d",minute,second];
+    cell.audioProgress.progress=0.0;
+    
+    [recordingTimer invalidate];
+    recordingTimer = nil;
+    if ([player play]) {
+        [player stop];
     }
 }
 #pragma mark - end

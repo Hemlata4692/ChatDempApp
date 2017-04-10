@@ -2243,6 +2243,15 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     NSError* error = nil;
     return [NSData dataWithContentsOfFile:fileAtPath options:0 error:&error];
 }
+
+- (NSData *)listionProfilePhotoDataFromCacheDirectoryjid:(NSString *)jid {
+    
+    //    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *filePath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appProfilePhotofolderName];
+    NSString *fileAtPath = [filePath stringByAppendingString:[NSString stringWithFormat:@"/%@_%@.jpeg",folderName,[[jid componentsSeparatedByString:@"@"] objectAtIndex:0]]];
+    NSError* error = nil;
+    return [NSData dataWithContentsOfFile:fileAtPath options:0 error:&error];
+}
 //end
 
 //Save send/Receive Images

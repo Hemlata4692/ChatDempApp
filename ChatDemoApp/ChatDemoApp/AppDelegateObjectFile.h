@@ -163,6 +163,7 @@ XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate,XMPPOutgoingFi
 
 - (NSString *)setMapImageInLocalDB:(UIImage*)image;
 - (NSData *)listionSendAttachedLocationImageCacheDirectoryFileName:(NSString *)fileName;
+- (NSData *)listionProfilePhotoDataFromCacheDirectoryjid:(NSString *)jid;
 
 //Group chat
 @property(strong, nonatomic)NSMutableDictionary *xmppSendGroupAttachment;

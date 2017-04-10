@@ -22,8 +22,29 @@
 @property (strong, nonatomic) IBOutlet UIImageView *userImage;
 @property (strong, nonatomic) IBOutlet UIImageView *attachedImageView;
 
+@property (strong, nonatomic) IBOutlet UIView *audioBackView;
+@property (strong, nonatomic) IBOutlet UIButton *playPauseButton;
+@property (strong, nonatomic) IBOutlet UIProgressView *audioProgress;
+@property (strong, nonatomic) IBOutlet UILabel *audioStartTime;
+@property (strong, nonatomic) IBOutlet UILabel *audioEndTIme;
+
 - (void)displaySingleMessageData:(NSXMLElement *)message profileImageView:(UIImage *)logedInUserPhoto chatType:(NSString *)chatType memberColor:(NSMutableDictionary *)memberColor;
 - (void)displayMultipleMessage:(NSXMLElement *)currentMessage nextmessage:(NSXMLElement *)nextmessage previousMessage:(NSXMLElement *)previousMessage profileImageView:(UIImage *)logedInUserPhoto chatType:(NSString *)chatType memberColor:(NSMutableDictionary *)memberColor;
 - (void)displayFirstMessage:(NSXMLElement *)currentMessage nextmessage:(NSXMLElement *)nextmessage profileImageView:(UIImage *)logedInUserPhoto chatType:(NSString *)chatType memberColor:(NSMutableDictionary *)memberColor;
 - (void)displayLastMessage:(NSXMLElement *)currentMessage previousMessage:(NSXMLElement *)previousMessage profileImageView:(UIImage *)logedInUserPhoto chatType:(NSString *)chatType memberColor:(NSMutableDictionary *)memberColor;
 @end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

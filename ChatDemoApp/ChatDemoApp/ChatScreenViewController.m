@@ -35,7 +35,8 @@
 #define messageTextViewFont [UIFont systemFontOfSize:17]
 #define DEFAULT_FONT(size) [UIFont systemFontOfSize:size]
 
-@interface ChatScreenViewController ()<CustomFilterDelegate,/*BSKeyboardControlsDelegate,*/ UIGestureRecognizerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, SendImageDelegate, SendDocumentDelegate, UIDocumentInteractionControllerDelegate, SendLocationDelegate, SendAudioDelegate, AVAudioPlayerDelegate>{
+@interface ChatScreenViewController ()<CustomFilterDelegate,/*BSKeyboardControlsDelegate,*/ UIGestureRecognizerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, SendImageDelegate, SendDocumentDelegate, UIDocumentInteractionControllerDelegate, SendLocationDelegate, SendAudioDelegate, AVAudioPlayerDelegate> {
+    
     CGFloat messageHeight, messageYValue;
     NSMutableArray *userData;
     NSString *otherUserId;
@@ -135,6 +136,7 @@
     
     [recordingTimer invalidate];
     recordingTimer = nil;
+    player=nil;
     chatAudioInfo=[NSMutableDictionary new];
     
     if (!isAttachmentOpen) {
@@ -438,7 +440,6 @@
     
     UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     GlobalImageViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"GlobalImageViewController"];
-    popupView.globalImage=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
     if ([[innerData attributeStringValueForName:@"from"] isEqualToString:myDelegate.xmppLogedInUserId]) {
         popupView.globalImage=logedInUserPhoto;
     }

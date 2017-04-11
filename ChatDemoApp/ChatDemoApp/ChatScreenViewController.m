@@ -24,6 +24,10 @@
 #import "LocationViewController.h"
 #import "SendAudioViewController.h"
 
+#import <MediaPlayer/MediaPlayer.h>
+#import <MobileCoreServices/MobileCoreServices.h>
+#import <AVKit/AVKit.h>
+
 #define navigationBarHeight 64
 #define toolbarHeight 0
 #define messageTextviewInitialHeight 40
@@ -546,6 +550,10 @@
             [tempAttachmentArra addObject:@"Audio"];
             [tempAttachmentImageArra addObject:@"audioIcon"];
             
+            [tempAttachment setObject:[NSNumber numberWithInt:6] forKey:@"Video"];
+            [tempAttachmentArra addObject:@"Video"];
+            [tempAttachmentImageArra addObject:@"videoIcon"];
+            
             filterViewObj.filterDict=[tempAttachment mutableCopy];
             filterViewObj.filterArray=[tempAttachmentArra mutableCopy];
             filterViewObj.filterImageArray=[tempAttachmentImageArra mutableCopy];
@@ -706,7 +714,10 @@
     }
     
     cell.playPauseButton.tag=indexPath.row;
+    cell.videoPlayButton.tag=indexPath.row;
     [cell.playPauseButton addTarget:self action:@selector(playAudioAction:) forControlEvents:UIControlEventTouchUpInside];
+    [cell.videoPlayButton addTarget:self action:@selector(playVideoAction:) forControlEvents:UIControlEventTouchUpInside];
+    
     if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"AudioAttachment"]&&(chatAudioInfo.count!=0)&&([[chatAudioInfo objectForKey:@"fileName"] isEqualToString:[innerData attributeStringValueForName:@"fileName"]])) {
         
         if ([[chatAudioInfo objectForKey:@"isRunning"] boolValue]) {
@@ -820,7 +831,11 @@
                 [self presentViewController:popupView animated:YES completion:nil];
             }
                 break;
-                
+            case 6:
+            {
+                NSLog(@"2");
+                [self showActionSheetVideo];
+            }
             default:
                 break;
         }
@@ -896,6 +911,88 @@
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     
     [picker dismissViewControllerAnimated:YES completion:NULL];
+}
+#pragma mark - end
+
+#pragma mark - Open video gallery/recorder
+- (void)showActionSheetVideo {
+
+    UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Video Option"
+                                                                   message:nil
+                                                            preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    UIAlertAction* cameraAction = [UIAlertAction actionWithTitle:@"Video Recorder" style:UIAlertActionStyleDefault
+                                                         handler:^(UIAlertAction * action) {
+                                                             
+                                                             if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+                                                                 
+                                                                 isAttachmentOpen=true;
+                                                                 UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+                                                                 picker.delegate = self;
+                                                                 picker.videoQuality = UIImagePickerControllerQualityTypeMedium;
+                                                                 picker.allowsEditing = YES;
+                                                                 picker.sourceType = UIImagePickerControllerSourceTypeCamera;
+                                                                 picker.mediaTypes = [[NSArray alloc] initWithObjects: (NSString *) kUTTypeMovie, nil];
+                                                                 
+                                                                 [self presentViewController:picker animated:YES completion:NULL];
+                                                             }
+                                                         }];
+    
+    UIAlertAction* galleryAction = [UIAlertAction actionWithTitle:@"Choose from Album" style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * action) {
+                                                              
+                                                              isAttachmentOpen=true;
+                                                              UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
+                                                              imagePicker.delegate = self;
+                                                              imagePicker.videoQuality = UIImagePickerControllerQualityTypeMedium;
+                                                              imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+                                                              imagePicker.mediaTypes = [[NSArray alloc] initWithObjects:(NSString *)kUTTypeMovie,nil];
+                                                              imagePicker.allowsEditing=NO;
+                                                              [self presentViewController:imagePicker animated:YES completion:nil];
+                                                          }];
+    
+    UIAlertAction * defaultAct = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel
+                                                        handler:^(UIAlertAction * action) {
+                                                            [alert dismissViewControllerAnimated:YES completion:nil];
+                                                        }];
+    [alert addAction:cameraAction];
+    [alert addAction:galleryAction];
+    [alert addAction:defaultAct];
+    
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
+#pragma mark - UIImagePickerController delegate method
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
+    
+    //Get size of video
+    NSURL *videoUrl=(NSURL*)[info objectForKey:UIImagePickerControllerMediaURL];
+    //Error Container
+    NSError *attributesError;
+    NSDictionary *fileAttributes=[[NSFileManager defaultManager] attributesOfItemAtPath:[videoUrl path] error:&attributesError];
+    NSNumber *fileSizeNumber=[fileAttributes objectForKey:NSFileSize];
+    long long fileSize = [fileSizeNumber longLongValue];
+    int maxSize=3;
+    
+    NSString *videoFilePath=[myDelegate getVideoFilePath];
+    if ((float)((float)(fileSize/1024)/1024)<=(float)maxSize) {
+        //If size is less than or equal to max size then execute this code. And save this video in document folder
+        NSString *mediaType = [info objectForKey: UIImagePickerControllerMediaType];
+        if (CFStringCompare ((__bridge CFStringRef) mediaType, kUTTypeMovie, 0) == kCFCompareEqualTo) {
+            NSURL *videoUrl=(NSURL*)[info objectForKey:UIImagePickerControllerMediaURL];
+            NSString *moviePath = [videoUrl path];
+            
+            if (UIVideoAtPathIsCompatibleWithSavedPhotosAlbum (moviePath)) {
+                NSData *videoData=[NSData dataWithContentsOfURL:videoUrl];
+                [videoData writeToFile:videoFilePath atomically:NO];
+            }
+        }
+    }
+    else {
+        //If size greater from max size then shows toast.
+        [self.view makeToast:[NSString stringWithFormat:@"File size cannot exceed %d MB.",maxSize]];
+    }
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 #pragma mark - end
 
@@ -1066,6 +1163,7 @@
         
         for (int i=(int)userData.count-1; i>=0; i--) {
             
+            
             NSXMLElement *innerElementData = [[userData objectAtIndex:i] elementForName:@"data"];
             if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"ImageAttachment"]||[[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"FileAttachment"]) {
                
@@ -1115,6 +1213,21 @@
     }
 }
 #pragma mark - end
+
+#pragma mark - Play video handling
+- (IBAction)playVideoAction:(UIButton *)sender {
+    
+    NSXMLElement* message = [userData objectAtIndex:[sender tag]];
+    NSXMLElement *innerData=[message elementForName:@"data"];
+    
+    //play video
+    NSURL *videoURL = [NSURL fileURLWithPath:[myDelegate videoPathDocumentCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+    AVPlayer *videoplayer = [AVPlayer playerWithURL:videoURL];
+    AVPlayerViewController *playerViewController = [AVPlayerViewController new];
+    playerViewController.player = videoplayer;
+    [playerViewController.player play];//used to play on start
+    [self presentViewController:playerViewController animated:YES completion:nil];
+}
 
 #pragma mark - Play audio handling
 - (IBAction)playAudioAction:(UIButton *)sender {

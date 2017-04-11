@@ -27,6 +27,7 @@
 @property (strong, nonatomic) IBOutlet UIProgressView *audioProgress;
 @property (strong, nonatomic) IBOutlet UILabel *audioStartTime;
 @property (strong, nonatomic) IBOutlet UILabel *audioEndTIme;
+@property (strong, nonatomic) IBOutlet UIButton *videoPlayButton;
 
 - (void)displaySingleMessageData:(NSXMLElement *)message profileImageView:(UIImage *)logedInUserPhoto chatType:(NSString *)chatType memberColor:(NSMutableDictionary *)memberColor;
 - (void)displayMultipleMessage:(NSXMLElement *)currentMessage nextmessage:(NSXMLElement *)nextmessage previousMessage:(NSXMLElement *)previousMessage profileImageView:(UIImage *)logedInUserPhoto chatType:(NSString *)chatType memberColor:(NSMutableDictionary *)memberColor;

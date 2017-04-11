@@ -7,6 +7,7 @@
 //
 
 #import "ChatScreenTableViewCell.h"
+#import <AVFoundation/AVFoundation.h>
 
 @implementation ChatScreenTableViewCell
 
@@ -51,6 +52,7 @@
     self.audioProgress.hidden=true;
     self.audioStartTime.hidden=true;
     self.audioEndTIme.hidden=true;
+    self.videoPlayButton.hidden=true;
     
     self.userImage.hidden=false;
     self.nameLabel.hidden=false;
@@ -66,6 +68,12 @@
     else {
     
         self.attachedImageView.hidden=true;
+    }
+    
+    if ([chatType isEqualToString:@"VideoAttachment"]) {
+        
+        self.attachedImageView.hidden=false;
+        self.videoPlayButton.hidden=NO;
     }
     
     self.userImage.layer.masksToBounds=YES;
@@ -100,7 +108,7 @@
     self.nameLabel.text=[nameString capitalizedString];
     
 //    self.nameLabel.text=[[innerData attributeStringValueForName:@"senderName"] capitalizedString];
-    if (![chatType isEqualToString:@"AudioAttachment"]) {
+    if (![chatType isEqualToString:@"AudioAttachment"]&&![chatType isEqualToString:@"VideoAttachment"]) {
         
         self.messageLabel.text=[[message elementForName:@"body"] stringValue];
     }
@@ -116,7 +124,7 @@
     self.attachedImageView.layer.masksToBounds=YES;
     self.attachedImageView.contentMode=UIViewContentModeScaleToFill;
     
-    if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]) {
+    if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]||[chatType isEqualToString:@"VideoAttachment"]) {
         self.attachedImageView.frame=CGRectMake(76, (5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+5), 200, 128); //Here frame = (AttachedImage_x_Space, (NameLabel_TopSpace + NameLabel_Height + space_Between_NameLabel_And_AttachedImage), AttachedImage_width, AttachedImage_height
         if ([chatType isEqualToString:@"FileAttachment"]) {
             
@@ -137,7 +145,13 @@
             self.attachedImageView.layer.masksToBounds=YES;
             self.attachedImageView.contentMode=UIViewContentModeScaleAspectFit;
             
-            self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+            if ([chatType isEqualToString:@"VideoAttachment"]) {
+                
+                self.attachedImageView.image=[self getThumbnailVideoImage:[myDelegate videoPathDocumentCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+            }
+            else {
+                self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+            }
         }
     }
     else {
@@ -148,6 +162,10 @@
     if (![chatType isEqualToString:@"AudioAttachment"]) {
         
         self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
+    }
+    else if ([chatType isEqualToString:@"VideoAttachment"]) {
+        
+        self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), 0); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
     }
     else {
         
@@ -183,6 +201,7 @@
     self.audioProgress.hidden=true;
     self.audioStartTime.hidden=true;
     self.audioEndTIme.hidden=true;
+    self.videoPlayButton.hidden=true;
     
     self.userImage.hidden=true;
     self.nameLabel.hidden=true;
@@ -197,6 +216,12 @@
     else {
         
         self.attachedImageView.hidden=true;
+    }
+    
+    if ([chatType isEqualToString:@"VideoAttachment"]) {
+        
+        self.attachedImageView.hidden=false;
+        self.videoPlayButton.hidden=NO;
     }
     
     NSXMLElement *innerData=[currentMessage elementForName:@"data"];
@@ -216,7 +241,7 @@
         self.attachedImageView.layer.masksToBounds=YES;
         self.attachedImageView.contentMode=UIViewContentModeScaleToFill;
         
-        if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]) {
+        if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]||[chatType isEqualToString:@"VideoAttachment"]) {
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 128); //Here frame = (AttachedImage_x_Space, attachedImageView_TopSpace, AttachedImage_width, AttachedImage_height
             
             if ([chatType isEqualToString:@"FileAttachment"]) {
@@ -237,7 +262,13 @@
                 self.attachedImageView.layer.masksToBounds=YES;
                 self.attachedImageView.contentMode=UIViewContentModeScaleAspectFit;
                 
-                self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+                if ([chatType isEqualToString:@"VideoAttachment"]) {
+                    
+                    self.attachedImageView.image=[self getThumbnailVideoImage:[myDelegate videoPathDocumentCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+                }
+                else {
+                    self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+                }
             }
         }
         else {
@@ -248,6 +279,10 @@
         if (![chatType isEqualToString:@"AudioAttachment"]) {
             
             self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
+        }
+        else if ([chatType isEqualToString:@"VideoAttachment"]) {
+            
+            self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), 0); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
         }
         else {
             
@@ -286,7 +321,7 @@
         self.attachedImageView.layer.masksToBounds=YES;
         self.attachedImageView.contentMode=UIViewContentModeScaleToFill;
         
-        if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]) {
+        if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]||[chatType isEqualToString:@"VideoAttachment"]) {
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 128); //Here frame = (AttachedImage_x_Space, attachedImageView_TopSpace, AttachedImage_width, AttachedImage_height
             if ([chatType isEqualToString:@"FileAttachment"]) {
                 
@@ -307,7 +342,13 @@
                 self.attachedImageView.layer.masksToBounds=YES;
                 self.attachedImageView.contentMode=UIViewContentModeScaleAspectFit;
                 
-                self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+                if ([chatType isEqualToString:@"VideoAttachment"]) {
+                    
+                    self.attachedImageView.image=[self getThumbnailVideoImage:[myDelegate videoPathDocumentCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+                }
+                else {
+                    self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+                }
             }
         }
         else {
@@ -318,6 +359,10 @@
         if (![chatType isEqualToString:@"AudioAttachment"]) {
             
             self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
+        }
+        else if ([chatType isEqualToString:@"VideoAttachment"]) {
+            
+            self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), 0); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
         }
         else {
             
@@ -358,6 +403,7 @@
     self.audioProgress.hidden=true;
     self.audioStartTime.hidden=true;
     self.audioEndTIme.hidden=true;
+    self.videoPlayButton.hidden=true;
     
     self.userImage.hidden=false;
     self.nameLabel.hidden=false;
@@ -373,6 +419,12 @@
     else {
         
         self.attachedImageView.hidden=true;
+    }
+    
+    if ([chatType isEqualToString:@"VideoAttachment"]) {
+        
+        self.attachedImageView.hidden=false;
+        self.videoPlayButton.hidden=NO;
     }
     
     NSXMLElement *innerData=[currentMessage elementForName:@"data"];
@@ -394,7 +446,7 @@
         self.attachedImageView.layer.masksToBounds=YES;
         self.attachedImageView.contentMode=UIViewContentModeScaleToFill;
         
-        if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]) {
+        if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]||[chatType isEqualToString:@"VideoAttachment"]) {
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 128); //Here frame = (AttachedImage_x_Space, attachedImageView_TopSpace, AttachedImage_width, AttachedImage_height
             
             if ([chatType isEqualToString:@"FileAttachment"]) {
@@ -415,7 +467,14 @@
                 self.attachedImageView.layer.masksToBounds=YES;
                 self.attachedImageView.contentMode=UIViewContentModeScaleAspectFit;
                 
-                self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+                if ([chatType isEqualToString:@"VideoAttachment"]) {
+                    
+                    self.attachedImageView.image=[self getThumbnailVideoImage:[myDelegate videoPathDocumentCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+                }
+                else {
+                    self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
+                }
+                
             }
         }
         else {
@@ -426,6 +485,10 @@
         if (![chatType isEqualToString:@"AudioAttachment"]) {
             
             self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
+        }
+        else if ([chatType isEqualToString:@"VideoAttachment"]) {
+            
+            self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), 0); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
         }
         else {
             
@@ -467,5 +530,17 @@
     NSDate *date = [dateFormatter dateFromString:timeString];
     [dateFormatter setDateFormat:@"hh:mm a"];
     return [dateFormatter stringFromDate:date];
+}
+
+- (UIImage*)getThumbnailVideoImage:(NSString *)videoFilePath {
+    //get thumbnail image from video
+    NSURL *videoURl = [NSURL fileURLWithPath:videoFilePath];
+    AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:videoURl options:nil];
+    AVAssetImageGenerator *generate = [[AVAssetImageGenerator alloc] initWithAsset:asset];
+    generate.appliesPreferredTrackTransform = YES;
+    NSError *err = NULL;
+    CMTime time = CMTimeMake(1, 2);
+    CGImageRef imgRef = [generate copyCGImageAtTime:time actualTime:NULL error:&err];
+    return [[UIImage alloc] initWithCGImage:imgRef];
 }
 @end

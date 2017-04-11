@@ -90,6 +90,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 @synthesize folderName;
 @synthesize appMediafolderName;
 @synthesize appMediaAudiofolderName;
+@synthesize appMediaVideofolderName;
 @synthesize appProfilePhotofolderName;
 @synthesize appSentReceivePhotofolderName;
 @synthesize appDocumentfolderName;
@@ -122,6 +123,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     appProfilePhotofolderName=[NSString stringWithFormat:@"%@/%@_ProfilePhotos",appMediafolderName,folderName];
     appSentReceivePhotofolderName=[NSString stringWithFormat:@"%@/%@_Photos",appMediafolderName,folderName];
     appMediaAudiofolderName=[NSString stringWithFormat:@"%@/%@_Audio",appMediafolderName,folderName];
+    appMediaVideofolderName=[NSString stringWithFormat:@"%@/%@_Video",appMediafolderName,folderName];
     appDocumentfolderName=[NSString stringWithFormat:@"%@/%@_Documents",folderName,folderName];
     appMapPhotofolderName=[NSString stringWithFormat:@"%@/%@_Map",folderName,folderName];
     [self createCacheDirectory];
@@ -1159,6 +1161,26 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     }
     
     return [audioPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_%@.wav",folderName,datestr]];
+}
+#pragma mark - end
+
+#pragma mark - Get Video file
+- (NSString *)getVideoFilePath {
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    NSLocale *locale = [[NSLocale alloc]
+                        initWithLocaleIdentifier:@"en_US"];
+    [dateFormatter setLocale:locale];
+    [dateFormatter setDateFormat:@"ddMMYYhhmmss"];
+    NSString * datestr = [dateFormatter stringFromDate:[NSDate date]];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *audioPath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appMediaVideofolderName];
+    if (![fileManager fileExistsAtPath:audioPath]) {
+        
+        [fileManager createDirectoryAtPath:audioPath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    
+    return [audioPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_%@.mp4",folderName,datestr]];
 }
 #pragma mark - end
 
@@ -2307,6 +2329,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [self createCacheDirectory:appProfilePhotofolderName];
     [self createCacheDirectory:appSentReceivePhotofolderName];
     [self createCacheDirectory:appMediaAudiofolderName];
+    [self createCacheDirectory:appMediaVideofolderName];
     [self createCacheDirectory:appDocumentfolderName];
     [self createCacheDirectory:appMapPhotofolderName];
 }
@@ -2528,6 +2551,34 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [fileData writeToFile:filePath atomically:YES];
 }
 
+//Get file data from cache
+- (NSData *)videoDocumentCacheDirectoryFileName:(NSString *)fileName {
+    
+    NSString *filePath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appMediaVideofolderName];
+    NSString *fileAtPath = [filePath stringByAppendingPathComponent:fileName];
+    NSError* error = nil;
+    return [NSData dataWithContentsOfFile:fileAtPath options:0 error:&error];
+}
+
+//Get file path from cache
+- (NSString *)videoPathDocumentCacheDirectoryFileName:(NSString *)fileName {
+    
+    NSString *filePath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appMediaVideofolderName];
+    return [filePath stringByAppendingPathComponent:fileName];
+}
+//end
+
+- (void)saveVideoFileInLocalDocumentDirectory:(NSString *)fileName file:(NSData *)fileData {
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *filePath = [[self applicationCacheDirectory] stringByAppendingPathComponent:appMediaVideofolderName];
+    if (![fileManager fileExistsAtPath:filePath]) {
+        
+        [fileManager createDirectoryAtPath:filePath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    filePath=[filePath stringByAppendingPathComponent:fileName];
+    [fileData writeToFile:filePath atomically:YES];
+}
 
 #pragma mark - end
 @end

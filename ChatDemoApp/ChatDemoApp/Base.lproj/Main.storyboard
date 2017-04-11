@@ -822,6 +822,11 @@
                                                     </subviews>
                                                     <color key="backgroundColor" red="0.88780084390000003" green="0.88780084390000003" blue="0.88780084390000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 </view>
+                                                <button hidden="YES" opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1Nh-Lj-QYS">
+                                                    <rect key="frame" x="158" y="79" width="40" height="40"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <state key="normal" image="videoRecordPlay"/>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="trailing" secondItem="rdM-Ur-WKB" secondAttribute="trailing" id="2iG-UA-Sao"/>
@@ -849,6 +854,7 @@
                                             <outlet property="playPauseButton" destination="zEv-9T-XX5" id="zrU-c0-HAZ"/>
                                             <outlet property="separatorLabel" destination="rdM-Ur-WKB" id="5c7-4k-tEp"/>
                                             <outlet property="userImage" destination="Fhc-FY-YYc" id="cZh-cm-1Wg"/>
+                                            <outlet property="videoPlayButton" destination="1Nh-Lj-QYS" id="3sJ-oi-Xmf"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -1620,7 +1626,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ANX-BO-X11" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4613" y="-542"/>
+            <point key="canvasLocation" x="4590" y="-543"/>
         </scene>
         <!--Edit User Status View Controller-->
         <scene sceneID="WAM-cl-2Nl">
@@ -1877,6 +1883,11 @@
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                 </imageView>
+                                                <button hidden="YES" opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NVl-EA-VO5">
+                                                    <rect key="frame" x="158" y="79" width="40" height="40"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <state key="normal" image="videoRecordPlay"/>
+                                                </button>
                                                 <view hidden="YES" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="b2q-Wk-cMM">
                                                     <rect key="frame" x="76" y="33" width="200" height="48"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -1936,6 +1947,7 @@
                                             <outlet property="playPauseButton" destination="0YP-WR-APY" id="GtV-r0-vvN"/>
                                             <outlet property="separatorLabel" destination="xHU-JH-RgD" id="YA6-uj-a3A"/>
                                             <outlet property="userImage" destination="guo-ZE-Zo6" id="vtL-we-5Q5"/>
+                                            <outlet property="videoPlayButton" destination="NVl-EA-VO5" id="ijw-ny-agN"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -2032,7 +2044,7 @@
                                 <rect key="frame" x="80" y="59" width="240" height="165"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <subviews>
-                                    <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" bounces="NO" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="80" sectionHeaderHeight="1" sectionFooterHeight="1" translatesAutoresizingMaskIntoConstraints="NO" id="wI7-wH-nAd">
+                                    <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="80" sectionHeaderHeight="1" sectionFooterHeight="1" translatesAutoresizingMaskIntoConstraints="NO" id="wI7-wH-nAd">
                                         <rect key="frame" x="0.0" y="11" width="240" height="154"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -2396,6 +2408,7 @@
         <image name="recordplay" width="66" height="66"/>
         <image name="sendIcon" width="30" height="30"/>
         <image name="upArrow" width="20" height="10"/>
+        <image name="videoRecordPlay" width="36" height="36"/>
         <image name="viewIcon" width="30" height="30"/>
     </resources>
 </document>

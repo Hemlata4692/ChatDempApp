@@ -619,6 +619,27 @@
             }
         }
     }
+    else if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"VideoAttachment"]) {
+        
+        NSLog(@"%f",([[innerData attributeStringValueForName:@"nameHeight"] floatValue]>20?[[innerData attributeStringValueForName:@"nameHeight"] floatValue]:20));
+        float mainCellHeight=5+([[innerData attributeStringValueForName:@"nameHeight"] floatValue]>20?[[innerData attributeStringValueForName:@"nameHeight"] floatValue]:20)+5+128+10+20+5; //here mainCellHeight = NameLabel_topSpace + NameHeight + space_Between_NameLabel_And_VideoImage + VideoImageViewHeight + space_Between_VideoImageView_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
+        
+        if (userData.count==1 || indexPath.row == 0) {
+            
+            return mainCellHeight;
+        }
+        else{
+            NSXMLElement* message1 = [userData objectAtIndex:(int)indexPath.row - 1];
+            NSXMLElement *innerData1=[message1 elementForName:@"data"];
+            if ([[innerData attributeStringValueForName:@"from"] isEqualToString:[innerData1 attributeStringValueForName:@"from"]]) {
+                
+                return 5+128+10+20+5;//Topspace_VideoImage + VideoImageHeight + space_Between_VideoImage_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
+            }
+            else{
+                return mainCellHeight;
+            }
+        }
+    }
     else if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"AudioAttachment"]) {
         
         NSLog(@"%f",([[innerData attributeStringValueForName:@"nameHeight"] floatValue]>20?[[innerData attributeStringValueForName:@"nameHeight"] floatValue]:20));
@@ -965,34 +986,49 @@
 #pragma mark - UIImagePickerController delegate method
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     
-    //Get size of video
-    NSURL *videoUrl=(NSURL*)[info objectForKey:UIImagePickerControllerMediaURL];
-    //Error Container
-    NSError *attributesError;
-    NSDictionary *fileAttributes=[[NSFileManager defaultManager] attributesOfItemAtPath:[videoUrl path] error:&attributesError];
-    NSNumber *fileSizeNumber=[fileAttributes objectForKey:NSFileSize];
-    long long fileSize = [fileSizeNumber longLongValue];
-    int maxSize=3;
-    
-    NSString *videoFilePath=[myDelegate getVideoFilePath];
-    if ((float)((float)(fileSize/1024)/1024)<=(float)maxSize) {
-        //If size is less than or equal to max size then execute this code. And save this video in document folder
-        NSString *mediaType = [info objectForKey: UIImagePickerControllerMediaType];
-        if (CFStringCompare ((__bridge CFStringRef) mediaType, kUTTypeMovie, 0) == kCFCompareEqualTo) {
-            NSURL *videoUrl=(NSURL*)[info objectForKey:UIImagePickerControllerMediaURL];
-            NSString *moviePath = [videoUrl path];
-            
-            if (UIVideoAtPathIsCompatibleWithSavedPhotosAlbum (moviePath)) {
-                NSData *videoData=[NSData dataWithContentsOfURL:videoUrl];
-                [videoData writeToFile:videoFilePath atomically:NO];
+    [self dismissViewControllerAnimated:YES completion:nil];
+    if (UTTypeEqual(kUTTypeMovie,
+                    (__bridge CFStringRef)[info objectForKey:UIImagePickerControllerMediaType])) {
+        
+        //Get size of video
+        NSURL *videoUrl=(NSURL*)[info objectForKey:UIImagePickerControllerMediaURL];
+        //Error Container
+        NSError *attributesError;
+        NSDictionary *fileAttributes=[[NSFileManager defaultManager] attributesOfItemAtPath:[videoUrl path] error:&attributesError];
+        NSNumber *fileSizeNumber=[fileAttributes objectForKey:NSFileSize];
+        long long fileSize = [fileSizeNumber longLongValue];
+        int maxSize=3;
+        
+        NSString *videoFilePath=[myDelegate getVideoFilePath];
+        if ((float)((float)(fileSize/1024)/1024)<=(float)maxSize) {
+            //If size is less than or equal to max size then execute this code. And save this video in document folder
+            NSString *mediaType = [info objectForKey: UIImagePickerControllerMediaType];
+            if (CFStringCompare ((__bridge CFStringRef) mediaType, kUTTypeMovie, 0) == kCFCompareEqualTo) {
+                NSURL *videoUrl=(NSURL*)[info objectForKey:UIImagePickerControllerMediaURL];
+                NSString *moviePath = [videoUrl path];
+                
+                if (UIVideoAtPathIsCompatibleWithSavedPhotosAlbum (moviePath)) {
+                    NSData *videoData=[NSData dataWithContentsOfURL:videoUrl];
+                    [videoData writeToFile:videoFilePath atomically:NO];
+                }
             }
+            [self sendVideoFileAction:[videoFilePath lastPathComponent]];
+            
+        }
+        else {
+            //If size greater from max size then shows toast.
+            [self.view makeToast:[NSString stringWithFormat:@"File size cannot exceed %d MB.",maxSize]];
         }
     }
     else {
-        //If size greater from max size then shows toast.
-        [self.view makeToast:[NSString stringWithFormat:@"File size cannot exceed %d MB.",maxSize]];
+    
+        UIStoryboard * storyboard=storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+        SendImageViewController *popupView =[storyboard instantiateViewControllerWithIdentifier:@"SendImageViewController"];
+        [popupView setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+        popupView.delegate=self;
+        popupView.attachImage=[info objectForKey:UIImagePickerControllerOriginalImage];;
+        [self presentViewController:popupView animated:YES completion:nil];
     }
-    [self dismissViewControllerAnimated:YES completion:nil];
 }
 #pragma mark - end
 
@@ -1163,7 +1199,6 @@
         
         for (int i=(int)userData.count-1; i>=0; i--) {
             
-            
             NSXMLElement *innerElementData = [[userData objectAtIndex:i] elementForName:@"data"];
             if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"ImageAttachment"]||[[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"FileAttachment"]) {
                
@@ -1184,6 +1219,15 @@
 #pragma mark - end
 
 #pragma mark - Send file delegates
+- (void)sendVideoFileAction:(NSString *)documentName {
+    
+    Internet *internet=[[Internet alloc] init];
+    if (![internet start]) {
+        
+        [self sendDocumentAttachment:documentName friendName:self.friendUserName attachmentType:FileAtachmentType_Video timeDuration:@""];
+    }
+}
+
 - (void)sendDocumentDelegateAction:(NSString *)documentName {
 
     Internet *internet=[[Internet alloc] init];

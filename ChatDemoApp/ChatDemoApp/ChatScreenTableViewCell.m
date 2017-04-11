@@ -147,9 +147,14 @@
             
             if ([chatType isEqualToString:@"VideoAttachment"]) {
                 
+                self.videoPlayButton.translatesAutoresizingMaskIntoConstraints=YES;
+                self.videoPlayButton.frame=CGRectMake(76+(self.attachedImageView.frame.size.width/2.0)-20, (5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+5)+(self.attachedImageView.frame.size.height/2.0)-20, 40, 40);
                 self.attachedImageView.image=[self getThumbnailVideoImage:[myDelegate videoPathDocumentCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
             }
             else {
+                
+                self.videoPlayButton.translatesAutoresizingMaskIntoConstraints=YES;
+                self.videoPlayButton.frame=CGRectMake(76+(self.attachedImageView.frame.size.width/2.0)-20, (5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+5)+(self.attachedImageView.frame.size.height/2.0)-20, 40, 40);
                 self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
             }
         }
@@ -159,7 +164,7 @@
         self.attachedImageView.frame=CGRectMake(76, (5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+5), 200, 0); //Here frame = (AttachedImage_x_Space, (NameLabel_TopSpace + NameLabel_Height + space_Between_NameLabel_And_AttachedImage), AttachedImage_width, AttachedImage_height
     }
     
-    if (![chatType isEqualToString:@"AudioAttachment"]) {
+    if (![chatType isEqualToString:@"AudioAttachment"]&&![chatType isEqualToString:@"VideoAttachment"]) {
         
         self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
     }
@@ -264,6 +269,9 @@
                 
                 if ([chatType isEqualToString:@"VideoAttachment"]) {
                     
+                    self.videoPlayButton.translatesAutoresizingMaskIntoConstraints=YES;
+                    self.videoPlayButton.frame=CGRectMake(76+(self.attachedImageView.frame.size.width/2.0)-20, 5.0+(self.attachedImageView.frame.size.height/2.0)-20, 40, 40);
+                    
                     self.attachedImageView.image=[self getThumbnailVideoImage:[myDelegate videoPathDocumentCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
                 }
                 else {
@@ -276,7 +284,7 @@
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 0); //Here frame = (AttachedImage_x_Space, (NameLabel_TopSpace + NameLabel_Height + space_Between_NameLabel_And_AttachedImage), AttachedImage_width, AttachedImage_height
         }
         
-        if (![chatType isEqualToString:@"AudioAttachment"]) {
+        if (![chatType isEqualToString:@"AudioAttachment"]&&![chatType isEqualToString:@"VideoAttachment"]) {
             
             self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
         }
@@ -344,6 +352,8 @@
                 
                 if ([chatType isEqualToString:@"VideoAttachment"]) {
                     
+                    self.videoPlayButton.translatesAutoresizingMaskIntoConstraints=YES;
+                    self.videoPlayButton.frame=CGRectMake(76+(self.attachedImageView.frame.size.width/2.0)-20, 5.0+(self.attachedImageView.frame.size.height/2.0)-20, 40, 40);
                     self.attachedImageView.image=[self getThumbnailVideoImage:[myDelegate videoPathDocumentCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
                 }
                 else {
@@ -356,7 +366,7 @@
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 0); //Here frame = (AttachedImage_x_Space, (NameLabel_TopSpace + NameLabel_Height + space_Between_NameLabel_And_AttachedImage), AttachedImage_width, AttachedImage_height
         }
         
-        if (![chatType isEqualToString:@"AudioAttachment"]) {
+        if (![chatType isEqualToString:@"AudioAttachment"]&&![chatType isEqualToString:@"VideoAttachment"]) {
             
             self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
         }
@@ -469,6 +479,9 @@
                 
                 if ([chatType isEqualToString:@"VideoAttachment"]) {
                     
+                    self.videoPlayButton.translatesAutoresizingMaskIntoConstraints=YES;
+                    self.videoPlayButton.frame=CGRectMake(76+(self.attachedImageView.frame.size.width/2.0)-20, 5.0+(self.attachedImageView.frame.size.height/2.0)-20, 40, 40);
+                    
                     self.attachedImageView.image=[self getThumbnailVideoImage:[myDelegate videoPathDocumentCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
                 }
                 else {
@@ -482,7 +495,7 @@
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 0); //Here frame = (AttachedImage_x_Space, (NameLabel_TopSpace + NameLabel_Height + space_Between_NameLabel_And_AttachedImage), AttachedImage_width, AttachedImage_height
         }
         
-        if (![chatType isEqualToString:@"AudioAttachment"]) {
+        if (![chatType isEqualToString:@"AudioAttachment"]&&![chatType isEqualToString:@"VideoAttachment"]) {
             
             self.messageLabel.frame=CGRectMake(76, self.attachedImageView.frame.origin.y + self.attachedImageView.frame.size.height+5, [[UIScreen mainScreen] bounds].size.width - (76+8), [[innerData attributeStringValueForName:@"messageBodyHeight"] floatValue]); //Here frame = (MessageLabel_x_Space, (attachedImageView_TopSpace + attachedImageView_Height + space_Between_attachedImageView_And_MessageLabel), screenWidth - (MessageLabel_x_Space + MessageLabel_trailingSpace), MessageLabelHeight
         }

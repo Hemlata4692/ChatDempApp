@@ -414,6 +414,12 @@
             fileData=[appDelegate audioDocumentCacheDirectoryFileName:fileName];
         }
             break;
+        case FileAtachmentType_Video:
+        {
+            attachmentFileType=@"VideoAttachment";
+            fileData=[appDelegate videoDocumentCacheDirectoryFileName:fileName];
+        }
+            break;
         default:
             break;
     }

@@ -126,6 +126,9 @@
     else if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"AudioAttachment"]) {
         self.statusLabel.text=@"Audio \U0001F50A";
     }
+    else if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"VideoAttachment"]) {
+        self.statusLabel.text=@"Video \U0001F3A5";
+    }
     else {
         self.statusLabel.text=[[historyElement elementForName:@"body"] stringValue];
     }

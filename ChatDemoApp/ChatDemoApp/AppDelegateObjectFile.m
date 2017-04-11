@@ -1244,6 +1244,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
             else if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"AudioAttachment"]) {
                 [self saveAudioFileInLocalDocumentDirectory:name file:data];
             }
+            else if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"VideoAttachment"]) {
+                [self saveVideoFileInLocalDocumentDirectory:name file:data];
+            }
             [[XmppCoreDataHandler sharedManager] insertLocalMessageStorageDataBase:[innerElementData attributeStringValueForName:@"from"] message:messageData];
             
             if (![selectedFriendUserId isEqualToString:[innerElementData attributeStringValueForName:@"from"]]){
@@ -1257,6 +1260,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
                 else if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"AudioAttachment"]) {
                     [self addLocalNotification:senderName message:@"Audio" userId:[innerElementData attributeStringValueForName:@"from"]];
                 }
+                else if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"VideoAttachment"]) {
+                    [self addLocalNotification:senderName message:@"Video" userId:[innerElementData attributeStringValueForName:@"from"]];
+                }
                 [XMPPUserDefaultManager setXMPPBadgeIndicatorKey:[innerElementData attributeStringValueForName:@"from"]];
                 
             }
@@ -1269,6 +1275,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
                 }
                 else if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"AudioAttachment"]) {
                     [self addLocalNotification:senderName message:@"Audio" userId:[innerElementData attributeStringValueForName:@"from"]];
+                }
+                else if ([[innerElementData attributeStringValueForName:@"chatType"] isEqualToString:@"VideoAttachment"]) {
+                    [self addLocalNotification:senderName message:@"Video" userId:[innerElementData attributeStringValueForName:@"from"]];
                 }
             }
 
@@ -1399,6 +1408,9 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     }
     else if ([message isEqualToString:@"Audio"]) {
         messageString=@"Audio \U0001F50A";
+    }
+    else if ([message isEqualToString:@"Video"]) {
+        messageString=@"Video \U0001F3A5";
     }
     else {
         messageString=message;

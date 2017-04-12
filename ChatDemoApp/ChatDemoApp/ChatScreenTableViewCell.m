@@ -125,6 +125,7 @@
     self.attachedImageView.contentMode=UIViewContentModeScaleToFill;
     
     if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]||[chatType isEqualToString:@"VideoAttachment"]) {
+        
         self.attachedImageView.frame=CGRectMake(76, (5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+5), 200, 128); //Here frame = (AttachedImage_x_Space, (NameLabel_TopSpace + NameLabel_Height + space_Between_NameLabel_And_AttachedImage), AttachedImage_width, AttachedImage_height
         if ([chatType isEqualToString:@"FileAttachment"]) {
             
@@ -153,8 +154,6 @@
             }
             else {
                 
-                self.videoPlayButton.translatesAutoresizingMaskIntoConstraints=YES;
-                self.videoPlayButton.frame=CGRectMake(76+(self.attachedImageView.frame.size.width/2.0)-20, (5+[[innerData attributeStringValueForName:@"nameHeight"] floatValue]+5)+(self.attachedImageView.frame.size.height/2.0)-20, 40, 40);
                 self.attachedImageView.image=[UIImage imageWithData:[myDelegate listionSendAttachedImageCacheDirectoryFileName:[innerData attributeStringValueForName:@"fileName"]]];
             }
         }
@@ -247,6 +246,7 @@
         self.attachedImageView.contentMode=UIViewContentModeScaleToFill;
         
         if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]||[chatType isEqualToString:@"VideoAttachment"]) {
+            
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 128); //Here frame = (AttachedImage_x_Space, attachedImageView_TopSpace, AttachedImage_width, AttachedImage_height
             
             if ([chatType isEqualToString:@"FileAttachment"]) {
@@ -330,6 +330,7 @@
         self.attachedImageView.contentMode=UIViewContentModeScaleToFill;
         
         if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]||[chatType isEqualToString:@"VideoAttachment"]) {
+            
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 128); //Here frame = (AttachedImage_x_Space, attachedImageView_TopSpace, AttachedImage_width, AttachedImage_height
             if ([chatType isEqualToString:@"FileAttachment"]) {
                 
@@ -457,6 +458,7 @@
         self.attachedImageView.contentMode=UIViewContentModeScaleToFill;
         
         if ([chatType isEqualToString:@"ImageAttachment"]||[chatType isEqualToString:@"FileAttachment"]||[chatType isEqualToString:@"Location"]||[chatType isEqualToString:@"VideoAttachment"]) {
+            
             self.attachedImageView.frame=CGRectMake(76, 5, 200, 128); //Here frame = (AttachedImage_x_Space, attachedImageView_TopSpace, AttachedImage_width, AttachedImage_height
             
             if ([chatType isEqualToString:@"FileAttachment"]) {

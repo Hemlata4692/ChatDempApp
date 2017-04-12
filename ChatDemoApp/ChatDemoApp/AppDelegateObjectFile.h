@@ -184,6 +184,7 @@ XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate,XMPPOutgoingFi
 - (void)sendImageAppdelegateMethod:(NSString *)fileName imageCaption:(NSString *)imageCaption roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid;
 - (void)sendDocumentAppdelegateMethod:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid;
 - (void)sendAudioFileAppdelegateMethod:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid timeDuration:(NSString *)timeDuration;
+- (void)sendVideoAppdelegateMethod:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid;
 //end
 
 

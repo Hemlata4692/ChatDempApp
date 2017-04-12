@@ -76,6 +76,9 @@ typedef NS_ENUM (NSInteger, GroupChatType){
 //Send audio
 - (void)sendAudioFileAttachment:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist timeDuration:(NSString *)timeDuration;
 
+//Send video
+- (void)sendVidoFileAttachment:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist;
+
 //File transfer notify methods
 - (void)sendFileSuccessDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId;
 - (void)sendFileFailDelegate:(NSXMLElement *)message uniquiId:(NSString *)uniqueId;

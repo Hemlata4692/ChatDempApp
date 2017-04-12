@@ -1261,6 +1261,7 @@
 #pragma mark - Play video handling
 - (IBAction)playVideoAction:(UIButton *)sender {
     
+    isAttachmentOpen=true;
     NSXMLElement* message = [userData objectAtIndex:[sender tag]];
     NSXMLElement *innerData=[message elementForName:@"data"];
     

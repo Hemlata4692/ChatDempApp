@@ -1055,6 +1055,12 @@
 //    [appDelegate sendDocumentAppdelegateMethod:fileName roomName:roomName memberlist:[memberlist mutableCopy] type:@"audio" roomJid:appDelegate.chatRoomAppDelegateRoomJid];
 }
 
+- (void)sendVidoFileAttachment:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist {
+    
+    [appDelegate sendVideoAppdelegateMethod:fileName roomName:roomName memberlist:[memberlist mutableCopy] type:@"video" roomJid:appDelegate.chatRoomAppDelegateRoomJid];
+    //    [appDelegate sendDocumentAppdelegateMethod:fileName roomName:roomName memberlist:[memberlist mutableCopy] type:@"audio" roomJid:appDelegate.chatRoomAppDelegateRoomJid];
+}
+
 //- (NSXMLElement *)convertedMessage:(NSString *)to roomName:(NSString *)roomName fileName:(NSString *)fileName messageString:(NSString *)messageString fileType:(NSString *)fileType {
 //    
 //    NSString *messageStr = [messageString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];

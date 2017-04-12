@@ -780,6 +780,27 @@
             }
         }
     }
+    else if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"VideoAttachment"]) {
+        
+        NSLog(@"%f",([[innerData attributeStringValueForName:@"nameHeight"] floatValue]>20?[[innerData attributeStringValueForName:@"nameHeight"] floatValue]:20));
+        float mainCellHeight=5+([[innerData attributeStringValueForName:@"nameHeight"] floatValue]>20?[[innerData attributeStringValueForName:@"nameHeight"] floatValue]:20)+5+128+10+20+5; //here mainCellHeight = NameLabel_topSpace + NameHeight + space_Between_NameLabel_And_VideoImage + VideoImageViewHeight + space_Between_VideoImageView_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
+        
+        if (userData.count==1 || indexPath.row == 0) {
+            
+            return mainCellHeight;
+        }
+        else{
+            NSXMLElement* message1 = [userData objectAtIndex:(int)indexPath.row - 1];
+            NSXMLElement *innerData1=[message1 elementForName:@"data"];
+            if ([[innerData attributeStringValueForName:@"from"] isEqualToString:[innerData1 attributeStringValueForName:@"from"]]) {
+                
+                return 5+128+10+20+5;//Topspace_VideoImage + VideoImageHeight + space_Between_VideoImage_And_DateLabel + DateLabelHeight + DateLabel_BottomSpace
+            }
+            else{
+                return mainCellHeight;
+            }
+        }
+    }
     else if ([[innerData attributeStringValueForName:@"chatType"] isEqualToString:@"AudioAttachment"]) {
         
         NSLog(@"%f",([[innerData attributeStringValueForName:@"nameHeight"] floatValue]>20?[[innerData attributeStringValueForName:@"nameHeight"] floatValue]:20));
@@ -900,6 +921,7 @@
 #pragma mark - Play video handling
 - (IBAction)playVideoAction:(UIButton *)sender {
     
+    isAttachmentOpen=true;
     NSXMLElement* message = [userData objectAtIndex:[sender tag]];
     NSXMLElement *innerData=[message elementForName:@"data"];
     
@@ -1086,6 +1108,7 @@
                     [videoData writeToFile:videoFilePath atomically:NO];
                 }
             }
+            [self sendVideoDelegateAction:[videoFilePath lastPathComponent]];
 //            [self sendVideoFileAction:[videoFilePath lastPathComponent]];
             
         }
@@ -1348,6 +1371,36 @@
     if (![internet start]) {
         
         [self sendLocationXmppMessage:[roomDetail objectForKey:@"roomJid"] roomName:[roomDetail objectForKey:@"roomName"]  messageString:locationAddress latitude:latitude longitude:longitude];
+    }
+}
+#pragma mark - end
+
+#pragma mark - Send audio file delegates
+- (void)sendVideoDelegateAction:(NSString *)fileName {
+    
+    Internet *internet=[[Internet alloc] init];
+    if (![internet start]) {
+        Internet *internet=[[Internet alloc] init];
+        if (![internet start]) {
+            
+            NSArray *keys=[membersPresentStatus allKeys];
+            NSMutableArray *onlineMember=[NSMutableArray new];
+            for (NSString *key in keys) {
+                
+                if ([[membersPresentStatus objectForKey:key] boolValue]) {
+                    
+                    [onlineMember addObject:[[key componentsSeparatedByString:@"@"] objectAtIndex:0]];
+                    //                [onlineMember addObject:@"0000000000"];
+                }
+            }
+            if (onlineMember.count>0) {
+                [self sendVidoFileAttachment:fileName roomName:[roomDetail objectForKey:@"roomName"] memberlist:[onlineMember mutableCopy]];
+            }
+            else {
+                [UserDefaultManager showAlertMessage:@"Alert" message:@"All Recipient may be offline."];
+            }
+        }
+        //        [self sendDocumentAttachment:fileName friendName:self.friendUserName attachmentType:FileAtachmentType_Audio timeDuration:timeDuration];
     }
 }
 #pragma mark - end

@@ -1041,23 +1041,23 @@
 #pragma mark - Send document/Image
 - (void)sendImageAttachment:(NSString *)fileName imageCaption:(NSString *)imageCaption roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist {
     
-    [appDelegate sendImageAppdelegateMethod:fileName imageCaption:imageCaption roomName:roomName memberlist:[memberlist mutableCopy] type:@"image" roomJid:appDelegate.chatRoomAppDelegateRoomJid];
+    [appDelegate sendImageAppdelegateMethod:fileName imageCaption:imageCaption roomName:roomName memberlist:[memberlist mutableCopy] type:XMPPFileAtachmentType_Image roomJid:appDelegate.chatRoomAppDelegateRoomJid];
 }
 
 - (void)sendDocumentAttachment:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist {
     
-    [appDelegate sendDocumentAppdelegateMethod:fileName roomName:roomName memberlist:[memberlist mutableCopy] type:@"file" roomJid:appDelegate.chatRoomAppDelegateRoomJid];
+    [appDelegate sendDocumentAppdelegateMethod:fileName roomName:roomName memberlist:[memberlist mutableCopy] type:XMPPFileAtachmentType_File roomJid:appDelegate.chatRoomAppDelegateRoomJid];
 }
 
 - (void)sendAudioFileAttachment:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist timeDuration:(NSString *)timeDuration {
     
-    [appDelegate sendAudioFileAppdelegateMethod:fileName roomName:roomName memberlist:[memberlist mutableCopy] type:@"audio" roomJid:appDelegate.chatRoomAppDelegateRoomJid timeDuration:timeDuration];
+    [appDelegate sendAudioFileAppdelegateMethod:fileName roomName:roomName memberlist:[memberlist mutableCopy] type:XMPPFileAtachmentType_Audio roomJid:appDelegate.chatRoomAppDelegateRoomJid timeDuration:timeDuration];
 //    [appDelegate sendDocumentAppdelegateMethod:fileName roomName:roomName memberlist:[memberlist mutableCopy] type:@"audio" roomJid:appDelegate.chatRoomAppDelegateRoomJid];
 }
 
 - (void)sendVidoFileAttachment:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist {
     
-    [appDelegate sendVideoAppdelegateMethod:fileName roomName:roomName memberlist:[memberlist mutableCopy] type:@"video" roomJid:appDelegate.chatRoomAppDelegateRoomJid];
+    [appDelegate sendVideoAppdelegateMethod:fileName roomName:roomName memberlist:[memberlist mutableCopy] type:XMPPFileAtachmentType_Video roomJid:appDelegate.chatRoomAppDelegateRoomJid];
     //    [appDelegate sendDocumentAppdelegateMethod:fileName roomName:roomName memberlist:[memberlist mutableCopy] type:@"audio" roomJid:appDelegate.chatRoomAppDelegateRoomJid];
 }
 

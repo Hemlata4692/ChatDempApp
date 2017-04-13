@@ -27,6 +27,13 @@
 
 #import "Reachability.h"
 
+typedef NS_ENUM (NSInteger, XMPPFileAtachmentType){
+    XMPPFileAtachmentType_Image,
+    XMPPFileAtachmentType_File,
+    XMPPFileAtachmentType_Audio,
+    XMPPFileAtachmentType_Video
+};
+
 @interface AppDelegateObjectFile : UIResponder<XMPPRosterDelegate,XMPPStreamDelegate,
 XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate,XMPPOutgoingFileTransferDelegate>
 {
@@ -181,10 +188,10 @@ XMPPIncomingFileTransferDelegate,XMPPMUCDelegate,XMPPRoomDelegate,XMPPOutgoingFi
 - (NSData*)reducedImageSize:(UIImage *)selectedImage;
 
 //Send document/Images/Audio
-- (void)sendImageAppdelegateMethod:(NSString *)fileName imageCaption:(NSString *)imageCaption roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid;
-- (void)sendDocumentAppdelegateMethod:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid;
-- (void)sendAudioFileAppdelegateMethod:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid timeDuration:(NSString *)timeDuration;
-- (void)sendVideoAppdelegateMethod:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid;
+- (void)sendImageAppdelegateMethod:(NSString *)fileName imageCaption:(NSString *)imageCaption roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(XMPPFileAtachmentType)type roomJid:(NSString *)roomJid;
+- (void)sendDocumentAppdelegateMethod:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(XMPPFileAtachmentType)type roomJid:(NSString *)roomJid;
+- (void)sendAudioFileAppdelegateMethod:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(XMPPFileAtachmentType)type roomJid:(NSString *)roomJid timeDuration:(NSString *)timeDuration;
+- (void)sendVideoAppdelegateMethod:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(XMPPFileAtachmentType)type roomJid:(NSString *)roomJid;
 //end
 
 

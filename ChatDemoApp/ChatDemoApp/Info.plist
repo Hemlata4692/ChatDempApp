@@ -15,13 +15,13 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>1.1</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>ConferenceServerJid</key>
 	<string>conference</string>
 	<key>HostName</key>
-	<string>117.240.110.83</string>
+	<string>192.168.18.171</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
@@ -39,7 +39,7 @@
 	<key>PortNumber</key>
 	<integer>5222</integer>
 	<key>ServerName</key>
-	<string>117.240.110.83</string>
+	<string>192.168.18.171</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>voip</string>

@@ -1926,7 +1926,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 #pragma mark - end
 
 #pragma mark - Send document/Images
-- (void)sendImageAppdelegateMethod:(NSString *)fileName imageCaption:(NSString *)imageCaption roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid {
+- (void)sendImageAppdelegateMethod:(NSString *)fileName imageCaption:(NSString *)imageCaption roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(XMPPFileAtachmentType)type roomJid:(NSString *)roomJid {
     
     if (nil==xmppSendGroupAttachment) {
         xmppSendGroupAttachment=[NSMutableDictionary new];
@@ -1951,7 +1951,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [tempDictionary setObject:roomName forKey:@"roomName"];
     [tempDictionary setObject:roomJid forKey:@"RoomJid"];
     [tempDictionary setObject:fileName forKey:@"fileName"];
-    [tempDictionary setObject:type forKey:@"Type"];
+    [tempDictionary setObject:[NSNumber numberWithInt:type] forKey:@"Type"];
     [tempDictionary setObject:[memberlist mutableCopy] forKey:@"MembersList"];
     [tempDictionary setObject:[memberlist objectAtIndex:0] forKey:@"SelectedMember"];
     [tempDictionary setObject:attachmentXml forKey:@"Attachment"];
@@ -1968,7 +1968,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
                    });
 }
 
-- (void)sendDocumentAppdelegateMethod:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid {
+- (void)sendDocumentAppdelegateMethod:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(XMPPFileAtachmentType)type roomJid:(NSString *)roomJid {
     
     if (nil==xmppSendGroupAttachment) {
         xmppSendGroupAttachment=[NSMutableDictionary new];
@@ -1992,7 +1992,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [tempDictionary setObject:roomName forKey:@"roomName"];
     [tempDictionary setObject:roomJid forKey:@"RoomJid"];
     [tempDictionary setObject:fileName forKey:@"fileName"];
-    [tempDictionary setObject:type forKey:@"Type"];
+    [tempDictionary setObject:[NSNumber numberWithInt:type] forKey:@"Type"];
     [tempDictionary setObject:[memberlist mutableCopy] forKey:@"MembersList"];
     [tempDictionary setObject:[memberlist objectAtIndex:0] forKey:@"SelectedMember"];
     [tempDictionary setObject:attachmentXml forKey:@"Attachment"];
@@ -2008,7 +2008,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
                    });
 }
 
-- (void)sendAudioFileAppdelegateMethod:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid timeDuration:(NSString *)timeDuration {
+- (void)sendAudioFileAppdelegateMethod:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(XMPPFileAtachmentType)type roomJid:(NSString *)roomJid timeDuration:(NSString *)timeDuration {
     
     if (nil==xmppSendGroupAttachment) {
         xmppSendGroupAttachment=[NSMutableDictionary new];
@@ -2032,7 +2032,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [tempDictionary setObject:roomName forKey:@"roomName"];
     [tempDictionary setObject:roomJid forKey:@"RoomJid"];
     [tempDictionary setObject:fileName forKey:@"fileName"];
-    [tempDictionary setObject:type forKey:@"Type"];
+    [tempDictionary setObject:[NSNumber numberWithInt:type] forKey:@"Type"];
     [tempDictionary setObject:timeDuration forKey:@"timeDuration"];
     [tempDictionary setObject:[memberlist mutableCopy] forKey:@"MembersList"];
     [tempDictionary setObject:[memberlist objectAtIndex:0] forKey:@"SelectedMember"];
@@ -2049,7 +2049,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
                    });
 }
 
-- (void)sendVideoAppdelegateMethod:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(NSString *)type roomJid:(NSString *)roomJid {
+- (void)sendVideoAppdelegateMethod:(NSString *)fileName roomName:(NSString *)roomName memberlist:(NSMutableArray *)memberlist type:(XMPPFileAtachmentType)type roomJid:(NSString *)roomJid {
     
     if (nil==xmppSendGroupAttachment) {
         xmppSendGroupAttachment=[NSMutableDictionary new];
@@ -2073,7 +2073,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [tempDictionary setObject:roomName forKey:@"roomName"];
     [tempDictionary setObject:roomJid forKey:@"RoomJid"];
     [tempDictionary setObject:fileName forKey:@"fileName"];
-    [tempDictionary setObject:type forKey:@"Type"];
+    [tempDictionary setObject:[NSNumber numberWithInt:type] forKey:@"Type"];
     [tempDictionary setObject:[memberlist mutableCopy] forKey:@"MembersList"];
     [tempDictionary setObject:[memberlist objectAtIndex:0] forKey:@"SelectedMember"];
     [tempDictionary setObject:attachmentXml forKey:@"Attachment"];
@@ -2301,16 +2301,16 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
             }
             [xmppSendGroupAttachment setObject:[tempDic mutableCopy] forKey:uniqueId];
             
-            if ([[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"Type"] isEqualToString:@"image"]) {
+            if ([[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"Type"] intValue]==XMPPFileAtachmentType_Image) {
                 [self sendImageAttachmentUniqueId:uniqueId];
             }
-            else if ([[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"Type"] isEqualToString:@"file"]) {
+            else if ([[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"Type"]  intValue]==XMPPFileAtachmentType_File) {
                 [self sendDocumentAttachmentUniqueId:uniqueId];
             }
-            else if ([[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"Type"] isEqualToString:@"audio"]) {
+            else if ([[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"Type"]  intValue]==XMPPFileAtachmentType_Audio) {
                 [self sendAudioAttachmentUniqueId:uniqueId];
             }
-            else if ([[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"Type"] isEqualToString:@"video"]) {
+            else if ([[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"Type"]  intValue]==XMPPFileAtachmentType_Video) {
                 [self sendVideoAttachmentUniqueId:uniqueId];
             }
         }
@@ -2337,16 +2337,16 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
                 [tempDic setObject:@"1" forKey:@"Status"];
                 [xmppSendGroupAttachment setObject:[tempDic mutableCopy] forKey:uniqueId];
                 
-                if ([[[xmppSendGroupAttachment objectForKey:[tempArray objectAtIndex:0]] objectForKey:@"Type"] isEqualToString:@"image"]) {
+                if ([[[xmppSendGroupAttachment objectForKey:[tempArray objectAtIndex:0]] objectForKey:@"Type"] intValue]==XMPPFileAtachmentType_Image) {
                     [self sendImageAttachmentUniqueId:[tempArray objectAtIndex:0]];
                 }
-                else if ([[[xmppSendGroupAttachment objectForKey:[tempArray objectAtIndex:0]] objectForKey:@"Type"] isEqualToString:@"file"]) {
-                    [self sendDocumentAttachmentUniqueId:[tempArray objectAtIndex:0]];
+                else if ([[[xmppSendGroupAttachment objectForKey:[tempArray objectAtIndex:0]] objectForKey:@"Type"]  intValue]==XMPPFileAtachmentType_File) {
+                    [self sendDocumentAttachmentUniqueId:uniqueId];
                 }
-                else if ([[[xmppSendGroupAttachment objectForKey:[tempArray objectAtIndex:0]] objectForKey:@"Type"] isEqualToString:@"audio"]) {
-                    [self sendAudioAttachmentUniqueId:[tempArray objectAtIndex:0]];
+                else if ([[[xmppSendGroupAttachment objectForKey:[tempArray objectAtIndex:0]] objectForKey:@"Type"]  intValue]==XMPPFileAtachmentType_Audio) {
+                     [self sendAudioAttachmentUniqueId:[tempArray objectAtIndex:0]];
                 }
-                else if (([[[xmppSendGroupAttachment objectForKey:[tempArray objectAtIndex:0]] objectForKey:@"Type"] isEqualToString:@"video"])) {
+                else if ([[[xmppSendGroupAttachment objectForKey:[tempArray objectAtIndex:0]] objectForKey:@"Type"]  intValue]==XMPPFileAtachmentType_Video) {
                     [self sendVideoAttachmentUniqueId:[tempArray objectAtIndex:0]];
                 }
             }

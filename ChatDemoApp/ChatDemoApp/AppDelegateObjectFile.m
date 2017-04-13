@@ -2134,7 +2134,17 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"RoomJid"],[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"SelectedMember"]]];
     
     NSXMLElement *messageData=[[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"Attachment"] elementForName:@"data"];
-    if ([xmppOutgoingFileTransfer sendCustomizedData:fileData named:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"fileName"] toRecipient:jid description:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"fileName"] date:[messageData attributeStringValueForName:@"date"] time:[messageData attributeStringValueForName:@"time"] senderId:[messageData attributeStringValueForName:@"from"] chatType:@"FileAttachment" senderName:xmppLogedInUserName receiverName:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"roomName"] error:&err]) {
+    if ([xmppOutgoingFileTransfer sendCustomizedData:fileData
+                                               named:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"fileName"]
+                                         toRecipient:jid
+                                         description:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"fileName"]
+                                                date:[messageData attributeStringValueForName:@"date"]
+                                                time:[messageData attributeStringValueForName:@"time"]
+                                            senderId:[messageData attributeStringValueForName:@"from"]
+                                            chatType:@"FileAttachment"
+                                          senderName:xmppLogedInUserName
+                                        receiverName:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"roomName"]
+                                               error:&err]) {
         
         [[XmppCoreDataHandler sharedManager] updateLocalMessageStorageDatabaseBareJidStr:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"RoomJid"] message:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"Attachment"] uniquiId:uniqueId];
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -2200,7 +2210,17 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     XMPPJID *jid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@/%@",[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"RoomJid"],[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"SelectedMember"]]];
     
     NSXMLElement *messageData=[[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"Attachment"] elementForName:@"data"];
-    if ([xmppOutgoingFileTransfer sendCustomizedData:fileData named:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"fileName"] toRecipient:jid description:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"fileName"] date:[messageData attributeStringValueForName:@"date"] time:[messageData attributeStringValueForName:@"time"] senderId:[messageData attributeStringValueForName:@"from"] chatType:@"VideoAttachment" senderName:xmppLogedInUserName receiverName:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"roomName"] error:&err]) {
+    if ([xmppOutgoingFileTransfer sendCustomizedData:fileData
+                                               named:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"fileName"]
+                                         toRecipient:jid
+                                         description:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"fileName"]
+                                                date:[messageData attributeStringValueForName:@"date"]
+                                                time:[messageData attributeStringValueForName:@"time"]
+                                            senderId:[messageData attributeStringValueForName:@"from"]
+                                            chatType:@"VideoAttachment"
+                                          senderName:xmppLogedInUserName
+                                        receiverName:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"roomName"]
+                                               error:&err]) {
         
         [[XmppCoreDataHandler sharedManager] updateLocalMessageStorageDatabaseBareJidStr:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"RoomJid"] message:[[xmppSendGroupAttachment objectForKey:uniqueId] objectForKey:@"Attachment"] uniquiId:uniqueId];
         dispatch_async(dispatch_get_main_queue(), ^{

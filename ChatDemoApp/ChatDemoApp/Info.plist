@@ -21,7 +21,7 @@
 	<key>ConferenceServerJid</key>
 	<string>conference</string>
 	<key>HostName</key>
-	<string>192.168.18.171</string>
+	<string>117.240.110.83</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
@@ -39,7 +39,7 @@
 	<key>PortNumber</key>
 	<integer>5222</integer>
 	<key>ServerName</key>
-	<string>192.168.18.171</string>
+	<string>117.240.110.83</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>voip</string>

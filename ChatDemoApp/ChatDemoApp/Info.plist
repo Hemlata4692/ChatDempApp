@@ -15,9 +15,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.1</string>
+	<string>1.2</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>2</string>
 	<key>ConferenceServerJid</key>
 	<string>conference</string>
 	<key>HostName</key>
@@ -32,6 +32,8 @@
 	<string>Allow Location</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Allow Location</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We need to access your microphone</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We need to access your photos in order to attach them</string>
 	<key>PasswordRequired</key>
